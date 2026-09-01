@@ -93,11 +93,7 @@ export function CourseCards({
                   <Badge className="h-6 px-3 text-xs">Módulo 1</Badge>
 
                   {courseClasses(course).length > 0 && (
-                    <Badge variant="outline" className="h-6 px-3 text-xs">
-                      <Users />
-                      {courseSeatsRemaining(course)} de {courseCapacity(course)}{' '}
-                      vagas
-                    </Badge>
+                    <SeatsBadge course={course} />
                   )}
                 </div>
 
@@ -184,5 +180,31 @@ export function CourseCards({
         </div>
       </div>
     </section>
+  )
+}
+
+/**
+ * Quantas vagas sobraram, e a cor que diz se ainda dá tempo.
+ *
+ * Dois estados e não três. O desenho pedia um âmbar no meio - "acabando" -, e
+ * âmbar não existe na camada semântica do shadcn: entrariam um `--warning` e um
+ * `--warning-foreground` só para este badge, e este projeto não tem token fora
+ * dos nomes que o shadcn define. Com turma de quarenta lugares, "3 de 40" já se
+ * lê no próprio número.
+ *
+ * `destructive` quando zera, e a frase não muda: quem lê "0 de 40" não precisa
+ * de outra palavra para entender, e trocar a copy seria mudar conteúdo.
+ */
+function SeatsBadge({ course }: { course: CourseResponse }): React.JSX.Element {
+  const remaining = courseSeatsRemaining(course)
+
+  let variant: React.ComponentProps<typeof Badge>['variant'] = 'outline'
+  if (remaining === 0) variant = 'destructive'
+
+  return (
+    <Badge variant={variant} className="h-6 px-3 text-xs">
+      <Users />
+      {remaining} de {courseCapacity(course)} vagas
+    </Badge>
   )
 }
