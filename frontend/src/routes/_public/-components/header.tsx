@@ -7,6 +7,9 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from '#/components/ui/sheet'
@@ -98,22 +101,35 @@ export function Header(): React.JSX.Element {
           <Sheet>
             <SheetTrigger
               render={
+                // `size-11` e não o `size-8` do `icon-lg`: é o único caminho
+                // para o menu no celular, e um alvo de 32px erra debaixo do
+                // polegar.
                 <Button
                   variant="ghost"
                   size="icon-lg"
-                  className="lg:hidden"
+                  className="size-11 lg:hidden"
                   aria-label="Abrir menu"
                 >
                   <List />
                 </Button>
               }
             />
-            <SheetContent side="right" className="w-72 bg-cream">
-              <SheetTitle className="text-lg font-semibold">
-                Maiyu Academy
-              </SheetTitle>
+            <SheetContent side="right" className="w-80 bg-cream">
+              {/*
+                `SheetHeader` e `SheetFooter` e não os filhos nus: o padding do
+                painel mora neles. Sem eles o título encostava na borda enquanto
+                a navegação logo abaixo tinha recuo próprio.
+              */}
+              <SheetHeader>
+                <SheetTitle className="text-lg font-semibold text-ink">
+                  Maiyu Academy
+                </SheetTitle>
+                <SheetDescription className="sr-only">
+                  Navegação do site e contato.
+                </SheetDescription>
+              </SheetHeader>
 
-              <nav aria-label="Principal" className="grid gap-1 px-4">
+              <nav aria-label="Principal" className="grid gap-1 px-6">
                 {LINKS.map((link) => (
                   <SheetClose
                     key={link.label}
@@ -141,9 +157,16 @@ export function Header(): React.JSX.Element {
                     </a>
                   }
                 />
-
-                <EnrollmentCta className="mt-3 w-full" />
               </nav>
+
+              {/*
+                O CTA também dentro de `SheetClose`: ele navega para
+                `/matricula`, e sem fechar o painel a rota trocava atrás de um
+                Sheet aberto, com o scroll da página preso.
+              */}
+              <SheetFooter>
+                <SheetClose render={<EnrollmentCta className="w-full" />} />
+              </SheetFooter>
             </SheetContent>
           </Sheet>
         </div>

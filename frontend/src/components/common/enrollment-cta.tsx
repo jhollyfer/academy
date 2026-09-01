@@ -11,16 +11,25 @@ import {
   enrollmentStateFrom,
 } from '#/lib/enrollment-state'
 import { whatsappUrl } from '#/lib/site'
-import type { VariantProps } from 'class-variance-authority'
-import type { buttonVariants } from '#/components/ui/button'
+import type { Merge } from '#/lib/interfaces'
 
-type EnrollmentCtaProps = {
-  variant?: VariantProps<typeof buttonVariants>['variant']
-  size?: VariantProps<typeof buttonVariants>['size']
-  className?: string
-  /** O curso a pré-selecionar, quando o botão sai de dentro de um card. */
-  courseSlug?: string
-}
+/**
+ * O resto das props vai para o `Button` porque este botão é embrulhável: dentro
+ * do menu mobile ele mora num `<SheetClose render={<EnrollmentCta />} />`, e o
+ * Base UI funde `onClick` e `ref` no elemento do `render`. Um componente que
+ * não espalha o resto descarta os dois em silêncio - a pessoa navega e o painel
+ * fica aberto por cima da página.
+ *
+ * `render` fica de fora: quem decide o elemento renderizado é este componente,
+ * que é o que ele existe para decidir.
+ */
+type EnrollmentCtaProps = Merge<
+  Omit<React.ComponentProps<typeof Button>, 'render' | 'children'>,
+  {
+    /** O curso a pré-selecionar, quando o botão sai de dentro de um card. */
+    courseSlug?: string
+  }
+>
 
 /**
  * O botão de matrícula, em qualquer lugar da vitrine.
@@ -49,6 +58,7 @@ export function EnrollmentCta({
   size = 'pill',
   className,
   courseSlug,
+  ...rest
 }: EnrollmentCtaProps): React.JSX.Element {
   const { data } = useQuery(storefrontCoursesQueryOptions())
 
@@ -63,6 +73,7 @@ export function EnrollmentCta({
   if (state.kind === 'NONE') {
     return (
       <Button
+        {...rest}
         variant={variant}
         size={size}
         className={className}
@@ -82,6 +93,7 @@ export function EnrollmentCta({
 
   return (
     <Button
+      {...rest}
       variant={variant}
       size={size}
       className={className}
