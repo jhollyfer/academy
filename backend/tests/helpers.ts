@@ -1,6 +1,7 @@
 import type { ApiClient, ApiResponse } from '@japa/api-client'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { COOKIE_TOKEN } from '#services/cookie.service'
+import { FACTORY_PASSWORD, UserFactory } from '#database/factories/user_factory'
 
 /**
  * Lê o JSON da resposta sem brigar com o tipo. O registry do client casa a rota
@@ -53,6 +54,19 @@ export async function authenticate(
 /** Atalho para a sessão do dono, que é a mais usada nos testes de painel. */
 export function authenticateAsOwner(client: ApiClient): Promise<Session> {
   return authenticate(client, OWNER.email, OWNER.password)
+}
+
+/**
+ * Uma sessão de administrador, que é o outro lado de toda asserção de permissão.
+ *
+ * Criado na hora pelo factory, e não semeado: o seeder existe para o primeiro
+ * dono, que é a única conta que nenhum endpoint cria. Prender o administrador a
+ * ele daria a impressão de que ele também precisa de um caminho próprio.
+ */
+export async function authenticateAsAdministrator(client: ApiClient): Promise<Session> {
+  const administrator = await UserFactory.create()
+
+  return authenticate(client, administrator.email, FACTORY_PASSWORD)
 }
 
 /**
