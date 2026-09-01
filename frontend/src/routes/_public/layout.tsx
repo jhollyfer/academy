@@ -19,7 +19,21 @@ const MAIN_ID = 'conteudo'
 
 function RouteComponent(): React.JSX.Element {
   return (
-    <div className="flex min-h-svh flex-col">
+    /*
+      `light` fixo, e temporário.
+
+      A vitrine ainda pinta suas seções com os tokens de marca - `bg-paper`,
+      `bg-cream`, `text-ink` -, que não invertem: eles aparecem em par dentro
+      das variantes de `badge`, `button` e `highlight`, e inverter o par viraria
+      bloco escuro em placa branca. Sem esta trava, quem usa o sistema no escuro
+      veria a moldura da página escurecer em volta de seções que continuam
+      claras.
+
+      Sai quando a última rota da vitrine trocar os nomes de marca pelos
+      semânticos. Rota migrada não precisa dela; é uma linha só, e é a última
+      linha da migração.
+    */
+    <div className="light flex min-h-svh flex-col">
       {/*
         Primeiro elemento focável da página. `sr-only` com `focus:not-sr-only`, e
         não `display: none`: escondido de verdade o link não receberia foco e

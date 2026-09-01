@@ -1,11 +1,18 @@
 import * as React from 'react'
-import { createFileRoute, Link, Outlet, redirect, useRouter } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  Link,
+  Outlet,
+  redirect,
+  useRouter,
+} from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
 import { SignOut } from '@phosphor-icons/react'
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
 import { useSignOut } from '#/integrations/tanstack-query/mutations'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { Button } from '#/components/ui/button'
+import { ThemeToggle } from '#/components/common/theme-toggle'
 import { cn } from '#/lib/utils'
 
 /**
@@ -18,13 +25,18 @@ export const Route = createFileRoute('/_private')({
     try {
       // `ensureQueryData` e não `prefetchQuery`: o primeiro devolve o dado e
       // propaga o erro, o segundo engole os dois e o guard nunca reprovaria.
-      const account = await context.queryClient.ensureQueryData(accountQueryOptions())
+      const account = await context.queryClient.ensureQueryData(
+        accountQueryOptions(),
+      )
 
       return { account }
     } catch {
       // Qualquer falha aqui é ausência de sessão utilizável: o `request` já
       // tentou renovar com o refresh token antes de deixar o erro subir.
-      throw redirect({ to: '/authentication', search: { redirect: location.href } })
+      throw redirect({
+        to: '/authentication',
+        search: { redirect: location.href },
+      })
     }
   },
   component: RouteComponent,
@@ -46,9 +58,11 @@ function RouteComponent(): React.JSX.Element {
   const { account } = Route.useRouteContext()
 
   return (
-    // `light` fixo: o painel é onde alguém passa uma hora seguida numa tabela, e
-    // o escuro neon do site é feito para converter, não para trabalhar.
-    <div className="light min-h-svh bg-background text-foreground">
+    // Sem tema fixo: o painel segue o `<html>`, como no simple-hub, no adacaibs
+    // e no lowcodejs. A justificativa do `light` cravado - "aqui alguém passa
+    // uma hora seguida numa tabela" - continua verdadeira, e é exatamente por
+    // isso que a escolha passa a ser de quem trabalha na tela, e não do arquivo.
+    <div className="min-h-svh bg-background text-foreground">
       {/*
         `sr-only` com `focus:not-sr-only`, e não `display: none`: escondido de
         verdade o link não receberia foco e deixaria de existir para quem ele
@@ -74,9 +88,11 @@ function RouteComponent(): React.JSX.Element {
                 to={link.to}
                 activeOptions={{ exact: link.exact }}
                 className={cn(
-                  'rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground'
+                  'rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground',
                 )}
-                activeProps={{ className: 'bg-secondary text-foreground font-medium' }}
+                activeProps={{
+                  className: 'bg-secondary text-foreground font-medium',
+                }}
               >
                 {link.label}
               </Link>
@@ -87,6 +103,7 @@ function RouteComponent(): React.JSX.Element {
             <span className="hidden text-sm text-muted-foreground sm:inline">
               {account.name}
             </span>
+            <ThemeToggle />
             <SignOutButton />
           </div>
         </div>
