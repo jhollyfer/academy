@@ -9,7 +9,7 @@
 - [x] **Fase B** — vitrine migrada
 
 - [x] **Fase B-fim** — a trava `light` caiu
-- [ ] **Fase C** — painel com a casca de sidebar do simple-hub
+- [x] **Fase C** — painel com a casca de sidebar do simple-hub
 
 ## As regras que valem
 
@@ -68,16 +68,37 @@ Consequência: **o rodapé perde a escada de opacidade**. `text-cream/60` e
 temas. `text-ink/5` (pétala) e `text-ink/50` (sparkle) continuam — são
 decorativos, não texto.
 
+## Contraste medido, os dois temas
+
+| Par | Claro | Escuro | Mínimo |
+| --- | --- | --- | --- |
+| foreground / background | 15,05 ✅ | 15,05 ✅ | 4,5 |
+| foreground / card | 15,71 ✅ | 10,83 ✅ | 4,5 |
+| muted-foreground / background | 10,83 ✅ | 8,04 ✅ | 4,5 |
+| primary-foreground / primary | 12,58 ✅ | 12,58 ✅ | 4,5 |
+| background/70 / slab invertido | 8,04 ✅ | 5,71 ✅ | 4,5 |
+| destructive / background | 5,63 ✅ | 4,51 ✅ | 4,5 |
+| ring / background | 4,55 ✅ | 12,58 ✅ | 3 |
+| input / card | 3,06 ✅ | 3,06 ✅ | 3 |
+| primary / background | 1,20 ❌ | 12,58 ✅ | 3 |
+| border / background | 1,22 ❌ | 1,46 ❌ | 3 |
+
+Os dois vermelhos são conhecidos e aceitos. `primary/background` no claro é a
+borda do botão verde contra o #FAFAFA - o preço de manter o bloco verde vivo do
+hero; o texto dentro dele dá 12,58:1. `border/background` é a borda decorativa
+de card, valor de fábrica do shadcn, e não delimita controle nenhum.
+
 ## Riscos anotados
 
 - Os três blocos escuros (`footer.tsx:23`, `course-cards.tsx:53`,
   `what-you-get.tsx:110`) **invertem**: no escuro o rodapé vira placa clara.
   Decidir olhando.
-- `whatsapp-float.tsx:32` usa `var(--accent-fg)`, **que não existe**. Bug.
-- `legal-page.tsx:32` tem `prose-invert` em bloco claro. Resquício.
-- `astronaut-illustration.tsx:120` tem `stroke="white"` cravado.
-- `matricula/index.lazy.tsx:329,338` usam `var(--neon-ink)`, que morreu.
-- `enrollment-cta.tsx:57` passa `variant='pill'`, que não existe mais.
+- `astronaut-illustration.tsx:120` tem `stroke="white"` cravado. **Aberto.**
+- Falta ver na tela: rodapé, seção de cursos e coluna do "o que você leva" no
+  tema escuro; teclado do início ao fim em `/matricula`; e as capturas das
+  cinco rotas em 390px e 1440px nos dois temas.
+- Resolvidos: `var(--accent-fg)` inexistente, `prose-invert` em bloco claro, os
+  dois `var(--neon-ink)` de `/matricula`, e o `variant='pill'` órfão.
 
 ## A oferta (dado, não visual)
 
