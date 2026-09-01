@@ -29,40 +29,24 @@
  * PALETA MAIYU
  * ============================================================================
  *
- * O sistema é o da referência: base creme quente, blocos grandes arredondados
- * em verde claro, tipografia geométrica, e uma palavra em serifa itálica dentro
- * de uma pílula em todo título. A cor da referência é âmbar; aqui é o verde da
- * Maiyu, e só isso muda.
+ * Nenhum token de marca. A página inteira - vitrine e painel - pinta com os
+ * nomes que o shadcn já define, e a paleta oficial entra como **valor** deles.
+ * Um `--cream` que era `background`, um `--ink` que era `foreground`, um
+ * `--line` que era `border` e um `--green` que era `primary` moravam aqui e
+ * eram apelido: morreram.
  *
- *   --cream  o chão da página, e o fundo das seções alternadas
- *   --paper  o card, um degrau acima do creme
- *   --ink    o texto, as seções escuras de contraste, o rodapé
- *   --green  os blocos grandes e as pílulas, sempre com texto --ink por cima
- *   --neon   o acento fino: ícone, check, sublinhado, detalhe
+ * O verde da marca é `--primary`, e é o mesmo #88FF9A nos dois temas, com
+ * `--primary-foreground` #272221 nos dois. Um valor só, e não um par que
+ * inverte, porque ele é **preenchimento**: é o bloco do hero, o banner final, a
+ * pílula do título e o botão cheio. Sobre o fundo escuro ele dá 12,58:1; sobre
+ * o claro a borda do botão fica fraca, e o que resolve isso é o texto por
+ * dentro, que dá os mesmos 12,58:1.
  *
- * Uma escala antiga já morreu aqui: um `:root` escuro com `--surface: #0e1613`
- * e um `.light` claro, ligados pelo `next-themes` em `system`. A landing
- * invertia com o sistema operacional de quem abria, e `border-white/5`, escrita
- * para o fundo escuro, sumia por completo na metade das visitas.
- *
- * O escuro volta agora, e volta por outro caminho: **só a camada semântica do
- * shadcn tem `.dark`**. Os tokens de marca acima - creme, tinta, verde, neon -
- * vivem apenas no `:root` e não invertem, porque eles aparecem sempre em par
- * (`bg-green text-ink`, `bg-ink text-cream`) dentro das variantes de `badge`,
- * `button` e `highlight`. Inverter o par transformaria o bloco de contraste
- * escuro numa placa branca no meio de uma página escura.
- *
- * Enquanto a vitrine não migrar para os nomes semânticos, ela fica presa no
- * claro pela classe `light` do `_public/layout.tsx` - do mesmo jeito que o
- * painel esteve até aqui. Rota migrada solta a trava e passa a responder ao
- * tema; quando a última soltar, esta camada de marca sai da folha.
- *
- * O NEON NÃO É COR DE TEXTO SOBRE CLARO. #2be31f dá 10,8:1 sobre o ink e
- * 1,6:1 sobre o creme: dentro de bloco escuro ele é excelente, e sobre a página
- * ele é invisível - reprova até como elemento gráfico, que pede 3:1. Por isso
- * existem dois verdes de acento, e não um. O `--neon` vive dentro dos blocos
- * `--ink`; o `--neon-ink` é o que aguenta ser lido e visto sobre claro, com
- * 5,2:1, e é ele em check, ícone e link de seção clara.
+ * O VERDE PURO NÃO É COR DE TEXTO SOBRE CLARO: #88FF9A dá 1,20:1 sobre o
+ * #FAFAFA, e reprova até como elemento gráfico, que pede 3:1. Por isso `--ring`,
+ * `--accent-foreground` e `--chart-1` - os três papéis em que o verde é traço e
+ * não superfície - carregam o mesmo matiz escurecido no claro, #178528, com
+ * 4,55:1. No escuro os três voltam ao verde puro.
  * ============================================================================
  */
 
@@ -70,46 +54,17 @@
  * `.light.light`, com a classe repetida, e não `.light`.
  *
  * É o que deixa uma ilha clara viver **dentro** do `<html class="dark">`, que é
- * o que a vitrine precisa enquanto não migra. Uma classe só empataria em
- * especificidade com `.dark`, e quem ganharia seria a que viesse depois na
- * folha - e `.dark` tem de vir depois daqui, senão ela perderia para o `:root`
- * no próprio `<html>`. Repetir a classe sobe para (0,2,0) e encerra o assunto
- * sem depender de ordem.
+ * o que a vitrine precisa enquanto a migração não termina. Uma classe só
+ * empataria em especificidade com `.dark`, e quem ganharia seria a que viesse
+ * depois na folha - e `.dark` tem de vir depois daqui, senão perderia para o
+ * `:root` no próprio `<html>`. Repetir a classe sobe para (0,2,0) e encerra o
+ * assunto sem depender de ordem.
  *
- * O bloco é um só de propósito: a alternativa era copiar os trinta tokens da
- * ponte shadcn num segundo lugar, e dois lugares divergem.
+ * Sai junto com a trava de `_public/layout.tsx`, na última rota migrada.
  */
 :root,
 .light.light {
   color-scheme: light;
-
-  /* --------------------------------------------------------------------
-   * Tokens da marca
-   * -------------------------------------------------------------------- */
-
-  /* A paleta oficial da marca. O creme amarelado saiu: a base clara agora é o
-     #FAFAFA da identidade, e a tinta é o #272221 dela - 15,05:1 entre os dois,
-     contra os 6,9:1 do par anterior. */
-  --cream: #fafafa;
-  --paper: #ffffff;
-  --ink: #272221;
-  --green: #88ff9a;
-  --neon: #88ff9a;
-
-  /* A versão do verde que sobrevive a fundo claro. Ver o cabeçalho.
-     Mesmo matiz da marca (129°), escurecido até 4,55:1 sobre o #FAFAFA - e
-     4,75:1 com branco por cima, que é o que o botão cheio precisa. */
-  --neon-ink: #178528;
-
-  /* Texto secundário sobre a base clara: 10,83:1. É o #403937 da marca, o mesmo
-     que no escuro vira superfície elevada. */
-  --ink-soft: #403937;
-
-  /* A borda é o que separa bloco de bloco, porque a sombra é quase nula. Duas
-     forças: a fina fecha card e bloco, a forte desenha o divisor da barra de
-     números, que precisa ser visto sem virar traço preto. */
-  --line: rgba(39, 34, 33, 0.1);
-  --line-strong: rgba(39, 34, 33, 0.2);
 
   /* --------------------------------------------------------------------
    * Raio
@@ -123,63 +78,64 @@
   --radius: 0.5rem;
 
   /* --------------------------------------------------------------------
-   * Ponte shadcn
+   * A camada semântica
    *
-   * O painel e a autenticação leem estes nomes, não os da marca. Eles ficam
-   * apontando para a escala nova em vez de sumirem: apagá-los redesenharia a
-   * secretaria inteira de lambuja, que não é o que este trabalho pediu.
+   * Quem pinta a página inteira. Os valores estão aqui em vez de atrás de um
+   * `var(--cream)`: um alias de uma linha só para um nome que ninguém mais lê é
+   * um degrau a mais para descobrir a cor de qualquer coisa.
    * -------------------------------------------------------------------- */
 
-  --background: var(--cream);
-  --foreground: var(--ink);
-  --card: var(--paper);
-  --card-foreground: var(--ink);
-  --popover: var(--paper);
-  --popover-foreground: var(--ink);
-  /* O verde legível, e não o neon: ação primária do painel é botão cheio com
-     texto por cima, e o neon não aguenta texto. */
-  --primary: var(--neon-ink);
-  --primary-foreground: var(--paper);
+  --background: #fafafa;
+  --foreground: #272221;
+  --card: #ffffff;
+  --card-foreground: #272221;
+  --popover: #ffffff;
+  --popover-foreground: #272221;
+  /* O verde da marca, puro. Ele é preenchimento em todo papel que ocupa, e a
+     tinta por cima dele é sempre a escura: 12,58:1. */
+  --primary: #88ff9a;
+  --primary-foreground: #272221;
   --secondary: #efefef;
-  --secondary-foreground: var(--ink);
+  --secondary-foreground: #272221;
   --muted: #efefef;
-  --muted-foreground: var(--ink-soft);
+  /* O #403937 da marca, o mesmo que no escuro vira superfície elevada: 10,83:1. */
+  --muted-foreground: #403937;
   --accent-color: #efefef;
-  --accent-foreground: var(--neon-ink);
+  --accent-foreground: #178528;
   --destructive: #c2251c;
-  --destructive-foreground: var(--paper);
-  --border: var(--line);
+  --destructive-foreground: #ffffff;
+  /* A borda é o que separa bloco de bloco, porque a sombra é quase nula. */
+  --border: rgba(39, 34, 33, 0.1);
   /*
-   * A borda do campo é mais forte que `--line-strong`, e tem valor próprio em
-   * vez de apontar para ele.
+   * A borda do campo tem valor próprio, e é mais forte que a de bloco.
    *
    * A regra 1.4.11 do WCAG pede 3:1 de **componente de interface**, e a borda de
-   * um input é isso - é ela que diz onde clicar. `--line-strong` dá 1,26:1 sobre
+   * um input é isso - é ela que diz onde clicar. A borda de bloco dá 1,26:1 sobre
    * o #FAFAFA: serve de divisor, não serve de campo. Isto dá 3,03:1. A diferença
    * aparece inteira no formulário de `/matricula`, que é o funil.
    */
   --input: rgba(39, 34, 33, 0.49);
-  --ring: var(--neon-ink);
+  --ring: #178528;
 
   /*
    * A escala de gráfico é a paleta secundária da marca, escurecida até 3:1 sobre
    * a base clara - o piso de elemento gráfico. O roxo e o rosa entram aqui e só
    * aqui: são cor de dado, nunca de ação.
    */
-  --chart-1: var(--neon-ink);
+  --chart-1: #178528;
   --chart-2: #07a0b4;
   --chart-3: #a07bf5;
   --chart-4: #f94ea9;
   --chart-5: #3168f7;
 
-  --sidebar: var(--paper);
-  --sidebar-foreground: var(--ink);
-  --sidebar-primary: var(--neon-ink);
-  --sidebar-primary-foreground: var(--paper);
+  --sidebar: #ffffff;
+  --sidebar-foreground: #272221;
+  --sidebar-primary: #88ff9a;
+  --sidebar-primary-foreground: #272221;
   --sidebar-accent: #efefef;
-  --sidebar-accent-foreground: var(--neon-ink);
-  --sidebar-border: var(--line);
-  --sidebar-ring: var(--neon-ink);
+  --sidebar-accent-foreground: #178528;
+  --sidebar-border: rgba(39, 34, 33, 0.1);
+  --sidebar-ring: #178528;
 }
 
 /*
@@ -187,18 +143,15 @@
  * O TEMA ESCURO
  * ============================================================================
  *
- * Só a camada semântica. Nenhum token de marca é redeclarado aqui, e isso é
- * deliberado - o cabeçalho da folha explica por quê.
- *
  * A base é o #272221 da marca, e a superfície elevada - card, popover, sidebar,
  * sheet - é o #403937. Um degrau só, e ele vem da cor, não de sombra: sombra
  * preta sobre fundo quase preto não separa nada. Quem fecha o card no escuro é
  * a borda.
  *
- * O verde da marca é primária aqui sem escurecer: #88FF9A dá 12,58:1 sobre a
- * base, e o texto por cima dele é o #272221 - **nunca** claro. No claro é o
- * contrário, e é por isso que `--primary` aponta para `--neon-ink` lá e para o
- * verde puro aqui: é o mesmo papel, com o pé trocado.
+ * `--primary` não aparece invertido aqui porque não inverte: o verde é
+ * preenchimento, e o mesmo #88FF9A serve os dois temas. Quem troca são os três
+ * papéis em que o verde é traço - `--ring`, `--accent-foreground` e
+ * `--chart-1` -, que no claro precisam do matiz escurecido e aqui voltam ao puro.
  * ============================================================================
  */
 .dark {
@@ -213,6 +166,8 @@
   --popover: #403937;
   --popover-foreground: #fafafa;
 
+  /* Igual ao claro, e de propósito: o verde é preenchimento, e o mesmo
+     preenchimento serve os dois temas. 12,58:1 sobre a base. */
   --primary: #88ff9a;
   --primary-foreground: #272221;
 
@@ -277,16 +232,6 @@
   --font-sans: 'Outfit Variable', system-ui, sans-serif;
   --font-display: 'Outfit Variable', system-ui, sans-serif;
   --font-serif: 'Playfair Display Variable', Georgia, serif;
-
-  --color-cream: var(--cream);
-  --color-paper: var(--paper);
-  --color-ink: var(--ink);
-  --color-ink-soft: var(--ink-soft);
-  --color-green: var(--green);
-  --color-neon: var(--neon);
-  --color-neon-ink: var(--neon-ink);
-  --color-line: var(--line);
-  --color-line-strong: var(--line-strong);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
