@@ -264,6 +264,10 @@ export default class extends BaseSeeder {
     // O nome carrega a hora porque é o que separa duas turmas do mesmo curso no
     // mesmo sábado de manhã na tela da secretaria - a coluna `startsAtTime` é o
     // dado, o nome é como a pessoa a chama.
+    //
+    // 12 de setembro de 2026, um sábado, para as cinco. A data é o que a home, o
+    // card do curso e o passo 1 da matrícula anunciam, e ela sai daqui - a
+    // secretaria a move pelo painel quando a oferta mudar.
     for (const entry of CLASSES) {
       const course = entry.course === 'robotics' ? robotics : web
 
@@ -272,7 +276,7 @@ export default class extends BaseSeeder {
         {
           courseId: course.id,
           name: entry.name,
-          startsAt: DateTime.fromISO('2026-03-07'),
+          startsAt: DateTime.fromISO('2026-09-12'),
           weekday: Weekdays.SATURDAY,
           shift: entry.shift,
           startsAtTime: entry.startsAtTime,
