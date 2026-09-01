@@ -11,6 +11,7 @@ export interface ApiDefinition {
       paginate: typeof routes['storefront.courses.paginate']
       show: typeof routes['storefront.courses.show']
     }
+    faqs: typeof routes['storefront.faqs']
     enrollments: {
       create: typeof routes['storefront.enrollments.create']
       show: typeof routes['storefront.enrollments.show']

@@ -98,6 +98,10 @@ router
       .prefix('courses')
       .as('courses')
 
+    // O FAQ da escola, o que a home mostra. Fora de `courses` de propósito: são
+    // as perguntas de `courseId` nulo, que não pertencem a curso nenhum.
+    router.get('faqs', [controllers.storefront.faqs.Paginate]).as('faqs')
+
     router
       .group(() => {
         router.post('/', [controllers.storefront.enrollments.Create])

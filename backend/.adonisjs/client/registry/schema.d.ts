@@ -55,6 +55,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storefront/courses/show.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'storefront.faqs': {
+    methods: ["GET","HEAD"]
+    pattern: '/storefront/faqs'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#core/validator').PaginationValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/storefront/faqs/paginate.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storefront/faqs/paginate.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'storefront.enrollments.create': {
     methods: ["POST"]
     pattern: '/storefront/enrollments'

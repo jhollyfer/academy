@@ -57,5 +57,8 @@ export const controllers = {
       Create: () => import('#features/storefront/enrollments/create.controller'),
       Show: () => import('#features/storefront/enrollments/show.controller'),
     },
+    faqs: {
+      Paginate: () => import('#features/storefront/faqs/paginate.controller'),
+    },
   },
 }

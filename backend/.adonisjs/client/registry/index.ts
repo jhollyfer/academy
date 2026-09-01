@@ -30,6 +30,12 @@ const routes = {
     tokens: [{"old":"/storefront/courses/:slug","type":0,"val":"storefront","end":""},{"old":"/storefront/courses/:slug","type":0,"val":"courses","end":""},{"old":"/storefront/courses/:slug","type":1,"val":"slug","end":""}],
     types: placeholder as Registry['storefront.courses.show']['types'],
   },
+  'storefront.faqs': {
+    methods: ["GET","HEAD"],
+    pattern: '/storefront/faqs',
+    tokens: [{"old":"/storefront/faqs","type":0,"val":"storefront","end":""},{"old":"/storefront/faqs","type":0,"val":"faqs","end":""}],
+    types: placeholder as Registry['storefront.faqs']['types'],
+  },
   'storefront.enrollments.create': {
     methods: ["POST"],
     pattern: '/storefront/enrollments',

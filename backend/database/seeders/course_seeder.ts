@@ -62,26 +62,51 @@ const WEB_MODULES = [
   ['Projeto final: apresentação', 'Publicar, mostrar e receber crítica.'],
 ] as const
 
+/**
+ * O FAQ da escola, o que a home mostra. `courseId` nulo, servido por
+ * `GET /storefront/faqs`.
+ *
+ * A ordem é a das perguntas que mais chegam no WhatsApp: quem nunca programou
+ * pergunta isso antes de perguntar preço.
+ */
 const GENERAL_FAQS = [
+  [
+    'Preciso saber programar antes?',
+    'Não. Os dois cursos começam do zero, e a primeira aula parte do princípio de que você nunca viu código nem circuito.',
+  ],
+  [
+    'Preciso levar notebook?',
+    'Não. O laboratório tem computador e kit de eletrônica para as aulas. Se quiser levar o seu, pode.',
+  ],
   [
     'As aulas são presenciais mesmo?',
     'São. Todo sábado, em Benjamin Constant. O que pode ser feito de casa é a matrícula.',
   ],
   [
-    'Preciso levar computador?',
-    'Não. O laboratório tem computador e kit de eletrônica para as aulas.',
+    // TODO: trocar a resposta quando a secretaria fechar a política de
+    // certificado. Até lá a página não promete o que ninguém decidiu.
+    'Tem certificado?',
+    'A secretaria ainda está fechando essa política. Pergunte pelo WhatsApp antes de se matricular.',
   ],
   [
-    'E se eu nunca mexi com isso?',
-    'Os dois cursos começam do zero. Não é preciso saber nada antes.',
+    'E se eu faltar em um sábado?',
+    'Faltar não cancela a matrícula. Avise a secretaria pelo WhatsApp para combinar como acompanhar o que perdeu.',
   ],
   [
-    'Como funciona o pagamento?',
-    'São R$ 150 de inscrição, uma vez, mais R$ 150 por mês durante os quatro meses. O pagamento é por Pix.',
+    'Menor de idade pode se matricular?',
+    'Pode, a partir de 14 anos. Abaixo de 18 o formulário pede nome, documento e telefone do responsável legal.',
   ],
   [
-    'Perco a vaga se a turma encher?',
-    'Não. Sua inscrição entra na fila de espera, e a secretaria chama pela ordem se abrir vaga.',
+    'Como eu pago?',
+    'Por Pix. São R$ 150 de inscrição, uma vez, e R$ 150 por mês durante os quatro meses. O comprovante da inscrição você envia na própria página da matrícula.',
+  ],
+  [
+    'E se a turma encher?',
+    'A inscrição continua aberta e entra na fila de espera. Ela não ocupa vaga, e a secretaria chama pela ordem se alguém cancelar.',
+  ],
+  [
+    'Tem continuação depois do módulo 1?',
+    'Cada curso é o módulo 1 de uma trilha. O módulo 2 ainda não tem data. O módulo 1 é completo por si e termina com um projeto seu.',
   ],
 ] as const
 
