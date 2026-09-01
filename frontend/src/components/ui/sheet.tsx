@@ -26,30 +26,13 @@ function SheetOverlay({ className, ...props }: SheetPrimitive.Backdrop.Props) {
     <SheetPrimitive.Backdrop
       data-slot="sheet-overlay"
       className={cn(
-        "fixed inset-0 z-50 bg-foreground/60 transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0 supports-backdrop-filter:backdrop-blur-xs",
+        "fixed inset-0 z-50 bg-black/80 transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0 supports-backdrop-filter:backdrop-blur-xs",
         className
       )}
       {...props}
     />
   )
 }
-
-/**
- * As classes de cada borda, num lookup e não numa variante `data-[side=…]`.
- *
- * A variante gerava um seletor `classe + [data-side]`, com especificidade maior
- * que a de uma classe solta: um `w-72` vindo do caller nunca vencia o `w-3/4`
- * daqui, e o `tailwind-merge` também não os fundia, porque para ele são grupos
- * diferentes. Plana, a classe volta a ser sobrescrevível pelo `className`.
- */
-const SHEET_SIDE = {
-  top: 'inset-x-0 top-0 h-auto border-b data-ending-style:-translate-y-10 data-starting-style:-translate-y-10',
-  bottom:
-    'inset-x-0 bottom-0 h-auto border-t data-ending-style:translate-y-10 data-starting-style:translate-y-10',
-  left: 'inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm data-ending-style:-translate-x-10 data-starting-style:-translate-x-10',
-  right:
-    'inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm data-ending-style:translate-x-10 data-starting-style:translate-x-10',
-} as const
 
 function SheetContent({
   className,
@@ -58,7 +41,7 @@ function SheetContent({
   showCloseButton = true,
   ...props
 }: SheetPrimitive.Popup.Props & {
-  side?: keyof typeof SHEET_SIDE
+  side?: "top" | "right" | "bottom" | "left"
   showCloseButton?: boolean
 }) {
   return (
@@ -68,11 +51,7 @@ function SheetContent({
         data-slot="sheet-content"
         data-side={side}
         className={cn(
-          // `overflow-y-auto`: o painel tem altura fixa da viewport, e sem isso
-          // o que passa da dobra fica inalcançável. `overscroll-contain` para o
-          // scroll não vazar para a página atrás quando chega no fim.
-          "fixed z-50 flex flex-col overflow-y-auto overscroll-contain bg-popover bg-clip-padding text-sm text-popover-foreground shadow-lg transition duration-200 ease-in-out data-ending-style:opacity-0 data-starting-style:opacity-0",
-          SHEET_SIDE[side],
+          "fixed z-50 flex flex-col bg-popover bg-clip-padding text-xs/relaxed text-popover-foreground shadow-lg transition duration-200 ease-in-out data-ending-style:opacity-0 data-starting-style:opacity-0 data-[side=bottom]:inset-x-0 data-[side=bottom]:bottom-0 data-[side=bottom]:h-auto data-[side=bottom]:border-t data-[side=bottom]:data-ending-style:translate-y-[2.5rem] data-[side=bottom]:data-starting-style:translate-y-[2.5rem] data-[side=left]:inset-y-0 data-[side=left]:left-0 data-[side=left]:h-full data-[side=left]:w-3/4 data-[side=left]:border-r data-[side=left]:data-ending-style:translate-x-[-2.5rem] data-[side=left]:data-starting-style:translate-x-[-2.5rem] data-[side=right]:inset-y-0 data-[side=right]:right-0 data-[side=right]:h-full data-[side=right]:w-3/4 data-[side=right]:border-l data-[side=right]:data-ending-style:translate-x-[2.5rem] data-[side=right]:data-starting-style:translate-x-[2.5rem] data-[side=top]:inset-x-0 data-[side=top]:top-0 data-[side=top]:h-auto data-[side=top]:border-b data-[side=top]:data-ending-style:translate-y-[-2.5rem] data-[side=top]:data-starting-style:translate-y-[-2.5rem] data-[side=left]:sm:max-w-sm data-[side=right]:sm:max-w-sm",
           className
         )}
         {...props}
@@ -82,18 +61,16 @@ function SheetContent({
           <SheetPrimitive.Close
             data-slot="sheet-close"
             render={
-              // `size-11` sobre o `icon-sm`: o `size` do variant continua
-              // valendo para o ícone, e o alvo de toque sobe para os 44px que
-              // um polegar acerta.
               <Button
                 variant="ghost"
-                className="absolute top-4 right-4 size-11"
+                className="absolute top-4 right-4"
                 size="icon-sm"
               />
             }
           >
-            <XIcon />
-            <span className="sr-only">Fechar</span>
+            <XIcon
+            />
+            <span className="sr-only">Close</span>
           </SheetPrimitive.Close>
         )}
       </SheetPrimitive.Popup>
