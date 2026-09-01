@@ -5,6 +5,15 @@
 
 export const controllers = {
   administrator: {
+    classes: {
+      Archive: () => import('#features/administrator/classes/archive.controller'),
+      Create: () => import('#features/administrator/classes/create.controller'),
+      Delete: () => import('#features/administrator/classes/delete.controller'),
+      Paginate: () => import('#features/administrator/classes/paginate.controller'),
+      Show: () => import('#features/administrator/classes/show.controller'),
+      Unarchive: () => import('#features/administrator/classes/unarchive.controller'),
+      Update: () => import('#features/administrator/classes/update.controller'),
+    },
     courses: {
       Archive: () => import('#features/administrator/courses/archive.controller'),
       Create: () => import('#features/administrator/courses/create.controller'),

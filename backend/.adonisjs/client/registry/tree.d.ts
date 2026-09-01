@@ -13,11 +13,22 @@ export interface ApiDefinition {
       show: typeof routes['administrator.courses.show']
       update: typeof routes['administrator.courses.update']
     }
+    classes: {
+      paginate: typeof routes['administrator.classes.paginate']
+      create: typeof routes['administrator.classes.create']
+      show: typeof routes['administrator.classes.show']
+      update: typeof routes['administrator.classes.update']
+    }
     lifecycle: {
       courses: {
         archive: typeof routes['administrator.lifecycle.courses.archive']
         unarchive: typeof routes['administrator.lifecycle.courses.unarchive']
         purge: typeof routes['administrator.lifecycle.courses.purge']
+      }
+      classes: {
+        archive: typeof routes['administrator.lifecycle.classes.archive']
+        unarchive: typeof routes['administrator.lifecycle.classes.unarchive']
+        purge: typeof routes['administrator.lifecycle.classes.purge']
       }
     }
   }

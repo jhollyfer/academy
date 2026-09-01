@@ -1,6 +1,17 @@
 import vine from '@vinejs/vine'
 import type { FieldContext, Infer } from '@vinejs/vine/types'
-import { ACTIVE_STATUSES, COURSE_ACCENTS, SORT_DIRECTIONS, TRASHED_MODES } from '#core/entity'
+import {
+  ACTIVE_STATUSES,
+  CLASS_STATUSES,
+  ClassStatuses,
+  COURSE_ACCENTS,
+  ENROLLMENT_FILE_KINDS,
+  ENROLLMENT_STATUSES,
+  SHIFTS,
+  SORT_DIRECTIONS,
+  TRASHED_MODES,
+  WEEKDAYS,
+} from '#core/entity'
 
 /**
  * Fonte única dos schemas VineJS do backend.
@@ -190,6 +201,13 @@ export function sortFields<const TColumns extends readonly [string, ...string[]]
  * seria prometer no OpenAPI uma ordem que nenhum cabeçalho oferece.
  */
 export const COURSE_SORT_COLUMNS = ['name', 'position', 'createdAt'] as const
+export const CLASS_SORT_COLUMNS = ['name', 'startsAt', 'capacity', 'status', 'createdAt'] as const
+export const ENROLLMENT_SORT_COLUMNS = ['studentName', 'status', 'createdAt'] as const
+/**
+ * `position` é a ordem na grade e no FAQ - o que a tela mostra. Não há por que
+ * ordenar por título: a sequência dos sábados é o conteúdo.
+ */
+export const ORDERED_CHILD_SORT_COLUMNS = ['position', 'createdAt'] as const
 
 /**
  * E-mail, com o teto da coluna.
@@ -320,3 +338,202 @@ export const AuthenticationSignInValidator = vine.create({
 })
 
 export type AuthenticationSignInPayload = Infer<typeof AuthenticationSignInValidator>
+
+// ---------------------------------------------------------------------------
+// administrator/courses/:id/modules e :id/faqs
+// ---------------------------------------------------------------------------
+
+export const AdministratorCourseModuleCreateValidator = vine.create({
+  title: vine.string().trim().minLength(2).maxLength(200),
+  description: vine.string().trim().maxLength(2000).nullable().optional(),
+  position: vine.number().min(0).max(999).optional(),
+})
+
+export const AdministratorCourseModuleUpdateValidator = vine.create({
+  title: vine.string().trim().minLength(2).maxLength(200).optional(),
+  description: vine.string().trim().maxLength(2000).nullable().optional(),
+  position: vine.number().min(0).max(999).optional(),
+})
+
+export const AdministratorCourseFaqCreateValidator = vine.create({
+  question: vine.string().trim().minLength(4).maxLength(300),
+  answer: vine.string().trim().minLength(2),
+  position: vine.number().min(0).max(999).optional(),
+})
+
+export const AdministratorCourseFaqUpdateValidator = vine.create({
+  question: vine.string().trim().minLength(4).maxLength(300).optional(),
+  answer: vine.string().trim().minLength(2).optional(),
+  position: vine.number().min(0).max(999).optional(),
+})
+
+/**
+ * O identificador de um filho aninhado: o curso no caminho e o próprio registro.
+ *
+ * Os dois juntos e não só o `id` porque o escopo vem do caminho: pedir o módulo
+ * `X` do curso `Y` quando ele pertence ao curso `Z` é **404**, não 403 - a
+ * resposta não confirma que o registro existe em outro lugar.
+ */
+export const NestedIdentifierValidator = vine.create({
+  courseId: vine.string().uuid(),
+  id: vine.string().uuid(),
+})
+
+export const CourseScopeValidator = vine.create({
+  courseId: vine.string().uuid(),
+})
+
+export type AdministratorCourseModuleCreatePayload = Infer<
+  typeof AdministratorCourseModuleCreateValidator
+>
+export type AdministratorCourseModuleUpdatePayload = Infer<
+  typeof AdministratorCourseModuleUpdateValidator
+>
+export type AdministratorCourseFaqCreatePayload = Infer<
+  typeof AdministratorCourseFaqCreateValidator
+>
+export type AdministratorCourseFaqUpdatePayload = Infer<
+  typeof AdministratorCourseFaqUpdateValidator
+>
+export type NestedIdentifierPayload = Infer<typeof NestedIdentifierValidator>
+export type CourseScopePayload = Infer<typeof CourseScopeValidator>
+
+// ---------------------------------------------------------------------------
+// administrator/classes
+// ---------------------------------------------------------------------------
+
+export const AdministratorClassCreateValidator = vine.create({
+  courseId: vine.string().uuid(),
+  name: vine.string().trim().minLength(2).maxLength(160),
+  startsAt: vine.date(),
+  // Nula enquanto a escola não fechou a data de encerramento. `afterField`
+  // porque uma turma que termina antes de começar é erro de digitação, e o
+  // banco aceitaria calado.
+  endsAt: vine.date({ formats: ['iso8601'] }).afterField('startsAt').nullable().optional(),
+  weekday: vine.enum(WEEKDAYS),
+  shift: vine.enum(SHIFTS),
+  location: vine.string().trim().minLength(2).maxLength(200),
+  capacity: vine.number().min(1).max(10_000),
+  // `FULL` não entra: é derivado da ocupação, e digitá-lo criaria uma segunda
+  // fonte da verdade que divergiria na primeira matrícula.
+  status: vine.enum([ClassStatuses.OPEN, ClassStatuses.CLOSED]).optional(),
+})
+
+export const AdministratorClassUpdateValidator = vine.create({
+  courseId: vine.string().uuid().optional(),
+  name: vine.string().trim().minLength(2).maxLength(160).optional(),
+  startsAt: vine.date().optional(),
+  endsAt: vine.date({ formats: ['iso8601'] }).nullable().optional(),
+  weekday: vine.enum(WEEKDAYS).optional(),
+  shift: vine.enum(SHIFTS).optional(),
+  location: vine.string().trim().minLength(2).maxLength(200).optional(),
+  capacity: vine.number().min(1).max(10_000).optional(),
+  status: vine.enum([ClassStatuses.OPEN, ClassStatuses.CLOSED]).optional(),
+})
+
+export const AdministratorClassPaginationValidator = vine.create({
+  ...paginationFields(),
+  ...trashedField(),
+  ...sortFields(CLASS_SORT_COLUMNS),
+  courseId: vine.string().uuid().optional(),
+  status: vine.enum(CLASS_STATUSES).optional(),
+})
+
+export type AdministratorClassCreatePayload = Infer<typeof AdministratorClassCreateValidator>
+export type AdministratorClassUpdatePayload = Infer<typeof AdministratorClassUpdateValidator>
+export type AdministratorClassPaginationPayload = Infer<
+  typeof AdministratorClassPaginationValidator
+>
+
+// ---------------------------------------------------------------------------
+// administrator/enrollments
+// ---------------------------------------------------------------------------
+
+export const AdministratorEnrollmentPaginationValidator = vine.create({
+  ...paginationFields(),
+  ...trashedField(),
+  ...sortFields(ENROLLMENT_SORT_COLUMNS),
+  classId: vine.string().uuid().optional(),
+  courseId: vine.string().uuid().optional(),
+  status: vine.enum(ENROLLMENT_STATUSES).optional(),
+})
+
+/**
+ * A secretaria move o estado e anota. Nada mais: os dados do candidato são dele,
+ * e corrigi-los pelo painel apagaria o que ele declarou sem deixar rastro.
+ *
+ * A transição legal não é checada aqui e sim no use-case, contra
+ * `ENROLLMENT_TRANSITIONS`: o validator não conhece o estado atual.
+ */
+export const AdministratorEnrollmentUpdateValidator = vine.create({
+  status: vine.enum(ENROLLMENT_STATUSES).optional(),
+  notes: vine.string().trim().maxLength(2000).nullable().optional(),
+})
+
+export type AdministratorEnrollmentPaginationPayload = Infer<
+  typeof AdministratorEnrollmentPaginationValidator
+>
+export type AdministratorEnrollmentUpdatePayload = Infer<
+  typeof AdministratorEnrollmentUpdateValidator
+>
+
+// ---------------------------------------------------------------------------
+// storefront/enrollments
+// ---------------------------------------------------------------------------
+
+/**
+ * A matrícula virtual.
+ *
+ * O responsável legal é **condicional à idade**, e essa exigência **não** está
+ * aqui: ela é do use-case, que a devolve como `422` com um `errors` por campo.
+ *
+ * Não é preguiça, é limitação medida. A condição depende de outro campo
+ * (`studentBirthDate`), então teria de ser uma regra de objeto - e uma regra de
+ * objeto do VineJS reporta no caminho do objeto, com o nome do campo indo parar
+ * em `meta`. O `form-errors.ts` do frontend leria isso como erro de `root`, e os
+ * três inputs que faltam ficariam sem marcação nenhuma. O `errors` do
+ * `HTTPException` mapeia campo para mensagem, que é exatamente o que a tela
+ * precisa.
+ */
+export const StorefrontEnrollmentCreateValidator = vine.create(
+  vine
+    .object({
+      classId: vine.string().uuid(),
+      studentName: vine.string().trim().minLength(2).maxLength(160),
+      studentBirthDate: vine.date({ formats: ['iso8601'] }),
+      studentDocument: cpf().nullable().optional(),
+      email: email(),
+      phone: phone(),
+
+      guardianName: vine.string().trim().minLength(2).maxLength(160).nullable().optional(),
+      guardianDocument: cpf().nullable().optional(),
+      guardianPhone: phone().nullable().optional(),
+
+      // Aceites. `literal(true)` e não booleano: "false" não é um consentimento
+      // que valha gravar, é o formulário enviado sem a caixa marcada.
+      termsAccepted: vine.literal(true),
+      lgpdConsent: vine.literal(true),
+    })
+)
+
+export type StorefrontEnrollmentCreatePayload = Infer<typeof StorefrontEnrollmentCreateValidator>
+
+/**
+ * O comprovante do Pix, anexado depois de o binário já estar no bucket.
+ *
+ * Recebe o `id` do `storages`, não o arquivo: o upload é presigned multipart e o
+ * binário nunca atravessa esta API.
+ */
+export const StorefrontEnrollmentAttachmentValidator = vine.create({
+  storageId: vine.string().uuid(),
+  kind: vine.enum(ENROLLMENT_FILE_KINDS).optional(),
+})
+
+export const ProtocolValidator = vine.create({
+  protocol: vine.string().uuid(),
+})
+
+export type StorefrontEnrollmentAttachmentPayload = Infer<
+  typeof StorefrontEnrollmentAttachmentValidator
+>
+export type ProtocolPayload = Infer<typeof ProtocolValidator>

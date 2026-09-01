@@ -105,3 +105,39 @@ export async function createCourse(
 
   return body(response)
 }
+
+/**
+ * O payload mínimo de uma turma. `courseId` é obrigatório e vem de quem chama.
+ */
+export function classPayload(
+  courseId: string,
+  overrides: Record<string, unknown> = {}
+): Record<string, unknown> {
+  return {
+    courseId,
+    name: 'Turma 1 / 2026',
+    startsAt: '2026-03-07',
+    weekday: 'SATURDAY',
+    shift: 'MORNING',
+    location: 'FAMETRO, Benjamin Constant/AM',
+    capacity: 40,
+    ...overrides,
+  }
+}
+
+/** Cria uma turma pelo painel e devolve o recurso criado. */
+export async function createClass(
+  client: ApiClient,
+  session: Session,
+  courseId: string,
+  overrides: Record<string, unknown> = {}
+): Promise<Record<string, any>> {
+  const response = await client
+    .post('/administrator/classes')
+    .cookies(session)
+    .json(classPayload(courseId, overrides))
+
+  response.assertStatus(201)
+
+  return body(response)
+}

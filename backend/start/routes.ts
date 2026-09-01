@@ -95,6 +95,16 @@ router
       .prefix('courses')
       .as('courses')
 
+    router
+      .group(() => {
+        router.get('/', [controllers.administrator.classes.Paginate])
+        router.post('/', [controllers.administrator.classes.Create])
+        router.get(':id', [controllers.administrator.classes.Show])
+        router.put(':id', [controllers.administrator.classes.Update])
+      })
+      .prefix('classes')
+      .as('classes')
+
     // O ciclo de vida do registro é privilégio do dono. As três operações são
     // distintas de propósito: `archive` manda para a lixeira (grava
     // `deletedAt`), `unarchive` traz de volta, e só o `DELETE` apaga a linha -
@@ -124,6 +134,20 @@ router
           })
           .prefix('courses')
           .as('courses')
+
+        router
+          .group(() => {
+            router.patch(':id/archive', [controllers.administrator.classes.Archive]).as('archive')
+            router
+              .patch(':id/unarchive', [controllers.administrator.classes.Unarchive])
+              .as('unarchive')
+            router
+              .delete(':id', [controllers.administrator.classes.Delete])
+              .as('purge')
+              .use(middleware.role(['OWNER']))
+          })
+          .prefix('classes')
+          .as('classes')
       })
       .as('lifecycle')
   })
