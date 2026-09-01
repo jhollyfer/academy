@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
 import { COOKIE_TOKEN } from '#services/cookie.service'
-import { authenticateAsOwner, body, OWNER, resetDatabase } from '#tests/helpers'
+import { authenticateAsOwner, body, OWNER, resetDatabase } from '../helpers.ts'
 
 /**
  * A porta do painel, e a própria conta atrás dela.
@@ -9,7 +9,7 @@ import { authenticateAsOwner, body, OWNER, resetDatabase } from '#tests/helpers'
  * barato de todos os autenticados - juntos provam o guard inteiro: emissão do
  * par de tokens, leitura do cookie e invalidação no sign-out.
  */
-test.group('authentication', (group) => {
+test.group('autenticação > sign-in', (group) => {
   group.each.setup(() => resetDatabase())
 
   test('abre a sessão com 204 e dois cookies httpOnly', async ({ client, assert }) => {
@@ -77,7 +77,7 @@ test.group('authentication', (group) => {
   })
 })
 
-test.group('account/profile', (group) => {
+test.group('conta > leitura', (group) => {
   group.each.setup(() => resetDatabase())
 
   test('devolve a conta da sessão, sem a senha', async ({ client, assert }) => {

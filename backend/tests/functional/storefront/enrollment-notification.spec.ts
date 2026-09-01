@@ -7,7 +7,7 @@ import {
   createCourse,
   enrollmentPayload,
   resetDatabase,
-} from '#tests/helpers'
+} from '../../helpers.ts'
 
 /**
  * O aviso que a secretaria recebe quando alguém se inscreve.
@@ -18,7 +18,7 @@ import {
  * usa `sendLater`: enfileirar é o comportamento, e afirmar `sent` provaria o
  * oposto do desenhado.
  */
-test.group('storefront/enrollments · aviso para a secretaria', (group) => {
+test.group('vitrine > matrículas > aviso para a secretaria', (group) => {
   let mails: FakeMailer
 
   group.each.setup(() => resetDatabase())

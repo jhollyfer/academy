@@ -2,7 +2,8 @@ import { test } from '@japa/runner'
 import Storage from '#models/storage'
 import { UploadStatuses } from '#core/entity'
 import { StorageCreateValidator } from '#core/validator'
-import { authenticateAsOwner, body, resetDatabase, type Session } from '#tests/helpers'
+import { authenticateAsOwner, body, resetDatabase } from '../helpers.ts'
+import type { Session } from '../helpers.ts'
 import type { ApiClient } from '@japa/api-client'
 
 /** Um PNG mínimo de verdade, para o bucket receber bytes e não uma string vazia. */
@@ -26,7 +27,7 @@ function openUpload(client: ApiClient, session: Session, overrides: Record<strin
  * formato da resposta do `POST` provaria o contrato e não o mecanismo - e o
  * mecanismo é onde este caminho quebra.
  */
-test.group('storages', (group) => {
+test.group('storages > upload', (group) => {
   group.each.setup(() => resetDatabase())
 
   test('recusa sem sessão com 401', async ({ client }) => {

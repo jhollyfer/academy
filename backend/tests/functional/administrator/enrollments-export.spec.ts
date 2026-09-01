@@ -6,7 +6,7 @@ import {
   createCourse,
   enrollmentPayload,
   resetDatabase,
-} from '#tests/helpers'
+} from '../../helpers.ts'
 
 /**
  * O CSV que a secretaria abre no Excel.
@@ -15,7 +15,7 @@ import {
  * só o arquivo tem: o BOM, o separador `;` e o escape. Os três são invisíveis na
  * tela e só aparecem quando alguém abre o arquivo e vê as colunas trocadas.
  */
-test.group('administrator/enrollments · export', (group) => {
+test.group('administrador > matrículas > exportação', (group) => {
   group.each.setup(() => resetDatabase())
 
   test('recusa sem sessão com 401', async ({ client }) => {
