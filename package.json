@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev:frontend": "cd frontend && npm run dev",
-    "build:frontend": "cd frontend && npm run build",
-    "lint:frontend": "cd frontend && npm run lint"
+    "dev:frontend": "cd frontend-old && npm run dev",
+    "build:frontend": "cd frontend-old && npm run build",
+    "lint:frontend": "cd frontend-old && npm run lint"
   }
 }
