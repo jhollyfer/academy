@@ -53,7 +53,9 @@ export const Route = createLazyFileRoute('/_private/admin/turmas/$id/')({
 function RouteComponent(): React.JSX.Element {
   const { id } = ClassRoute.useParams()
   const { data: entity } = useSuspenseQuery(classDetailQueryOptions(id))
-  const { data: courses } = useSuspenseQuery(coursesListQueryOptions({ perPage: 100 }))
+  const { data: courses } = useSuspenseQuery(
+    coursesListQueryOptions({ perPage: 100 }),
+  )
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
@@ -111,16 +113,16 @@ function RouteComponent(): React.JSX.Element {
             <RowActionsArchive onConfirm={() => archive.mutate(entity.id)}>
               <ConfirmDialogTitle>Arquivar {entity.name}?</ConfirmDialogTitle>
               <ConfirmDialogDescription>
-                A turma some do site e da matrícula. As matrículas dela continuam onde estão, e a
-                vaga volta a contar se você restaurar.
+                A turma some do site e da matrícula. As matrículas dela
+                continuam onde estão, e a vaga volta a contar se você restaurar.
               </ConfirmDialogDescription>
             </RowActionsArchive>
 
             <RowActionsDelete onConfirm={() => remove.mutate(entity.id)}>
               <ConfirmDialogTitle>Apagar {entity.name}?</ConfirmDialogTitle>
               <ConfirmDialogDescription>
-                Isto não tem volta. Só funciona em turma já arquivada e sem nenhuma matrícula,
-                nem cancelada.
+                Isto não tem volta. Só funciona em turma já arquivada e sem
+                nenhuma matrícula, nem cancelada.
               </ConfirmDialogDescription>
             </RowActionsDelete>
           </RowActions>

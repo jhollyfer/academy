@@ -62,8 +62,13 @@ function RouteComponent(): React.JSX.Element {
       isPending={isPending}
       emptyTitle="Nenhum curso cadastrado"
       emptyDescription="Cadastre o primeiro curso para abrir turma e receber matrícula."
-      rowTo={(course) => ({ to: '/admin/cursos/$id', params: { id: course.id } })}
-      onSearchChange={(term) => navigate({ search: { ...search, search: term, page: undefined } })}
+      rowTo={(course) => ({
+        to: '/admin/cursos/$id',
+        params: { id: course.id },
+      })}
+      onSearchChange={(term) =>
+        navigate({ search: { ...search, search: term, page: undefined } })
+      }
       onPageChange={(page) => navigate({ search: { ...search, page } })}
     />
   )

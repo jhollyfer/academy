@@ -1,6 +1,11 @@
 import * as React from 'react'
 import { Link } from '@tanstack/react-router'
-import { CaretLeft, CaretRight, MagnifyingGlass, Plus } from '@phosphor-icons/react'
+import {
+  CaretLeft,
+  CaretRight,
+  MagnifyingGlass,
+  Plus,
+} from '@phosphor-icons/react'
 import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
 import { Skeleton } from '#/components/ui/skeleton'
@@ -119,7 +124,9 @@ export function ListShell<TRow extends { id: string }>({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-          {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
+          {description && (
+            <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+          )}
         </div>
 
         {createTo && (
@@ -168,7 +175,9 @@ export function ListShell<TRow extends { id: string }>({
                   {columns.map((column) => (
                     <TableCell
                       key={column.key}
-                      className={cn(column.hideOnMobile && 'hidden md:table-cell')}
+                      className={cn(
+                        column.hideOnMobile && 'hidden md:table-cell',
+                      )}
                     >
                       <Skeleton className="h-5 w-full max-w-[16ch]" />
                     </TableCell>
@@ -178,9 +187,14 @@ export function ListShell<TRow extends { id: string }>({
 
             {!isPending && rows.length === 0 && (
               <TableRow>
-                <TableCell colSpan={columns.length} className="py-16 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="py-16 text-center"
+                >
                   <p className="font-medium">{emptyTitle}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{emptyDescription}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {emptyDescription}
+                  </p>
                 </TableCell>
               </TableRow>
             )}
@@ -190,11 +204,16 @@ export function ListShell<TRow extends { id: string }>({
                 const target = rowTo?.(row)
 
                 return (
-                  <TableRow key={row.id} className={cn(target && 'cursor-pointer')}>
+                  <TableRow
+                    key={row.id}
+                    className={cn(target && 'cursor-pointer')}
+                  >
                     {columns.map((column, index) => (
                       <TableCell
                         key={column.key}
-                        className={cn(column.hideOnMobile && 'hidden md:table-cell')}
+                        className={cn(
+                          column.hideOnMobile && 'hidden md:table-cell',
+                        )}
                       >
                         {/*
                           O link envolve a **primeira** célula, e não a linha:

@@ -38,8 +38,13 @@ export const queryKeys = {
 
   enrollments: {
     all: ['enrollments'] as const,
-    list: (params: ListSearch & { courseId?: string; classId?: string; status?: string }) =>
-      ['enrollments', 'list', params] as const,
+    list: (
+      params: ListSearch & {
+        courseId?: string
+        classId?: string
+        status?: string
+      },
+    ) => ['enrollments', 'list', params] as const,
     detail: (id: string) => ['enrollments', 'detail', id] as const,
   },
 
@@ -64,6 +69,7 @@ export const queryKeys = {
      * o `id`, que o candidato não tem - e o corpo é outro, sem as anotações da
      * secretaria.
      */
-    enrollment: (protocol: string) => ['storefront', 'enrollments', protocol] as const,
+    enrollment: (protocol: string) =>
+      ['storefront', 'enrollments', protocol] as const,
   },
 }

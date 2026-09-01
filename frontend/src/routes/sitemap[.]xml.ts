@@ -31,8 +31,9 @@ export const Route = createFileRoute('/sitemap.xml')({
           const response = await fetch(`${api}/storefront/courses?perPage=100`)
 
           if (response.ok) {
-            const payload: { data?: Array<{ slug?: string; updatedAt?: string }> } =
-              await response.json()
+            const payload: {
+              data?: Array<{ slug?: string; updatedAt?: string }>
+            } = await response.json()
 
             for (const course of payload.data ?? []) {
               if (!course.slug) continue

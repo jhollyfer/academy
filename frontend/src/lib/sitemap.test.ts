@@ -3,9 +3,13 @@ import { buildSitemap, STATIC_ENTRIES } from './sitemap'
 
 describe('buildSitemap', () => {
   it('monta URL absoluta sem barra dobrada', () => {
-    const xml = buildSitemap('https://academy.maiyu.com.br/', [{ path: '/cursos/robotica' }])
+    const xml = buildSitemap('https://academy.maiyu.com.br/', [
+      { path: '/cursos/robotica' },
+    ])
 
-    expect(xml).toContain('<loc>https://academy.maiyu.com.br/cursos/robotica</loc>')
+    expect(xml).toContain(
+      '<loc>https://academy.maiyu.com.br/cursos/robotica</loc>',
+    )
     expect(xml).not.toContain('//cursos')
   })
 
@@ -16,7 +20,9 @@ describe('buildSitemap', () => {
   })
 
   it('escapa o que o XML reserva', () => {
-    const xml = buildSitemap('https://exemplo.com', [{ path: '/busca?a=1&b=2' }])
+    const xml = buildSitemap('https://exemplo.com', [
+      { path: '/busca?a=1&b=2' },
+    ])
 
     // `&` cru quebraria o documento inteiro, e o buscador descarta sem avisar.
     expect(xml).toContain('a=1&amp;b=2')
@@ -42,6 +48,12 @@ describe('buildSitemap', () => {
   it('a lista estática cobre a home, a matrícula e as páginas legais', () => {
     const paths = STATIC_ENTRIES.map((entry) => entry.path)
 
-    expect(paths).toEqual(['/', '/matricula', '/sobre', '/termos', '/privacidade'])
+    expect(paths).toEqual([
+      '/',
+      '/matricula',
+      '/sobre',
+      '/termos',
+      '/privacidade',
+    ])
   })
 })

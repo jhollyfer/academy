@@ -89,8 +89,20 @@ export function useMultipartUpload({
       partSize: plan.partSize,
     })
 
-    const etags = await send(file, plan, onProgress, signal, concurrency, basePath)
-    const storage = await complete(plan.storage.id, plan.uploadId, etags, basePath)
+    const etags = await send(
+      file,
+      plan,
+      onProgress,
+      signal,
+      concurrency,
+      basePath,
+    )
+    const storage = await complete(
+      plan.storage.id,
+      plan.uploadId,
+      etags,
+      basePath,
+    )
 
     clearResume(file)
 

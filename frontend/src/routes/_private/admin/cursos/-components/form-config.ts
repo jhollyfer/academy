@@ -57,7 +57,9 @@ export function courseDefaults(): AdministratorCourseCreatePayload {
  * array, e mandar `position` de volta seria o cliente decidindo o que o servidor
  * já decide.
  */
-export function courseToValues(course: CourseResponse): AdministratorCourseCreatePayload {
+export function courseToValues(
+  course: CourseResponse,
+): AdministratorCourseCreatePayload {
   return {
     name: course.name,
     slug: course.slug,

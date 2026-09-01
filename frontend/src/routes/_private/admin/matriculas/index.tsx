@@ -13,12 +13,13 @@ import type { Merge } from '#/lib/interfaces'
  * `useState` obrigaria a descrever o caminho por escrito.
  */
 function validateSearch(
-  search: Record<string, unknown>
+  search: Record<string, unknown>,
 ): Merge<ListSearch, { status?: EnrollmentStatus }> {
   // O retorno é um tipo só, e não uma união com e sem `status`: uma união faria
   // o campo sumir do tipo em quem lê o search, e a tela não conseguiria nem ler
   // o filtro que ela mesma escreveu.
-  const result: Merge<ListSearch, { status?: EnrollmentStatus }> = validateListSearch(search)
+  const result: Merge<ListSearch, { status?: EnrollmentStatus }> =
+    validateListSearch(search)
 
   const status = ENROLLMENT_STATUSES.find((value) => value === search.status)
 

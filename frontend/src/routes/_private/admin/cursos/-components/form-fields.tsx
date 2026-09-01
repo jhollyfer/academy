@@ -4,7 +4,12 @@ import { Plus, Trash } from '@phosphor-icons/react'
 import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
 import { Textarea } from '#/components/ui/textarea'
-import { Field, FieldError, FieldGroup, FieldLabel } from '#/components/ui/field'
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '#/components/ui/field'
 import {
   Select,
   SelectContent,
@@ -58,7 +63,9 @@ export function CourseFormFields({
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="name">Nome do curso</FieldLabel>
               <Input {...field} id="name" aria-invalid={fieldState.invalid} />
-              {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+              {fieldState.error && (
+                <FieldError>{fieldState.error.message}</FieldError>
+              )}
             </Field>
           )}
         />
@@ -76,7 +83,9 @@ export function CourseFormFields({
                 placeholder="Deixe em branco para sair do nome"
                 aria-invalid={fieldState.invalid}
               />
-              {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+              {fieldState.error && (
+                <FieldError>{fieldState.error.message}</FieldError>
+              )}
             </Field>
           )}
         />
@@ -94,7 +103,9 @@ export function CourseFormFields({
                 placeholder="A linha que aparece embaixo do nome no card"
                 aria-invalid={fieldState.invalid}
               />
-              {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+              {fieldState.error && (
+                <FieldError>{fieldState.error.message}</FieldError>
+              )}
             </Field>
           )}
         />
@@ -105,8 +116,15 @@ export function CourseFormFields({
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="description">Descrição</FieldLabel>
-              <Textarea {...field} id="description" rows={5} aria-invalid={fieldState.invalid} />
-              {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+              <Textarea
+                {...field}
+                id="description"
+                rows={5}
+                aria-invalid={fieldState.invalid}
+              />
+              {fieldState.error && (
+                <FieldError>{fieldState.error.message}</FieldError>
+              )}
             </Field>
           )}
         />
@@ -130,7 +148,9 @@ export function CourseFormFields({
                     ))}
                   </SelectContent>
                 </Select>
-                {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+                {fieldState.error && (
+                  <FieldError>{fieldState.error.message}</FieldError>
+                )}
               </Field>
             )}
           />
@@ -141,7 +161,10 @@ export function CourseFormFields({
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="status">Situação</FieldLabel>
-                <Select value={field.value ?? 'ACTIVE'} onValueChange={field.onChange}>
+                <Select
+                  value={field.value ?? 'ACTIVE'}
+                  onValueChange={field.onChange}
+                >
                   <SelectTrigger id="status">
                     <SelectValue />
                   </SelectTrigger>
@@ -153,7 +176,9 @@ export function CourseFormFields({
                     ))}
                   </SelectContent>
                 </Select>
-                {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+                {fieldState.error && (
+                  <FieldError>{fieldState.error.message}</FieldError>
+                )}
               </Field>
             )}
           />
@@ -161,11 +186,21 @@ export function CourseFormFields({
       </fieldset>
 
       <fieldset className="grid gap-6">
-        <legend className="text-lg font-semibold">Formato e investimento</legend>
+        <legend className="text-lg font-semibold">
+          Formato e investimento
+        </legend>
 
         <div className="grid gap-6 sm:grid-cols-2">
-          <NumberField form={form} name="workloadHours" label="Carga horária (horas)" />
-          <NumberField form={form} name="durationMonths" label="Duração (meses)" />
+          <NumberField
+            form={form}
+            name="workloadHours"
+            label="Carga horária (horas)"
+          />
+          <NumberField
+            form={form}
+            name="durationMonths"
+            label="Duração (meses)"
+          />
           <NumberField
             form={form}
             name="enrollmentFeeInCents"
@@ -194,8 +229,15 @@ export function CourseFormFields({
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="requirements">Requisitos</FieldLabel>
-              <Textarea {...field} value={field.value ?? ''} id="requirements" rows={3} />
-              {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+              <Textarea
+                {...field}
+                value={field.value ?? ''}
+                id="requirements"
+                rows={3}
+              />
+              {fieldState.error && (
+                <FieldError>{fieldState.error.message}</FieldError>
+              )}
             </Field>
           )}
         />
@@ -205,9 +247,18 @@ export function CourseFormFields({
           name="projectOutcome"
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="projectOutcome">O que o aluno vai construir</FieldLabel>
-              <Textarea {...field} value={field.value ?? ''} id="projectOutcome" rows={3} />
-              {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+              <FieldLabel htmlFor="projectOutcome">
+                O que o aluno vai construir
+              </FieldLabel>
+              <Textarea
+                {...field}
+                value={field.value ?? ''}
+                id="projectOutcome"
+                rows={3}
+              />
+              {fieldState.error && (
+                <FieldError>{fieldState.error.message}</FieldError>
+              )}
             </Field>
           )}
         />
@@ -216,7 +267,8 @@ export function CourseFormFields({
       <fieldset className="grid gap-4">
         <legend className="text-lg font-semibold">Grade</legend>
         <p className="text-sm text-muted-foreground">
-          Um item por encontro, na ordem em que acontecem. A ordem da lista é a ordem no site.
+          Um item por encontro, na ordem em que acontecem. A ordem da lista é a
+          ordem no site.
         </p>
 
         {modules.fields.map((entry, index) => (
@@ -231,7 +283,9 @@ export function CourseFormFields({
                       Encontro {index + 1}
                     </FieldLabel>
                     <Input {...field} id={`modules.${index}.title`} />
-                    {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+                    {fieldState.error && (
+                      <FieldError>{fieldState.error.message}</FieldError>
+                    )}
                   </Field>
                 )}
               />
@@ -252,7 +306,9 @@ export function CourseFormFields({
               name={`modules.${index}.description`}
               render={({ field }) => (
                 <Field>
-                  <FieldLabel htmlFor={`modules.${index}.description`}>O que tem nele</FieldLabel>
+                  <FieldLabel htmlFor={`modules.${index}.description`}>
+                    O que tem nele
+                  </FieldLabel>
                   <Textarea
                     {...field}
                     value={field.value ?? ''}
@@ -287,9 +343,13 @@ export function CourseFormFields({
                 name={`faqs.${index}.question`}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid} className="flex-1">
-                    <FieldLabel htmlFor={`faqs.${index}.question`}>Pergunta</FieldLabel>
+                    <FieldLabel htmlFor={`faqs.${index}.question`}>
+                      Pergunta
+                    </FieldLabel>
                     <Input {...field} id={`faqs.${index}.question`} />
-                    {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+                    {fieldState.error && (
+                      <FieldError>{fieldState.error.message}</FieldError>
+                    )}
                   </Field>
                 )}
               />
@@ -310,9 +370,13 @@ export function CourseFormFields({
               name={`faqs.${index}.answer`}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={`faqs.${index}.answer`}>Resposta</FieldLabel>
+                  <FieldLabel htmlFor={`faqs.${index}.answer`}>
+                    Resposta
+                  </FieldLabel>
                   <Textarea {...field} id={`faqs.${index}.answer`} rows={2} />
-                  {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+                  {fieldState.error && (
+                    <FieldError>{fieldState.error.message}</FieldError>
+                  )}
                 </Field>
               )}
             />
@@ -350,7 +414,13 @@ function NumberField({
   nullable,
 }: {
   form: UseFormReturn<AdministratorCourseCreatePayload>
-  name: 'workloadHours' | 'durationMonths' | 'enrollmentFeeInCents' | 'monthlyFeeInCents' | 'minimumAge' | 'position'
+  name:
+    | 'workloadHours'
+    | 'durationMonths'
+    | 'enrollmentFeeInCents'
+    | 'monthlyFeeInCents'
+    | 'minimumAge'
+    | 'position'
   label: string
   hint?: string
   nullable?: boolean
@@ -382,8 +452,12 @@ function NumberField({
             }}
             aria-invalid={fieldState.invalid}
           />
-          {hint && !fieldState.error && <p className="text-xs text-muted-foreground">{hint}</p>}
-          {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+          {hint && !fieldState.error && (
+            <p className="text-xs text-muted-foreground">{hint}</p>
+          )}
+          {fieldState.error && (
+            <FieldError>{fieldState.error.message}</FieldError>
+          )}
         </Field>
       )}
     />
