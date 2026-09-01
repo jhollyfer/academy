@@ -99,7 +99,30 @@ shadcn: no simple-hub o mesmo par dá 1,28:1 no claro. A 1.4.11 pede 3:1 de
 quem identifica é `--input`, que aqui tem valor próprio e passa nos dois temas
 (no simple-hub `--input` é igual a `--border` e reprovaria).
 
-## Riscos anotados
+## Verificação final, feita
+
+- `pnpm typecheck`, `pnpm lint`, `pnpm build` e 121 testes limpos, frontend e
+  backend.
+- Sete rotas percorridas em navegador com **console limpo**: sem aviso de
+  `nativeButton`, sem mismatch de hidratação, sem erro de CORS. 1,1 a 2,0 s por
+  navegação.
+- Tabulação real em `/matricula`: passo 1 → passo 2 só com Tab, Espaço e Enter,
+  anel de foco em todas as paradas nos dois temas. Os únicos focáveis sem anel
+  são os botões do painel de devtools do TanStack, que não existem em produção.
+- 20 capturas: 5 rotas × 2 temas × 390px e 1440px.
+- Seeder rodado: as cinco turmas começam em 12/09/2026.
+
+## Ambiente local, fora do versionamento
+
+`backend/.env` estava com `NODE_ENV=production` e `CORS_ORIGIN` comentada. Com
+isso `app.inDev` é falso, a allowlist fica vazia, a API para de responder
+`Access-Control-Allow-Origin`, e **todo refetch do navegador morre** - com os
+dados ainda na tela, porque o SSR busca no servidor, onde não há CORS. Foi
+acrescentado `CORS_ORIGIN=http://localhost:3000` no `.env` local (não
+versionado) e a explicação entrou no `.env.example`. O `NODE_ENV=production`
+continua lá, e é decisão de quem configurou a máquina.
+
+## Riscos anotados## Riscos anotados
 
 - Os três blocos escuros (`footer.tsx:23`, `course-cards.tsx:53`,
   `what-you-get.tsx:110`) **invertem**: no escuro o rodapé vira placa clara.
