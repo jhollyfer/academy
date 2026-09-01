@@ -197,10 +197,7 @@ test.group('vitrine > cursos > turmas anunciadas', (group) => {
     assert.isNull(listed.nextClass)
   })
 
-  test('o detalhe do curso anuncia as mesmas turmas que a listagem', async ({
-    client,
-    assert,
-  }) => {
+  test('o detalhe do curso anuncia as mesmas turmas que a listagem', async ({ client, assert }) => {
     const session = await authenticateAsOwner(client)
     const course = await createCourse(client, session)
 

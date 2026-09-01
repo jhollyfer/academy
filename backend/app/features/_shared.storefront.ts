@@ -41,14 +41,16 @@ export function visibleCourses<TQuery extends ModelQueryBuilderContract<typeof C
  * por card, e a página inteira paga isso antes de pintar.
  */
 export function announceableClassesQuery(courseIds: ReadonlyArray<string>) {
-  return withSeatsTaken(Class.query())
-    .whereIn('courseId', [...courseIds])
-    .whereNull('deletedAt')
-    .whereIn('status', [ClassStatuses.OPEN, ClassStatuses.FULL])
-    .orderBy('startsAt', 'asc')
-    // Desempate pela hora: as turmas de um curso caem todas no mesmo sábado, e
-    // sem isto a ordem entre a de 8h e a de 10h seria a que o banco entregasse.
-    .orderBy('startsAtTime', 'asc')
+  return (
+    withSeatsTaken(Class.query())
+      .whereIn('courseId', [...courseIds])
+      .whereNull('deletedAt')
+      .whereIn('status', [ClassStatuses.OPEN, ClassStatuses.FULL])
+      .orderBy('startsAt', 'asc')
+      // Desempate pela hora: as turmas de um curso caem todas no mesmo sábado, e
+      // sem isto a ordem entre a de 8h e a de 10h seria a que o banco entregasse.
+      .orderBy('startsAtTime', 'asc')
+  )
 }
 
 /**
