@@ -116,7 +116,8 @@ function RouteComponent(): React.JSX.Element {
             )}
 
             <Button type="submit" disabled={mutation.isPending} className="w-full">
-              {mutation.isPending ? 'Entrando...' : 'Entrar'}
+              {mutation.isPending && 'Entrando...'}
+              {!mutation.isPending && 'Entrar'}
             </Button>
           </FieldGroup>
         </form>

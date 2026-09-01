@@ -15,13 +15,13 @@ services:
     # deixa os três projetos convivendo sem ninguém ter de derrubar o container
     # do outro (AD-013). Dentro da rede do compose o Postgres segue em 5432.
     ports:
-      - "${DB_PORT:-5434}:5432"
+      - '${DB_PORT:-5434}:5432'
     volumes:
       - academy-backend-database-volume:/var/lib/postgresql/data
     # networks:
     #   - academy-backend-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U academy -d academy"]
+      test: ['CMD-SHELL', 'pg_isready -U academy -d academy']
       interval: 5s
       timeout: 5s
       retries: 5
@@ -45,12 +45,12 @@ services:
     # são do `simple-hub` e 9002/9003 do `adacaibs`. Console em
     # http://localhost:9005.
     ports:
-      - "${STORAGE_PORT:-9004}:9000"
-      - "${STORAGE_CONSOLE_PORT:-9005}:9001"
+      - '${STORAGE_PORT:-9004}:9000'
+      - '${STORAGE_CONSOLE_PORT:-9005}:9001'
     volumes:
       - academy-backend-storage-volume:/data
     healthcheck:
-      test: ["CMD-SHELL", "mc ready local"]
+      test: ['CMD-SHELL', 'mc ready local']
       interval: 5s
       timeout: 5s
       retries: 10

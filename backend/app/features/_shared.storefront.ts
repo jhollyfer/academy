@@ -1,5 +1,5 @@
 import Class from '#models/class'
-import Course from '#models/course'
+import type Course from '#models/course'
 import { withSeatsTaken } from '#features/_shared.seats'
 import { ActiveStatuses, ClassStatuses } from '#core/entity'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
@@ -16,9 +16,9 @@ import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
  * primeira condição nova, e a divergência apareceria como um curso fantasma na
  * vitrine, não como erro.
  */
-export function visibleCourses<
-  TQuery extends ModelQueryBuilderContract<typeof Course, Course>,
->(query: TQuery): TQuery {
+export function visibleCourses<TQuery extends ModelQueryBuilderContract<typeof Course, Course>>(
+  query: TQuery
+): TQuery {
   query.whereNull('deletedAt').where('status', ActiveStatuses.ACTIVE)
 
   return query

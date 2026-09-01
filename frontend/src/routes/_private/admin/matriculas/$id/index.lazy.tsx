@@ -43,6 +43,13 @@ const STATUS: Record<
   CANCELLED: { label: 'Cancelada', action: 'Cancelar matrícula', variant: 'destructive' },
 }
 
+/** Cancelar não pode parecer a ação principal, mesmo sendo a única disponível. */
+function triggerVariant(status: EnrollmentStatus): 'outline' | 'default' {
+  if (status === EnrollmentStatuses.CANCELLED) return 'outline'
+
+  return 'default'
+}
+
 function RouteComponent(): React.JSX.Element {
   const { id } = EnrollmentRoute.useParams()
   const { data: enrollment } = useSuspenseQuery(enrollmentDetailQueryOptions(id))
@@ -182,7 +189,7 @@ function RouteComponent(): React.JSX.Element {
                   key={status}
                   trigger={
                     <Button
-                      variant={status === EnrollmentStatuses.CANCELLED ? 'outline' : 'default'}
+                      variant={triggerVariant(status)}
                       disabled={mutation.isPending}
                       className="w-full justify-start"
                     >

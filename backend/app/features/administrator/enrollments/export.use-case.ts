@@ -70,7 +70,10 @@ export default class EnrollmentExportUseCase {
       if (payload.courseId)
         query.whereIn(
           'classId',
-          Enrollment.query().client.from('classes').select('id').where('course_id', payload.courseId)
+          Enrollment.query()
+            .client.from('classes')
+            .select('id')
+            .where('course_id', payload.courseId)
         )
 
       if (payload.search) {

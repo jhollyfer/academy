@@ -37,7 +37,10 @@ export default class EnrollmentListUseCase {
       if (payload.courseId)
         query.whereIn(
           'classId',
-          Enrollment.query().client.from('classes').select('id').where('course_id', payload.courseId)
+          Enrollment.query()
+            .client.from('classes')
+            .select('id')
+            .where('course_id', payload.courseId)
         )
 
       // A busca alcança o protocolo de propósito: é o número que o candidato
@@ -56,7 +59,12 @@ export default class EnrollmentListUseCase {
       const enrollments = await query
         // Mais recentes primeiro: a fila da secretaria começa pelo que acabou
         // de chegar, ao contrário das listagens de catálogo.
-        .orderBy(...sortOrder({ ...payload, direction: payload.direction ?? SortDirections.DESC }, 'createdAt'))
+        .orderBy(
+          ...sortOrder(
+            { ...payload, direction: payload.direction ?? SortDirections.DESC },
+            'createdAt'
+          )
+        )
         .paginate(payload.page ?? PAGE, payload.perPage ?? PER_PAGE)
 
       return right({ meta: enrollments.getMeta(), data: enrollments.all() })

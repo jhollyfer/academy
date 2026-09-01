@@ -33,7 +33,9 @@ export default class CourseShowUseCase {
       return right(course)
     } catch (error) {
       logger.error({ err: error }, '[courses > show][error]')
-      return left(HTTPException.InternalServerError('Erro interno do servidor', 'COURSE_SHOW_ERROR'))
+      return left(
+        HTTPException.InternalServerError('Erro interno do servidor', 'COURSE_SHOW_ERROR')
+      )
     }
   }
 }

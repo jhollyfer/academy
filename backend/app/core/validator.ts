@@ -271,7 +271,6 @@ export type TrashablePaginationPayload = Infer<typeof TrashablePaginationValidat
 // administrator/courses
 // ---------------------------------------------------------------------------
 
-
 /**
  * Um encontro da grade. Sem `id` nem `position`: o módulo não tem identidade
  * estável do lado do cliente, e a ordem é o índice do array - quem arrasta um
@@ -309,7 +308,7 @@ export const AdministratorCourseCreateValidator = vine.create({
   // ainda assim passa pelo `SlugService.normalize` no use-case.
   slug: vine.string().trim().maxLength(140).optional(),
   tagline: vine.string().trim().maxLength(200).nullable().optional(),
-  description: vine.string().trim().minLength(10),
+  description: vine.string().trim().minLength(10).maxLength(4000),
   accent: vine.enum(COURSE_ACCENTS),
   workloadHours: vine.number().min(1).max(10_000),
   durationMonths: vine.number().min(1).max(120),
@@ -347,7 +346,7 @@ export const AdministratorCourseUpdateValidator = vine.create({
   name: vine.string().trim().minLength(2).maxLength(160).optional(),
   slug: vine.string().trim().maxLength(140).optional(),
   tagline: vine.string().trim().maxLength(200).nullable().optional(),
-  description: vine.string().trim().minLength(10).optional(),
+  description: vine.string().trim().minLength(10).maxLength(4000).optional(),
   accent: vine.enum(COURSE_ACCENTS).optional(),
   workloadHours: vine.number().min(1).max(10_000).optional(),
   durationMonths: vine.number().min(1).max(120).optional(),
@@ -405,7 +404,11 @@ export const AdministratorClassCreateValidator = vine.create({
   // Nula enquanto a escola não fechou a data de encerramento. `afterField`
   // porque uma turma que termina antes de começar é erro de digitação, e o
   // banco aceitaria calado.
-  endsAt: vine.date({ formats: ['iso8601'] }).afterField('startsAt').nullable().optional(),
+  endsAt: vine
+    .date({ formats: ['iso8601'] })
+    .afterField('startsAt')
+    .nullable()
+    .optional(),
   weekday: vine.enum(WEEKDAYS),
   shift: vine.enum(SHIFTS),
   location: vine.string().trim().minLength(2).maxLength(200),
@@ -419,7 +422,10 @@ export const AdministratorClassUpdateValidator = vine.create({
   courseId: vine.string().uuid().optional(),
   name: vine.string().trim().minLength(2).maxLength(160).optional(),
   startsAt: vine.date().optional(),
-  endsAt: vine.date({ formats: ['iso8601'] }).nullable().optional(),
+  endsAt: vine
+    .date({ formats: ['iso8601'] })
+    .nullable()
+    .optional(),
   weekday: vine.enum(WEEKDAYS).optional(),
   shift: vine.enum(SHIFTS).optional(),
   location: vine.string().trim().minLength(2).maxLength(200).optional(),
@@ -492,24 +498,23 @@ export type AdministratorEnrollmentUpdatePayload = Infer<
  * precisa.
  */
 export const StorefrontEnrollmentCreateValidator = vine.create(
-  vine
-    .object({
-      classId: vine.string().uuid(),
-      studentName: vine.string().trim().minLength(2).maxLength(160),
-      studentBirthDate: vine.date({ formats: ['iso8601'] }),
-      studentDocument: cpf().nullable().optional(),
-      email: email(),
-      phone: phone(),
+  vine.object({
+    classId: vine.string().uuid(),
+    studentName: vine.string().trim().minLength(2).maxLength(160),
+    studentBirthDate: vine.date({ formats: ['iso8601'] }),
+    studentDocument: cpf().nullable().optional(),
+    email: email(),
+    phone: phone(),
 
-      guardianName: vine.string().trim().minLength(2).maxLength(160).nullable().optional(),
-      guardianDocument: cpf().nullable().optional(),
-      guardianPhone: phone().nullable().optional(),
+    guardianName: vine.string().trim().minLength(2).maxLength(160).nullable().optional(),
+    guardianDocument: cpf().nullable().optional(),
+    guardianPhone: phone().nullable().optional(),
 
-      // Aceites. `literal(true)` e não booleano: "false" não é um consentimento
-      // que valha gravar, é o formulário enviado sem a caixa marcada.
-      termsAccepted: vine.literal(true),
-      lgpdConsent: vine.literal(true),
-    })
+    // Aceites. `literal(true)` e não booleano: "false" não é um consentimento
+    // que valha gravar, é o formulário enviado sem a caixa marcada.
+    termsAccepted: vine.literal(true),
+    lgpdConsent: vine.literal(true),
+  })
 )
 
 export type StorefrontEnrollmentCreatePayload = Infer<typeof StorefrontEnrollmentCreateValidator>

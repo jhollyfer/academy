@@ -131,9 +131,9 @@ function RouteComponent(): React.JSX.Element {
         {enrollment.status !== EnrollmentStatuses.CANCELLED && (
           <section className="mt-12 border-t border-white/5 pt-10">
             <h2 className="font-display text-xl font-bold italic">
-              {enrollment.status === EnrollmentStatuses.WAITLIST
-                ? 'Pagamento da inscrição'
-                : 'Pague a inscrição e envie o comprovante'}
+              {enrollment.status === EnrollmentStatuses.WAITLIST && 'Pagamento da inscrição'}
+              {enrollment.status !== EnrollmentStatuses.WAITLIST &&
+                'Pague a inscrição e envie o comprovante'}
             </h2>
 
             {enrollment.status === EnrollmentStatuses.WAITLIST && (

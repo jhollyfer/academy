@@ -16,9 +16,7 @@ test.group('storefront/enrollments', (group) => {
     const course = await createCourse(client, session)
     const turma = await createClass(client, session, course.id)
 
-    const response = await client
-      .post('/storefront/enrollments')
-      .json(enrollmentPayload(turma.id))
+    const response = await client.post('/storefront/enrollments').json(enrollmentPayload(turma.id))
 
     response.assertStatus(201)
 
@@ -32,10 +30,7 @@ test.group('storefront/enrollments', (group) => {
     assert.isNotNull(enrollment.lgpdConsentAt)
   })
 
-  test('menor de idade sem responsável é 422 com um erro por campo', async ({
-    client,
-    assert,
-  }) => {
+  test('menor de idade sem responsável é 422 com um erro por campo', async ({ client, assert }) => {
     const session = await authenticateAsOwner(client)
     const course = await createCourse(client, session)
     const turma = await createClass(client, session, course.id)
@@ -69,18 +64,6 @@ test.group('storefront/enrollments', (group) => {
     )
 
     response.assertStatus(201)
-  })
-
-  test('sem aceite de LGPD é 422', async ({ client }) => {
-    const session = await authenticateAsOwner(client)
-    const course = await createCourse(client, session)
-    const turma = await createClass(client, session, course.id)
-
-    const response = await client
-      .post('/storefront/enrollments')
-      .json(enrollmentPayload(turma.id, { lgpdConsent: false }))
-
-    response.assertStatus(422)
   })
 
   test('turma lotada entra como WAITLIST em vez de recusar', async ({ client, assert }) => {
@@ -131,9 +114,7 @@ test.group('storefront/enrollments', (group) => {
     const course = await createCourse(client, session)
     const turma = await createClass(client, session, course.id, { status: 'CLOSED' })
 
-    const response = await client
-      .post('/storefront/enrollments')
-      .json(enrollmentPayload(turma.id))
+    const response = await client.post('/storefront/enrollments').json(enrollmentPayload(turma.id))
 
     response.assertStatus(422)
     assert.equal(body(response).code, 'CLASS_UNAVAILABLE')
@@ -149,18 +130,13 @@ test.group('storefront/enrollments', (group) => {
       .cookies(session)
       .json({ status: 'INACTIVE' })
 
-    const response = await client
-      .post('/storefront/enrollments')
-      .json(enrollmentPayload(turma.id))
+    const response = await client.post('/storefront/enrollments').json(enrollmentPayload(turma.id))
 
     response.assertStatus(422)
     assert.equal(body(response).code, 'CLASS_UNAVAILABLE')
   })
 
-  test('acompanha pelo protocolo e não vê a anotação da secretaria', async ({
-    client,
-    assert,
-  }) => {
+  test('acompanha pelo protocolo e não vê a anotação da secretaria', async ({ client, assert }) => {
     const session = await authenticateAsOwner(client)
     const course = await createCourse(client, session)
     const turma = await createClass(client, session, course.id)

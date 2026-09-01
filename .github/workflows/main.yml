@@ -5,14 +5,14 @@ on:
     branches: [main]
 
 jobs:
-  build-backend:
-    uses: ./.github/workflows/main-build-backend.yml
+  check-backend:
+    uses: ./.github/workflows/main-check-backend.yml
 
   build-frontend:
     uses: ./.github/workflows/main-build-frontend.yml
 
   docker-backend:
-    needs: build-backend
+    needs: check-backend
     uses: ./.github/workflows/main-docker-backend.yml
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}

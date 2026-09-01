@@ -75,7 +75,8 @@ export function ReceiptUpload({
     } catch (error) {
       // O erro do upload é do transporte, não da API: mostra a mensagem dele em
       // vez de uma genérica, que não diria se foi tipo, tamanho ou rede.
-      const message = error instanceof Error ? error.message : 'Não deu para enviar o arquivo.'
+      let message = 'Não deu para enviar o arquivo.'
+      if (error instanceof Error) message = error.message
 
       toast.error(message)
     } finally {
@@ -112,7 +113,8 @@ export function ReceiptUpload({
       >
         {busy && <Spinner className="animate-spin" />}
         {!busy && <Paperclip />}
-        {busy ? 'Enviando...' : 'Anexar comprovante'}
+        {busy && 'Enviando...'}
+        {!busy && 'Anexar comprovante'}
       </Button>
 
       {progress !== null && (

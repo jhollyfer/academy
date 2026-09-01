@@ -372,7 +372,9 @@ function NumberField({
               const raw = event.target.value
 
               if (raw === '') {
-                field.onChange(nullable ? null : undefined)
+                if (nullable) field.onChange(null)
+                if (!nullable) field.onChange(undefined)
+
                 return
               }
 

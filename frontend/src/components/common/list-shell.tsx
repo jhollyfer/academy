@@ -36,6 +36,25 @@ import type { PaginationMeta } from '#/integrations/response'
  * o seu conjunto de filtros.
  */
 
+/** Singular ou plural, sem ternário: a regra do projeto é `if`, não `?:`. */
+function label(total: number): string {
+  if (total === 1) return 'registro'
+
+  return 'registros'
+}
+
+/**
+ * A página anterior, com a primeira virando `undefined`.
+ *
+ * `?page=1` é ruído: é o default, e deixá-lo na URL faz o link compartilhado
+ * carregar um parâmetro que não muda nada.
+ */
+function previousPage(page: number): number | undefined {
+  if (page - 1 <= 1) return undefined
+
+  return page - 1
+}
+
 export type Column<TRow> = {
   key: string
   header: string
@@ -205,7 +224,7 @@ export function ListShell<TRow extends { id: string }>({
       {meta && meta.total > 0 && (
         <div className="flex items-center justify-between gap-4 text-sm text-muted-foreground">
           <p aria-live="polite">
-            {meta.total} {meta.total === 1 ? 'registro' : 'registros'}, página {page} de {lastPage}
+            {meta.total} {label(meta.total)}, página {page} de {lastPage}
           </p>
 
           <div className="flex gap-2">
@@ -213,7 +232,7 @@ export function ListShell<TRow extends { id: string }>({
               variant="outline"
               size="sm"
               disabled={page <= 1}
-              onClick={() => onPageChange(page - 1 === 1 ? undefined : page - 1)}
+              onClick={() => onPageChange(previousPage(page))}
             >
               <CaretLeft />
               Anterior

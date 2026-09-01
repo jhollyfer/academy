@@ -18,7 +18,7 @@ import {
   FormShellTitle,
 } from '#/components/common/form-shell'
 import { ClassFormFields } from './-form-fields'
-import { CLASS_FIELDS, classDefaults } from './-form-config'
+import { CLASS_FIELDS, classDefaults, optionalDate } from './-form-config'
 import type { ClassFormValues } from './-form-config'
 import type { AdministratorClassCreatePayload } from '#/lib/validator'
 import type { ClassResponse } from '#/integrations/response'
@@ -48,7 +48,7 @@ function RouteComponent(): React.JSX.Element {
     payload: ({ startsAt, endsAt, ...rest }) => ({
       ...rest,
       startsAt: new Date(startsAt),
-      endsAt: endsAt ? new Date(endsAt) : null,
+      endsAt: optionalDate(endsAt),
     }),
   })
 

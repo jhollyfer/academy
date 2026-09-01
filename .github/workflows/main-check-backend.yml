@@ -1,0 +1,121 @@
+name: Check Backend
+
+on:
+  workflow_call:
+
+jobs:
+  check:
+    name: Backend - Lint, Typecheck, OpenAPI & Test
+    runs-on: ubuntu-latest
+
+    # A porta e o nome do banco vêm de `backend/.env.test`, que é versionado:
+    # 5433 no host (AD-013) e `academy_test`. Declarar `POSTGRES_DB` já com o
+    # nome de teste dispensa o `createdb` que o desenvolvimento local faz à mão.
+    services:
+      database:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: academy
+          POSTGRES_PASSWORD: academy
+          POSTGRES_DB: academy_test
+        ports:
+          - "5434:5432"
+        options: >-
+          --health-cmd "pg_isready -U academy -d academy_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.21.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: backend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: pnpm install --frozen-lockfile
+
+      - name: Run linter
+        working-directory: ./backend
+        run: pnpm lint
+
+      - name: Typecheck
+        working-directory: ./backend
+        run: pnpm typecheck
+
+      # `openapi.json` é artefato commitado. Este passo reprova quem mexeu numa
+      # rota, num validator ou num bloco `docs` e não regerou o documento.
+      #
+      # O bloco `env` é do passo, e não do job: `openapi:generate` roda com
+      # `startApp`, ou seja, boota a aplicação, e o boot valida `start/env.ts`.
+      # Estes valores existem só para o schema passar — o comando lê rotas e
+      # schemas VineJS, não toca no banco nem no bucket. No job inteiro eles
+      # venceriam o `.env.test` do passo seguinte, porque variável de processo
+      # tem precedência sobre arquivo, e a suíte apontaria para um banco que
+      # não existe.
+      - name: Check OpenAPI document
+        working-directory: ./backend
+        env:
+          NODE_ENV: development
+          PORT: "3333"
+          HOST: 0.0.0.0
+          LOG_LEVEL: info
+          APP_KEY: ci-placeholder-sem-uso-fora-deste-job
+          APP_URL: http://localhost:3333
+          SESSION_DRIVER: cookie
+          DATABASE_URL: postgres://ci:ci@localhost:5432/ci
+          UPLOAD_MAX_SIZE: "1073741824"
+        run: node ace openapi:generate --check
+
+      # O MinIO não sobe como `services:` porque precisa de `command` — a chave
+      # existe no compose e não no bloco de serviço do Actions. `--network host`
+      # com `--address :9004` reproduz a porta publicada do compose (AD-013), que
+      # é a que `.env.test` procura.
+      #
+      # O bootstrap é o mesmo do serviço `storage-bootstrap`: cria o bucket de
+      # teste e libera leitura anônima, porque a `url` de um anexo é pública.
+      - name: Start MinIO
+        run: |
+          docker run -d --name storage --network host \
+            -e MINIO_ROOT_USER=academy \
+            -e MINIO_ROOT_PASSWORD=academy-secret \
+            -e MINIO_API_CORS_ALLOW_ORIGIN='*' \
+            minio/minio:latest server /data --address ":9004" --console-address ":9005"
+
+          for _ in $(seq 1 30); do
+            curl -fsS http://localhost:9004/minio/health/live && break
+            sleep 2
+          done
+
+          docker run --rm --network host --entrypoint sh minio/mc:latest -c '
+            set -e
+            mc alias set target http://localhost:9004 academy academy-secret
+            mc mb --ignore-existing target/academy-test
+            mc anonymous set download target/academy-test
+          '
+
+      # A suíte é funcional e fala com o Postgres e com o MinIO de verdade
+      # (`multipart.spec.ts`, `storages.spec.ts`) — é o mesmo caminho de código
+      # que produção usa. Só entram aqui as variáveis que `.env.test` não traz:
+      # o resto sai do arquivo versionado, e sobrescrevê-lo daqui apontaria a
+      # suíte para outro banco e outro bucket.
+      - name: Test
+        working-directory: ./backend
+        env:
+          PORT: "3333"
+          HOST: 0.0.0.0
+          LOG_LEVEL: info
+          APP_KEY: ci-placeholder-sem-uso-fora-deste-job
+          APP_URL: http://localhost:3333
+        run: pnpm test

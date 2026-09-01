@@ -37,8 +37,21 @@ export const Route = createLazyFileRoute('/_public/matricula/')({
  * terceiro é o que sai do resolver e chega ao `onSubmit`.
  */
 type FormValues = Merge<
-  Omit<StorefrontEnrollmentCreatePayload, 'studentBirthDate'>,
-  { studentBirthDate: string }
+  Omit<StorefrontEnrollmentCreatePayload, 'studentBirthDate' | 'termsAccepted' | 'lgpdConsent'>,
+  {
+    studentBirthDate: string
+    /**
+     * Os aceites são `boolean` aqui e `literal(true)` no payload.
+     *
+     * O validator exige `true` porque um aceite `false` não é consentimento - é
+     * o formulário enviado sem a caixa marcada. Mas o **campo** pode estar
+     * desmarcado enquanto a pessoa lê os termos, e tipá-lo `true` faria o
+     * `checked={field.value === true}` do checkbox ser uma comparação que o
+     * compilador já sabe verdadeira: a caixa nunca desmarcaria na tela.
+     */
+    termsAccepted: boolean
+    lgpdConsent: boolean
+  }
 >
 
 /**
@@ -95,6 +108,19 @@ function ageFrom(birthDate: string): number | null {
   return age
 }
 
+/**
+ * O que dizer sobre as vagas de uma turma.
+ *
+ * Turma cheia não some da lista: quem chega depois das quarenta entra na fila de
+ * espera, e esconder a opção o mandaria embora.
+ */
+function seatsLabel(remaining: number | undefined): string {
+  if (remaining === undefined) return ''
+  if (remaining === 0) return 'Turma cheia: você entra na fila de espera.'
+
+  return `${remaining} vagas restantes.`
+}
+
 function RouteComponent(): React.JSX.Element {
   const router = useRouter()
   const search = EnrollmentRoute.useSearch()
@@ -116,7 +142,7 @@ function RouteComponent(): React.JSX.Element {
     resolver: vineResolver(StorefrontEnrollmentCreateValidator),
     mode: 'onTouched',
     defaultValues: {
-      classId: preselected?.nextClass.id ?? options[0]?.nextClass.id ?? '',
+      classId: preselected?.nextClass.id ?? options.at(0)?.nextClass.id ?? '',
       studentName: '',
       studentBirthDate: '',
       studentDocument: null,
@@ -125,6 +151,9 @@ function RouteComponent(): React.JSX.Element {
       guardianName: null,
       guardianDocument: null,
       guardianPhone: null,
+      // Marcados por padrão: são obrigatórios, a tela os explica, e começar
+      // desmarcado só acrescenta dois cliques ao caminho de quem já decidiu. O
+      // texto ao lado da caixa continua sendo o consentimento informado.
       termsAccepted: true,
       lgpdConsent: true,
     },
@@ -136,7 +165,8 @@ function RouteComponent(): React.JSX.Element {
   const birthDate = form.watch('studentBirthDate')
   const classId = form.watch('classId')
 
-  const age = birthDate ? ageFrom(birthDate) : null
+  let age: number | null = null
+  if (birthDate) age = ageFrom(birthDate)
   const isMinor = age !== null && age < LEGAL_AGE
 
   // Os passos que esta pessoa vai ver. Derivado, não guardado: a idade muda
@@ -246,9 +276,7 @@ function RouteComponent(): React.JSX.Element {
                             <span className="text-sm text-muted-foreground">
                               {course.nextClass.name}, começa em{' '}
                               {formatDate(course.nextClass.startsAt)}.{' '}
-                              {course.nextClass.seatsRemaining === 0
-                                ? 'Turma cheia: você entra na fila de espera.'
-                                : `${course.nextClass.seatsRemaining} vagas restantes.`}
+                              {seatsLabel(course.nextClass.seatsRemaining)}
                             </span>
                           </span>
                         </label>
@@ -518,7 +546,8 @@ function RouteComponent(): React.JSX.Element {
 
             {index === steps.length - 1 && (
               <Button type="submit" disabled={mutation.isPending}>
-                {mutation.isPending ? 'Enviando...' : 'Enviar matrícula'}
+                {mutation.isPending && 'Enviando...'}
+                {!mutation.isPending && 'Enviar matrícula'}
                 <CheckCircle />
               </Button>
             )}

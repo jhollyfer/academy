@@ -1,40 +1,52 @@
 name: Build Frontend
 
+# Reusable: quem chama é o `main.yml`, no push para `main`. O gatilho de push
+# direto que este arquivo tinha existia enquanto a cadeia de deploy não existia
+# neste projeto; agora ela existe, e dois gatilhos para o mesmo build rodariam o
+# mesmo trabalho duas vezes.
 on:
   workflow_call:
 
 jobs:
   build:
+    name: Compile & Package
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.21.0
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
+          node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: frontend/pnpm-lock.yaml
 
       - name: Install dependencies
         working-directory: ./frontend
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build
         working-directory: ./frontend
         env:
-          NEXT_PUBLIC_API_URL: https://api.academy.maiyu.com.br
           NODE_OPTIONS: "--max-old-space-size=8192"
-        run: npm run build
+        run: pnpm build
 
-      - name: Upload build artifact
+      # O `VITE_API_URL` não entra aqui: ele vem de `frontend/.env.production`,
+      # que é versionado. Valor com prefixo `VITE_` é embutido no bundle, ou
+      # seja, público por definição - e tê-lo no arquivo evita que trocar de
+      # endereço vire uma edição de workflow.
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: frontend-build
-          path: |
-            frontend/.next/standalone/
-            frontend/.next/static/
-            frontend/public/
-          include-hidden-files: true
           retention-days: 1
+          include-hidden-files: true
+          path: |
+            frontend/.output/

@@ -4480,7 +4480,8 @@
           },
           "description": {
             "type": "string",
-            "minLength": 10
+            "minLength": 10,
+            "maxLength": 4000
           },
           "accent": {
             "enum": [
@@ -5503,7 +5504,8 @@
           },
           "description": {
             "type": "string",
-            "minLength": 10
+            "minLength": 10,
+            "maxLength": 4000
           },
           "accent": {
             "enum": [

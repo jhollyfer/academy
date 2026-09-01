@@ -143,21 +143,43 @@ export async function createClass(
 }
 
 /**
+ * O que cada teste troca no payload de matrícula.
+ *
+ * Um tipo próprio em vez de `Record<string, unknown>`: o cliente do Japa infere
+ * o corpo esperado do registry de rotas, e um `Record` largo não satisfaz a
+ * assinatura - a chamada compilaria em nenhum lugar e o teste passaria só por
+ * `node ace test` não checar tipo.
+ */
+type EnrollmentOverrides = {
+  studentName?: string
+  studentBirthDate?: string
+  studentDocument?: string | null
+  email?: string
+  phone?: string
+  guardianName?: string | null
+  guardianDocument?: string | null
+  guardianPhone?: string | null
+}
+
+/**
  * O payload mínimo de uma matrícula. Maior de idade por padrão - o caso do menor
  * é o que cada teste sobrescreve, porque é o que tem regra.
  */
-export function enrollmentPayload(
-  classId: string,
-  overrides: Record<string, unknown> = {}
-): Record<string, unknown> {
+export function enrollmentPayload(classId: string, overrides: EnrollmentOverrides = {}) {
   return {
     classId,
     studentName: 'João da Silva',
     studentBirthDate: '2000-04-12',
     email: 'joao@exemplo.com',
     phone: '97984600872',
-    termsAccepted: true,
-    lgpdConsent: true,
     ...overrides,
+    // Fora do alcance de `overrides` de propósito: o registro de rotas tipa os
+    // dois como `literal(true)`, e o cliente do Japa recusa `false` em tempo de
+    // compilação. Quem prova que a API os exige é `enrollment-consent.spec.ts`,
+    // que chama o validator direto - lá o payload inválido é construível.
+    // `as const` para o tipo continuar `true` e não alargar para `boolean`: o
+    // registro de rotas os declara `literal(true)`, e `boolean` não satisfaz.
+    termsAccepted: true as const,
+    lgpdConsent: true as const,
   }
 }

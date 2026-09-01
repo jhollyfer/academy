@@ -35,7 +35,7 @@ import {
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
 import { ClassFormFields } from '../-form-fields'
-import { CLASS_FIELDS, classToValues } from '../-form-config'
+import { CLASS_FIELDS, classToValues, optionalDate } from '../-form-config'
 import { Route as ClassRoute } from './index'
 import type { ClassFormValues } from '../-form-config'
 import type { AdministratorClassUpdatePayload } from '#/lib/validator'
@@ -72,7 +72,7 @@ function RouteComponent(): React.JSX.Element {
     payload: ({ startsAt, endsAt, ...rest }) => ({
       ...rest,
       startsAt: new Date(startsAt),
-      endsAt: endsAt ? new Date(endsAt) : null,
+      endsAt: optionalDate(endsAt),
     }),
   })
 

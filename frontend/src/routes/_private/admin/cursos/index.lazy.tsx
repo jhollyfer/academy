@@ -19,11 +19,11 @@ const COLUMNS: ReadonlyArray<Column<CourseResponse>> = [
   {
     key: 'status',
     header: 'Situação',
-    cell: (course) => (
-      <Badge variant={course.status === ActiveStatuses.ACTIVE ? 'default' : 'secondary'}>
-        {course.status === ActiveStatuses.ACTIVE ? 'No ar' : 'Fora do ar'}
-      </Badge>
-    ),
+    cell: (course) => {
+      if (course.status === ActiveStatuses.ACTIVE) return <Badge>No ar</Badge>
+
+      return <Badge variant="secondary">Fora do ar</Badge>
+    },
   },
   {
     key: 'classes',

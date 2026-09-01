@@ -32,10 +32,15 @@ export function Reveal({
 }): React.JSX.Element {
   const reduce = useReducedMotion()
 
+  // `false` desliga o estado inicial. Sem isto, `opacity: 0` ficaria valendo
+  // quando a animação é anulada, e a seção nunca apareceria.
+  let initial: false | { opacity: number; y: number } = { opacity: 0, y: 20 }
+  if (reduce) initial = false
+
   return (
     <motion.div
       className={className}
-      initial={reduce ? false : { opacity: 0, y: 20 }}
+      initial={initial}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}

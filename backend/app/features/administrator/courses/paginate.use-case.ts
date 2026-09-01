@@ -48,7 +48,9 @@ export default class CourseListUseCase {
       })
     } catch (error) {
       logger.error({ err: error }, '[courses > list][error]')
-      return left(HTTPException.InternalServerError('Erro interno do servidor', 'COURSE_LIST_ERROR'))
+      return left(
+        HTTPException.InternalServerError('Erro interno do servidor', 'COURSE_LIST_ERROR')
+      )
     }
   }
 }

@@ -174,12 +174,17 @@ export function ClassFormFields({
               id="capacity"
               type="number"
               inputMode="numeric"
-              value={field.value ?? ''}
+              value={field.value}
               onBlur={field.onBlur}
               onChange={(event) => {
                 const raw = event.target.value
 
-                field.onChange(raw === '' ? undefined : Number(raw))
+                if (raw === '') {
+                  field.onChange(undefined)
+                  return
+                }
+
+                field.onChange(Number(raw))
               }}
               aria-invalid={fieldState.invalid}
             />

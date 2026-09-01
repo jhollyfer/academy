@@ -115,7 +115,10 @@ function hasValidCpfDigits(digits: string): boolean {
 
     const rest = (sum * 10) % 11
 
-    if ((rest === 10 ? 0 : rest) !== Number(digits[size])) return false
+    let expected = rest
+    if (rest === 10) expected = 0
+
+    if (expected !== Number(digits[size])) return false
   }
 
   return true

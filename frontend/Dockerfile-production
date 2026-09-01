@@ -1,0 +1,21 @@
+FROM node:24-alpine
+
+WORKDIR /app
+
+# curl para healthcheck
+RUN apk add --no-cache curl
+
+# Copia .output pronto (vem do artifact)
+COPY .output/ ./.output/
+
+# Usuario nao-root
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nitro && \
+    chown -R nitro:nodejs /app/.output
+
+USER nitro
+
+EXPOSE 3000
+ENV PORT=3000
+
+CMD ["node", ".output/server/index.mjs"]

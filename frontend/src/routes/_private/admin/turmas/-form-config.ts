@@ -47,13 +47,39 @@ export function classToValues(entity: ClassResponse): ClassFormValues {
     // não converter, pelo motivo do `formatDate`: `new Date()` num fuso a oeste
     // retrocede um dia.
     startsAt: entity.startsAt.slice(0, 10),
-    endsAt: entity.endsAt ? entity.endsAt.slice(0, 10) : null,
+    endsAt: dateOnly(entity.endsAt),
     weekday: entity.weekday,
     shift: entity.shift,
     location: entity.location,
     capacity: entity.capacity,
     // `FULL` é derivado e o formulário não o oferece. Turma lotada em edição
     // mostra `OPEN`, e salvar não a reabre: o servidor recalcula.
-    status: entity.status === 'FULL' ? 'OPEN' : entity.status,
+    status: editableStatus(entity.status),
   }
+}
+
+/** A data sem a hora, para o `<input type="date">`. Nula continua nula. */
+function dateOnly(iso: string | null): string | null {
+  if (!iso) return null
+
+  return iso.slice(0, 10)
+}
+
+function editableStatus(status: ClassResponse['status']): 'OPEN' | 'CLOSED' {
+  if (status === 'CLOSED') return 'CLOSED'
+
+  return 'OPEN'
+}
+
+/**
+ * A data opcional do formulário na forma que a API recebe.
+ *
+ * Vazio é `null` e não `Invalid Date`: `new Date('')` produz uma data inválida
+ * que o VineJS recusa com "informe uma data", num campo que a pessoa
+ * deliberadamente deixou em branco.
+ */
+export function optionalDate(value: string | null): Date | null {
+  if (!value) return null
+
+  return new Date(value)
 }

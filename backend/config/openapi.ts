@@ -47,7 +47,6 @@ export type TagRule = {
   plural?: string
 }
 
-
 const tags: TagRule[] = [
   {
     prefix: '/authentication',

@@ -3,12 +3,7 @@ import EnrollmentFile from '#models/enrollment_file'
 import Storage from '#models/storage'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import {
-  EnrollmentFileKinds,
-  EnrollmentStatuses,
-  UploadStatuses,
-  type Merge,
-} from '#core/entity'
+import { EnrollmentFileKinds, EnrollmentStatuses, UploadStatuses, type Merge } from '#core/entity'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import type { ProtocolPayload, StorefrontEnrollmentAttachmentPayload } from '#core/validator'
@@ -37,10 +32,7 @@ export default class StorefrontEnrollmentAttachUseCase {
           })
         )
 
-      const storage = await Storage.query()
-        .where('id', storageId)
-        .whereNull('deletedAt')
-        .first()
+      const storage = await Storage.query().where('id', storageId).whereNull('deletedAt').first()
 
       if (!storage)
         return left(

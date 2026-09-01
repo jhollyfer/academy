@@ -22,7 +22,10 @@ function RouteComponent(): React.JSX.Element {
   const { data } = useSuspenseQuery(storefrontCoursesQueryOptions())
 
   const courses = data.data
-  const [first] = courses
+  // `.at(0)` e nao `courses[0]`: com `noUncheckedIndexedAccess` desligado, o
+  // indice mente que sempre ha elemento, e a home de uma escola sem curso
+  // cadastrado quebraria no primeiro acesso.
+  const first = courses.at(0)
 
   return (
     <>

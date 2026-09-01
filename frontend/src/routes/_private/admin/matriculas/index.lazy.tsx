@@ -53,6 +53,13 @@ const COLUMNS: ReadonlyArray<Column<EnrollmentResponse>> = [
   },
 ]
 
+/** O botão do filtro ativo fica sólido, o resto fantasma. */
+function variantFor(active: boolean): 'secondary' | 'ghost' {
+  if (active) return 'secondary'
+
+  return 'ghost'
+}
+
 function RouteComponent(): React.JSX.Element {
   const search = EnrollmentsRoute.useSearch()
   const navigate = useNavigate({ from: EnrollmentsRoute.fullPath })
@@ -67,7 +74,7 @@ function RouteComponent(): React.JSX.Element {
       */}
       <div className="flex flex-wrap items-center gap-2">
         <Button
-          variant={search.status ? 'ghost' : 'secondary'}
+          variant={variantFor(!search.status)}
           size="sm"
           onClick={() => navigate({ search: { ...search, status: undefined, page: undefined } })}
         >
@@ -76,7 +83,7 @@ function RouteComponent(): React.JSX.Element {
         {ENROLLMENT_STATUSES.map((status) => (
           <Button
             key={status}
-            variant={search.status === status ? 'secondary' : 'ghost'}
+            variant={variantFor(search.status === status)}
             size="sm"
             onClick={() => navigate({ search: { ...search, status, page: undefined } })}
           >

@@ -2,7 +2,10 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import EnrollmentListUseCase from './paginate.use-case.ts'
-import { AdministratorEnrollmentPaginationValidator, ENROLLMENT_SORT_COLUMNS } from '#core/validator'
+import {
+  AdministratorEnrollmentPaginationValidator,
+  ENROLLMENT_SORT_COLUMNS,
+} from '#core/validator'
 
 @inject()
 export default class EnrollmentListController {

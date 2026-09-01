@@ -20,10 +20,7 @@ export default class extends BaseSchema {
         .notNullable()
         .unique()
         .defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
-      table
-        .enum('status', ENROLLMENT_STATUSES)
-        .notNullable()
-        .defaultTo(EnrollmentStatuses.PENDING)
+      table.enum('status', ENROLLMENT_STATUSES).notNullable().defaultTo(EnrollmentStatuses.PENDING)
 
       // ---------------------------------------------------------------------
       // Candidato
