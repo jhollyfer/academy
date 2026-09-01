@@ -24,7 +24,7 @@ const loggerConfig = defineConfig({
        * aplicação, e ele não muda de ambiente para ambiente - variável de
        * ambiente para um valor fixo é configuração que ninguém escolhe.
        */
-      name: 'simple-hub',
+      name: 'maiyu-academy',
 
       /**
        * Minimum level to output (trace, debug, info, warn, error, fatal).

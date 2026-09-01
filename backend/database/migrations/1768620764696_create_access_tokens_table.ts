@@ -5,15 +5,14 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('id')
+      table.uuid('id').primary().defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
       table
-        .integer('tokenable_id')
+        .uuid('tokenable_id')
         .notNullable()
         .unsigned()
         .references('id')
         .inTable('users')
         .onDelete('CASCADE')
-
       table.string('type').notNullable()
       table.string('name').nullable()
       table.string('hash').notNullable()
