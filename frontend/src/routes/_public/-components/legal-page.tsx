@@ -22,12 +22,14 @@ export function LegalPage({
 }): React.JSX.Element {
   return (
     <div className="mx-auto max-w-7xl px-4 py-16 lg:py-24">
-      <h1 className="font-display text-4xl leading-[1.05] font-extrabold tracking-tight italic sm:text-5xl">
+      <h1 className="text-4xl leading-[1.05] font-semibold tracking-tight sm:text-5xl">
         {title}
       </h1>
-      <p className="mt-4 text-sm text-muted-foreground">Última atualização: {updatedAt}</p>
+      <p className="mt-4 text-sm text-muted-foreground">
+        Última atualização: {updatedAt}
+      </p>
 
-      <div className="prose prose-invert mt-12 max-w-[68ch] prose-headings:font-display prose-headings:italic prose-a:text-neon">
+      <div className="prose prose-invert mt-12 max-w-[68ch] prose-headings:prose-headings:prose-a:text-neon-ink">
         {children}
       </div>
     </div>

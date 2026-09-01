@@ -6,7 +6,6 @@ import { CheckCircle, Copy, Hourglass, Warning } from '@phosphor-icons/react'
 import { storefrontEnrollmentQueryOptions } from '#/integrations/tanstack-query/queries'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { Button } from '#/components/ui/button'
-import { CircuitBackground } from '#/components/common/neon'
 import { formatDate, formatMoney } from '#/lib/format'
 import { EnrollmentStatuses } from '#/lib/entity'
 import { Route as ProtocolRoute } from './$protocol'
@@ -51,7 +50,8 @@ const STATUS_VIEW: Record<
   CANCELLED: {
     icon: <Warning weight="fill" />,
     title: 'Matrícula cancelada',
-    description: 'Se isso não era o esperado, fale com a secretaria pelo WhatsApp.',
+    description:
+      'Se isso não era o esperado, fale com a secretaria pelo WhatsApp.',
   },
 }
 
@@ -65,7 +65,9 @@ const PIX_KEY = '00.000.000/0001-00'
 
 function RouteComponent(): React.JSX.Element {
   const { protocol } = ProtocolRoute.useParams()
-  const { data: enrollment } = useSuspenseQuery(storefrontEnrollmentQueryOptions(protocol))
+  const { data: enrollment } = useSuspenseQuery(
+    storefrontEnrollmentQueryOptions(protocol),
+  )
   const queryClient = useQueryClient()
 
   const view = STATUS_VIEW[enrollment.status]
@@ -80,18 +82,18 @@ function RouteComponent(): React.JSX.Element {
       // `clipboard` falha sem HTTPS e em alguns navegadores embutidos. A chave
       // está visível na tela de qualquer forma, então o aviso diz o que fazer em
       // vez de só reclamar.
-      toast.error('Não deu para copiar. Selecione a chave na tela e copie à mão.')
+      toast.error(
+        'Não deu para copiar. Selecione a chave na tela e copie à mão.',
+      )
     }
   }
 
   return (
     <div className="relative">
-      <CircuitBackground />
-
       <div className="relative mx-auto max-w-2xl px-4 py-16 lg:py-20">
-        <div className="text-neon [&_svg]:size-10">{view.icon}</div>
+        <div className="text-neon-ink [&_svg]:size-10">{view.icon}</div>
 
-        <h1 className="mt-5 font-display text-3xl leading-[1.05] font-extrabold tracking-tight italic sm:text-4xl">
+        <h1 className="mt-5 text-3xl leading-[1.05] font-semibold tracking-tight sm:text-4xl">
           {view.title}
         </h1>
         <p className="mt-4 max-w-[52ch] leading-relaxed text-muted-foreground">
@@ -103,9 +105,11 @@ function RouteComponent(): React.JSX.Element {
           vai ditar no WhatsApp, e dígito de largura variável se lê pior em voz
           alta.
         */}
-        <div className="chamfer mt-10 border border-white/10 bg-card p-6">
+        <div className="rounded-card mt-10 border border-line bg-card p-6">
           <p className="text-sm text-muted-foreground">Seu protocolo</p>
-          <p className="mt-2 font-mono text-sm break-all tabular-nums">{enrollment.protocol}</p>
+          <p className="mt-2 font-mono text-sm break-all tabular-nums">
+            {enrollment.protocol}
+          </p>
           <p className="mt-4 text-sm text-muted-foreground">
             Guarde este endereço. É por ele que você acompanha a matrícula.
           </p>
@@ -121,7 +125,8 @@ function RouteComponent(): React.JSX.Element {
               <div className="grid grid-cols-[8rem_1fr] gap-3">
                 <dt className="text-muted-foreground">Turma</dt>
                 <dd>
-                  {enrollment.class.name}, a partir de {formatDate(enrollment.class.startsAt)}
+                  {enrollment.class.name}, a partir de{' '}
+                  {formatDate(enrollment.class.startsAt)}
                 </dd>
               </div>
             )}
@@ -129,27 +134,30 @@ function RouteComponent(): React.JSX.Element {
         )}
 
         {enrollment.status !== EnrollmentStatuses.CANCELLED && (
-          <section className="mt-12 border-t border-white/5 pt-10">
-            <h2 className="font-display text-xl font-bold italic">
-              {enrollment.status === EnrollmentStatuses.WAITLIST && 'Pagamento da inscrição'}
+          <section className="mt-12 border-t border-line pt-10">
+            <h2 className="text-xl font-bold">
+              {enrollment.status === EnrollmentStatuses.WAITLIST &&
+                'Pagamento da inscrição'}
               {enrollment.status !== EnrollmentStatuses.WAITLIST &&
                 'Pague a inscrição e envie o comprovante'}
             </h2>
 
             {enrollment.status === EnrollmentStatuses.WAITLIST && (
               <p className="mt-3 text-sm text-muted-foreground">
-                Você só paga se abrir vaga e a secretaria chamar. Não pague agora.
+                Você só paga se abrir vaga e a secretaria chamar. Não pague
+                agora.
               </p>
             )}
 
             {enrollment.status !== EnrollmentStatuses.WAITLIST && (
               <>
                 <p className="mt-3 max-w-[52ch] text-sm text-muted-foreground">
-                  {course && `São ${formatMoney(course.enrollmentFeeInCents)} de inscrição. `}
+                  {course &&
+                    `São ${formatMoney(course.enrollmentFeeInCents)} de inscrição. `}
                   Pague por Pix e anexe o comprovante aqui embaixo.
                 </p>
 
-                <div className="chamfer mt-6 flex flex-wrap items-center justify-between gap-4 border border-white/10 bg-card p-5">
+                <div className="rounded-card mt-6 flex flex-wrap items-center justify-between gap-4 border border-line bg-card p-5">
                   <div>
                     <p className="text-sm text-muted-foreground">Chave Pix</p>
                     <p className="mt-1 font-mono text-sm">{PIX_KEY}</p>
@@ -162,7 +170,7 @@ function RouteComponent(): React.JSX.Element {
 
                 <div className="mt-8">
                   {hasReceipt && (
-                    <p className="mb-4 inline-flex items-center gap-2 text-sm text-neon">
+                    <p className="mb-4 inline-flex items-center gap-2 text-sm text-neon-ink">
                       <CheckCircle weight="fill" className="size-4" />
                       Comprovante enviado. A secretaria vai conferir.
                     </p>

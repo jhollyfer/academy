@@ -1,52 +1,135 @@
-import * as React from 'react'
-import { SectionTitle } from '#/components/common/neon'
-import { Reveal } from './reveal'
+import type * as React from 'react'
+
+import { Card, CardContent, CardTitle } from '#/components/ui/card'
+import { Highlight } from '#/components/common/highlight'
+import { REVEAL, STAGGER } from './reveal'
+import { cn } from '#/lib/utils'
 
 /**
- * Quem ensina.
+ * Quem dá aula, e o que cada um faz.
  *
- * Numa cidade pequena isto pesa mais que qualquer selo: o aluno provavelmente
- * conhece alguém que conhece essas pessoas, e o nome real é a prova social que
- * nenhum depoimento inventado substitui. É também por isso que a página não tem
- * seção de depoimento: a escola está estreando e não tem ex-aluno, e depoimento
- * fabricado é o que queima confiança mais rápido num lugar onde todo mundo se
- * fala.
+ * É a prova social desta página. Não há aluno formado, então não há depoimento,
+ * não há nota e não há contagem de turmas: o que a escola tem para mostrar é
+ * quem está na sala, e são quatro pessoas da região com formação na área.
  *
- * TODO: trocar as fotos por retratos reais dos quatro, 800x800.
+ * Cinco tópicos por pessoa, e não um parágrafo de biografia: quem lê está
+ * decidindo se essa gente sabe o que vai ensinar, e a lista responde isso em
+ * dois segundos de leitura.
+ *
+ * TODO: faltam os sobrenomes de Leonardo e de Victor. Enquanto não chegarem, a
+ * página mostra o primeiro nome em vez de inventar um.
  */
 const TEAM = [
-  { name: 'Jhollyfer Rodrigues', role: 'Desenvolvimento web', seed: 'maiyu-team-jhollyfer' },
-  { name: 'Caik Farias', role: 'Robótica e eletrônica', seed: 'maiyu-team-caik' },
-  { name: 'Leonardo', role: 'Robótica', seed: 'maiyu-team-leonardo' },
-  { name: 'Victor', role: 'Desenvolvimento web', seed: 'maiyu-team-victor' },
+  {
+    name: 'Jhollyfer Rodrigues',
+    role: 'Engenheiro de software',
+    portrait: '/ilustracoes/retrato-jhollyfer.svg',
+    skills: [
+      'Desenvolvimento de software',
+      'Programação web',
+      'Front-end e back-end',
+      'Arquitetura de sistemas',
+      'Projetos tecnológicos',
+    ],
+  },
+  {
+    name: 'Caik Farias',
+    role: 'Engenheiro da computação, responsável técnico da robótica',
+    portrait: '/ilustracoes/retrato-caik.svg',
+    skills: [
+      'Infraestrutura de TI',
+      'Manutenção e suporte',
+      'Redes e sistemas',
+      'Gestão de projetos',
+      'Tecnologia educacional',
+    ],
+  },
+  {
+    name: 'Leonardo',
+    role: 'Engenheiro eletricista',
+    portrait: '/ilustracoes/retrato-leonardo.svg',
+    skills: [
+      'Eletricidade e eletrônica',
+      'Automação',
+      'Robótica',
+      'Circuitos e sensores',
+      'Integração eletroeletrônica',
+    ],
+  },
+  {
+    name: 'Victor',
+    role: 'Analista de sistemas',
+    portrait: '/ilustracoes/retrato-victor.svg',
+    skills: [
+      'Análise de sistemas',
+      'Cibersegurança',
+      'Suporte e processos',
+      'Documentação e modelagem',
+      'Soluções digitais',
+    ],
+  },
 ] as const
 
 export function Team(): React.JSX.Element {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-20 lg:py-28">
-      <SectionTitle first="Quem vai" second="ensinar você" />
+    <section data-slot="home-team" className="px-3 py-3 sm:px-4 sm:py-4">
+      <div className="rounded-block border border-line bg-cream px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
+        <div className="mx-auto max-w-7xl">
+          <h2
+            className={cn(
+              REVEAL,
+              'max-w-[16ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-ink sm:text-4xl lg:text-5xl',
+            )}
+          >
+            Quem vai <Highlight variant="outline">ensinar</Highlight> você
+          </h2>
 
-      <div className="mt-12 grid grid-cols-2 gap-6 lg:grid-cols-4">
-        {TEAM.map((person, index) => (
-          <Reveal key={person.name} delay={index * 0.06}>
-            <figure className="grid gap-4">
-              <div className="chamfer aspect-square overflow-hidden bg-surface">
+          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {TEAM.map((person, index) => (
+              <Card
+                key={person.name}
+                size="lg"
+                className={cn(REVEAL, 'h-full')}
+                style={{ animationDelay: `${index * STAGGER}ms` }}
+              >
                 <img
-                  src={`https://picsum.photos/seed/${person.seed}/800/800`}
-                  alt={`Retrato de ${person.name}`}
-                  width={800}
-                  height={800}
+                  src={person.portrait}
+                  alt={`Retrato ilustrado de ${person.name}`}
+                  width={400}
+                  height={300}
                   loading="lazy"
-                  className="h-full w-full object-cover grayscale transition-[filter] duration-500 hover:grayscale-0"
+                  className="aspect-4/3 w-full bg-paper object-contain"
                 />
-              </div>
-              <figcaption>
-                <p className="font-display font-bold tracking-tight italic">{person.name}</p>
-                <p className="text-sm text-muted-foreground">{person.role}</p>
-              </figcaption>
-            </figure>
-          </Reveal>
-        ))}
+
+                <CardContent className="flex flex-col gap-3">
+                  <div>
+                    <CardTitle className="text-lg font-semibold text-ink">
+                      {person.name}
+                    </CardTitle>
+                    <p className="mt-1 text-xs leading-relaxed text-ink-soft">
+                      {person.role}
+                    </p>
+                  </div>
+
+                  <ul className="grid gap-1.5">
+                    {person.skills.map((skill) => (
+                      <li
+                        key={skill}
+                        className="flex items-start gap-2 text-sm leading-relaxed text-ink-soft"
+                      >
+                        <span
+                          aria-hidden
+                          className="mt-2 size-1.5 shrink-0 rounded-full bg-neon-ink"
+                        />
+                        {skill}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   )

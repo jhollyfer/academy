@@ -13,7 +13,12 @@ import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import { Toaster } from '#/components/ui/sonner'
 import { TooltipProvider } from '#/components/ui/tooltip'
 
-import { SITE_DESCRIPTION, SITE_TAGLINE } from '#/lib/site'
+import {
+  SITE_DESCRIPTION,
+  SITE_IMAGE,
+  SITE_TAGLINE,
+  SITE_TITLE,
+} from '#/lib/site'
 
 import appCss from '../styles.css?url'
 
@@ -68,6 +73,32 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         name: 'description',
         content: SITE_DESCRIPTION,
       },
+      /*
+       * O cartão de link, e o padrão de todo o site.
+       *
+       * O `head` das rotas casadas é fundido por nome e por propriedade, e o
+       * mais fundo vence: a página de um curso põe o próprio título por cima
+       * destes, e as demais ficam com a cara do site em vez de um cartão sem
+       * imagem nem descrição.
+       *
+       * `og:locale` importa mais aqui do que num site em inglês: a página é
+       * regional, e é o que impede o cartão de sair com o idioma adivinhado.
+       */
+      { property: 'og:site_name', content: SITE_TITLE },
+      { property: 'og:locale', content: 'pt_BR' },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:title', content: SITE_TAGLINE },
+      { property: 'og:description', content: SITE_DESCRIPTION },
+      { property: 'og:image', content: SITE_IMAGE },
+      /*
+       * `summary_large_image` e não `summary`: com a imagem de 1200x630 o
+       * cartão pequeno recorta o texto do centro, que é onde o nome da escola
+       * está.
+       */
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: SITE_TAGLINE },
+      { name: 'twitter:description', content: SITE_DESCRIPTION },
+      { name: 'twitter:image', content: SITE_IMAGE },
     ],
     links: [
       /*
@@ -75,10 +106,15 @@ export const Route = createRootRouteWithContext<RouterContext>()({
        * a aba fica com o ícone genérico até a resposta chegar. Declarado, ele
        * entra junto com o resto do `head`.
        */
+      /*
+       * SVG e não `.ico`. O `.ico` declarado aqui antes apontava para um arquivo
+       * que nunca existiu no projeto: a aba ficava com o ícone genérico e o
+       * servidor respondia 404 a cada visita.
+       */
       {
         rel: 'icon',
-        href: '/favicon.ico',
-        sizes: '32x32',
+        href: '/favicon.svg',
+        type: 'image/svg+xml',
       },
       {
         rel: 'stylesheet',

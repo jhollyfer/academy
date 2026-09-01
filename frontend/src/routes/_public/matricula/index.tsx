@@ -13,20 +13,23 @@ import { SITE_TITLE } from '#/lib/site'
  * devolve promessa. Mesmo motivo do `list-search.ts`.
  */
 function validateSearch(search: Record<string, unknown>): { curso?: string } {
-  if (typeof search.curso === 'string' && search.curso) return { curso: search.curso }
+  if (typeof search.curso === 'string' && search.curso)
+    return { curso: search.curso }
 
   return {}
 }
 
 export const Route = createFileRoute('/_public/matricula/')({
   validateSearch,
-  loader: ({ context }) => context.queryClient.ensureQueryData(storefrontCoursesQueryOptions()),
+  loader: ({ context }) =>
+    context.queryClient.ensureQueryData(storefrontCoursesQueryOptions()),
   head: () => ({
     meta: [
       { title: `Matrícula - ${SITE_TITLE}` },
       {
         name: 'description',
-        content: 'Faça sua matrícula na Maiyu Academy sem sair de casa. Leva menos de cinco minutos.',
+        content:
+          'Faça sua matrícula na Maiyu Academy sem sair de casa. Leva menos de cinco minutos.',
       },
       // O formulário não tem por que aparecer na busca: quem chega direto nele
       // sem passar pela página do curso não sabe o que está comprando.

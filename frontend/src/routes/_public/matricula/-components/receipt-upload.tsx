@@ -118,7 +118,10 @@ export function ReceiptUpload({
       </Button>
 
       {progress !== null && (
-        <p aria-live="polite" className="text-sm text-muted-foreground tabular-nums">
+        <p
+          aria-live="polite"
+          className="text-sm text-muted-foreground tabular-nums"
+        >
           {progress}% enviado
         </p>
       )}

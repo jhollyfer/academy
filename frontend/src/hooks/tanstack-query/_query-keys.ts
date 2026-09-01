@@ -54,6 +54,12 @@ export const queryKeys = {
     courses: () => ['storefront', 'courses'] as const,
     course: (slug: string) => ['storefront', 'courses', slug] as const,
     /**
+     * O FAQ da escola, o de `courseId` nulo. Chave própria e não derivada de
+     * `courses`: são recursos diferentes, e uma edição de curso no painel não
+     * tem por que invalidar as perguntas gerais.
+     */
+    faqs: () => ['storefront', 'faqs'] as const,
+    /**
      * O acompanhamento por protocolo. Não é `enrollments.detail`: a chave lá é
      * o `id`, que o candidato não tem - e o corpo é outro, sem as anotações da
      * secretaria.

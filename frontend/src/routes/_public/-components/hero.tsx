@@ -1,97 +1,107 @@
-import * as React from 'react'
-import { Link } from '@tanstack/react-router'
-import { ArrowRight } from '@phosphor-icons/react'
+import type * as React from 'react'
+import { useQuery } from '@tanstack/react-query'
+
 import { Button } from '#/components/ui/button'
-import { CircuitBackground, StatItem } from '#/components/common/neon'
+import { Highlight } from '#/components/common/highlight'
+import { Sparkles, Petal } from '#/components/common/marks'
+import { EnrollmentCta } from '#/components/common/enrollment-cta'
+import { storefrontCoursesQueryOptions } from '#/integrations/tanstack-query/queries'
+import { enrollmentStateFrom } from '#/lib/enrollment-state'
+import { formatDate } from '#/lib/format'
+import { REVEAL } from './reveal'
+import { cn } from '#/lib/utils'
 
 /**
- * Os fatos que a escola já tem fechados. Números reais, das artes de lançamento
- * - nenhum é estimativa nem enfeite de precisão.
+ * A primeira dobra: o bloco verde arredondado com a chamada e a data da turma.
+ *
+ * O argumento é o da escola inteira, e ele não é sobre a Maiyu: é sobre quem lê.
+ * "Você não precisa sair daqui" responde à razão pela qual alguém do Alto
+ * Solimões desistiria antes de perguntar o preço.
+ *
+ * A subchamada carrega data, dia, horário e vagas porque são as quatro coisas
+ * que a pessoa precisa saber para decidir se continua rolando. Elas vêm da
+ * turma anunciada, e não escritas à mão: a página já anunciou 40 vagas em março
+ * enquanto a matrícula dizia que não havia turma, e não vai anunciar de novo.
+ *
+ * O bloco tem margem lateral e canto de 32px em vez de sangrar até a borda:
+ * é o gesto do sistema, e é o que faz o creme da página aparecer em volta como
+ * moldura.
  */
-const FACTS = [
-  { value: '4', label: 'meses de curso' },
-  { value: '16', label: 'sábados de aula' },
-  { value: '32h', label: 'de carga horária' },
-  { value: '40', label: 'vagas por turma' },
-] as const
-
 export function Hero(): React.JSX.Element {
-  return (
-    <section className="relative overflow-hidden border-b border-white/5">
-      <CircuitBackground />
+  const { data } = useQuery(storefrontCoursesQueryOptions())
+  const state = enrollmentStateFrom(data?.data)
 
-      {/*
-        `min-h` e não `h-screen`: no Safari do iPhone a barra de endereço muda de
-        altura ao rolar, e `h-screen` faz a seção pular junto.
-      */}
-      <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 pt-16 pb-20 lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:pt-24">
-        <div>
-          {/*
-            Duas linhas, e a segunda no acento: é o gesto das artes, e é o que
-            faz quem clicou no anúncio reconhecer a página antes de ler.
-          */}
-          <h1 className="font-display text-4xl leading-[1.05] font-extrabold tracking-tight text-balance italic sm:text-5xl lg:text-6xl">
-            Você não precisa sair daqui{' '}
-            <span className="text-neon">para aprender tecnologia</span>
+  // Sem turma anunciada a frase perde a data em vez de inventar uma. O que
+  // sobra continua verdadeiro.
+  let schedule = 'Aulas presenciais aos sábados de manhã, em Benjamin Constant.'
+  if (state.kind !== 'NONE') {
+    schedule = `A turma de estreia começa em ${formatDate(state.startsAt)}. Aulas presenciais aos sábados de manhã, em Benjamin Constant.`
+  }
+
+  return (
+    <section data-slot="home-hero" className="px-3 pt-3 sm:px-4 sm:pt-4">
+      <div className="relative overflow-hidden rounded-block bg-green px-6 pt-14 pb-0 sm:px-10 lg:px-14 lg:pt-20">
+        <Petal className="-top-24 -right-20 size-96 text-ink/5" />
+
+        <div className="relative mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.15fr_1fr] lg:items-end lg:gap-16">
+          <h1
+            className={cn(
+              REVEAL,
+              'text-4xl leading-[1.12] font-semibold tracking-tight text-balance text-ink sm:text-5xl lg:text-6xl',
+            )}
+          >
+            Você não precisa sair daqui
+            <br className="hidden sm:block" /> para aprender{' '}
+            <Highlight variant="ink">tecnologia</Highlight>
+            <Sparkles className="ml-3 inline-block size-6 align-super text-ink/50" />
           </h1>
 
-          <p className="mt-6 max-w-[52ch] text-lg leading-relaxed text-muted-foreground">
-            Robótica e desenvolvimento web, presencial, aos sábados. Quatro meses, do zero ao
-            projeto pronto.
-          </p>
+          <div className={cn(REVEAL, 'delay-100')}>
+            <p className="max-w-[46ch] text-base leading-relaxed text-ink/75 sm:text-lg">
+              {schedule}
+            </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Button render={<Link to="/matricula" />} size="lg">
-              Garanta sua vaga
-              <ArrowRight />
-            </Button>
-            {/*
-              Âncora para a seção dos dois cards, e não link para um curso.
-              "Ver os cursos" no plural levando a robótica escolhia pela pessoa
-              justamente na hora em que ela ainda está decidindo - e não existe
-              índice de cursos: são dois, e eles cabem na home.
+            {/* TODO: trocar por "das 8h às 10h" quando a secretaria fechar o horário. */}
+            <p className="mt-2 text-base leading-relaxed text-ink/75 sm:text-lg">
+              São 40 vagas por turma.
+            </p>
 
-              `<a href="#">` e não `<Link>`: é navegação dentro da mesma página,
-              e o roteador não tem o que resolver aqui.
-            */}
-            <Button render={<a href="#cursos" />} size="lg" variant="outline">
-              Ver os cursos
-            </Button>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <EnrollmentCta variant="pill" size="pill-lg" />
+
+              {/*
+                Âncora e não `Link`: os cursos são a seção logo abaixo, e não uma
+                rota. Trocar de tela para ver dois cards seria pior que rolar
+                até eles.
+              */}
+              <Button
+                variant="pill-outline"
+                size="pill-lg"
+                render={<a href="#cursos">Ver os cursos</a>}
+              />
+            </div>
           </div>
         </div>
 
         {/*
-          A foto vem do `picsum` com semente descritiva enquanto as imagens reais
-          do laboratório não chegam. É placeholder anotado, não escolha: foto de
-          banco de imagens numa cidade pequena é reconhecida como falsa por quem
-          mora lá, e o efeito é o oposto do pretendido.
-
-          TODO: trocar por foto real do laboratório, 1200x900.
+          A ilustração encosta na base do bloco e transborda um pouco, que é o
+          que impede o retângulo verde de terminar num corte reto. `mt-12` e não
+          margem negativa: negativa criaria rolagem horizontal em 360px.
         */}
-        <div className="chamfer neon-glow relative aspect-[4/3] overflow-hidden bg-surface">
-          <img
-            src="https://picsum.photos/seed/maiyu-academy-lab-robotica/1200/900"
-            alt="Alunos em uma bancada de eletrônica montando um projeto de robótica"
-            width={1200}
-            height={900}
-            loading="eager"
-            fetchPriority="high"
-            className="h-full w-full object-cover opacity-90"
-          />
-        </div>
-      </div>
-
-      {/*
-        A barra de fatos fica **abaixo** do hero, não dentro dele: o hero é a
-        proposta e o botão, e empilhar mais um bloco de texto ali empurraria o
-        CTA para fora da primeira tela no celular.
-      */}
-      <div className="relative border-t border-white/5 bg-surface/40">
-        <dl className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-4 py-8 sm:grid-cols-4">
-          {FACTS.map((fact) => (
-            <StatItem key={fact.label} value={fact.value} label={fact.label} />
-          ))}
-        </dl>
+        <img
+          src="/ilustracoes/bancada-arduino.svg"
+          alt="Uma bancada com placa Arduino, protoboard e um notebook com código"
+          width={400}
+          height={300}
+          // A primeira coisa que se vê. Adiá-la deixaria o bloco verde vazio
+          // enquanto o resto da página já terminou de montar.
+          loading="eager"
+          fetchPriority="high"
+          className={cn(
+            REVEAL,
+            'delay-200 relative mx-auto mt-12 w-full max-w-lg',
+          )}
+        />
       </div>
     </section>
   )

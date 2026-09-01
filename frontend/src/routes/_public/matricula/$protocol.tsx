@@ -4,7 +4,9 @@ import { SITE_TITLE } from '#/lib/site'
 
 export const Route = createFileRoute('/_public/matricula/$protocol')({
   loader: ({ context, params }) =>
-    context.queryClient.ensureQueryData(storefrontEnrollmentQueryOptions(params.protocol)),
+    context.queryClient.ensureQueryData(
+      storefrontEnrollmentQueryOptions(params.protocol),
+    ),
   head: () => ({
     meta: [
       { title: `Sua matrícula - ${SITE_TITLE}` },

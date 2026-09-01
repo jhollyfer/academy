@@ -16,7 +16,11 @@ import { whatsappUrl } from '#/lib/site'
  * `<a>` e não botão: é navegação para outro site, e um botão aqui quebraria o
  * abrir-em-nova-aba do meio do teclado.
  */
-export function WhatsappFloat({ message }: { message: string }): React.JSX.Element {
+export function WhatsappFloat({
+  message,
+}: {
+  message: string
+}): React.JSX.Element {
   return (
     <a
       href={whatsappUrl(message)}

@@ -1,63 +1,103 @@
 import type * as React from 'react'
-import { createLazyFileRoute, Link } from '@tanstack/react-router'
+import { createLazyFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { ArrowRight, CalendarBlank, Clock, MapPin, Users } from '@phosphor-icons/react'
+import { CalendarBlank, Clock, MapPin, Users } from '@phosphor-icons/react'
+
+import { Badge } from '#/components/ui/badge'
+import { Card, CardContent } from '#/components/ui/card'
+import { Separator } from '#/components/ui/separator'
+import { Highlight } from '#/components/common/highlight'
+import { Leaf } from '#/components/common/marks'
+import { EnrollmentCta } from '#/components/common/enrollment-cta'
 import { storefrontCourseQueryOptions } from '#/integrations/tanstack-query/queries'
-import { Button } from '#/components/ui/button'
-import { CircuitBackground } from '#/components/common/neon'
 import { formatDate, formatMoney } from '#/lib/format'
 import { Faq } from '../-components/faq'
-import { Reveal } from '../-components/reveal'
+import { REVEAL, STAGGER } from '../-components/reveal'
 import { WhatsappFloat } from '../-components/whatsapp-float'
 import { Route as CourseRoute } from './$slug'
+import { cn } from '#/lib/utils'
 
 export const Route = createLazyFileRoute('/_public/cursos/$slug')({
   component: RouteComponent,
 })
+
+/**
+ * A ilustração do curso, por `slug`. Mesmo mapa do card da home: a arte é
+ * decisão de design e não coluna do banco.
+ */
+const ILLUSTRATIONS: Record<string, string> = {
+  robotica: '/ilustracoes/robo-seguidor-de-linha.svg',
+  'web-development': '/ilustracoes/notebook-com-codigo.svg',
+}
+
+const FALLBACK_ILLUSTRATION = '/ilustracoes/bancada-arduino.svg'
 
 function RouteComponent(): React.JSX.Element {
   const { slug } = CourseRoute.useParams()
   const { data: course } = useSuspenseQuery(storefrontCourseQueryOptions(slug))
 
   return (
-    <div data-accent={course.accent}>
-      <section className="relative overflow-hidden border-b border-white/5">
-        <CircuitBackground />
+    <>
+      <section className="px-3 pt-3 sm:px-4 sm:pt-4">
+        <div className="relative overflow-hidden rounded-block bg-green px-6 py-14 sm:px-10 lg:px-14 lg:py-20">
+          <Leaf className="-top-24 -right-20 size-96 text-ink/5" />
 
-        <div className="relative mx-auto max-w-7xl px-4 pt-16 pb-16 lg:pt-24">
-          <h1 className="max-w-[18ch] font-display text-4xl leading-[1.05] font-extrabold tracking-tight text-balance italic sm:text-5xl lg:text-6xl">
-            {course.name}
-          </h1>
+          <div className="relative mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[1.2fr_1fr]">
+            <div className={cn(REVEAL)}>
+              <Badge variant="ink" size="lg">
+                Módulo 1
+              </Badge>
 
-          {course.tagline && (
-            <p className="mt-6 max-w-[52ch] text-lg leading-relaxed text-muted-foreground">
-              {course.tagline}
-            </p>
-          )}
+              <h1 className="mt-5 max-w-[18ch] text-4xl leading-[1.12] font-semibold tracking-tight text-balance text-ink sm:text-5xl lg:text-6xl">
+                {course.name}
+              </h1>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Button render={<Link to="/matricula" search={{ curso: course.slug }} />} size="lg">
-              Garanta sua vaga
-              <ArrowRight />
-            </Button>
+              {course.tagline && (
+                <p className="mt-6 max-w-[52ch] text-lg leading-relaxed text-ink/75">
+                  {course.tagline}
+                </p>
+              )}
+
+              <EnrollmentCta
+                variant="pill"
+                size="pill-lg"
+                className="mt-8"
+                courseSlug={course.slug}
+              />
+            </div>
+
+            <img
+              src={ILLUSTRATIONS[course.slug] ?? FALLBACK_ILLUSTRATION}
+              alt=""
+              width={400}
+              height={300}
+              loading="eager"
+              fetchPriority="high"
+              className={cn(
+                REVEAL,
+                'delay-100 w-full max-w-sm justify-self-center',
+              )}
+            />
           </div>
 
           {/*
-            Os fatos da turma como uma faixa, e não como quatro cards: são quatro
+            Os fatos da turma como faixa, e não como quatro cards: são quatro
             valores curtos, e envolvê-los em caixas pediria elevação que não
             comunica hierarquia nenhuma.
           */}
-          <dl className="mt-12 grid gap-6 border-t border-white/5 pt-8 sm:grid-cols-2 lg:grid-cols-4">
+          <dl className="relative mx-auto mt-12 grid max-w-7xl gap-6 border-t border-ink/15 pt-8 sm:grid-cols-2 lg:grid-cols-4">
             <Fact icon={<Clock />} label="Carga horária">
               {course.workloadHours}h em {course.durationMonths} meses
             </Fact>
+
             {course.nextClass && (
               <>
                 <Fact icon={<CalendarBlank />} label="Começa em">
                   {formatDate(course.nextClass.startsAt)}
                 </Fact>
                 <Fact icon={<Users />} label="Vagas restantes">
-                  {course.nextClass.seatsRemaining} de {course.nextClass.capacity}
+                  {course.nextClass.seatsRemaining ?? course.nextClass.capacity}{' '}
+                  de {course.nextClass.capacity}
                 </Fact>
                 <Fact icon={<MapPin />} label="Onde">
                   {course.nextClass.location}
@@ -68,112 +108,140 @@ function RouteComponent(): React.JSX.Element {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-20 lg:py-28">
-        <div className="grid gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-16">
-          <div>
-            <h2 className="font-display text-3xl leading-[1.05] font-extrabold tracking-tight italic sm:text-4xl">
-              Sobre o <span className="text-[var(--local-accent,var(--accent))]">curso</span>
-            </h2>
-            <p className="mt-6 max-w-[52ch] leading-relaxed text-muted-foreground">
-              {course.description}
-            </p>
+      <section className="px-3 py-3 sm:px-4 sm:py-4">
+        <div className="rounded-block border border-line bg-cream px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
+          <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
+            <div className={cn(REVEAL)}>
+              <h2 className="text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-ink sm:text-4xl">
+                Sobre o <Highlight variant="outline">curso</Highlight>
+              </h2>
 
-            {course.projectOutcome && (
-              <div className="mt-8">
-                <p className="font-display text-xl font-bold italic">O que você vai construir</p>
-                <p className="mt-3 max-w-[52ch] leading-relaxed text-muted-foreground">
-                  {course.projectOutcome}
-                </p>
-              </div>
-            )}
+              <p className="mt-6 max-w-[52ch] leading-relaxed text-ink-soft">
+                {course.description}
+              </p>
 
-            {course.requirements && (
-              <div className="mt-8">
-                <p className="font-display text-xl font-bold italic">O que você precisa</p>
-                <p className="mt-3 max-w-[52ch] leading-relaxed text-muted-foreground">
-                  {course.requirements}
-                  {course.minimumAge !== null && ` A partir de ${course.minimumAge} anos.`}
-                </p>
-              </div>
-            )}
-          </div>
+              {course.projectOutcome && (
+                <div className="mt-8">
+                  <p className="text-lg font-semibold text-ink">
+                    O que você vai construir
+                  </p>
+                  <p className="mt-2 max-w-[52ch] leading-relaxed text-ink-soft">
+                    {course.projectOutcome}
+                  </p>
+                </div>
+              )}
 
-          {/*
-            A grade dos sábados, numerada. É o gesto da referência: número grande
-            no acento à direita de um título à esquerda, e o número faz o papel
-            que um marcador de lista faria pior - aqui a ordem é o conteúdo.
-          */}
-          {course.modules && course.modules.length > 0 && (
-            <ol className="grid gap-8">
-              {course.modules.map((entry, index) => (
-                <Reveal key={entry.id} delay={index * 0.04}>
-                  <li className="grid grid-cols-[auto_1fr] gap-5">
+              {course.requirements && (
+                <div className="mt-8">
+                  <p className="text-lg font-semibold text-ink">
+                    O que você precisa
+                  </p>
+                  <p className="mt-2 max-w-[52ch] leading-relaxed text-ink-soft">
+                    {course.requirements}
+                    {course.minimumAge !== null &&
+                      ` A partir de ${course.minimumAge} anos.`}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/*
+              A grade dos sábados, numerada. O número faz o papel que um marcador
+              de lista faria pior: aqui a ordem é o conteúdo.
+            */}
+            {course.modules && course.modules.length > 0 && (
+              <ol className="grid gap-7">
+                {course.modules.map((entry, index) => (
+                  <li
+                    key={entry.id}
+                    className={cn(REVEAL, 'grid grid-cols-[auto_1fr] gap-5')}
+                    style={{ animationDelay: `${index * (STAGGER / 2)}ms` }}
+                  >
                     <span
                       aria-hidden
-                      className="font-display text-2xl leading-none font-extrabold text-[var(--local-accent,var(--accent))] italic tabular-nums"
+                      className="text-2xl leading-none font-semibold text-neon-ink tabular-nums"
                     >
                       {String(index + 1).padStart(2, '0')}
                     </span>
                     <div>
-                      <p className="font-display text-lg font-bold tracking-tight italic">
+                      <p className="text-lg font-semibold tracking-tight text-ink">
                         {entry.title}
                       </p>
                       {entry.description && (
-                        <p className="mt-1.5 leading-relaxed text-muted-foreground">
+                        <p className="mt-1.5 leading-relaxed text-ink-soft">
                           {entry.description}
                         </p>
                       )}
                     </div>
                   </li>
-                </Reveal>
-              ))}
-            </ol>
-          )}
+                ))}
+              </ol>
+            )}
+          </div>
         </div>
       </section>
 
-      <section className="border-y border-white/5 bg-surface/30">
-        <div className="mx-auto max-w-7xl px-4 py-20 lg:py-28">
-          <h2 className="font-display text-3xl leading-[1.05] font-extrabold tracking-tight italic sm:text-4xl">
-            Quanto <span className="text-[var(--local-accent,var(--accent))]">custa</span>
-          </h2>
+      <section className="px-3 py-3 sm:px-4 sm:py-4">
+        <div className="rounded-block border border-line bg-paper px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
+          <div className="mx-auto max-w-7xl">
+            <h2
+              className={cn(
+                REVEAL,
+                'text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-ink sm:text-4xl',
+              )}
+            >
+              Quanto <Highlight variant="fill">custa</Highlight>
+            </h2>
 
-          <div className="mt-10 grid gap-10 sm:grid-cols-2 lg:max-w-3xl">
-            <div>
-              <p className="font-display text-5xl leading-none font-extrabold text-[var(--local-accent,var(--accent))] italic lg:text-6xl">
-                {formatMoney(course.enrollmentFeeInCents)}
-              </p>
-              <p className="mt-3 text-muted-foreground">de inscrição, uma vez só.</p>
+            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:max-w-3xl">
+              <Card size="lg" className={cn(REVEAL)}>
+                <CardContent>
+                  <p className="text-4xl leading-none font-semibold tracking-tight text-ink lg:text-5xl">
+                    {formatMoney(course.enrollmentFeeInCents)}
+                  </p>
+                  <p className="mt-3 text-ink-soft">
+                    de inscrição, uma vez só.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card size="lg" className={cn(REVEAL, 'delay-100')}>
+                <CardContent>
+                  <p className="text-4xl leading-none font-semibold tracking-tight text-ink lg:text-5xl">
+                    {formatMoney(course.monthlyFeeInCents)}
+                  </p>
+                  <p className="mt-3 text-ink-soft">
+                    por mês, durante os {course.durationMonths} meses.
+                  </p>
+                </CardContent>
+              </Card>
             </div>
-            <div>
-              <p className="font-display text-5xl leading-none font-extrabold text-[var(--local-accent,var(--accent))] italic lg:text-6xl">
-                {formatMoney(course.monthlyFeeInCents)}
-              </p>
-              <p className="mt-3 text-muted-foreground">
-                por mês, durante os {course.durationMonths} meses.
-              </p>
-            </div>
+
+            <Separator className="my-10 bg-line" />
+
+            <p className="max-w-[60ch] leading-relaxed text-ink-soft">
+              O pagamento é por Pix. Você envia o comprovante junto com a
+              matrícula e a secretaria confirma.
+            </p>
+
+            <EnrollmentCta
+              variant="pill"
+              size="pill-lg"
+              className="mt-8"
+              courseSlug={course.slug}
+            />
           </div>
-
-          <Button
-            render={<Link to="/matricula" search={{ curso: course.slug }} />}
-            size="lg"
-            className="mt-10"
-          >
-            Garanta sua vaga
-            <ArrowRight />
-          </Button>
         </div>
       </section>
 
       {course.faqs && course.faqs.length > 0 && (
-        <Faq faqs={course.faqs} title="Dúvidas sobre" highlight="este curso" />
+        <Faq faqs={course.faqs} title="Dúvidas sobre" highlight="curso" />
       )}
 
       <WhatsappFloat
         message={`Olá! Quero saber mais sobre o curso de ${course.name} na Maiyu Academy.`}
       />
-    </div>
+    </>
   )
 }
 
@@ -188,11 +256,13 @@ function Fact({
 }): React.JSX.Element {
   return (
     <div className="flex flex-col-reverse gap-1">
-      <dt className="inline-flex items-center gap-2 text-sm text-muted-foreground [&_svg]:size-4 [&_svg]:text-[var(--local-accent,var(--accent))]">
+      <dt className="inline-flex items-center gap-2 text-sm text-ink/70 [&_svg]:size-4">
         {icon}
         {label}
       </dt>
-      <dd className="font-display text-lg font-bold tracking-tight italic">{children}</dd>
+      <dd className="text-lg font-semibold tracking-tight text-ink">
+        {children}
+      </dd>
     </div>
   )
 }

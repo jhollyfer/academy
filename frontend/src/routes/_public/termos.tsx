@@ -7,7 +7,8 @@ export const Route = createFileRoute('/_public/termos')({
       { title: `Termos de uso - ${SITE_TITLE}` },
       {
         name: 'description',
-        content: 'As regras da matrícula, do pagamento e da participação nos cursos da Maiyu Academy.',
+        content:
+          'As regras da matrícula, do pagamento e da participação nos cursos da Maiyu Academy.',
       },
     ],
   }),

@@ -11,7 +11,6 @@ import { applyMutationError } from '#/lib/form-errors'
 import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
 import { Field, FieldError, FieldGroup, FieldLabel } from '#/components/ui/field'
-import { CircuitBackground } from '#/components/common/neon'
 import { Route as SignInRoute } from './index'
 
 /** Os campos que o backend pode marcar. `root` não entra: é o canal de "a
@@ -61,11 +60,10 @@ function RouteComponent(): React.JSX.Element {
 
   return (
     <div className="relative flex min-h-svh items-center justify-center px-4 py-12">
-      <CircuitBackground />
 
       <div className="relative w-full max-w-sm">
-        <h1 className="font-display text-2xl font-extrabold tracking-tight italic">
-          Maiyu <span className="text-neon">Academy</span>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Maiyu <span className="text-neon-ink">Academy</span>
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Acesso da secretaria.

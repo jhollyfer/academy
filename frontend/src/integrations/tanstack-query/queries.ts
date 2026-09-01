@@ -4,6 +4,7 @@ import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import type {
   AccountResponse,
   ClassResponse,
+  CourseFaqResponse,
   CourseResponse,
   EnrollmentResponse,
   Paginated,
@@ -139,6 +140,22 @@ export function storefrontCoursesQueryOptions() {
     queryKey: queryKeys.storefront.courses(),
     queryFn: ({ signal }) =>
       request<Paginated<CourseResponse>>('/storefront/courses', { signal }),
+  })
+}
+
+/**
+ * O FAQ da escola, o que a home mostra.
+ *
+ * Consulta própria e não um recorte de `storefrontCourses`: as perguntas gerais
+ * têm `courseId` nulo, então não pertencem a curso nenhum e nenhuma relação as
+ * alcança. Elas viviam no banco sem endpoint que as servisse, e a home não
+ * renderizava FAQ nenhum por causa disso.
+ */
+export function storefrontFaqsQueryOptions() {
+  return queryOptions({
+    queryKey: queryKeys.storefront.faqs(),
+    queryFn: ({ signal }) =>
+      request<Paginated<CourseFaqResponse>>('/storefront/faqs', { signal }),
   })
 }
 

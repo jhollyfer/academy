@@ -24,6 +24,27 @@ export const SITE_TITLE = 'Maiyu Academy'
 export const SITE_URL = 'https://academy.maiyu.com.br'
 
 /**
+ * A imagem do cartão de link, absoluta.
+ *
+ * PNG e não o SVG que a gerou: WhatsApp, Telegram e o cartão do X não
+ * renderizam SVG, e é justamente neles que o link desta escola circula. O
+ * arquivo é gerado do `public/og.svg` e vive versionado ao lado dele.
+ *
+ * Absoluta porque quem lê é um rastreador de fora: caminho relativo em
+ * `og:image` resolve contra o domínio de quem raspa, e não contra o nosso.
+ *
+ * Para regerar depois de mexer no SVG:
+ *   node -e "require('sharp')('public/og.svg',{density:144})\
+ *     .resize(1200,630,{fit:'fill'}).png().toFile('public/og.png')"
+ */
+export const SITE_IMAGE = `${SITE_URL}/og.png`
+
+/** O caminho vira endereço absoluto, para `canonical` e `og:url`. */
+export function absoluteUrl(path: string): string {
+  return `${SITE_URL}${path}`
+}
+
+/**
  * A descrição da raiz, herdada por rota que não escreva a sua.
  *
  * Nomeia a cidade de propósito: a busca que traz aluno é local ("curso de
@@ -42,7 +63,8 @@ export const SITE_DESCRIPTION =
  * de detalhe concatenam, e repetir o subtítulo em cada uma deixaria o título
  * longo demais para o que o buscador mostra.
  */
-export const SITE_TAGLINE = 'Maiyu Academy - Escola de Tecnologia em Benjamin Constant'
+export const SITE_TAGLINE =
+  'Maiyu Academy - Escola de Tecnologia em Benjamin Constant'
 
 /**
  * O WhatsApp da secretaria, só dígitos com o código do país.

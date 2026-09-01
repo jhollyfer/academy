@@ -63,7 +63,7 @@ function RouteComponent(): React.JSX.Element {
 
       <header className="border-b bg-card">
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-6 px-4">
-          <Link to="/admin" className="font-display font-extrabold tracking-tight italic">
+          <Link to="/admin" className="font-semibold tracking-tight">
             Maiyu <span className="text-primary">Academy</span>
           </Link>
 

@@ -1,8 +1,17 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Link } from '@tanstack/react-router'
-import { List } from '@phosphor-icons/react'
+import { List, WhatsappLogo } from '@phosphor-icons/react'
+
 import { Button } from '#/components/ui/button'
-import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from '#/components/ui/sheet'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from '#/components/ui/sheet'
+import { EnrollmentCta } from '#/components/common/enrollment-cta'
+import { whatsappUrl } from '#/lib/site'
 
 /**
  * Os destinos do site. Uma lista e não JSX repetido: o menu de desktop e o de
@@ -10,39 +19,76 @@ import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from '#/com
  */
 const LINKS = [
   { to: '/cursos/$slug', params: { slug: 'robotica' }, label: 'Robótica' },
-  { to: '/cursos/$slug', params: { slug: 'web-development' }, label: 'Desenvolvimento web' },
+  {
+    to: '/cursos/$slug',
+    params: { slug: 'web-development' },
+    label: 'Desenvolvimento web',
+  },
   { to: '/sobre', params: undefined, label: 'A escola' },
 ] as const
 
+const HEADER_MESSAGE =
+  'Olá! Vi o site da Maiyu Academy e quero tirar uma dúvida.'
+
+/**
+ * A faixa do topo: navegação à esquerda, marca ao centro, contato e matrícula à
+ * direita.
+ *
+ * A marca ao centro só a partir de `lg`. Abaixo disso o centro é disputado pelo
+ * botão de menu e pelo CTA, e uma marca centralizada entre os dois fica torta em
+ * qualquer largura: no celular ela volta para a esquerda, que é onde o polegar
+ * espera o caminho de volta para a home.
+ *
+ * `sticky` e não `fixed`: fixo tira o elemento do fluxo e obriga a compensar a
+ * altura com um espaçador, que é onde o layout escorrega quando a barra muda de
+ * tamanho.
+ */
 export function Header(): React.JSX.Element {
   return (
-    // `sticky` e não `fixed`: fixo tira o elemento do fluxo e obriga a compensar
-    // a altura com um espaçador, que é onde o layout escorrega quando a barra
-    // muda de tamanho.
-    <header className="sticky top-0 z-40 border-b border-white/5 bg-background/80 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-8 px-4">
-        <Link to="/" className="font-display text-lg font-extrabold tracking-tight italic">
-          Maiyu <span className="text-neon">Academy</span>
-        </Link>
-
-        <nav aria-label="Principal" className="hidden items-center gap-6 lg:flex">
+    <header className="sticky top-0 z-40 border-b border-line bg-cream/85 backdrop-blur">
+      <div className="mx-auto flex h-18 max-w-7xl items-center gap-4 px-4 lg:grid lg:grid-cols-[1fr_auto_1fr]">
+        <nav
+          aria-label="Principal"
+          className="hidden items-center gap-7 lg:flex"
+        >
           {LINKS.map((link) => (
             <Link
               key={link.label}
               to={link.to}
               params={link.params}
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-              activeProps={{ className: 'text-foreground' }}
+              className="text-sm text-ink-soft transition-colors hover:text-ink"
+              activeProps={{ className: 'text-ink' }}
             >
               {link.label}
             </Link>
           ))}
         </nav>
 
-        <div className="ml-auto flex items-center gap-2">
-          <Button render={<Link to="/matricula" />} className="hidden sm:inline-flex">
-            Garanta sua vaga
-          </Button>
+        <Link
+          to="/"
+          className="text-lg font-semibold tracking-tight text-ink lg:justify-self-center"
+        >
+          Maiyu Academy
+        </Link>
+
+        <div className="ml-auto flex items-center gap-2 lg:ml-0 lg:justify-self-end">
+          <Button
+            variant="pill-outline"
+            size="pill"
+            className="hidden md:inline-flex"
+            render={
+              <a
+                href={whatsappUrl(HEADER_MESSAGE)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <WhatsappLogo />
+                WhatsApp
+              </a>
+            }
+          />
+
+          <EnrollmentCta className="hidden sm:inline-flex" />
 
           {/*
             O menu de celular é um Sheet, e o item de navegação fecha por
@@ -52,14 +98,19 @@ export function Header(): React.JSX.Element {
           <Sheet>
             <SheetTrigger
               render={
-                <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Abrir menu">
+                <Button
+                  variant="ghost"
+                  size="icon-lg"
+                  className="lg:hidden"
+                  aria-label="Abrir menu"
+                >
                   <List />
                 </Button>
               }
             />
-            <SheetContent side="right" className="w-72">
-              <SheetTitle className="font-display text-lg font-extrabold italic">
-                Maiyu <span className="text-neon">Academy</span>
+            <SheetContent side="right" className="w-72 bg-cream">
+              <SheetTitle className="text-lg font-semibold">
+                Maiyu Academy
               </SheetTitle>
 
               <nav aria-label="Principal" className="grid gap-1 px-4">
@@ -70,23 +121,28 @@ export function Header(): React.JSX.Element {
                       <Link
                         to={link.to}
                         params={link.params}
-                        className="rounded-md px-3 py-2.5 text-base text-muted-foreground transition-colors hover:bg-surface-soft hover:text-foreground"
+                        className="rounded-md px-3 py-2.5 text-base text-ink-soft transition-colors hover:bg-ink/5 hover:text-ink"
                       >
                         {link.label}
                       </Link>
                     }
                   />
                 ))}
+
                 <SheetClose
                   render={
-                    <Link
-                      to="/matricula"
-                      className="mt-3 rounded-md bg-primary px-3 py-2.5 text-center font-medium text-primary-foreground"
+                    <a
+                      href={whatsappUrl(HEADER_MESSAGE)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="rounded-md px-3 py-2.5 text-base text-ink-soft transition-colors hover:bg-ink/5 hover:text-ink"
                     >
-                      Garanta sua vaga
-                    </Link>
+                      WhatsApp
+                    </a>
                   }
                 />
+
+                <EnrollmentCta className="mt-3 w-full" />
               </nav>
             </SheetContent>
           </Sheet>

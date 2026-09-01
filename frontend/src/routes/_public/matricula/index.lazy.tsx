@@ -12,11 +12,18 @@ import type { StorefrontEnrollmentCreatePayload } from '#/lib/validator'
 import type { Merge } from '#/lib/interfaces'
 import { LEGAL_AGE } from '#/lib/entity'
 import { applyMutationError } from '#/lib/form-errors'
+import { WAITING_LIST_MESSAGE } from '#/lib/enrollment-state'
+import { whatsappUrl } from '#/lib/site'
+import { Highlight } from '#/components/common/highlight'
 import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
 import { Checkbox } from '#/components/ui/checkbox'
-import { Field, FieldError, FieldGroup, FieldLabel } from '#/components/ui/field'
-import { CircuitBackground } from '#/components/common/neon'
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '#/components/ui/field'
 import { formatMoney, formatDate } from '#/lib/format'
 import { Route as EnrollmentRoute } from './index'
 import type { ClassResponse, CourseResponse } from '#/integrations/response'
@@ -37,7 +44,10 @@ export const Route = createLazyFileRoute('/_public/matricula/')({
  * terceiro é o que sai do resolver e chega ao `onSubmit`.
  */
 type FormValues = Merge<
-  Omit<StorefrontEnrollmentCreatePayload, 'studentBirthDate' | 'termsAccepted' | 'lgpdConsent'>,
+  Omit<
+    StorefrontEnrollmentCreatePayload,
+    'studentBirthDate' | 'termsAccepted' | 'lgpdConsent'
+  >,
   {
     studentBirthDate: string
     /**
@@ -72,7 +82,13 @@ type Step = (typeof STEPS)[number]
 /** Os campos que cada passo valida antes de deixar avançar. */
 const STEP_FIELDS = {
   curso: ['classId'],
-  aluno: ['studentName', 'studentBirthDate', 'studentDocument', 'email', 'phone'],
+  aluno: [
+    'studentName',
+    'studentBirthDate',
+    'studentDocument',
+    'email',
+    'phone',
+  ],
   responsavel: ['guardianName', 'guardianDocument', 'guardianPhone'],
   revisao: ['termsAccepted', 'lgpdConsent'],
 } as const satisfies Record<Step, ReadonlyArray<keyof FormValues>>
@@ -101,7 +117,8 @@ function ageFrom(birthDate: string): number | null {
   let age = today.getFullYear() - year
 
   const beforeBirthday =
-    today.getMonth() + 1 < month || (today.getMonth() + 1 === month && today.getDate() < day)
+    today.getMonth() + 1 < month ||
+    (today.getMonth() + 1 === month && today.getDate() < day)
 
   if (beforeBirthday) age -= 1
 
@@ -191,7 +208,7 @@ function RouteComponent(): React.JSX.Element {
       // a mensagem existiria três telas acima, e a tela só diria "não enviou".
       const marked = Object.keys(error.errors ?? {})
       const target = steps.find((name) =>
-        STEP_FIELDS[name].some((field) => marked.includes(field))
+        STEP_FIELDS[name].some((field) => marked.includes(field)),
       )
 
       if (target) setStep(target)
@@ -210,26 +227,53 @@ function RouteComponent(): React.JSX.Element {
     mutation.mutate(values)
   }
 
+  /*
+   * O vazio de verdade.
+   *
+   * Ele aparecia sempre, e não porque faltasse turma: a listagem da vitrine não
+   * populava `nextClass`, então o filtro acima zerava com o banco cheio. A
+   * página anunciava 40 vagas em março e esta tela dizia que não havia turma.
+   *
+   * Consertado o servidor, esta tela voltou a significar o que diz. E como
+   * agora ela é rara, ela não pode terminar em beco: sai daqui com uma conversa
+   * aberta no WhatsApp, que é o mesmo destino que o CTA da home assume quando
+   * não há turma.
+   */
   if (options.length === 0) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-24 text-center">
-        <h1 className="font-display text-3xl font-extrabold italic">
-          Nenhuma turma aberta <span className="text-neon">no momento</span>
+        <h1 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+          Nenhuma turma aberta <Highlight variant="fill">agora</Highlight>
         </h1>
-        <p className="mt-4 text-muted-foreground">
-          As matrículas abrem junto com a próxima turma. Fale com a secretaria para ser avisado.
+        <p className="mx-auto mt-5 max-w-[46ch] leading-relaxed text-ink-soft">
+          As matrículas abrem junto com a próxima turma. Deixe seu contato com a
+          secretaria e avisamos assim que as inscrições começarem.
         </p>
+
+        <Button
+          variant="pill"
+          size="pill-lg"
+          className="mt-8"
+          render={
+            <a
+              href={whatsappUrl(WAITING_LIST_MESSAGE)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Quero ser avisado
+              <ArrowRight />
+            </a>
+          }
+        />
       </div>
     )
   }
 
   return (
     <div className="relative">
-      <CircuitBackground />
-
       <div className="relative mx-auto max-w-2xl px-4 py-16 lg:py-20">
-        <h1 className="font-display text-3xl leading-[1.05] font-extrabold tracking-tight italic sm:text-4xl">
-          Sua <span className="text-neon">matrícula</span>
+        <h1 className="text-3xl leading-[1.05] font-semibold tracking-tight sm:text-4xl">
+          Sua <span className="text-neon-ink">matrícula</span>
         </h1>
 
         {/*
@@ -245,7 +289,7 @@ function RouteComponent(): React.JSX.Element {
           {step === 'curso' && (
             <FieldGroup>
               <fieldset>
-                <legend className="font-display text-xl font-bold italic">
+                <legend className="text-xl font-bold">
                   Qual curso você quer fazer?
                 </legend>
 
@@ -258,7 +302,7 @@ function RouteComponent(): React.JSX.Element {
                         <label
                           key={course.id}
                           data-accent={course.accent}
-                          className="chamfer flex cursor-pointer items-start gap-4 border border-white/10 bg-card p-5 transition-colors has-checked:border-[var(--local-accent,var(--accent))] has-checked:bg-surface-soft"
+                          className="rounded-card flex cursor-pointer items-start gap-4 border border-line bg-card p-5 transition-colors has-checked:border-[var(--neon-ink)] has-checked:bg-cream"
                         >
                           <input
                             type="radio"
@@ -267,10 +311,10 @@ function RouteComponent(): React.JSX.Element {
                             checked={field.value === course.nextClass.id}
                             onChange={() => field.onChange(course.nextClass.id)}
                             onBlur={field.onBlur}
-                            className="mt-1 size-4 accent-[var(--local-accent,var(--accent))]"
+                            className="mt-1 size-4 accent-[var(--neon-ink)]"
                           />
                           <span className="grid gap-1">
-                            <span className="font-display font-bold tracking-tight italic">
+                            <span className="font-bold tracking-tight">
                               {course.name}
                             </span>
                             <span className="text-sm text-muted-foreground">
@@ -281,7 +325,9 @@ function RouteComponent(): React.JSX.Element {
                           </span>
                         </label>
                       ))}
-                      {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+                      {fieldState.error && (
+                        <FieldError>{fieldState.error.message}</FieldError>
+                      )}
                     </div>
                   )}
                 />
@@ -292,7 +338,7 @@ function RouteComponent(): React.JSX.Element {
           {step === 'aluno' && (
             <FieldGroup>
               <fieldset className="grid gap-6">
-                <legend className="font-display text-xl font-bold italic">
+                <legend className="text-xl font-bold">
                   Dados de quem vai estudar
                 </legend>
 
@@ -301,14 +347,18 @@ function RouteComponent(): React.JSX.Element {
                   name="studentName"
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="studentName">Nome completo</FieldLabel>
+                      <FieldLabel htmlFor="studentName">
+                        Nome completo
+                      </FieldLabel>
                       <Input
                         {...field}
                         id="studentName"
                         autoComplete="name"
                         aria-invalid={fieldState.invalid}
                       />
-                      {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+                      {fieldState.error && (
+                        <FieldError>{fieldState.error.message}</FieldError>
+                      )}
                     </Field>
                   )}
                 />
@@ -318,7 +368,9 @@ function RouteComponent(): React.JSX.Element {
                   name="studentBirthDate"
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="studentBirthDate">Data de nascimento</FieldLabel>
+                      <FieldLabel htmlFor="studentBirthDate">
+                        Data de nascimento
+                      </FieldLabel>
                       {/*
                         `type="date"` nativo e não um seletor de calendário: a
                         data é de nascimento, e um calendário obriga a navegar
@@ -332,21 +384,29 @@ function RouteComponent(): React.JSX.Element {
                         autoComplete="bday"
                         aria-invalid={fieldState.invalid}
                       />
-                      {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+                      {fieldState.error && (
+                        <FieldError>{fieldState.error.message}</FieldError>
+                      )}
                     </Field>
                   )}
                 />
 
                 <Field>
-                  <FieldLabel htmlFor="studentDocument">CPF (opcional)</FieldLabel>
+                  <FieldLabel htmlFor="studentDocument">
+                    CPF (opcional)
+                  </FieldLabel>
                   <Input
-                    {...registerWithMask('studentDocument', 'cpf', { autoUnmask: true })}
+                    {...registerWithMask('studentDocument', 'cpf', {
+                      autoUnmask: true,
+                    })}
                     id="studentDocument"
                     inputMode="numeric"
                     placeholder="000.000.000-00"
                   />
                   {form.formState.errors.studentDocument && (
-                    <FieldError>{form.formState.errors.studentDocument.message}</FieldError>
+                    <FieldError>
+                      {form.formState.errors.studentDocument.message}
+                    </FieldError>
                   )}
                 </Field>
 
@@ -363,7 +423,9 @@ function RouteComponent(): React.JSX.Element {
                         autoComplete="email"
                         aria-invalid={fieldState.invalid}
                       />
-                      {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+                      {fieldState.error && (
+                        <FieldError>{fieldState.error.message}</FieldError>
+                      )}
                     </Field>
                   )}
                 />
@@ -371,15 +433,21 @@ function RouteComponent(): React.JSX.Element {
                 <Field>
                   <FieldLabel htmlFor="phone">Telefone com DDD</FieldLabel>
                   <Input
-                    {...registerWithMask('phone', ['(99) 9999-9999', '(99) 99999-9999'], {
-                      autoUnmask: true,
-                    })}
+                    {...registerWithMask(
+                      'phone',
+                      ['(99) 9999-9999', '(99) 99999-9999'],
+                      {
+                        autoUnmask: true,
+                      },
+                    )}
                     id="phone"
                     inputMode="tel"
                     placeholder="(97) 98460-0872"
                   />
                   {form.formState.errors.phone && (
-                    <FieldError>{form.formState.errors.phone.message}</FieldError>
+                    <FieldError>
+                      {form.formState.errors.phone.message}
+                    </FieldError>
                   )}
                 </Field>
               </fieldset>
@@ -389,12 +457,13 @@ function RouteComponent(): React.JSX.Element {
           {step === 'responsavel' && (
             <FieldGroup>
               <fieldset className="grid gap-6">
-                <legend className="font-display text-xl font-bold italic">
+                <legend className="text-xl font-bold">
                   Dados do responsável legal
                 </legend>
                 <p className="text-sm text-muted-foreground">
-                  Quem tem menos de {LEGAL_AGE} anos precisa de um responsável na matrícula. É
-                  exigência da lei de proteção de dados, não da escola.
+                  Quem tem menos de {LEGAL_AGE} anos precisa de um responsável
+                  na matrícula. É exigência da lei de proteção de dados, não da
+                  escola.
                 </p>
 
                 <Controller
@@ -402,14 +471,18 @@ function RouteComponent(): React.JSX.Element {
                   name="guardianName"
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="guardianName">Nome completo</FieldLabel>
+                      <FieldLabel htmlFor="guardianName">
+                        Nome completo
+                      </FieldLabel>
                       <Input
                         {...field}
                         value={field.value ?? ''}
                         id="guardianName"
                         aria-invalid={fieldState.invalid}
                       />
-                      {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+                      {fieldState.error && (
+                        <FieldError>{fieldState.error.message}</FieldError>
+                      )}
                     </Field>
                   )}
                 />
@@ -417,28 +490,40 @@ function RouteComponent(): React.JSX.Element {
                 <Field>
                   <FieldLabel htmlFor="guardianDocument">CPF</FieldLabel>
                   <Input
-                    {...registerWithMask('guardianDocument', 'cpf', { autoUnmask: true })}
+                    {...registerWithMask('guardianDocument', 'cpf', {
+                      autoUnmask: true,
+                    })}
                     id="guardianDocument"
                     inputMode="numeric"
                     placeholder="000.000.000-00"
                   />
                   {form.formState.errors.guardianDocument && (
-                    <FieldError>{form.formState.errors.guardianDocument.message}</FieldError>
+                    <FieldError>
+                      {form.formState.errors.guardianDocument.message}
+                    </FieldError>
                   )}
                 </Field>
 
                 <Field>
-                  <FieldLabel htmlFor="guardianPhone">Telefone com DDD</FieldLabel>
+                  <FieldLabel htmlFor="guardianPhone">
+                    Telefone com DDD
+                  </FieldLabel>
                   <Input
-                    {...registerWithMask('guardianPhone', ['(99) 9999-9999', '(99) 99999-9999'], {
-                      autoUnmask: true,
-                    })}
+                    {...registerWithMask(
+                      'guardianPhone',
+                      ['(99) 9999-9999', '(99) 99999-9999'],
+                      {
+                        autoUnmask: true,
+                      },
+                    )}
                     id="guardianPhone"
                     inputMode="tel"
                     placeholder="(97) 98460-0872"
                   />
                   {form.formState.errors.guardianPhone && (
-                    <FieldError>{form.formState.errors.guardianPhone.message}</FieldError>
+                    <FieldError>
+                      {form.formState.errors.guardianPhone.message}
+                    </FieldError>
                   )}
                 </Field>
               </fieldset>
@@ -448,10 +533,10 @@ function RouteComponent(): React.JSX.Element {
           {step === 'revisao' && (
             <FieldGroup>
               <fieldset className="grid gap-6">
-                <legend className="font-display text-xl font-bold italic">Confira e envie</legend>
+                <legend className="text-xl font-bold">Confira e envie</legend>
 
                 {selected && (
-                  <dl className="chamfer grid gap-3 border border-white/10 bg-card p-5 text-sm">
+                  <dl className="rounded-card grid gap-3 border border-line bg-card p-5 text-sm">
                     <Row label="Curso">{selected.name}</Row>
                     <Row label="Turma">
                       {selected.nextClass.name}, a partir de{' '}
@@ -459,8 +544,8 @@ function RouteComponent(): React.JSX.Element {
                     </Row>
                     <Row label="Aluno">{form.getValues('studentName')}</Row>
                     <Row label="Investimento">
-                      {formatMoney(selected.enrollmentFeeInCents)} de inscrição, depois{' '}
-                      {formatMoney(selected.monthlyFeeInCents)} por mês
+                      {formatMoney(selected.enrollmentFeeInCents)} de inscrição,
+                      depois {formatMoney(selected.monthlyFeeInCents)} por mês
                     </Row>
                   </dl>
                 )}
@@ -473,18 +558,26 @@ function RouteComponent(): React.JSX.Element {
                       <label className="flex items-start gap-3 text-sm">
                         <Checkbox
                           checked={field.value === true}
-                          onCheckedChange={(checked) => field.onChange(checked === true)}
+                          onCheckedChange={(checked) =>
+                            field.onChange(checked === true)
+                          }
                           aria-invalid={fieldState.invalid}
                         />
                         <span className="text-muted-foreground">
                           Li e aceito os{' '}
-                          <a href="/termos" target="_blank" className="text-neon hover:underline">
+                          <a
+                            href="/termos"
+                            target="_blank"
+                            className="text-neon-ink hover:underline"
+                          >
                             termos de uso
                           </a>
                           .
                         </span>
                       </label>
-                      {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+                      {fieldState.error && (
+                        <FieldError>{fieldState.error.message}</FieldError>
+                      )}
                     </Field>
                   )}
                 />
@@ -497,22 +590,27 @@ function RouteComponent(): React.JSX.Element {
                       <label className="flex items-start gap-3 text-sm">
                         <Checkbox
                           checked={field.value === true}
-                          onCheckedChange={(checked) => field.onChange(checked === true)}
+                          onCheckedChange={(checked) =>
+                            field.onChange(checked === true)
+                          }
                           aria-invalid={fieldState.invalid}
                         />
                         <span className="text-muted-foreground">
-                          Autorizo o uso dos meus dados para processar esta matrícula, conforme a{' '}
+                          Autorizo o uso dos meus dados para processar esta
+                          matrícula, conforme a{' '}
                           <a
                             href="/privacidade"
                             target="_blank"
-                            className="text-neon hover:underline"
+                            className="text-neon-ink hover:underline"
                           >
                             política de privacidade
                           </a>
                           .
                         </span>
                       </label>
-                      {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+                      {fieldState.error && (
+                        <FieldError>{fieldState.error.message}</FieldError>
+                      )}
                     </Field>
                   )}
                 />

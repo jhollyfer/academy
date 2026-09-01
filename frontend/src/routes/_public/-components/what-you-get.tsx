@@ -1,0 +1,142 @@
+import type * as React from 'react'
+import {
+  CirclesThreePlus,
+  Cpu,
+  PresentationChart,
+  Toolbox,
+  UsersThree,
+} from '@phosphor-icons/react'
+import type { Icon } from '@phosphor-icons/react'
+
+import {
+  Card,
+  CardContent,
+  CardTitle,
+  CardDescription,
+} from '#/components/ui/card'
+import { Highlight } from '#/components/common/highlight'
+import { EnrollmentCta } from '#/components/common/enrollment-cta'
+import { REVEAL, STAGGER } from './reveal'
+import { cn } from '#/lib/utils'
+
+/**
+ * O que a matrícula entrega, item a item.
+ *
+ * Cinco cards, e nenhum deles promete emprego, salário ou mercado. Não é
+ * modéstia: a escola estreia sem nenhum aluno formado, e uma promessa de
+ * carreira aqui seria a única frase da página que ninguém pode sustentar.
+ *
+ * TODO: falta o card de certificado. A política ainda não está definida, e
+ * anunciar certificado antes de a secretaria fechar é prometer documento que
+ * talvez não exista. Entra aqui quando decidirem, com o texto do FAQ junto.
+ */
+const ITEMS: ReadonlyArray<{ icon: Icon; title: string; description: string }> =
+  [
+    {
+      icon: Cpu,
+      title: 'A placa na sua mão',
+      description:
+        'Aula prática desde o primeiro sábado. Você monta o circuito, escreve o código e vê funcionar.',
+    },
+    {
+      icon: Toolbox,
+      title: 'Kit e bancada inclusos',
+      description:
+        'O laboratório tem computador, kit de eletrônica e ferramenta. Você não precisa levar nada.',
+    },
+    {
+      icon: UsersThree,
+      title: 'Turma de 40',
+      description:
+        'Uma turma por curso, com quarenta lugares. Sem sala lotada e sem fila para usar a bancada.',
+    },
+    {
+      icon: PresentationChart,
+      title: 'Projeto final apresentado',
+      description:
+        'No último sábado cada aluno apresenta o que construiu. É o que fica com você no fim.',
+    },
+    {
+      icon: CirclesThreePlus,
+      title: 'Professores engenheiros da região',
+      description:
+        'Quem dá aula mora aqui e trabalha com isso. Engenharia de software, engenharia da computação e engenharia elétrica.',
+    },
+  ]
+
+export function WhatYouGet(): React.JSX.Element {
+  return (
+    <section
+      data-slot="home-what-you-get"
+      className="px-3 py-3 sm:px-4 sm:py-4"
+    >
+      <div className="mx-auto grid max-w-7xl gap-4 lg:grid-cols-[minmax(0,22rem)_1fr]">
+        {/*
+          O card escuro é o único bloco de contraste desta metade da página, e é
+          ele que carrega o CTA. `on-ink` não é enfeite de nome: nada aqui
+          depende dela, mas ela marca a região escura para quem for acrescentar
+          um estado de foco próprio depois.
+        */}
+        <div
+          className={cn(
+            REVEAL,
+            'flex flex-col justify-between gap-10 rounded-block bg-ink p-8 sm:p-10',
+          )}
+        >
+          <h2 className="text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-cream sm:text-4xl">
+            O que você <Highlight variant="fill">leva</Highlight> daqui
+          </h2>
+
+          <div>
+            <p className="mb-7 text-base leading-relaxed text-cream/70">
+              Tudo o que a aula precisa já está no laboratório. Você leva o
+              caderno e a vontade.
+            </p>
+
+            <EnrollmentCta
+              variant="pill-green"
+              size="pill-lg"
+              className="w-full sm:w-auto"
+            />
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {ITEMS.map((item, index) => (
+            <Card
+              key={item.title}
+              size="lg"
+              className={cn(REVEAL, 'h-full')}
+              style={{ animationDelay: `${index * STAGGER}ms` }}
+            >
+              <CardContent className="flex flex-col gap-4">
+                {/*
+                  O círculo verde deslocado atrás do ícone, como na referência.
+                  Dois elementos e não uma borda: o deslocamento é o que dá a
+                  sensação de recorte colado, e uma borda ficaria concêntrica.
+                */}
+                <span className="relative inline-flex size-11 items-center justify-center">
+                  <span
+                    aria-hidden
+                    className="absolute -top-1 -left-1 size-9 rounded-full bg-green"
+                  />
+                  <item.icon
+                    weight="duotone"
+                    className="relative size-7 text-ink"
+                  />
+                </span>
+
+                <CardTitle className="text-lg font-semibold text-ink">
+                  {item.title}
+                </CardTitle>
+                <CardDescription className="text-sm leading-relaxed text-ink-soft">
+                  {item.description}
+                </CardDescription>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
