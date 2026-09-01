@@ -9,9 +9,11 @@ import { cn } from '#/lib/utils'
  * O gesto é a identidade, e identidade que cada tela reinventa deixa de ser
  * identidade.
  *
- * `eyebrow` é o rótulo pequeno em caixa alta acima do título, o "HOW SCATCODE
- * HELPS YOU GET STARTED" da referência. Opcional: nem toda seção precisa se
- * anunciar antes de começar.
+ * `eyebrow` é o rótulo pequeno em caixa alta acima do título. Opcional, e
+ * **raro**: um por bloco de três seções, no máximo. Um rótulo acima de cada
+ * título é o que faz uma página inteira ter o mesmo ritmo em todas as seções, e
+ * o efeito de "gerado" vem daí. Na dúvida, o título sozinho basta - a posição da
+ * seção na página já a categoriza.
  */
 export function SectionTitle({
   eyebrow,
@@ -32,10 +34,7 @@ export function SectionTitle({
       {...rest}
     >
       {eyebrow && (
-        <span className="inline-flex items-center gap-2 font-mono text-xs tracking-[0.18em] text-neon uppercase">
-          <span aria-hidden className="size-1.5 bg-neon" />
-          {eyebrow}
-        </span>
+        <span className="font-mono text-xs tracking-[0.18em] text-neon uppercase">{eyebrow}</span>
       )}
       {/*
         Um `<h2>` só, com a segunda linha dentro. Dois títulos irmãos dariam ao

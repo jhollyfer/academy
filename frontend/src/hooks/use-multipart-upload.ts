@@ -27,6 +27,19 @@ import type {
 
 export type MultipartUploadOptions = {
   /**
+   * O prefixo dos três endpoints de upload. Default `/storages`, que é o grupo
+   * autenticado do painel.
+   *
+   * Existe porque o candidato envia o comprovante do Pix **sem sessão**: o
+   * backend monta os mesmos controllers em
+   * `/storefront/enrollments/:protocol/uploads`, atrás do middleware que resolve
+   * o protocolo. Duplicar este hook para o público daria dois caminhos de código
+   * para o mesmo problema, com um recebendo correção e o outro não - que é
+   * exatamente o que o backend evitou não duplicando os controllers.
+   */
+  basePath?: string
+
+  /**
    * Quantas partes sobem ao mesmo tempo.
    *
    * Três porque o gargalo é a banda de subida, que é compartilhada: mais
@@ -45,6 +58,7 @@ export type UploadFile = (
 
 export function useMultipartUpload({
   concurrency = 3,
+  basePath = '/storages',
 }: MultipartUploadOptions = {}): { upload: UploadFile } {
   async function upload(
     file: File,
@@ -59,7 +73,7 @@ export function useMultipartUpload({
       )
     }
 
-    const plan = await open(file, mimetype)
+    const plan = await open(file, mimetype, basePath)
 
     // Já estava confirmado quando reencontramos o upload: nada a enviar.
     if (plan.storage.status === 'UPLOADED') {
@@ -75,8 +89,8 @@ export function useMultipartUpload({
       partSize: plan.partSize,
     })
 
-    const etags = await send(file, plan, onProgress, signal, concurrency)
-    const storage = await complete(plan.storage.id, plan.uploadId, etags)
+    const etags = await send(file, plan, onProgress, signal, concurrency, basePath)
+    const storage = await complete(plan.storage.id, plan.uploadId, etags, basePath)
 
     clearResume(file)
 
@@ -97,13 +111,14 @@ export function useMultipartUpload({
 async function open(
   file: File,
   mimetype: string,
+  basePath: string,
 ): Promise<StorageUploadResponse> {
   const saved = readResume(file)
 
   if (saved) {
     try {
       return await request<StorageUploadResponse>(
-        `/storages/${saved.storageId}/parts`,
+        `${basePath}/${saved.storageId}/parts`,
       )
     } catch (error) {
       if (!(error instanceof HTTPError) || error.status !== 404) throw error
@@ -112,7 +127,7 @@ async function open(
     }
   }
 
-  return request<StorageUploadResponse>('/storages', {
+  return request<StorageUploadResponse>(basePath, {
     method: 'POST',
     body: JSON.stringify({
       fileName: file.name,
@@ -137,6 +152,7 @@ async function send(
   onProgress: (percent: number) => void,
   signal: AbortSignal,
   concurrency: number,
+  basePath: string,
 ): Promise<Array<{ partNumber: number; etag: string }>> {
   const plan = planParts(file.size, initial.partSize)
   const etags = new Map<number, string>()
@@ -173,7 +189,7 @@ async function send(
     // recém-assinadas - as antigas podem já ter expirado.
     if (ready.length === 0) {
       batch = await request<StorageUploadResponse>(
-        `/storages/${initial.storage.id}/parts`,
+        `${basePath}/${initial.storage.id}/parts`,
       )
 
       for (const part of batch.uploaded) {
@@ -221,12 +237,13 @@ async function complete(
   storageId: string,
   uploadId: string | null,
   parts: Array<{ partNumber: number; etag: string }>,
+  basePath: string,
 ): Promise<StorageResponse> {
   const body: { parts?: Array<{ partNumber: number; etag: string }> } = {}
 
   if (uploadId) body.parts = parts
 
-  return request<StorageResponse>(`/storages/${storageId}/complete`, {
+  return request<StorageResponse>(`${basePath}/${storageId}/complete`, {
     method: 'POST',
     body: JSON.stringify(body),
   })

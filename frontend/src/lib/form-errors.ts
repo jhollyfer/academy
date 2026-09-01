@@ -27,12 +27,26 @@ import type { HTTPError } from '#/integrations/tanstack-query/http'
  * a migrar. O wizard ainda lê `error.errors` por conta própria, mas só para
  * descobrir a qual passo voltar; quem marca a tela é este helper.
  */
-export function applyHTTPErrorToForm<TValues extends FieldValues>({
+export function applyHTTPErrorToForm<
+  TValues extends FieldValues,
+  TContext = unknown,
+  TTransformed = TValues,
+>({
   form,
   error,
   fields,
 }: {
-  form: UseFormReturn<TValues>
+  /**
+   * O terceiro genérico existe para os formulários cujo resolver **transforma**
+   * o valor - o de matrícula tem `studentBirthDate` como `string` no campo e
+   * `Date` depois de validar. Sem ele, `UseFormReturn<TValues>` não casa com
+   * `UseFormReturn<TValues, unknown, TPayload>`, e o helper ficaria de fora
+   * justo do formulário mais longo do site.
+   *
+   * `setError` e `fields` continuam falando do lado do **campo**, que é o que
+   * importa aqui: o erro é pintado no input, não no payload.
+   */
+  form: UseFormReturn<TValues, TContext, TTransformed>
   error: HTTPError
   fields: ReadonlyArray<FieldPath<TValues>>
 }): boolean {
@@ -86,13 +100,17 @@ export function applyHTTPErrorToForm<TValues extends FieldValues>({
  * O critério nasceu de uma divergência: sete recursos ofereciam o reenvio no
  * cadastro e não na edição, que é o avesso da regra acima.
  */
-export function applyMutationError<TValues extends FieldValues>({
+export function applyMutationError<
+  TValues extends FieldValues,
+  TContext = unknown,
+  TTransformed = TValues,
+>({
   form,
   error,
   fields,
   retry,
 }: {
-  form: UseFormReturn<TValues>
+  form: UseFormReturn<TValues, TContext, TTransformed>
   error: HTTPError
   fields: ReadonlyArray<FieldPath<TValues>>
   retry?: {

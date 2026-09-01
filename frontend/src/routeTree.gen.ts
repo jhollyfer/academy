@@ -13,8 +13,14 @@ import { Route as PrivateLayoutRouteImport } from './routes/_private/layout'
 import { Route as PublicLayoutRouteImport } from './routes/_public/layout'
 import { Route as AuthenticationLayoutRouteImport } from './routes/authentication/layout'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
+import { Route as PublicPrivacidadeRouteImport } from './routes/_public/privacidade'
+import { Route as PublicSobreRouteImport } from './routes/_public/sobre'
+import { Route as PublicTermosRouteImport } from './routes/_public/termos'
 import { Route as AuthenticationIndexRouteImport } from './routes/authentication/index'
 import { Route as PrivateAdminIndexRouteImport } from './routes/_private/admin/index'
+import { Route as PublicCursosSlugRouteImport } from './routes/_public/cursos/$slug'
+import { Route as PublicMatriculaIndexRouteImport } from './routes/_public/matricula/index'
+import { Route as PublicMatriculaProtocolRouteImport } from './routes/_public/matricula/$protocol'
 import { Route as PrivateAdminCursosIndexRouteImport } from './routes/_private/admin/cursos/index'
 import { Route as PrivateAdminMatriculasIndexRouteImport } from './routes/_private/admin/matriculas/index'
 import { Route as PrivateAdminTurmasIndexRouteImport } from './routes/_private/admin/turmas/index'
@@ -36,7 +42,26 @@ const PublicIndexRoute = PublicIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => PublicLayoutRoute,
-} as any)
+} as any).lazy(() => import('./routes/_public/index.lazy').then((d) => d.Route))
+const PublicPrivacidadeRoute = PublicPrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => PublicLayoutRoute,
+} as any).lazy(() =>
+  import('./routes/_public/privacidade.lazy').then((d) => d.Route),
+)
+const PublicSobreRoute = PublicSobreRouteImport.update({
+  id: '/sobre',
+  path: '/sobre',
+  getParentRoute: () => PublicLayoutRoute,
+} as any).lazy(() => import('./routes/_public/sobre.lazy').then((d) => d.Route))
+const PublicTermosRoute = PublicTermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
+  getParentRoute: () => PublicLayoutRoute,
+} as any).lazy(() =>
+  import('./routes/_public/termos.lazy').then((d) => d.Route),
+)
 const AuthenticationIndexRoute = AuthenticationIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -49,6 +74,27 @@ const PrivateAdminIndexRoute = PrivateAdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => PrivateLayoutRoute,
 } as any)
+const PublicCursosSlugRoute = PublicCursosSlugRouteImport.update({
+  id: '/cursos/$slug',
+  path: '/cursos/$slug',
+  getParentRoute: () => PublicLayoutRoute,
+} as any).lazy(() =>
+  import('./routes/_public/cursos/$slug.lazy').then((d) => d.Route),
+)
+const PublicMatriculaIndexRoute = PublicMatriculaIndexRouteImport.update({
+  id: '/matricula/',
+  path: '/matricula/',
+  getParentRoute: () => PublicLayoutRoute,
+} as any).lazy(() =>
+  import('./routes/_public/matricula/index.lazy').then((d) => d.Route),
+)
+const PublicMatriculaProtocolRoute = PublicMatriculaProtocolRouteImport.update({
+  id: '/matricula/$protocol',
+  path: '/matricula/$protocol',
+  getParentRoute: () => PublicLayoutRoute,
+} as any).lazy(() =>
+  import('./routes/_public/matricula/$protocol.lazy').then((d) => d.Route),
+)
 const PrivateAdminCursosIndexRoute = PrivateAdminCursosIndexRouteImport.update({
   id: '/admin/cursos/',
   path: '/admin/cursos/',
@@ -69,16 +115,28 @@ const PrivateAdminTurmasIndexRoute = PrivateAdminTurmasIndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/authentication': typeof AuthenticationLayoutRouteWithChildren
+  '/privacidade': typeof PublicPrivacidadeRoute
+  '/sobre': typeof PublicSobreRoute
+  '/termos': typeof PublicTermosRoute
   '/authentication/': typeof AuthenticationIndexRoute
+  '/cursos/$slug': typeof PublicCursosSlugRoute
+  '/matricula/$protocol': typeof PublicMatriculaProtocolRoute
   '/admin/': typeof PrivateAdminIndexRoute
+  '/matricula/': typeof PublicMatriculaIndexRoute
   '/admin/cursos/': typeof PrivateAdminCursosIndexRoute
   '/admin/matriculas/': typeof PrivateAdminMatriculasIndexRoute
   '/admin/turmas/': typeof PrivateAdminTurmasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
+  '/privacidade': typeof PublicPrivacidadeRoute
+  '/sobre': typeof PublicSobreRoute
+  '/termos': typeof PublicTermosRoute
   '/authentication': typeof AuthenticationIndexRoute
+  '/cursos/$slug': typeof PublicCursosSlugRoute
+  '/matricula/$protocol': typeof PublicMatriculaProtocolRoute
   '/admin': typeof PrivateAdminIndexRoute
+  '/matricula': typeof PublicMatriculaIndexRoute
   '/admin/cursos': typeof PrivateAdminCursosIndexRoute
   '/admin/matriculas': typeof PrivateAdminMatriculasIndexRoute
   '/admin/turmas': typeof PrivateAdminTurmasIndexRoute
@@ -88,9 +146,15 @@ export interface FileRoutesById {
   '/_private': typeof PrivateLayoutRouteWithChildren
   '/_public': typeof PublicLayoutRouteWithChildren
   '/authentication': typeof AuthenticationLayoutRouteWithChildren
+  '/_public/privacidade': typeof PublicPrivacidadeRoute
+  '/_public/sobre': typeof PublicSobreRoute
+  '/_public/termos': typeof PublicTermosRoute
   '/_public/': typeof PublicIndexRoute
   '/authentication/': typeof AuthenticationIndexRoute
+  '/_public/cursos/$slug': typeof PublicCursosSlugRoute
+  '/_public/matricula/$protocol': typeof PublicMatriculaProtocolRoute
   '/_private/admin/': typeof PrivateAdminIndexRoute
+  '/_public/matricula/': typeof PublicMatriculaIndexRoute
   '/_private/admin/cursos/': typeof PrivateAdminCursosIndexRoute
   '/_private/admin/matriculas/': typeof PrivateAdminMatriculasIndexRoute
   '/_private/admin/turmas/': typeof PrivateAdminTurmasIndexRoute
@@ -100,16 +164,28 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/authentication'
+    | '/privacidade'
+    | '/sobre'
+    | '/termos'
     | '/authentication/'
+    | '/cursos/$slug'
+    | '/matricula/$protocol'
     | '/admin/'
+    | '/matricula/'
     | '/admin/cursos/'
     | '/admin/matriculas/'
     | '/admin/turmas/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/privacidade'
+    | '/sobre'
+    | '/termos'
     | '/authentication'
+    | '/cursos/$slug'
+    | '/matricula/$protocol'
     | '/admin'
+    | '/matricula'
     | '/admin/cursos'
     | '/admin/matriculas'
     | '/admin/turmas'
@@ -118,9 +194,15 @@ export interface FileRouteTypes {
     | '/_private'
     | '/_public'
     | '/authentication'
+    | '/_public/privacidade'
+    | '/_public/sobre'
+    | '/_public/termos'
     | '/_public/'
     | '/authentication/'
+    | '/_public/cursos/$slug'
+    | '/_public/matricula/$protocol'
     | '/_private/admin/'
+    | '/_public/matricula/'
     | '/_private/admin/cursos/'
     | '/_private/admin/matriculas/'
     | '/_private/admin/turmas/'
@@ -162,6 +244,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicIndexRouteImport
       parentRoute: typeof PublicLayoutRoute
     }
+    '/_public/privacidade': {
+      id: '/_public/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PublicPrivacidadeRouteImport
+      parentRoute: typeof PublicLayoutRoute
+    }
+    '/_public/sobre': {
+      id: '/_public/sobre'
+      path: '/sobre'
+      fullPath: '/sobre'
+      preLoaderRoute: typeof PublicSobreRouteImport
+      parentRoute: typeof PublicLayoutRoute
+    }
+    '/_public/termos': {
+      id: '/_public/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof PublicTermosRouteImport
+      parentRoute: typeof PublicLayoutRoute
+    }
     '/authentication/': {
       id: '/authentication/'
       path: '/'
@@ -175,6 +278,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof PrivateAdminIndexRouteImport
       parentRoute: typeof PrivateLayoutRoute
+    }
+    '/_public/cursos/$slug': {
+      id: '/_public/cursos/$slug'
+      path: '/cursos/$slug'
+      fullPath: '/cursos/$slug'
+      preLoaderRoute: typeof PublicCursosSlugRouteImport
+      parentRoute: typeof PublicLayoutRoute
+    }
+    '/_public/matricula/': {
+      id: '/_public/matricula/'
+      path: '/matricula'
+      fullPath: '/matricula/'
+      preLoaderRoute: typeof PublicMatriculaIndexRouteImport
+      parentRoute: typeof PublicLayoutRoute
+    }
+    '/_public/matricula/$protocol': {
+      id: '/_public/matricula/$protocol'
+      path: '/matricula/$protocol'
+      fullPath: '/matricula/$protocol'
+      preLoaderRoute: typeof PublicMatriculaProtocolRouteImport
+      parentRoute: typeof PublicLayoutRoute
     }
     '/_private/admin/cursos/': {
       id: '/_private/admin/cursos/'
@@ -219,11 +343,23 @@ const PrivateLayoutRouteWithChildren = PrivateLayoutRoute._addFileChildren(
 )
 
 interface PublicLayoutRouteChildren {
+  PublicPrivacidadeRoute: typeof PublicPrivacidadeRoute
+  PublicSobreRoute: typeof PublicSobreRoute
+  PublicTermosRoute: typeof PublicTermosRoute
   PublicIndexRoute: typeof PublicIndexRoute
+  PublicCursosSlugRoute: typeof PublicCursosSlugRoute
+  PublicMatriculaProtocolRoute: typeof PublicMatriculaProtocolRoute
+  PublicMatriculaIndexRoute: typeof PublicMatriculaIndexRoute
 }
 
 const PublicLayoutRouteChildren: PublicLayoutRouteChildren = {
+  PublicPrivacidadeRoute: PublicPrivacidadeRoute,
+  PublicSobreRoute: PublicSobreRoute,
+  PublicTermosRoute: PublicTermosRoute,
   PublicIndexRoute: PublicIndexRoute,
+  PublicCursosSlugRoute: PublicCursosSlugRoute,
+  PublicMatriculaProtocolRoute: PublicMatriculaProtocolRoute,
+  PublicMatriculaIndexRoute: PublicMatriculaIndexRoute,
 }
 
 const PublicLayoutRouteWithChildren = PublicLayoutRoute._addFileChildren(

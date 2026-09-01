@@ -1,14 +1,9 @@
 /**
- * Documento e telefone na forma que se lê.
+ * Documento, telefone, dinheiro e data na forma que se lê.
  *
- * O banco guarda só dígitos - `cpf()`, `cnpj()`, `cep()` e `phone()` tiram a
- * máscara no `parse()` antes de qualquer regra -, e a máscara de digitação só
- * existe enquanto o campo está em foco. Fora do formulário, quem reexibe é isto.
- *
- * Existe porque a mesma formatação estava escrita sete vezes em `slice()` solto
- * pelas telas de listagem e de detalhe, com sete chances de divergir, e porque o
- * telefone passou a precisar da mesma coisa quando deixou de ser gravado com
- * máscara.
+ * O banco guarda só dígitos - `cpf()` e `phone()` tiram a máscara no `parse()`
+ * antes de qualquer regra -, e a máscara de digitação só existe enquanto o
+ * campo está em foco. Fora do formulário, quem reexibe é isto.
  *
  * Todas devolvem o valor cru quando ele não tem o tamanho esperado, em vez de
  * fatiar o que não deve: dado antigo ou fora do padrão aparece como está, e não
@@ -18,21 +13,6 @@
 /** O hífen que as tabelas usam para "não informado". */
 const EMPTY = '-'
 
-/**
- * A placa da loja: nome fantasia, com a razão social de reserva.
- *
- * Existe porque a empresa deixou de ser achatada sobre o usuário, e o
- * `tradeName ?? name` que as telas usavam passou a ser `tradeName ?? legalName`
- * - em treze lugares. `legalName` é `notNullable()`, então nunca falta nome.
- */
-export function companyName(
-  company: { tradeName: string | null; legalName: string } | null | undefined,
-): string {
-  if (!company) return EMPTY
-
-  return company.tradeName ?? company.legalName
-}
-
 export function formatCpf(cpf: string | null | undefined): string {
   if (!cpf) return EMPTY
   if (cpf.length !== 11) return cpf
@@ -40,23 +20,9 @@ export function formatCpf(cpf: string | null | undefined): string {
   return `${cpf.slice(0, 3)}.${cpf.slice(3, 6)}.${cpf.slice(6, 9)}-${cpf.slice(9)}`
 }
 
-export function formatCnpj(cnpj: string | null | undefined): string {
-  if (!cnpj) return EMPTY
-  if (cnpj.length !== 14) return cnpj
-
-  return `${cnpj.slice(0, 2)}.${cnpj.slice(2, 5)}.${cnpj.slice(5, 8)}/${cnpj.slice(8, 12)}-${cnpj.slice(12)}`
-}
-
-export function formatCep(cep: string | null | undefined): string {
-  if (!cep) return EMPTY
-  if (cep.length !== 8) return cep
-
-  return `${cep.slice(0, 5)}-${cep.slice(5)}`
-}
-
 /**
  * Fixo tem dez dígitos e celular tem onze, e a diferença está no tamanho do
- * segundo grupo - `(92) 3333-4444` contra `(92) 99999-0000`. É a mesma regra que
+ * segundo grupo - `(97) 3333-4444` contra `(97) 98460-0872`. É a mesma regra que
  * a máscara `phone-br` aplica na digitação.
  */
 export function formatPhone(phone: string | null | undefined): string {
@@ -68,4 +34,62 @@ export function formatPhone(phone: string | null | undefined): string {
   const fim = phone.slice(-4)
 
   return `(${ddd}) ${meio}-${fim}`
+}
+
+/**
+ * Centavos inteiros na forma que se lê.
+ *
+ * A API guarda dinheiro em centavos porque ponto flutuante não representa
+ * R$ 150,10 exatamente. A divisão por 100 acontece **aqui**, na borda de
+ * apresentação, e em nenhum outro lugar - fazer conta com o valor dividido é
+ * como o centavo volta a se perder.
+ */
+export function formatMoney(cents: number): string {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(cents / 100)
+}
+
+/**
+ * Uma data ISO da API na forma brasileira.
+ *
+ * `'2026-03-07'` chega como data pura, sem hora. Passá-la por `new Date()` a
+ * interpreta como UTC meia-noite, e num fuso a oeste ela retrocede um dia - a
+ * turma que começa dia 7 seria anunciada dia 6, e Benjamin Constant é UTC-5.
+ * Por isso a data é fatiada como texto, e não convertida.
+ */
+export function formatDate(iso: string | null | undefined): string {
+  if (!iso) return EMPTY
+
+  const [date] = iso.split('T')
+  const [year, month, day] = date.split('-')
+
+  if (!year || !month || !day) return iso
+
+  return `${day}/${month}/${year}`
+}
+
+/**
+ * O mês e o ano por extenso, para o bloco de próxima turma: "março de 2026".
+ *
+ * A landing anuncia quando a turma começa, e o dia exato pesa menos que o mês -
+ * quem está decidindo quer saber se dá tempo de se organizar.
+ *
+ * `timeZone: 'UTC'` no formatador pelo mesmo motivo do `formatDate`: a data é
+ * construída em UTC, e formatá-la no fuso local a puxaria de volta um dia.
+ */
+export function formatMonthYear(iso: string | null | undefined): string {
+  if (!iso) return EMPTY
+
+  const [date] = iso.split('T')
+  const [year, month] = date.split('-')
+
+  if (!year || !month) return iso
+
+  const label = new Intl.DateTimeFormat('pt-BR', { month: 'long', timeZone: 'UTC' }).format(
+    new Date(Date.UTC(Number(year), Number(month) - 1, 1))
+  )
+
+  return `${label} de ${year}`
 }

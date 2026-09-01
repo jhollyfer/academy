@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatCep, formatCnpj, formatCpf, formatPhone } from './format'
+import { formatCpf, formatPhone } from './format'
 
 describe('formatCpf', () => {
   it('reexibe os onze dígitos com a pontuação', () => {
@@ -19,21 +19,7 @@ describe('formatCpf', () => {
   })
 })
 
-describe('formatCnpj', () => {
-  it('reexibe os catorze dígitos com a pontuação', () => {
-    expect(formatCnpj('11222333000181')).toBe('11.222.333/0001-81')
-  })
 
-  it('aceita o CNPJ alfanumérico, que também tem catorze', () => {
-    expect(formatCnpj('12ABC34501DE35')).toBe('12.ABC.345/01DE-35')
-  })
-})
-
-describe('formatCep', () => {
-  it('reexibe os oito dígitos com o hífen', () => {
-    expect(formatCep('69000000')).toBe('69000-000')
-  })
-})
 
 describe('formatPhone', () => {
   it('distingue fixo de celular pelo tamanho do meio', () => {
