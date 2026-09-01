@@ -23,8 +23,12 @@ import type { Merge } from '#/lib/interfaces'
  *   outline  a ação secundária ao lado de uma das duas
  *
  * O `slab` não é verde, e isso é conta, não gosto: `--primary` é #178528 no
- * tema claro, e um botão desse verde sobre o bloco `bg-foreground` (#272221)
- * daria 1,74:1 de contorno. O par invertido dá 15,05:1 nos dois temas.
+ * tema claro, e um botão desse verde sobre a placa daria 1,74:1 de contorno.
+ *
+ * Ele é o #FAFAFA nos dois temas, escrito com dois nomes diferentes porque a
+ * placa muda de cor: no claro ela é `--foreground` e o botão é `--background`;
+ * no escuro ela é `--card` e quem vale #FAFAFA passa a ser o `--foreground`.
+ * Dá 15,05:1 no claro e 10,83:1 no escuro.
  *
  * Não há tom para "outline dentro de bloco escuro": a página não usa nenhum
  * hoje, e um quarto tom sem chamada é um tom para alguém manter à toa.
@@ -37,7 +41,7 @@ const pillVariants = cva(
         /** Sobre a página clara. 15,05:1 nos dois temas - o par inverte junto. */
         ink: 'border-transparent bg-foreground text-background hover:bg-foreground/90 hover:text-background',
         /** Dentro de bloco escuro. O par do `ink` virado: 15,05:1 nos dois temas. */
-        slab: 'border-transparent bg-background text-foreground hover:bg-background/90 hover:text-foreground',
+        slab: 'border-transparent bg-background text-foreground hover:bg-background/90 hover:text-foreground dark:bg-foreground dark:text-background dark:hover:bg-foreground/90 dark:hover:text-background',
         /** A secundária. Só a borda, para não competir com a pílula ao lado. */
         outline:
           'border-foreground bg-transparent text-foreground hover:bg-foreground/8 hover:text-foreground',

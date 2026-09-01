@@ -20,19 +20,19 @@ const FOOTER_MESSAGE = 'Olá! Quero saber mais sobre os cursos da Maiyu Academy.
  */
 export function Footer(): React.JSX.Element {
   return (
-    <footer className="mt-3 rounded-t-block bg-foreground px-4 pt-16 pb-10 sm:mt-4">
+    <footer className="mt-3 rounded-t-block bg-foreground px-4 dark:bg-card pt-16 pb-10 sm:mt-4">
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <p className="text-lg font-semibold tracking-tight text-background">
+            <p className="text-lg font-semibold tracking-tight text-background dark:text-card-foreground">
               Maiyu Academy
             </p>
-            <p className="mt-3 max-w-[38ch] text-sm leading-relaxed text-background/70">
+            <p className="mt-3 max-w-[38ch] text-sm leading-relaxed text-background/70 dark:text-muted-foreground">
               Escola de tecnologia em {ADDRESS.city}, no Amazonas. Aulas
               presenciais aos sábados.
             </p>
             {/* TODO: acrescentar o logradouro quando `ADDRESS.street` for preenchido. */}
-            <p className="mt-4 text-sm text-background/70">
+            <p className="mt-4 text-sm text-background/70 dark:text-muted-foreground">
               {ADDRESS.city}, {ADDRESS.state}
             </p>
           </div>
@@ -41,36 +41,40 @@ export function Footer(): React.JSX.Element {
             aria-label="Cursos"
             className="grid content-start gap-2.5 text-sm"
           >
-            <p className="font-medium text-background">Cursos</p>
+            <p className="font-medium text-background dark:text-card-foreground">
+              Cursos
+            </p>
             <Link
               to="/cursos/$slug"
               params={{ slug: 'robotica' }}
-              className="text-background/70 transition-colors hover:text-background"
+              className="text-background/70 dark:text-muted-foreground transition-colors hover:text-background dark:hover:text-card-foreground"
             >
               Robótica
             </Link>
             <Link
               to="/cursos/$slug"
               params={{ slug: 'web-development' }}
-              className="text-background/70 transition-colors hover:text-background"
+              className="text-background/70 dark:text-muted-foreground transition-colors hover:text-background dark:hover:text-card-foreground"
             >
               Desenvolvimento web
             </Link>
             <Link
               to="/sobre"
-              className="text-background/70 transition-colors hover:text-background"
+              className="text-background/70 dark:text-muted-foreground transition-colors hover:text-background dark:hover:text-card-foreground"
             >
               A escola
             </Link>
           </nav>
 
           <div className="grid content-start gap-2.5 text-sm">
-            <p className="font-medium text-background">Contato</p>
+            <p className="font-medium text-background dark:text-card-foreground">
+              Contato
+            </p>
             <a
               href={whatsappUrl(FOOTER_MESSAGE)}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 text-background/70 transition-colors hover:text-background"
+              className="inline-flex items-center gap-2 text-background/70 dark:text-muted-foreground transition-colors hover:text-background dark:hover:text-card-foreground"
             >
               <WhatsappLogo className="size-4" />
               {formatPhone(WHATSAPP_NUMBER.slice(2))}
@@ -79,7 +83,7 @@ export function Footer(): React.JSX.Element {
               href="https://instagram.com/maiyu.academy"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 text-background/70 transition-colors hover:text-background"
+              className="inline-flex items-center gap-2 text-background/70 dark:text-muted-foreground transition-colors hover:text-background dark:hover:text-card-foreground"
             >
               <InstagramLogo className="size-4" />
               maiyu.academy
@@ -90,25 +94,27 @@ export function Footer(): React.JSX.Element {
             aria-label="Legal"
             className="grid content-start gap-2.5 text-sm"
           >
-            <p className="font-medium text-background">Legal</p>
+            <p className="font-medium text-background dark:text-card-foreground">
+              Legal
+            </p>
             <Link
               to="/privacidade"
-              className="text-background/70 transition-colors hover:text-background"
+              className="text-background/70 dark:text-muted-foreground transition-colors hover:text-background dark:hover:text-card-foreground"
             >
               Privacidade
             </Link>
             <Link
               to="/termos"
-              className="text-background/70 transition-colors hover:text-background"
+              className="text-background/70 dark:text-muted-foreground transition-colors hover:text-background dark:hover:text-card-foreground"
             >
               Termos de uso
             </Link>
           </nav>
         </div>
 
-        <Separator className="my-10 bg-background/20" />
+        <Separator className="my-10 bg-background/20 dark:bg-foreground/20" />
 
-        <p className="text-sm text-background/70">
+        <p className="text-sm text-background/70 dark:text-muted-foreground">
           © {new Date().getFullYear()} Maiyu Academy
         </p>
       </div>

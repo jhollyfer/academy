@@ -124,9 +124,8 @@ continua lá, e é decisão de quem configurou a máquina.
 
 ## Riscos anotados## Riscos anotados
 
-- Os três blocos escuros (`footer.tsx:23`, `course-cards.tsx:53`,
-  `what-you-get.tsx:110`) **invertem**: no escuro o rodapé vira placa clara.
-  Decidir olhando.
+- ~~Os três blocos escuros invertem no escuro.~~ **Resolvido**: no escuro eles
+  passam a ser `--card`, e o que vive dentro deles ganhou o par de `dark:`.
 - `astronaut-illustration.tsx` era falso alarme: o `stroke="white"` dele vive
   sobre o painel `bg-black` do 404, que é preto fixo nos dois temas de
   propósito. O bug de verdade era o `text-border` padrão do componente, que

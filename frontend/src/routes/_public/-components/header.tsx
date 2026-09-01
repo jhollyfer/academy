@@ -4,6 +4,7 @@ import { List, WhatsappLogo } from '@phosphor-icons/react'
 
 import { Button } from '#/components/ui/button'
 import { PillButton } from '#/components/common/pill-button'
+import { ThemeToggle } from '#/components/common/theme-toggle'
 import {
   Sheet,
   SheetClose,
@@ -91,6 +92,14 @@ export function Header(): React.JSX.Element {
               </a>
             }
           />
+
+          {/*
+            O mesmo botão do painel, e não um segundo: ele faltava aqui, e a
+            vitrine seguia o tema do sistema sem ninguém poder trocar. Fica
+            antes da pílula de matrícula de propósito - o CTA é o último
+            elemento da barra em toda largura.
+          */}
+          <ThemeToggle />
 
           <EnrollmentCta className="hidden sm:inline-flex" />
 

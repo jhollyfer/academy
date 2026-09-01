@@ -105,15 +105,15 @@ export function WhatYouGet(): React.JSX.Element {
         <div
           className={cn(
             REVEAL,
-            'flex flex-col justify-between gap-10 rounded-block bg-foreground p-8 sm:p-10',
+            'flex flex-col justify-between gap-10 rounded-block bg-foreground dark:bg-card p-8 sm:p-10',
           )}
         >
-          <h2 className="text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-background sm:text-4xl">
-            O que você <Highlight variant="ink">leva</Highlight> daqui
+          <h2 className="text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-background dark:text-card-foreground sm:text-4xl">
+            O que você <Highlight variant="slab">leva</Highlight> daqui
           </h2>
 
           <div>
-            <p className="mb-7 text-base leading-relaxed text-background/70">
+            <p className="mb-7 text-base leading-relaxed text-background/70 dark:text-muted-foreground">
               Tudo o que a aula precisa já está no laboratório. Você leva o
               caderno e a vontade.
             </p>

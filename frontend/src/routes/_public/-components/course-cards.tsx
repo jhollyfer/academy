@@ -50,22 +50,22 @@ export function CourseCards({
     <section
       data-slot="home-courses"
       id="cursos"
-      className="mt-3 scroll-mt-20 bg-foreground px-4 py-20 sm:mt-4 lg:py-28"
+      className="mt-3 scroll-mt-20 bg-foreground dark:bg-card px-4 py-20 sm:mt-4 lg:py-28"
     >
       <div className="mx-auto max-w-7xl">
         <h2
           className={cn(
             REVEAL,
-            'max-w-[16ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-background sm:text-4xl lg:text-5xl',
+            'max-w-[16ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-background dark:text-card-foreground sm:text-4xl lg:text-5xl',
           )}
         >
-          Dois cursos, uma <Highlight variant="ink">turma</Highlight> só
+          Dois cursos, uma <Highlight variant="slab">turma</Highlight> só
         </h2>
 
         <p
           className={cn(
             REVEAL,
-            'delay-100 mt-6 max-w-[64ch] text-base leading-relaxed text-background/70 sm:text-lg',
+            'delay-100 mt-6 max-w-[64ch] text-base leading-relaxed text-background/70 dark:text-muted-foreground sm:text-lg',
           )}
         >
           Cada curso é o módulo 1 de uma trilha, e é completo por si. No fim

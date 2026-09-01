@@ -69,13 +69,24 @@ Quatro, e a página inteira sai delas:
 | chão | `bg-background` | `school`, `team`, `who-its-for`, `faq` |
 | card | `bg-card` | `stats-bar`, `how-to-enroll`, `where-and-when`, cards de curso e professor |
 | verde | `bg-primary` + `text-primary-foreground` | hero, banner final, hero do curso, `/sobre` |
-| placa invertida | `bg-foreground` + `text-background` | rodapé, seção dos cursos, coluna do "o que você leva" |
+| placa | `bg-foreground dark:bg-card` | rodapé, seção dos cursos, coluna do "o que você leva" |
 
-**A placa inverte com o tema**: no escuro ela vira clara. Um bloco de contraste
-não tem como ser mais escuro que uma página já escura, e o par
-`foreground`/`background` é o único do vocabulário do shadcn que garante 15:1
-nos dois sentidos. Dentro dela, texto secundário é `text-background/70` — um
-nível só de opacidade, porque `/60` dá 4,19:1 no escuro e reprova.
+**A placa muda de cor com o tema, e não inverte.** No claro ela é
+`--foreground` (#272221), o contraste máximo contra a página clara. No escuro
+uma placa mais escura que a página é impossível, e `--foreground` a deixaria
+branca — três faixas claras no meio de uma página escura. Ela vira `--card`
+(#403937): continua sendo faixa distinta, agora por elevação.
+
+Quem vive dentro dela acompanha, e é por isso que três coisas carregam `dark:`:
+
+| | claro | escuro |
+| --- | --- | --- |
+| título | `text-background` | `dark:text-card-foreground` |
+| texto secundário | `text-background/70` | `dark:text-muted-foreground` |
+| CTA (`PillButton` tom `slab`) | `bg-background` | `dark:bg-foreground` — os dois são #FAFAFA |
+| pílula (`Highlight` variante `slab`) | branca com verde legível | `dark:bg-primary`, verde puro com tinta escura |
+
+Um nível só de opacidade no secundário: `/60` dava 4,19:1 e reprovava.
 
 Elevação é cor e borda, nunca sombra: sombra preta sobre fundo quase preto não
 separa nada.
@@ -86,7 +97,7 @@ separa nada.
 | --- | --- |
 | `pill-button.tsx` | a pílula da vitrine. Três tons: `ink` (sobre a página), `slab` (dentro da placa), `outline` (secundária). Compõe o `<Button>` de fábrica e desliga `nativeButton` quando o elemento final é link |
 | `section-card.tsx` | o terceiro tamanho de card — canto de 24px, respiro de 6, texto de 14px. O `Card` do registry só tem medidas de painel |
-| `highlight.tsx` | a palavra em serifa itálica dentro da pílula. `fill` sobre a página, `ink` dentro do verde e da placa, `outline` quando o fundo já carrega cor. **Uma por título** |
+| `highlight.tsx` | a palavra em serifa itálica dentro da pílula. `fill` sobre a página, `ink` dentro do bloco verde, `slab` dentro da placa, `outline` quando o fundo já carrega cor. **Uma por título** |
 | `enrollment-cta.tsx` | o único componente que decide para onde "Garanta sua vaga" leva. Sem turma anunciada, vira conversa no WhatsApp |
 | `page-shell`, `list-shell`, `form-shell`, `row-actions`, `confirm-dialog`, `theme-toggle` | o conjunto do `simple-hub`, usado pelo painel |
 
@@ -99,6 +110,10 @@ família na página é o destaque.
 
 ## Estados
 
+- **Troca de tema:** `ThemeToggle` no cabeçalho das duas áreas — o público e o
+  do painel. É o mesmo componente, com `aria-label` e ícone que reflete o
+  estado; a escolha persiste em `localStorage` e o script do `next-themes`
+  escreve a classe antes da hidratação, sem flash.
 - **Foco:** anel verde (`--ring`) em todo focável, herdado do
   `outline-ring/50` da camada base. Verificado com tabulação real em
   `/matricula`: passo 1 → passo 2 só com Tab, Espaço e Enter, anel visível em
@@ -120,8 +135,6 @@ delimita controle é `--input`, e ele passa nos dois temas.
 
 ## Dívida aberta
 
-- A placa invertida no tema escuro é uma decisão estética por confirmar: três
-  faixas claras numa página escura.
 - `not-found-page.tsx` usa `bg-black` e `text-white` literais, de propósito: o
   painel do 404 é preto fixo nos dois temas.
 - Sem escala tipográfica fechada. O enunciado original pedia seis tamanhos e a
