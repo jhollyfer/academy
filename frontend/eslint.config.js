@@ -41,6 +41,12 @@ export default [
     rules: {
       '@typescript-eslint/no-unnecessary-condition': 'off',
       'no-shadow': 'off',
+      // O registry escreve `import { cva, type VariantProps }` numa linha só, e
+      // desfaz a separação em `import type` a cada `shadcn add`.
+      'import/consistent-type-specifier-style': 'off',
+      // Mesmo motivo do `no-unnecessary-condition`: o `as` do `chart.tsx` existe
+      // para o payload do recharts, cujo tipo declarado é mais largo que o valor.
+      '@typescript-eslint/no-unnecessary-type-assertion': 'off',
     },
   },
   {
