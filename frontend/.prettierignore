@@ -1,0 +1,8 @@
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Saída do paraglide: gerada a cada build e ignorada pelo git, mas o
+# `prettier --check` contava os oito arquivos como pendência que ninguém
+# podia fechar - reescrevê-los só adiava o próximo `vite dev`.
+src/paraglide
