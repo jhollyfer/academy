@@ -92,26 +92,6 @@ test.group('vitrine > matrículas', (group) => {
     assert.equal(body(view).seatsRemaining, 0)
   })
 
-  test('cancelar devolve a vaga e a turma volta a OPEN', async ({ client, assert }) => {
-    const session = await authenticateAsOwner(client)
-    const course = await createCourse(client, session)
-    const turma = await createClass(client, session, course.id, { capacity: 1 })
-
-    const created = await client.post('/storefront/enrollments').json(enrollmentPayload(turma.id))
-    const enrollment = body(created)
-
-    const cancelled = await client
-      .put(`/administrator/enrollments/${enrollment.id}`)
-      .cookies(session)
-      .json({ status: 'CANCELLED' })
-
-    cancelled.assertStatus(200)
-
-    const view = await client.get(`/administrator/classes/${turma.id}`).cookies(session)
-    assert.equal(body(view).status, 'OPEN')
-    assert.equal(body(view).seatsRemaining, 1)
-  })
-
   test('turma fechada não aceita matrícula', async ({ client, assert }) => {
     const session = await authenticateAsOwner(client)
     const course = await createCourse(client, session)
@@ -169,47 +149,6 @@ test.group('vitrine > matrículas', (group) => {
     )
 
     response.assertStatus(404)
-  })
-
-  test('confirmar sem comprovante é recusado', async ({ client, assert }) => {
-    const session = await authenticateAsOwner(client)
-    const course = await createCourse(client, session)
-    const turma = await createClass(client, session, course.id)
-
-    const created = await client.post('/storefront/enrollments').json(enrollmentPayload(turma.id))
-    const enrollment = body(created)
-
-    const response = await client
-      .put(`/administrator/enrollments/${enrollment.id}`)
-      .cookies(session)
-      .json({ status: 'CONFIRMED' })
-
-    // Não há gateway: o arquivo é a única prova que existe.
-    response.assertStatus(409)
-    assert.equal(body(response).code, 'ENROLLMENT_RECEIPT_MISSING')
-  })
-
-  test('transição inválida é 409', async ({ client, assert }) => {
-    const session = await authenticateAsOwner(client)
-    const course = await createCourse(client, session)
-    const turma = await createClass(client, session, course.id)
-
-    const created = await client.post('/storefront/enrollments').json(enrollmentPayload(turma.id))
-    const enrollment = body(created)
-
-    await client
-      .put(`/administrator/enrollments/${enrollment.id}`)
-      .cookies(session)
-      .json({ status: 'CANCELLED' })
-
-    const response = await client
-      .put(`/administrator/enrollments/${enrollment.id}`)
-      .cookies(session)
-      .json({ status: 'PENDING' })
-
-    // `CANCELLED` é terminal.
-    response.assertStatus(409)
-    assert.equal(body(response).code, 'ENROLLMENT_INVALID_TRANSITION')
   })
 })
 

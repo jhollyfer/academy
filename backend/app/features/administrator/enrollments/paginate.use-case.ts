@@ -52,7 +52,11 @@ export default class EnrollmentListUseCase {
           scope
             .whereILike('studentName', term)
             .orWhereILike('email', term)
-            .orWhereILike('protocol', term)
+            // `::text` porque `protocol` é `uuid`, e o Postgres não tem `ILIKE`
+            // para esse tipo - sem o cast a consulta inteira morre em
+            // `operator does not exist: uuid ~~*`, e a busca da secretaria
+            // responde 500 em vez de listar.
+            .orWhereRaw('protocol::text ILIKE ?', [term])
         })
       }
 
