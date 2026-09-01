@@ -18,6 +18,42 @@ const routes = {
     tokens: [{"old":"/authentication/sign-out","type":0,"val":"authentication","end":""},{"old":"/authentication/sign-out","type":0,"val":"sign-out","end":""}],
     types: placeholder as Registry['authentication.sign-out']['types'],
   },
+  'storages.create': {
+    methods: ["POST"],
+    pattern: '/storages',
+    tokens: [{"old":"/storages","type":0,"val":"storages","end":""}],
+    types: placeholder as Registry['storages.create']['types'],
+  },
+  'storages.complete': {
+    methods: ["POST"],
+    pattern: '/storages/:id/complete',
+    tokens: [{"old":"/storages/:id/complete","type":0,"val":"storages","end":""},{"old":"/storages/:id/complete","type":1,"val":"id","end":""},{"old":"/storages/:id/complete","type":0,"val":"complete","end":""}],
+    types: placeholder as Registry['storages.complete']['types'],
+  },
+  'storages.parts': {
+    methods: ["GET","HEAD"],
+    pattern: '/storages/:id/parts',
+    tokens: [{"old":"/storages/:id/parts","type":0,"val":"storages","end":""},{"old":"/storages/:id/parts","type":1,"val":"id","end":""},{"old":"/storages/:id/parts","type":0,"val":"parts","end":""}],
+    types: placeholder as Registry['storages.parts']['types'],
+  },
+  'storages.delete': {
+    methods: ["DELETE"],
+    pattern: '/storages/:id',
+    tokens: [{"old":"/storages/:id","type":0,"val":"storages","end":""},{"old":"/storages/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['storages.delete']['types'],
+  },
+  'storages.download': {
+    methods: ["GET","HEAD"],
+    pattern: '/storages/:id/download',
+    tokens: [{"old":"/storages/:id/download","type":0,"val":"storages","end":""},{"old":"/storages/:id/download","type":1,"val":"id","end":""},{"old":"/storages/:id/download","type":0,"val":"download","end":""}],
+    types: placeholder as Registry['storages.download']['types'],
+  },
+  'account.profile': {
+    methods: ["GET","HEAD"],
+    pattern: '/account/profile',
+    tokens: [{"old":"/account/profile","type":0,"val":"account","end":""},{"old":"/account/profile","type":0,"val":"profile","end":""}],
+    types: placeholder as Registry['account.profile']['types'],
+  },
   'administrator.courses.paginate': {
     methods: ["GET","HEAD"],
     pattern: '/administrator/courses',

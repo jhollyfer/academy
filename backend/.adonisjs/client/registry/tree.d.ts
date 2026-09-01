@@ -6,6 +6,16 @@ export interface ApiDefinition {
     signIn: typeof routes['authentication.sign-in']
     signOut: typeof routes['authentication.sign-out']
   }
+  storages: {
+    create: typeof routes['storages.create']
+    complete: typeof routes['storages.complete']
+    parts: typeof routes['storages.parts']
+    delete: typeof routes['storages.delete']
+    download: typeof routes['storages.download']
+  }
+  account: {
+    profile: typeof routes['account.profile']
+  }
   administrator: {
     courses: {
       paginate: typeof routes['administrator.courses.paginate']

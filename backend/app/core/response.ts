@@ -17,6 +17,7 @@ import {
   USER_ROLES,
   WEEKDAYS,
 } from '#core/entity'
+import vine from '@vinejs/vine'
 import type { FeatureResponse, ModelResource } from '#core/openapi/types'
 
 /**
@@ -104,6 +105,66 @@ const ENROLLMENT: ModelResource = {
   enums: { status: ENROLLMENT_STATUSES },
   relations: { class: CLASS, files: [ENROLLMENT_FILE] },
 }
+
+// ---------------------------------------------------------------------------
+// O que não deriva de model
+// ---------------------------------------------------------------------------
+
+function identifier() {
+  return vine.string().uuid()
+}
+
+function timestamps() {
+  return {
+    createdAt: vine.date(),
+    updatedAt: vine.date().nullable(),
+    deletedAt: vine.date().nullable(),
+  }
+}
+
+/** O arquivo como sai na resposta. Igual ao model - a `url` é `@computed`. */
+function storageFields() {
+  return {
+    id: identifier(),
+    filename: vine.string(),
+    originalName: vine.string(),
+    mimetype: vine.string(),
+    size: vine.number(),
+    path: vine.string(),
+    status: vine.enum(UPLOAD_STATUSES),
+    url: vine.string(),
+    ...timestamps(),
+  }
+}
+
+/**
+ * O que o cliente precisa para subir o arquivo por conta própria: o registro, o
+ * tamanho da parte e para onde mandar cada uma.
+ *
+ * A mesma forma serve `POST /storages` e `GET /storages/:id/parts`, porque
+ * começar um upload e retomá-lo são a mesma pergunta - "para onde eu mando o
+ * quê". Ao iniciar, `uploaded` vem vazio; ao retomar, ele diz o que o bucket já
+ * tem e `parts` traz URL nova só para o que falta.
+ *
+ * Declarado em VineJS e não derivado de model porque não é um model: é um plano
+ * de upload, e não existe tabela `upload_plans`.
+ */
+export const StorageUploadResponse = vine.create({
+  storage: vine.object(storageFields()),
+  /** Nulo quando o arquivo coube numa parte só e sobe por um `PUT` simples. */
+  uploadId: vine.string().nullable(),
+  partSize: vine.number(),
+  totalParts: vine.number(),
+  parts: vine.array(vine.object({ partNumber: vine.number(), url: vine.string() })),
+  uploaded: vine.array(
+    vine.object({
+      partNumber: vine.number(),
+      size: vine.number(),
+      /** O que o `complete` exige de volta para conferir que a parte chegou. */
+      etag: vine.string(),
+    })
+  ),
+})
 
 // ---------------------------------------------------------------------------
 // Registro

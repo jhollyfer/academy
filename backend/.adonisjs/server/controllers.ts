@@ -4,6 +4,9 @@
  */
 
 export const controllers = {
+  account: {
+    Show: () => import('#features/account/show.controller'),
+  },
   administrator: {
     classes: {
       Archive: () => import('#features/administrator/classes/archive.controller'),
@@ -36,5 +39,12 @@ export const controllers = {
   authentication: {
     SignIn: () => import('#features/authentication/sign-in.controller'),
     SignOut: () => import('#features/authentication/sign-out.controller'),
+  },
+  storages: {
+    Complete: () => import('#features/storages/complete.controller'),
+    Create: () => import('#features/storages/create.controller'),
+    Delete: () => import('#features/storages/delete.controller'),
+    Download: () => import('#features/storages/download.controller'),
+    Parts: () => import('#features/storages/parts.controller'),
   },
 }

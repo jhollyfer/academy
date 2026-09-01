@@ -31,6 +31,78 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/authentication/sign-out.controller').default['handle']>>>
     }
   }
+  'storages.create': {
+    methods: ["POST"]
+    pattern: '/storages'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').StorageCreateValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').StorageCreateValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/storages/create.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storages/create.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'storages.complete': {
+    methods: ["POST"]
+    pattern: '/storages/:id/complete'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').StorageCompleteValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').StorageCompleteValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/storages/complete.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storages/complete.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'storages.parts': {
+    methods: ["GET","HEAD"]
+    pattern: '/storages/:id/parts'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQueryForGet<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/storages/parts.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storages/parts.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'storages.delete': {
+    methods: ["DELETE"]
+    pattern: '/storages/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/storages/delete.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storages/delete.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'storages.download': {
+    methods: ["GET","HEAD"]
+    pattern: '/storages/:id/download'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQueryForGet<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/storages/download.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storages/download.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'account.profile': {
+    methods: ["GET","HEAD"]
+    pattern: '/account/profile'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#features/account/show.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/account/show.controller').default['handle']>>>
+    }
+  }
   'administrator.courses.paginate': {
     methods: ["GET","HEAD"]
     pattern: '/administrator/courses'

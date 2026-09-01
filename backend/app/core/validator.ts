@@ -1,3 +1,4 @@
+import env from '#start/env'
 import vine from '@vinejs/vine'
 import type { FieldContext, Infer } from '@vinejs/vine/types'
 import {
@@ -537,3 +538,82 @@ export type StorefrontEnrollmentAttachmentPayload = Infer<
   typeof StorefrontEnrollmentAttachmentValidator
 >
 export type ProtocolPayload = Infer<typeof ProtocolValidator>
+
+// ---------------------------------------------------------------------------
+// storages
+// ---------------------------------------------------------------------------
+
+/**
+ * Os tipos aceitos, e a extensão que cada um ganha na chave do objeto.
+ *
+ * O mapa existe porque o nome que o usuário enviou **não** é fonte confiável de
+ * extensão - ele é rótulo , e `foto.png` pode ser um pdf. A extensão da
+ * chave sai do `mimetype` declarado, que é o mesmo valor com que a URL é
+ * assinada e que o bucket devolve na confirmação.
+ *
+ * `Record<Mimetype, string>` faz o compilador cobrar uma entrada por tipo:
+ * acrescentar um mimetype na lista sem dizer que extensão ele tem quebra a
+ * compilação, em vez de virar arquivo sem extensão no bucket.
+ */
+export const STORAGE_MIMETYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/svg+xml',
+  'application/pdf',
+] as const
+
+export type StorageMimetype = (typeof STORAGE_MIMETYPES)[number]
+
+export const STORAGE_EXTENSIONS: Record<StorageMimetype, string> = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/gif': 'gif',
+  'image/svg+xml': 'svg',
+  'application/pdf': 'pdf',
+}
+
+/**
+ * O teto por arquivo, em bytes . Vem do ambiente e não tem default: sem
+ * a variável a aplicação nem sobe (`start/env.ts`). A coluna `size` é `bigint`
+ * justamente para não impor aqui um teto que o operador não pediu.
+ */
+export const UPLOAD_MAX_SIZE = env.get('UPLOAD_MAX_SIZE')
+
+/**
+ * O que `POST /storages` recebe: metadados, nunca bytes.
+ *
+ * O binário vai do navegador direto ao bucket, então tipo e tamanho são
+ * **declarados** aqui e conferidos contra o objeto real no
+ * `POST /storages/:id/complete`. Recusar antes de assinar é o que impede um
+ * arquivo proibido de chegar ao bucket ; conferir depois é o que impede
+ * que o declarado tenha sido mentira.
+ */
+export const StorageCreateValidator = vine.create({
+  fileName: vine.string().trim().minLength(1).maxLength(255),
+  mimetype: vine.enum(STORAGE_MIMETYPES),
+  size: vine.number().min(1).max(UPLOAD_MAX_SIZE).withoutDecimals(),
+})
+
+export type StorageCreatePayload = Infer<typeof StorageCreateValidator>
+
+/**
+ * O que `POST /storages/:id/complete` recebe: o `ETag` de cada parte enviada.
+ *
+ * Vazio - ou ausente - é upload de parte única, que não tem parte para
+ * confirmar. O teto de dez mil é o do próprio S3.
+ */
+export const StorageCompleteValidator = vine.create({
+  parts: vine
+    .array(
+      vine.object({
+        partNumber: vine.number().min(1).max(10_000).withoutDecimals(),
+        etag: vine.string().trim().maxLength(64).minLength(1),
+      })
+    )
+    .optional(),
+})
+
+export type StorageCompletePayload = Infer<typeof StorageCompleteValidator>

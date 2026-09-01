@@ -77,6 +77,63 @@ router
   .as('authentication')
 
 /**
+ * Arquivos.
+ *
+ * O upload tem três passos, e não um, porque o binário não passa por aqui: o
+ * `POST` abre e devolve URLs assinadas, o navegador sobe as partes direto no
+ * bucket, e o `complete` confirma. O `GET :id/parts` é o quarto caminho, e o
+ * mesmo para dois casos - retomar depois de uma queda e buscar o próximo lote de
+ * URLs de um arquivo com partes demais.
+ *
+ * O `DELETE` é o par do `POST` e serve aos dois estados: cancela o upload em
+ * andamento e apaga o arquivo pronto. Só alcança arquivo órfão - como o registro
+ * é neutro e compartilhado, a posse não serve de autorização, e quem decide é a
+ * referência viva.
+ *
+ * Exige sessão. **Divergência deliberada da referência a partir daqui**: aqui o
+ * candidato envia o comprovante do Pix sem ter conta, e não vai ter. Abrir este
+ * grupo resolveria - e entregaria o bucket a quem quisesse enchê-lo. Então o
+ * storefront ganha o próprio caminho de upload, escopado pelo `protocol` da
+ * matrícula, que é um uuid que só quem se inscreveu conhece. É a duplicação por
+ * papel que o padrão trata como isolamento, não como descuido.
+ */
+router
+  .group(() => {
+    router.post('/', [controllers.storages.Create])
+    router.post(':id/complete', [controllers.storages.Complete]).as('complete')
+    router.get(':id/parts', [controllers.storages.Parts]).as('parts')
+    router.delete(':id', [controllers.storages.Delete])
+  })
+  .prefix('storages')
+  .as('storages')
+  .use(middleware.auth())
+
+/**
+ * Download com o nome original, **fora** do grupo autenticado acima.
+ *
+ * O bucket é `visibility: 'public'` e o mesmo binário já sai sem sessão pela
+ * `url` derivada. Exigir sessão só aqui trancaria a porta da frente com a dos
+ * fundos aberta, e ainda quebraria o `<a>` de "salvar arquivo" quando o cookie
+ * não acompanhasse a navegação.
+ */
+router.get('storages/:id/download', [controllers.storages.Download]).as('storages.download')
+
+/**
+ * A própria conta de quem está autenticado.
+ *
+ * Grupo próprio e não um recurso dentro de `/administrator`: o escopo aqui é a
+ * sessão, não o papel. Se amanhã existir outro papel no painel, ele lê o próprio
+ * perfil por esta mesma rota, sem duplicá-la.
+ */
+router
+  .group(() => {
+    router.get('profile', [controllers.account.Show]).as('profile')
+  })
+  .prefix('account')
+  .as('account')
+  .use(middleware.auth())
+
+/**
  * Módulo do painel: dono e administrador da secretaria. O papel é exigido no
  * grupo, não no endpoint - rota nova nasce protegida por estar aqui dentro.
  *
