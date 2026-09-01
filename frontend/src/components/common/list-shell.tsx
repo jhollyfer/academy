@@ -130,7 +130,7 @@ export function ListShell<TRow extends { id: string }>({
         </div>
 
         {createTo && (
-          <Button render={<Link to={createTo} />}>
+          <Button nativeButton={false} render={<Link to={createTo} />}>
             <Plus />
             {createLabel}
           </Button>

@@ -69,11 +69,31 @@ function PillButton({
   className,
   tone = 'ink',
   scale = 'md',
+  render,
+  nativeButton,
   ...props
 }: PillButtonProps): React.JSX.Element {
+  /*
+    Quase toda pílula desta vitrine é um link: "Garanta sua vaga" leva a
+    `/matricula`, "Ver os cursos" é uma âncora. O `Button` do Base UI assume
+    `nativeButton` verdadeiro, e quando o elemento final não é um `<button>` ele
+    avisa no console **a cada render** - com a árvore inteira junto. São sete
+    botões assim só na home, e o custo não é o aviso: é o console engasgando a
+    navegação em desenvolvimento.
+
+    `render` presente significa que quem manda no elemento é a chamada, e o
+    padrão passa a ser `false`. Quem quiser um `<button>` de verdade dentro do
+    `render` ainda pode dizer `nativeButton` na chamada - por isso a prop é lida
+    aqui em vez de ser cravada.
+  */
+  let isNativeButton = nativeButton
+  if (isNativeButton === undefined) isNativeButton = !render
+
   return (
     <Button
       {...props}
+      render={render}
+      nativeButton={isNativeButton}
       className={cn(pillVariants({ tone, scale }), className)}
     />
   )
