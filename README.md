@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Maiyu Academy
 
-## Getting Started
+Escola de tecnologia em Benjamin Constant, no Amazonas. Cursos presenciais de
+robótica e desenvolvimento web, aos sábados, na FAMETRO.
 
-First, run the development server:
+O repositório tem dois projetos independentes, no padrão de `simple-hub` e
+`adacaibs`: cada um tem o próprio `package.json`, o próprio lockfile e o próprio
+Dockerfile. Não há workspace na raiz, e é de propósito.
+
+| Diretório   | O que é                                                              |
+| ----------- | -------------------------------------------------------------------- |
+| `backend/`  | API em AdonisJS, vertical slice. Landing, matrícula e painel          |
+| `frontend/` | TanStack Start. Site público e painel da secretaria                   |
+
+Os diretórios `backend-old/`, `frontend-old/` e `aulas/` são o produto anterior
+("Tech Class") e o material de origem dele. Estão fora do escopo atual e seguem
+no repositório até a fase 2 decidir o que fazer com eles.
+
+## Subindo local
+
+O backend precisa de Postgres e MinIO. Os dois vêm do compose, nas portas 5434 e
+9004/9005 - `simple-hub` e `adacaibs` rodam na mesma máquina e já ocupam as
+anteriores.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd backend
+cp .env.example .env
+docker compose up -d
+pnpm install
+node ace migration:fresh --seed   # cria os dois cursos e a turma de estreia
+pnpm dev                          # http://localhost:3333
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```bash
+cd frontend
+cp .env.example .env
+pnpm install
+pnpm dev                          # http://localhost:3000
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+O painel entra em `/authentication`. O dono nasce do seeder:
+`administrator@mail.com` / `Administrator1!`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Documentação da API
 
-## Learn More
+`http://localhost:3333/documentation`. O `openapi.json` é gerado por
+`node ace openapi:generate` e commitado - o CI reprova quem mexe numa rota e não
+o regenera.
 
-To learn more about Next.js, take a look at the following resources:
+## Testes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+cd backend  && node ace test   # funcional, contra Postgres e MinIO de verdade
+cd frontend && pnpm test
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+O banco de teste é separado do de desenvolvimento. Crie uma vez:
 
-## Deploy on Vercel
+```bash
+docker compose exec database createdb -U academy academy_test
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploy
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Push em `main` dispara o `main.yml`: confere o backend, builda o frontend,
+publica as duas imagens no Docker Hub e chama o deploy no Coolify. O endereço da
+API vive em `frontend/.env.production` e é embutido no build - trocar de
+endereço exige rebuild da imagem.
