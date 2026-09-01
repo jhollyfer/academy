@@ -51,13 +51,16 @@ const WEB_MODULES = [
   ['Layout com Grid', 'Duas dimensões, e quando cada um serve.'],
   ['Responsivo de verdade', 'A página no celular primeiro, porque é de onde vem quase todo mundo.'],
   ['Primeiro site no ar', 'Publicar e mandar o link para alguém.'],
-  ['JavaScript: variáveis e tipos', 'O que o computador guarda e como.'],
-  ['Condição e repetição', 'Decidir e repetir, que é quase tudo que um programa faz.'],
-  ['Funções', 'Dar nome a um pedaço de lógica e reusá-lo.'],
-  ['Listas e objetos', 'Guardar muitas coisas e achar a certa.'],
-  ['Mexendo na página', 'Reagir ao clique e mudar o que está na tela.'],
-  ['Formulário e validação', 'Receber dado de alguém sem confiar cegamente nele.'],
-  ['Consumindo uma API', 'Buscar dado de fora e mostrar.'],
+  ['Formulários em HTML', 'Campos, rótulos e o que o navegador valida sem ajuda.'],
+  ['Imagens e mídia', 'Formato, peso e por que a foto do celular trava a página.'],
+  ['Tipografia na tela', 'Fonte, tamanho e entrelinha: a hierarquia que faz o texto ser lido.'],
+  [
+    'Cor, contraste e acessibilidade',
+    'Quem enxerga pouco, e quem está no sol, também precisa ler.',
+  ],
+  ['Componentes de CSS', 'Botão, card e menu: as peças que toda página repete.'],
+  ['Estados e transição', 'Hover, foco e movimento, sem uma linha de JavaScript.'],
+  ['Organizar o CSS', 'Nomes de classe, arquivos e o que fazer quando a folha cresce.'],
   ['Projeto final: construção', 'Cada aluno constrói o próprio site, com dado real.'],
   ['Projeto final: apresentação', 'Publicar, mostrar e receber crítica.'],
 ] as const
@@ -206,18 +209,17 @@ export default class extends BaseSeeder {
       {
         slug: 'web-development',
         name: 'Web Development Fundamentals',
-        tagline: 'HTML, CSS e JavaScript até você publicar um site que é seu.',
+        tagline: 'HTML e CSS até você publicar um site que é seu.',
         description:
           'Um curso de desenvolvimento web do começo: como a web funciona, HTML semântico, CSS ' +
-          'com Flexbox e Grid, e JavaScript até consumir uma API. No fim, cada aluno publica o ' +
-          'próprio site.',
+          'com Flexbox e Grid, e layout responsivo. No fim, cada aluno publica o próprio site.',
         accent: CourseAccents.WEB,
         workloadHours: 32,
         durationMonths: 4,
         minimumAge: 14,
         requirements:
           'Não é preciso saber programar. Saber usar computador com alguma desenvoltura ajuda.',
-        projectOutcome: 'Um site seu, publicado, consumindo dado real de uma API.',
+        projectOutcome: 'Um site seu, publicado, feito de HTML e CSS do zero.',
         enrollmentFeeInCents: 15_000,
         monthlyFeeInCents: 15_000,
         position: 1,

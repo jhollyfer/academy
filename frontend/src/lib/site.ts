@@ -76,19 +76,44 @@ export const SITE_TAGLINE =
 export const WHATSAPP_NUMBER = '5597984600872'
 
 /**
- * O endereço da unidade, para o bloco de matrícula presencial e o JSON-LD.
+ * A cidade da escola, para o JSON-LD e para o texto que só precisa dizer onde
+ * ela fica.
  *
- * `street` está vazio até a escola fechar o endereço. Quem lê trata vazio como
- * "só a cidade": anunciar um logradouro errado é pior que não anunciar nenhum,
- * porque alguém vai até lá.
- *
- * TODO: preencher com o logradouro e o número quando estiverem definidos.
+ * Sem logradouro de propósito - e agora sem nem o campo. A escola ocupa dois
+ * prédios, as aulas num e a inscrição presencial noutro, e um `street` só teria
+ * de escolher qual dos dois mentir. Quem precisa nomear o prédio lê `CAMPUS` ou
+ * `ENROLLMENT_DESK`; quem precisa só da cidade lê daqui.
  */
 export const ADDRESS = {
-  street: '',
   city: 'Benjamin Constant',
   state: 'AM',
   country: 'BR',
+} as const
+
+/**
+ * Onde as aulas acontecem.
+ *
+ * Sem logradouro: o prédio tem nome, e é por ele que se pergunta na cidade.
+ * Anunciar um número errado é pior que não anunciar nenhum, porque alguém vai
+ * até lá.
+ */
+export const CAMPUS = {
+  name: 'CETI Aristélio Sabino de Oliveira',
+  city: 'Benjamin Constant',
+  state: 'AM',
+} as const
+
+/**
+ * Onde a inscrição presencial é feita - e **não** é onde as aulas acontecem.
+ *
+ * São duas portas para a mesma vaga: o formulário deste site e o balcão. Elas
+ * ficam em prédios diferentes, e todo texto que cita uma precisa dizer isso: a
+ * página já afirmou o contrário, e quem leu aquilo iria ao prédio errado.
+ */
+export const ENROLLMENT_DESK = {
+  name: 'FAMETRO, unidade Benjamin Constant',
+  city: 'Benjamin Constant',
+  state: 'AM',
 } as const
 
 /**

@@ -5,7 +5,7 @@ import { Button } from '#/components/ui/button'
 import { Highlight } from '#/components/common/highlight'
 import { EnrollmentCta } from '#/components/common/enrollment-cta'
 import { REVEAL } from './reveal'
-import { whatsappUrl } from '#/lib/site'
+import { CAMPUS, ENROLLMENT_DESK, whatsappUrl } from '#/lib/site'
 import { cn } from '#/lib/utils'
 
 const STEPS = [
@@ -28,6 +28,11 @@ const ENROLL_MESSAGE = 'Olá! Quero saber como me matricular na Maiyu Academy.'
  * O caminho presencial fica ao lado e não escondido: quem não confia em pagar
  * pela internet, ou está sem dado, precisa saber que existe balcão antes de
  * desistir da página.
+ *
+ * E o balcão nomeia o prédio **e** nega o outro. São duas portas para a mesma
+ * vaga em endereços diferentes - inscrição na FAMETRO, aula no CETI -, e este
+ * rodapé dizia "no mesmo endereço das aulas". Quem leu aquilo iria ao prédio
+ * errado num sábado de manhã.
  */
 export function HowToEnroll(): React.JSX.Element {
   return (
@@ -82,8 +87,9 @@ export function HowToEnroll(): React.JSX.Element {
                 aria-hidden
                 className="mt-0.5 size-5 shrink-0 text-ink"
               />
-              Prefere resolver pessoalmente? A secretaria também faz a matrícula
-              no balcão, no mesmo endereço das aulas.
+              Prefere resolver pessoalmente? A inscrição também é feita no
+              balcão da {ENROLLMENT_DESK.name}. As aulas não são lá: acontecem
+              no {CAMPUS.name}.
             </p>
           </div>
 

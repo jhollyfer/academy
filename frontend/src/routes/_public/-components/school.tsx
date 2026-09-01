@@ -1,6 +1,7 @@
 import type * as React from 'react'
 
 import { Highlight } from '#/components/common/highlight'
+import { CAMPUS } from '#/lib/site'
 import { Leaf } from '#/components/common/marks'
 import { REVEAL } from './reveal'
 import { cn } from '#/lib/utils'
@@ -13,9 +14,12 @@ import { cn } from '#/lib/utils'
  * conexão que cai. É a razão de a escola existir, e por isso ela é a segunda
  * coisa que a página diz.
  *
- * Nenhuma menção à instituição que cede o espaço: o endereço ainda não está
- * fechado, e nomear o prédio antes de saber o logradouro é o mesmo erro de
- * anunciar rua errada, só que com o nome de outra pessoa.
+ * O prédio das aulas aparece pelo nome, e vem de `CAMPUS` em vez de escrito
+ * aqui: o mesmo nome sai no bloco de "onde e quando" e no rodapé da matrícula,
+ * e três cópias divergiriam no dia em que a escola mudasse de sala.
+ *
+ * O logradouro continua de fora. Numa cidade deste tamanho o CETI é referência
+ * conhecida, e o número da rua não é o que falta para alguém chegar lá.
  */
 export function School(): React.JSX.Element {
   return (
@@ -42,8 +46,8 @@ export function School(): React.JSX.Element {
             <div className="mt-7 space-y-5 text-base leading-relaxed text-ink-soft sm:text-lg">
               <p>
                 A Maiyu Academy é uma escola de tecnologia presencial em
-                Benjamin Constant, no Alto Solimões. As aulas acontecem na
-                secretaria, aos sábados, com bancada e computador no local.
+                Benjamin Constant, no Alto Solimões. As aulas acontecem no{' '}
+                {CAMPUS.name}, aos sábados, com bancada e computador no local.
               </p>
               <p>
                 Quem mora aqui não precisa se mudar para Manaus nem depender de

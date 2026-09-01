@@ -1,6 +1,12 @@
 import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { CalendarBlank, Clock, MapPin, Path } from '@phosphor-icons/react'
+import {
+  Buildings,
+  CalendarBlank,
+  Clock,
+  MapPin,
+  Path,
+} from '@phosphor-icons/react'
 import type { Icon } from '@phosphor-icons/react'
 
 import { Button } from '#/components/ui/button'
@@ -9,7 +15,7 @@ import { Highlight } from '#/components/common/highlight'
 import { storefrontCoursesQueryOptions } from '#/integrations/tanstack-query/queries'
 import { enrollmentStateFrom, scheduleSummary } from '#/lib/enrollment-state'
 import { formatDate } from '#/lib/format'
-import { ADDRESS, whatsappUrl } from '#/lib/site'
+import { CAMPUS, ENROLLMENT_DESK, whatsappUrl } from '#/lib/site'
 import { REVEAL } from './reveal'
 import { cn } from '#/lib/utils'
 
@@ -19,14 +25,14 @@ const DIRECTIONS_MESSAGE =
 /**
  * Onde e quando, num bloco só.
  *
- * A escola ainda não fechou o logradouro nem o horário exato, e a página diz
- * isso em vez de arredondar. Anunciar rua errada é pior que não anunciar
- * nenhuma, porque alguém vai até lá - e é por isso que o "como chegar" manda
- * falar com a secretaria em vez de mostrar um mapa que apontaria para o lugar
+ * São dois prédios, e o bloco diz os dois em linhas separadas: as aulas no
+ * CETI, a inscrição presencial no balcão da FAMETRO. Separá-los é o ponto - a
+ * página dizia "no mesmo endereço das aulas", e quem leu aquilo iria ao prédio
  * errado.
  *
- * TODO: preencher o logradouro em `ADDRESS.street` quando a secretaria fechar
- * o endereço. O horário deixou de ser TODO: sai das turmas.
+ * O logradouro continua de fora, e por isso o "como chegar" continua mandando
+ * falar com a secretaria: um mapa cravado no número errado leva alguém à
+ * calçada errada, que é pior do que não mostrar mapa nenhum.
  */
 export function WhereAndWhen(): React.JSX.Element {
   const { data } = useQuery(storefrontCoursesQueryOptions())
@@ -47,8 +53,13 @@ export function WhereAndWhen(): React.JSX.Element {
     { icon: Clock, term: 'Aulas', value: lessons },
     {
       icon: MapPin,
-      term: 'Endereço',
-      value: `Secretaria, em ${ADDRESS.city}, ${ADDRESS.state}.`,
+      term: 'Onde',
+      value: `${CAMPUS.name}, em ${CAMPUS.city}, ${CAMPUS.state}.`,
+    },
+    {
+      icon: Buildings,
+      term: 'Inscrição',
+      value: `Aqui pelo site, ou no balcão da ${ENROLLMENT_DESK.name}.`,
     },
     { icon: CalendarBlank, term: 'Início', value: start },
     { icon: Path, term: 'Duração', value: '16 sábados, 4 meses, 32 horas.' },
@@ -97,8 +108,9 @@ export function WhereAndWhen(): React.JSX.Element {
 
             <div className="mt-9 rounded-card bg-cream px-6 py-6">
               <p className="text-base leading-relaxed text-ink-soft">
-                O endereço completo ainda está sendo confirmado. Fale com a
-                secretaria pelo WhatsApp e ela envia a localização.
+                Os dois prédios são referência na cidade. Se precisar de um
+                ponto de chegada, a secretaria envia a localização pelo
+                WhatsApp.
               </p>
 
               <Button
