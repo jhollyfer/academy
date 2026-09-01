@@ -22,8 +22,13 @@ import { Route as PublicCursosSlugRouteImport } from './routes/_public/cursos/$s
 import { Route as PublicMatriculaIndexRouteImport } from './routes/_public/matricula/index'
 import { Route as PublicMatriculaProtocolRouteImport } from './routes/_public/matricula/$protocol'
 import { Route as PrivateAdminCursosIndexRouteImport } from './routes/_private/admin/cursos/index'
+import { Route as PrivateAdminCursosNovoRouteImport } from './routes/_private/admin/cursos/novo'
 import { Route as PrivateAdminMatriculasIndexRouteImport } from './routes/_private/admin/matriculas/index'
 import { Route as PrivateAdminTurmasIndexRouteImport } from './routes/_private/admin/turmas/index'
+import { Route as PrivateAdminTurmasNovaRouteImport } from './routes/_private/admin/turmas/nova'
+import { Route as PrivateAdminCursosIdIndexRouteImport } from './routes/_private/admin/cursos/$id/index'
+import { Route as PrivateAdminMatriculasIdIndexRouteImport } from './routes/_private/admin/matriculas/$id/index'
+import { Route as PrivateAdminTurmasIdIndexRouteImport } from './routes/_private/admin/turmas/$id/index'
 
 const PrivateLayoutRoute = PrivateLayoutRouteImport.update({
   id: '/_private',
@@ -73,7 +78,9 @@ const PrivateAdminIndexRoute = PrivateAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
   getParentRoute: () => PrivateLayoutRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_private/admin/index.lazy').then((d) => d.Route),
+)
 const PublicCursosSlugRoute = PublicCursosSlugRouteImport.update({
   id: '/cursos/$slug',
   path: '/cursos/$slug',
@@ -99,18 +106,70 @@ const PrivateAdminCursosIndexRoute = PrivateAdminCursosIndexRouteImport.update({
   id: '/admin/cursos/',
   path: '/admin/cursos/',
   getParentRoute: () => PrivateLayoutRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_private/admin/cursos/index.lazy').then((d) => d.Route),
+)
+const PrivateAdminCursosNovoRoute = PrivateAdminCursosNovoRouteImport.update({
+  id: '/admin/cursos/novo',
+  path: '/admin/cursos/novo',
+  getParentRoute: () => PrivateLayoutRoute,
+} as any).lazy(() =>
+  import('./routes/_private/admin/cursos/novo.lazy').then((d) => d.Route),
+)
 const PrivateAdminMatriculasIndexRoute =
   PrivateAdminMatriculasIndexRouteImport.update({
     id: '/admin/matriculas/',
     path: '/admin/matriculas/',
     getParentRoute: () => PrivateLayoutRoute,
-  } as any)
+  } as any).lazy(() =>
+    import('./routes/_private/admin/matriculas/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 const PrivateAdminTurmasIndexRoute = PrivateAdminTurmasIndexRouteImport.update({
   id: '/admin/turmas/',
   path: '/admin/turmas/',
   getParentRoute: () => PrivateLayoutRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_private/admin/turmas/index.lazy').then((d) => d.Route),
+)
+const PrivateAdminTurmasNovaRoute = PrivateAdminTurmasNovaRouteImport.update({
+  id: '/admin/turmas/nova',
+  path: '/admin/turmas/nova',
+  getParentRoute: () => PrivateLayoutRoute,
+} as any).lazy(() =>
+  import('./routes/_private/admin/turmas/nova.lazy').then((d) => d.Route),
+)
+const PrivateAdminCursosIdIndexRoute =
+  PrivateAdminCursosIdIndexRouteImport.update({
+    id: '/admin/cursos/$id/',
+    path: '/admin/cursos/$id/',
+    getParentRoute: () => PrivateLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/_private/admin/cursos/$id/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+const PrivateAdminMatriculasIdIndexRoute =
+  PrivateAdminMatriculasIdIndexRouteImport.update({
+    id: '/admin/matriculas/$id/',
+    path: '/admin/matriculas/$id/',
+    getParentRoute: () => PrivateLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/_private/admin/matriculas/$id/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+const PrivateAdminTurmasIdIndexRoute =
+  PrivateAdminTurmasIdIndexRouteImport.update({
+    id: '/admin/turmas/$id/',
+    path: '/admin/turmas/$id/',
+    getParentRoute: () => PrivateLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/_private/admin/turmas/$id/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
@@ -123,9 +182,14 @@ export interface FileRoutesByFullPath {
   '/matricula/$protocol': typeof PublicMatriculaProtocolRoute
   '/admin/': typeof PrivateAdminIndexRoute
   '/matricula/': typeof PublicMatriculaIndexRoute
+  '/admin/cursos/novo': typeof PrivateAdminCursosNovoRoute
+  '/admin/turmas/nova': typeof PrivateAdminTurmasNovaRoute
   '/admin/cursos/': typeof PrivateAdminCursosIndexRoute
   '/admin/matriculas/': typeof PrivateAdminMatriculasIndexRoute
   '/admin/turmas/': typeof PrivateAdminTurmasIndexRoute
+  '/admin/cursos/$id/': typeof PrivateAdminCursosIdIndexRoute
+  '/admin/matriculas/$id/': typeof PrivateAdminMatriculasIdIndexRoute
+  '/admin/turmas/$id/': typeof PrivateAdminTurmasIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
@@ -137,9 +201,14 @@ export interface FileRoutesByTo {
   '/matricula/$protocol': typeof PublicMatriculaProtocolRoute
   '/admin': typeof PrivateAdminIndexRoute
   '/matricula': typeof PublicMatriculaIndexRoute
+  '/admin/cursos/novo': typeof PrivateAdminCursosNovoRoute
+  '/admin/turmas/nova': typeof PrivateAdminTurmasNovaRoute
   '/admin/cursos': typeof PrivateAdminCursosIndexRoute
   '/admin/matriculas': typeof PrivateAdminMatriculasIndexRoute
   '/admin/turmas': typeof PrivateAdminTurmasIndexRoute
+  '/admin/cursos/$id': typeof PrivateAdminCursosIdIndexRoute
+  '/admin/matriculas/$id': typeof PrivateAdminMatriculasIdIndexRoute
+  '/admin/turmas/$id': typeof PrivateAdminTurmasIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -155,9 +224,14 @@ export interface FileRoutesById {
   '/_public/matricula/$protocol': typeof PublicMatriculaProtocolRoute
   '/_private/admin/': typeof PrivateAdminIndexRoute
   '/_public/matricula/': typeof PublicMatriculaIndexRoute
+  '/_private/admin/cursos/novo': typeof PrivateAdminCursosNovoRoute
+  '/_private/admin/turmas/nova': typeof PrivateAdminTurmasNovaRoute
   '/_private/admin/cursos/': typeof PrivateAdminCursosIndexRoute
   '/_private/admin/matriculas/': typeof PrivateAdminMatriculasIndexRoute
   '/_private/admin/turmas/': typeof PrivateAdminTurmasIndexRoute
+  '/_private/admin/cursos/$id/': typeof PrivateAdminCursosIdIndexRoute
+  '/_private/admin/matriculas/$id/': typeof PrivateAdminMatriculasIdIndexRoute
+  '/_private/admin/turmas/$id/': typeof PrivateAdminTurmasIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -172,9 +246,14 @@ export interface FileRouteTypes {
     | '/matricula/$protocol'
     | '/admin/'
     | '/matricula/'
+    | '/admin/cursos/novo'
+    | '/admin/turmas/nova'
     | '/admin/cursos/'
     | '/admin/matriculas/'
     | '/admin/turmas/'
+    | '/admin/cursos/$id/'
+    | '/admin/matriculas/$id/'
+    | '/admin/turmas/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -186,9 +265,14 @@ export interface FileRouteTypes {
     | '/matricula/$protocol'
     | '/admin'
     | '/matricula'
+    | '/admin/cursos/novo'
+    | '/admin/turmas/nova'
     | '/admin/cursos'
     | '/admin/matriculas'
     | '/admin/turmas'
+    | '/admin/cursos/$id'
+    | '/admin/matriculas/$id'
+    | '/admin/turmas/$id'
   id:
     | '__root__'
     | '/_private'
@@ -203,9 +287,14 @@ export interface FileRouteTypes {
     | '/_public/matricula/$protocol'
     | '/_private/admin/'
     | '/_public/matricula/'
+    | '/_private/admin/cursos/novo'
+    | '/_private/admin/turmas/nova'
     | '/_private/admin/cursos/'
     | '/_private/admin/matriculas/'
     | '/_private/admin/turmas/'
+    | '/_private/admin/cursos/$id/'
+    | '/_private/admin/matriculas/$id/'
+    | '/_private/admin/turmas/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -307,6 +396,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateAdminCursosIndexRouteImport
       parentRoute: typeof PrivateLayoutRoute
     }
+    '/_private/admin/cursos/novo': {
+      id: '/_private/admin/cursos/novo'
+      path: '/admin/cursos/novo'
+      fullPath: '/admin/cursos/novo'
+      preLoaderRoute: typeof PrivateAdminCursosNovoRouteImport
+      parentRoute: typeof PrivateLayoutRoute
+    }
     '/_private/admin/matriculas/': {
       id: '/_private/admin/matriculas/'
       path: '/admin/matriculas'
@@ -321,21 +417,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateAdminTurmasIndexRouteImport
       parentRoute: typeof PrivateLayoutRoute
     }
+    '/_private/admin/turmas/nova': {
+      id: '/_private/admin/turmas/nova'
+      path: '/admin/turmas/nova'
+      fullPath: '/admin/turmas/nova'
+      preLoaderRoute: typeof PrivateAdminTurmasNovaRouteImport
+      parentRoute: typeof PrivateLayoutRoute
+    }
+    '/_private/admin/cursos/$id/': {
+      id: '/_private/admin/cursos/$id/'
+      path: '/admin/cursos/$id'
+      fullPath: '/admin/cursos/$id/'
+      preLoaderRoute: typeof PrivateAdminCursosIdIndexRouteImport
+      parentRoute: typeof PrivateLayoutRoute
+    }
+    '/_private/admin/matriculas/$id/': {
+      id: '/_private/admin/matriculas/$id/'
+      path: '/admin/matriculas/$id'
+      fullPath: '/admin/matriculas/$id/'
+      preLoaderRoute: typeof PrivateAdminMatriculasIdIndexRouteImport
+      parentRoute: typeof PrivateLayoutRoute
+    }
+    '/_private/admin/turmas/$id/': {
+      id: '/_private/admin/turmas/$id/'
+      path: '/admin/turmas/$id'
+      fullPath: '/admin/turmas/$id/'
+      preLoaderRoute: typeof PrivateAdminTurmasIdIndexRouteImport
+      parentRoute: typeof PrivateLayoutRoute
+    }
   }
 }
 
 interface PrivateLayoutRouteChildren {
   PrivateAdminIndexRoute: typeof PrivateAdminIndexRoute
+  PrivateAdminCursosNovoRoute: typeof PrivateAdminCursosNovoRoute
+  PrivateAdminTurmasNovaRoute: typeof PrivateAdminTurmasNovaRoute
   PrivateAdminCursosIndexRoute: typeof PrivateAdminCursosIndexRoute
   PrivateAdminMatriculasIndexRoute: typeof PrivateAdminMatriculasIndexRoute
   PrivateAdminTurmasIndexRoute: typeof PrivateAdminTurmasIndexRoute
+  PrivateAdminCursosIdIndexRoute: typeof PrivateAdminCursosIdIndexRoute
+  PrivateAdminMatriculasIdIndexRoute: typeof PrivateAdminMatriculasIdIndexRoute
+  PrivateAdminTurmasIdIndexRoute: typeof PrivateAdminTurmasIdIndexRoute
 }
 
 const PrivateLayoutRouteChildren: PrivateLayoutRouteChildren = {
   PrivateAdminIndexRoute: PrivateAdminIndexRoute,
+  PrivateAdminCursosNovoRoute: PrivateAdminCursosNovoRoute,
+  PrivateAdminTurmasNovaRoute: PrivateAdminTurmasNovaRoute,
   PrivateAdminCursosIndexRoute: PrivateAdminCursosIndexRoute,
   PrivateAdminMatriculasIndexRoute: PrivateAdminMatriculasIndexRoute,
   PrivateAdminTurmasIndexRoute: PrivateAdminTurmasIndexRoute,
+  PrivateAdminCursosIdIndexRoute: PrivateAdminCursosIdIndexRoute,
+  PrivateAdminMatriculasIdIndexRoute: PrivateAdminMatriculasIdIndexRoute,
+  PrivateAdminTurmasIdIndexRoute: PrivateAdminTurmasIdIndexRoute,
 }
 
 const PrivateLayoutRouteWithChildren = PrivateLayoutRoute._addFileChildren(

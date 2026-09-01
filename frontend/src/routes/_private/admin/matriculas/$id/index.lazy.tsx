@@ -1,0 +1,261 @@
+import * as React from 'react'
+import { createLazyFileRoute, Link } from '@tanstack/react-router'
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import { ArrowLeft, FileArrowDown } from '@phosphor-icons/react'
+import { enrollmentDetailQueryOptions } from '#/integrations/tanstack-query/queries'
+import { useEnrollmentUpdate } from '#/integrations/tanstack-query/mutations'
+import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
+import { Badge } from '#/components/ui/badge'
+import { Button } from '#/components/ui/button'
+import { Textarea } from '#/components/ui/textarea'
+import {
+  ConfirmDialog,
+  ConfirmDialogCancel,
+  ConfirmDialogConfirm,
+  ConfirmDialogDescription,
+  ConfirmDialogFooter,
+  ConfirmDialogHeader,
+  ConfirmDialogTitle,
+} from '#/components/common/confirm-dialog'
+import { formatCpf, formatDate, formatPhone } from '#/lib/format'
+import { ENROLLMENT_TRANSITIONS, EnrollmentStatuses } from '#/lib/entity'
+import { Route as EnrollmentRoute } from './index'
+import type { EnrollmentStatus } from '#/lib/entity'
+
+export const Route = createLazyFileRoute('/_private/admin/matriculas/$id/')({
+  component: RouteComponent,
+})
+
+/**
+ * O rótulo e o verbo de cada estado.
+ *
+ * `action` é o que vai no botão: "Confirmar", não "Mudar para CONFIRMED". A
+ * secretaria pensa na ação, não na máquina de estados.
+ */
+const STATUS: Record<
+  EnrollmentStatus,
+  { label: string; action: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }
+> = {
+  PENDING: { label: 'Aguardando', action: 'Voltar para aguardando', variant: 'secondary' },
+  CONFIRMED: { label: 'Confirmada', action: 'Confirmar matrícula', variant: 'default' },
+  WAITLIST: { label: 'Fila de espera', action: 'Mandar para a fila', variant: 'outline' },
+  CANCELLED: { label: 'Cancelada', action: 'Cancelar matrícula', variant: 'destructive' },
+}
+
+function RouteComponent(): React.JSX.Element {
+  const { id } = EnrollmentRoute.useParams()
+  const { data: enrollment } = useSuspenseQuery(enrollmentDetailQueryOptions(id))
+  const queryClient = useQueryClient()
+
+  const [notes, setNotes] = React.useState(enrollment.notes ?? '')
+
+  const mutation = useEnrollmentUpdate(id, {
+    onSuccess: async function () {
+      toast.success('Matrícula atualizada')
+      await queryClient.invalidateQueries({ queryKey: queryKeys.enrollments.all })
+      // A turma também muda: confirmar ou cancelar mexe na ocupação.
+      await queryClient.invalidateQueries({ queryKey: queryKeys.classes.all })
+    },
+    // O 409 de comprovante ausente e o de transição inválida chegam aqui. A
+    // mensagem do servidor já diz o que fazer.
+    onError: (error) => toast.error(error.message),
+  })
+
+  // Só as transições que o servidor aceita viram botão. Mostrar as outras seria
+  // oferecer um clique que sempre dá 409.
+  const allowed = ENROLLMENT_TRANSITIONS[enrollment.status]
+  const receipt = (enrollment.files ?? []).at(-1)
+
+  return (
+    <div className="grid gap-8">
+      <div>
+        <Button variant="ghost" size="sm" render={<Link to="/admin/matriculas" />}>
+          <ArrowLeft />
+          Matrículas
+        </Button>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <h1 className="text-2xl font-semibold tracking-tight">{enrollment.studentName}</h1>
+          <Badge variant={STATUS[enrollment.status].variant}>
+            {STATUS[enrollment.status].label}
+          </Badge>
+        </div>
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
+        <div className="grid gap-8">
+          <section className="rounded-lg border bg-card p-6">
+            <h2 className="font-semibold">Dados enviados</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Como o candidato preencheu. O painel não edita: os dados são dele.
+            </p>
+
+            <dl className="mt-6 grid gap-4 sm:grid-cols-2">
+              <Row label="Curso">{enrollment.class?.course?.name ?? '-'}</Row>
+              <Row label="Turma">{enrollment.class?.name ?? '-'}</Row>
+              <Row label="Nascimento">
+                {formatDate(enrollment.studentBirthDate)} ({enrollment.ageAtEnrollment} anos na
+                inscrição)
+              </Row>
+              <Row label="CPF">{formatCpf(enrollment.studentDocument)}</Row>
+              <Row label="E-mail">{enrollment.email}</Row>
+              <Row label="Telefone">{formatPhone(enrollment.phone)}</Row>
+            </dl>
+
+            {enrollment.requiresGuardian && (
+              <>
+                <h3 className="mt-8 font-medium">Responsável legal</h3>
+                <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <Row label="Nome">{enrollment.guardianName ?? '-'}</Row>
+                  <Row label="CPF">{formatCpf(enrollment.guardianDocument)}</Row>
+                  <Row label="Telefone">{formatPhone(enrollment.guardianPhone)}</Row>
+                </dl>
+              </>
+            )}
+
+            <dl className="mt-8 grid gap-4 border-t pt-6 sm:grid-cols-2">
+              <Row label="Protocolo">
+                <span className="font-mono text-xs break-all">{enrollment.protocol}</span>
+              </Row>
+              <Row label="Consentimento LGPD">{formatDate(enrollment.lgpdConsentAt)}</Row>
+            </dl>
+          </section>
+
+          <section className="rounded-lg border bg-card p-6">
+            <h2 className="font-semibold">Comprovante do Pix</h2>
+
+            {!receipt && (
+              <p className="mt-3 text-sm text-muted-foreground">
+                Ainda não enviado. Sem ele, a confirmação é recusada.
+              </p>
+            )}
+
+            {receipt?.storage && (
+              <div className="mt-4 grid gap-4">
+                <p className="text-sm text-muted-foreground">
+                  Enviado em {formatDate(receipt.createdAt)}. {receipt.storage.originalName}
+                </p>
+
+                {/*
+                  Imagem aparece inline; PDF vira link. É a diferença entre a
+                  secretaria conferir num olhar e ter que baixar um arquivo para
+                  cada matrícula da fila.
+                */}
+                {receipt.storage.mimetype.startsWith('image/') && (
+                  <img
+                    src={receipt.storage.url}
+                    alt={`Comprovante enviado por ${enrollment.studentName}`}
+                    className="max-h-[420px] w-fit rounded-md border object-contain"
+                  />
+                )}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-fit"
+                  render={
+                    <a href={receipt.storage.url} target="_blank" rel="noreferrer">
+                      <FileArrowDown />
+                      Abrir arquivo
+                    </a>
+                  }
+                />
+              </div>
+            )}
+          </section>
+        </div>
+
+        <div className="grid gap-8 self-start">
+          <section className="rounded-lg border bg-card p-6">
+            <h2 className="font-semibold">Situação</h2>
+
+            {allowed.length === 0 && (
+              <p className="mt-3 text-sm text-muted-foreground">
+                Estado final. Não há para onde mover.
+              </p>
+            )}
+
+            <div className="mt-4 grid gap-2">
+              {allowed.map((status) => (
+                <ConfirmDialog
+                  key={status}
+                  trigger={
+                    <Button
+                      variant={status === EnrollmentStatuses.CANCELLED ? 'outline' : 'default'}
+                      disabled={mutation.isPending}
+                      className="w-full justify-start"
+                    >
+                      {STATUS[status].action}
+                    </Button>
+                  }
+                  onConfirm={() => mutation.mutate({ status })}
+                  destructive={status === EnrollmentStatuses.CANCELLED}
+                >
+                  <ConfirmDialogHeader>
+                    <ConfirmDialogTitle>
+                      {STATUS[status].action}: {enrollment.studentName}?
+                    </ConfirmDialogTitle>
+                    <ConfirmDialogDescription>
+                      {status === EnrollmentStatuses.CONFIRMED &&
+                        'Confirme só depois de ver o comprovante. A vaga passa a ser dela.'}
+                      {status === EnrollmentStatuses.CANCELLED &&
+                        'A vaga volta para a turma e o candidato deixa de ocupá-la.'}
+                      {status === EnrollmentStatuses.PENDING &&
+                        'A matrícula volta a ocupar vaga e aguarda conferência.'}
+                      {status === EnrollmentStatuses.WAITLIST &&
+                        'A matrícula deixa de ocupar vaga e entra na fila.'}
+                    </ConfirmDialogDescription>
+                  </ConfirmDialogHeader>
+                  <ConfirmDialogFooter>
+                    <ConfirmDialogCancel />
+                    <ConfirmDialogConfirm>{STATUS[status].action}</ConfirmDialogConfirm>
+                  </ConfirmDialogFooter>
+                </ConfirmDialog>
+              ))}
+            </div>
+          </section>
+
+          <section className="rounded-lg border bg-card p-6">
+            <h2 className="font-semibold">Anotação interna</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Só a secretaria vê. Não aparece para o candidato.
+            </p>
+
+            <Textarea
+              value={notes}
+              onChange={(event) => setNotes(event.target.value)}
+              rows={4}
+              className="mt-4"
+              aria-label="Anotação interna"
+            />
+
+            <Button
+              size="sm"
+              className="mt-3"
+              disabled={mutation.isPending || notes === (enrollment.notes ?? '')}
+              onClick={() => mutation.mutate({ notes: notes || null })}
+            >
+              Salvar anotação
+            </Button>
+          </section>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function Row({
+  label,
+  children,
+}: {
+  label: string
+  children: React.ReactNode
+}): React.JSX.Element {
+  return (
+    <div>
+      <dt className="text-sm text-muted-foreground">{label}</dt>
+      <dd className="mt-0.5">{children}</dd>
+    </div>
+  )
+}
