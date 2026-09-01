@@ -91,7 +91,7 @@ function RouteComponent(): React.JSX.Element {
             <Trail />
           </div>
           <div className="ml-auto flex items-center gap-2 px-4">
-            <ThemeToggle />
+            <ThemeToggle className="size-8" />
           </div>
         </header>
 

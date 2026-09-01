@@ -99,7 +99,7 @@ export function Header(): React.JSX.Element {
             antes da pílula de matrícula de propósito - o CTA é o último
             elemento da barra em toda largura.
           */}
-          <ThemeToggle />
+          <ThemeToggle className="size-11 lg:size-8" />
 
           <EnrollmentCta className="hidden sm:inline-flex" />
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatCpf, formatPhone } from './format'
+import { formatCpf, formatPhone, pluralize } from './format'
 
 describe('formatCpf', () => {
   it('reexibe os onze dígitos com a pontuação', () => {
@@ -31,5 +31,16 @@ describe('formatPhone', () => {
 
   it('mostra hífen quando não há valor', () => {
     expect(formatPhone(null)).toBe('-')
+  })
+})
+
+describe('pluralize', () => {
+  it('uma turma no singular', () => {
+    expect(pluralize(1, 'turma', 'turmas')).toBe('1 turma')
+  })
+
+  it('o resto no plural, inclusive zero', () => {
+    expect(pluralize(0, 'turma', 'turmas')).toBe('0 turmas')
+    expect(pluralize(5, 'turma', 'turmas')).toBe('5 turmas')
   })
 })

@@ -3,6 +3,7 @@ import { MoonIcon, SunIcon } from '@phosphor-icons/react'
 import { useTheme } from 'next-themes'
 
 import { Button } from '#/components/ui/button'
+import { cn } from '#/lib/utils'
 import {
   Tooltip,
   TooltipContent,
@@ -22,7 +23,19 @@ import {
  * qual ícone aparece é a classe `dark` no `<html>`, que o script do
  * `next-themes` escreve antes da hidratação.
  */
-export function ThemeToggle(): React.JSX.Element {
+/**
+ * `className` porque o alvo muda de tamanho conforme onde ele mora.
+ *
+ * O `size="icon"` do registry é 28px, que é a medida certa ao lado de uma
+ * tabela no painel e é pequena demais no cabeçalho do celular - o botão de menu
+ * ao lado dele usa 44px justamente por isso. Quem chama decide; o padrão
+ * continua sendo o do registry.
+ */
+export function ThemeToggle({
+  className,
+}: {
+  className?: string
+}): React.JSX.Element {
   const { resolvedTheme, setTheme } = useTheme()
 
   function toggle(): void {
@@ -44,7 +57,7 @@ export function ThemeToggle(): React.JSX.Element {
             size="icon"
             onClick={toggle}
             aria-label="Alternar tema"
-            className="relative overflow-hidden"
+            className={cn('relative overflow-hidden', className)}
           >
             <SunIcon
               weight="fill"
