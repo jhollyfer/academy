@@ -43,15 +43,25 @@ function escapeXml(value: string): string {
  * outra URL para o rastreador.
  */
 function absolute(origin: string, path: string): string {
-  return `${origin.replace(/\/+$/, '')}/${path.replace(/^\/+/, '')}`.replace(/\/$/, '') || origin
+  return (
+    `${origin.replace(/\/+$/, '')}/${path.replace(/^\/+/, '')}`.replace(
+      /\/$/,
+      '',
+    ) || origin
+  )
 }
 
-export function buildSitemap(origin: string, entries: Array<SitemapEntry>): string {
+export function buildSitemap(
+  origin: string,
+  entries: Array<SitemapEntry>,
+): string {
   const urls = entries.map(function (entry) {
     const parts = [`    <loc>${escapeXml(absolute(origin, entry.path))}</loc>`]
 
-    if (entry.lastModified) parts.push(`    <lastmod>${entry.lastModified}</lastmod>`)
-    if (entry.priority !== undefined) parts.push(`    <priority>${entry.priority}</priority>`)
+    if (entry.lastModified)
+      parts.push(`    <lastmod>${entry.lastModified}</lastmod>`)
+    if (entry.priority !== undefined)
+      parts.push(`    <priority>${entry.priority}</priority>`)
 
     return `  <url>\n${parts.join('\n')}\n  </url>`
   })

@@ -3,5 +3,7 @@ import { enrollmentDetailQueryOptions } from '#/integrations/tanstack-query/quer
 
 export const Route = createFileRoute('/_private/admin/matriculas/$id/')({
   loader: ({ context, params }) =>
-    context.queryClient.ensureQueryData(enrollmentDetailQueryOptions(params.id)),
+    context.queryClient.ensureQueryData(
+      enrollmentDetailQueryOptions(params.id),
+    ),
 })

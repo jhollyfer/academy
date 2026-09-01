@@ -10,7 +10,9 @@ export const Route = createFileRoute('/_private/admin/turmas/$id/')({
     // encadeá-las somaria os dois tempos de espera sem motivo.
     await Promise.all([
       context.queryClient.ensureQueryData(classDetailQueryOptions(params.id)),
-      context.queryClient.ensureQueryData(coursesListQueryOptions({ perPage: 100 })),
+      context.queryClient.ensureQueryData(
+        coursesListQueryOptions({ perPage: 100 }),
+      ),
     ])
   },
 })

@@ -15,8 +15,12 @@ export const Route = createLazyFileRoute('/_private/admin/')({
 })
 
 function RouteComponent(): React.JSX.Element {
-  const { data: classes } = useSuspenseQuery(classesListQueryOptions({ perPage: 100 }))
-  const { data: enrollments } = useSuspenseQuery(enrollmentsListQueryOptions({ perPage: 100 }))
+  const { data: classes } = useSuspenseQuery(
+    classesListQueryOptions({ perPage: 100 }),
+  )
+  const { data: enrollments } = useSuspenseQuery(
+    enrollmentsListQueryOptions({ perPage: 100 }),
+  )
 
   const rows = enrollments.data
 
@@ -24,12 +28,17 @@ function RouteComponent(): React.JSX.Element {
   // seria a resposta certa se a escala pedisse; com uma turma de quarenta, ele
   // seria uma rota a mais para somar quatro números que já estão na memória.
   const counts = {
-    pending: rows.filter((row) => row.status === EnrollmentStatuses.PENDING).length,
-    confirmed: rows.filter((row) => row.status === EnrollmentStatuses.CONFIRMED).length,
-    waitlist: rows.filter((row) => row.status === EnrollmentStatuses.WAITLIST).length,
+    pending: rows.filter((row) => row.status === EnrollmentStatuses.PENDING)
+      .length,
+    confirmed: rows.filter((row) => row.status === EnrollmentStatuses.CONFIRMED)
+      .length,
+    waitlist: rows.filter((row) => row.status === EnrollmentStatuses.WAITLIST)
+      .length,
   }
 
-  const open = classes.data.filter((entity) => entity.status !== ClassStatuses.CLOSED)
+  const open = classes.data.filter(
+    (entity) => entity.status !== ClassStatuses.CLOSED,
+  )
 
   return (
     <div className="grid gap-8">
@@ -66,7 +75,8 @@ function RouteComponent(): React.JSX.Element {
 
         {open.length === 0 && (
           <p className="mt-3 text-sm text-muted-foreground">
-            Nenhuma turma aberta. Sem turma, o site não tem o que oferecer na matrícula.
+            Nenhuma turma aberta. Sem turma, o site não tem o que oferecer na
+            matrícula.
           </p>
         )}
 
@@ -87,7 +97,8 @@ function RouteComponent(): React.JSX.Element {
                       {entity.name}
                     </Link>
                     <p className="text-sm text-muted-foreground">
-                      {entity.course?.name} · começa em {formatDate(entity.startsAt)}
+                      {entity.course?.name} · começa em{' '}
+                      {formatDate(entity.startsAt)}
                     </p>
                   </div>
 
@@ -95,7 +106,9 @@ function RouteComponent(): React.JSX.Element {
                     <span className="text-sm tabular-nums">
                       {taken} de {entity.capacity}
                     </span>
-                    {entity.status === ClassStatuses.FULL && <Badge variant="secondary">Lotada</Badge>}
+                    {entity.status === ClassStatuses.FULL && (
+                      <Badge variant="secondary">Lotada</Badge>
+                    )}
                   </div>
                 </div>
 

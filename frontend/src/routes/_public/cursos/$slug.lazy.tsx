@@ -4,7 +4,8 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { CalendarBlank, Clock, MapPin, Users } from '@phosphor-icons/react'
 
 import { Badge } from '#/components/ui/badge'
-import { Card, CardContent } from '#/components/ui/card'
+import { CardContent } from '#/components/ui/card'
+import { SectionCard } from '#/components/common/section-card'
 import { Separator } from '#/components/ui/separator'
 import { Highlight } from '#/components/common/highlight'
 import { Leaf } from '#/components/common/marks'
@@ -44,28 +45,28 @@ function RouteComponent(): React.JSX.Element {
   return (
     <>
       <section className="px-3 pt-3 sm:px-4 sm:pt-4">
-        <div className="relative overflow-hidden rounded-block bg-green px-6 py-14 sm:px-10 lg:px-14 lg:py-20">
-          <Leaf className="-top-24 -right-20 size-96 text-ink/5" />
+        <div className="relative overflow-hidden rounded-block bg-primary px-6 py-14 sm:px-10 lg:px-14 lg:py-20">
+          <Leaf className="-top-24 -right-20 size-96 text-primary-foreground/5" />
 
           <div className="relative mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[1.2fr_1fr]">
             <div className={cn(REVEAL)}>
-              <Badge variant="ink" size="lg">
+              <Badge className="h-6 border-transparent bg-foreground px-3 text-xs text-background">
                 Módulo 1
               </Badge>
 
-              <h1 className="mt-5 max-w-[18ch] text-4xl leading-[1.12] font-semibold tracking-tight text-balance text-ink sm:text-5xl lg:text-6xl">
+              <h1 className="mt-5 max-w-[18ch] text-4xl leading-[1.12] font-semibold tracking-tight text-balance text-primary-foreground sm:text-5xl lg:text-6xl">
                 {course.name}
               </h1>
 
               {course.tagline && (
-                <p className="mt-6 max-w-[52ch] text-lg leading-relaxed text-ink/75">
+                <p className="mt-6 max-w-[52ch] text-lg leading-relaxed text-primary-foreground">
                   {course.tagline}
                 </p>
               )}
 
               <EnrollmentCta
-                variant="pill"
-                size="pill-lg"
+                tone="ink"
+                scale="lg"
                 className="mt-8"
                 courseSlug={course.slug}
               />
@@ -90,7 +91,7 @@ function RouteComponent(): React.JSX.Element {
             valores curtos, e envolvê-los em caixas pediria elevação que não
             comunica hierarquia nenhuma.
           */}
-          <dl className="relative mx-auto mt-12 grid max-w-7xl gap-6 border-t border-ink/15 pt-8 sm:grid-cols-2 lg:grid-cols-4">
+          <dl className="relative mx-auto mt-12 grid max-w-7xl gap-6 border-t border-primary-foreground/15 pt-8 sm:grid-cols-2 lg:grid-cols-4">
             <Fact icon={<Clock />} label="Carga horária">
               {course.workloadHours}h em {course.durationMonths} meses
             </Fact>
@@ -122,23 +123,23 @@ function RouteComponent(): React.JSX.Element {
       </section>
 
       <section className="px-3 py-3 sm:px-4 sm:py-4">
-        <div className="rounded-block border border-line bg-cream px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
+        <div className="rounded-block border border-border bg-background px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
           <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
             <div className={cn(REVEAL)}>
-              <h2 className="text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-ink sm:text-4xl">
+              <h2 className="text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-foreground sm:text-4xl">
                 Sobre o <Highlight variant="outline">curso</Highlight>
               </h2>
 
-              <p className="mt-6 max-w-[52ch] leading-relaxed text-ink-soft">
+              <p className="mt-6 max-w-[52ch] leading-relaxed text-muted-foreground">
                 {course.description}
               </p>
 
               {course.projectOutcome && (
                 <div className="mt-8">
-                  <p className="text-lg font-semibold text-ink">
+                  <p className="text-lg font-semibold text-foreground">
                     O que você vai construir
                   </p>
-                  <p className="mt-2 max-w-[52ch] leading-relaxed text-ink-soft">
+                  <p className="mt-2 max-w-[52ch] leading-relaxed text-muted-foreground">
                     {course.projectOutcome}
                   </p>
                 </div>
@@ -146,10 +147,10 @@ function RouteComponent(): React.JSX.Element {
 
               {course.requirements && (
                 <div className="mt-8">
-                  <p className="text-lg font-semibold text-ink">
+                  <p className="text-lg font-semibold text-foreground">
                     O que você precisa
                   </p>
-                  <p className="mt-2 max-w-[52ch] leading-relaxed text-ink-soft">
+                  <p className="mt-2 max-w-[52ch] leading-relaxed text-muted-foreground">
                     {course.requirements}
                     {course.minimumAge !== null &&
                       ` A partir de ${course.minimumAge} anos.`}
@@ -172,16 +173,16 @@ function RouteComponent(): React.JSX.Element {
                   >
                     <span
                       aria-hidden
-                      className="text-2xl leading-none font-semibold text-neon-ink tabular-nums"
+                      className="text-2xl leading-none font-semibold text-foreground tabular-nums"
                     >
                       {String(index + 1).padStart(2, '0')}
                     </span>
                     <div>
-                      <p className="text-lg font-semibold tracking-tight text-ink">
+                      <p className="text-lg font-semibold tracking-tight text-foreground">
                         {entry.title}
                       </p>
                       {entry.description && (
-                        <p className="mt-1.5 leading-relaxed text-ink-soft">
+                        <p className="mt-1.5 leading-relaxed text-muted-foreground">
                           {entry.description}
                         </p>
                       )}
@@ -195,51 +196,51 @@ function RouteComponent(): React.JSX.Element {
       </section>
 
       <section className="px-3 py-3 sm:px-4 sm:py-4">
-        <div className="rounded-block border border-line bg-paper px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
+        <div className="rounded-block border border-border bg-card px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
           <div className="mx-auto max-w-7xl">
             <h2
               className={cn(
                 REVEAL,
-                'text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-ink sm:text-4xl',
+                'text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-foreground sm:text-4xl',
               )}
             >
               Quanto <Highlight variant="fill">custa</Highlight>
             </h2>
 
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:max-w-3xl">
-              <Card size="lg" className={cn(REVEAL)}>
+              <SectionCard className={cn(REVEAL)}>
                 <CardContent>
-                  <p className="text-4xl leading-none font-semibold tracking-tight text-ink lg:text-5xl">
+                  <p className="text-4xl leading-none font-semibold tracking-tight text-foreground lg:text-5xl">
                     {formatMoney(course.enrollmentFeeInCents)}
                   </p>
-                  <p className="mt-3 text-ink-soft">
+                  <p className="mt-3 text-muted-foreground">
                     de inscrição, uma vez só.
                   </p>
                 </CardContent>
-              </Card>
+              </SectionCard>
 
-              <Card size="lg" className={cn(REVEAL, 'delay-100')}>
+              <SectionCard className={cn(REVEAL, 'delay-100')}>
                 <CardContent>
-                  <p className="text-4xl leading-none font-semibold tracking-tight text-ink lg:text-5xl">
+                  <p className="text-4xl leading-none font-semibold tracking-tight text-foreground lg:text-5xl">
                     {formatMoney(course.monthlyFeeInCents)}
                   </p>
-                  <p className="mt-3 text-ink-soft">
+                  <p className="mt-3 text-muted-foreground">
                     por mês, durante os {course.durationMonths} meses.
                   </p>
                 </CardContent>
-              </Card>
+              </SectionCard>
             </div>
 
-            <Separator className="my-10 bg-line" />
+            <Separator className="my-10 bg-border" />
 
-            <p className="max-w-[60ch] leading-relaxed text-ink-soft">
+            <p className="max-w-[60ch] leading-relaxed text-muted-foreground">
               O pagamento é por Pix. Você envia o comprovante junto com a
               matrícula e a secretaria confirma.
             </p>
 
             <EnrollmentCta
-              variant="pill"
-              size="pill-lg"
+              tone="ink"
+              scale="lg"
               className="mt-8"
               courseSlug={course.slug}
             />
@@ -269,11 +270,11 @@ function Fact({
 }): React.JSX.Element {
   return (
     <div className="flex flex-col-reverse gap-1">
-      <dt className="inline-flex items-center gap-2 text-sm text-ink/70 [&_svg]:size-4">
+      <dt className="inline-flex items-center gap-2 text-sm text-primary-foreground [&_svg]:size-4">
         {icon}
         {label}
       </dt>
-      <dd className="text-lg font-semibold tracking-tight text-ink">
+      <dd className="text-lg font-semibold tracking-tight text-primary-foreground">
         {children}
       </dd>
     </div>

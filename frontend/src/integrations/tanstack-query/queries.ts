@@ -58,7 +58,8 @@ function params(search: Record<string, unknown>): string {
 export function accountQueryOptions() {
   return queryOptions({
     queryKey: queryKeys.account.all,
-    queryFn: ({ signal }) => request<AccountResponse>('/account/profile', { signal }),
+    queryFn: ({ signal }) =>
+      request<AccountResponse>('/account/profile', { signal }),
     retry: false,
   })
 }
@@ -71,7 +72,10 @@ export function coursesListQueryOptions(search: ListSearch) {
   return queryOptions({
     queryKey: queryKeys.courses.list(search),
     queryFn: ({ signal }) =>
-      request<Paginated<CourseResponse>>(`/administrator/courses${params(search)}`, { signal }),
+      request<Paginated<CourseResponse>>(
+        `/administrator/courses${params(search)}`,
+        { signal },
+      ),
     // Mantém a página anterior enquanto a nova carrega. Sem isto a tabela some e
     // reaparece a cada troca de filtro, e a página inteira pula de altura.
     placeholderData: keepPreviousData,
@@ -90,11 +94,16 @@ export function courseDetailQueryOptions(id: string) {
 // administrator/classes
 // ---------------------------------------------------------------------------
 
-export function classesListQueryOptions(search: ListSearch & { courseId?: string }) {
+export function classesListQueryOptions(
+  search: ListSearch & { courseId?: string },
+) {
   return queryOptions({
     queryKey: queryKeys.classes.list(search),
     queryFn: ({ signal }) =>
-      request<Paginated<ClassResponse>>(`/administrator/classes${params(search)}`, { signal }),
+      request<Paginated<ClassResponse>>(
+        `/administrator/classes${params(search)}`,
+        { signal },
+      ),
     placeholderData: keepPreviousData,
   })
 }
@@ -102,7 +111,8 @@ export function classesListQueryOptions(search: ListSearch & { courseId?: string
 export function classDetailQueryOptions(id: string) {
   return queryOptions({
     queryKey: queryKeys.classes.detail(id),
-    queryFn: ({ signal }) => request<ClassResponse>(`/administrator/classes/${id}`, { signal }),
+    queryFn: ({ signal }) =>
+      request<ClassResponse>(`/administrator/classes/${id}`, { signal }),
   })
 }
 
@@ -111,14 +121,17 @@ export function classDetailQueryOptions(id: string) {
 // ---------------------------------------------------------------------------
 
 export function enrollmentsListQueryOptions(
-  search: ListSearch & { courseId?: string; classId?: string; status?: string }
+  search: ListSearch & { courseId?: string; classId?: string; status?: string },
 ) {
   return queryOptions({
     queryKey: queryKeys.enrollments.list(search),
     queryFn: ({ signal }) =>
-      request<Paginated<EnrollmentResponse>>(`/administrator/enrollments${params(search)}`, {
-        signal,
-      }),
+      request<Paginated<EnrollmentResponse>>(
+        `/administrator/enrollments${params(search)}`,
+        {
+          signal,
+        },
+      ),
     placeholderData: keepPreviousData,
   })
 }
@@ -127,7 +140,9 @@ export function enrollmentDetailQueryOptions(id: string) {
   return queryOptions({
     queryKey: queryKeys.enrollments.detail(id),
     queryFn: ({ signal }) =>
-      request<EnrollmentResponse>(`/administrator/enrollments/${id}`, { signal }),
+      request<EnrollmentResponse>(`/administrator/enrollments/${id}`, {
+        signal,
+      }),
   })
 }
 
@@ -162,7 +177,8 @@ export function storefrontFaqsQueryOptions() {
 export function storefrontCourseQueryOptions(slug: string) {
   return queryOptions({
     queryKey: queryKeys.storefront.course(slug),
-    queryFn: ({ signal }) => request<CourseResponse>(`/storefront/courses/${slug}`, { signal }),
+    queryFn: ({ signal }) =>
+      request<CourseResponse>(`/storefront/courses/${slug}`, { signal }),
   })
 }
 
@@ -177,7 +193,9 @@ export function storefrontEnrollmentQueryOptions(protocol: string) {
   return queryOptions({
     queryKey: queryKeys.storefront.enrollment(protocol),
     queryFn: ({ signal }) =>
-      request<EnrollmentResponse>(`/storefront/enrollments/${protocol}`, { signal }),
+      request<EnrollmentResponse>(`/storefront/enrollments/${protocol}`, {
+        signal,
+      }),
     retry: false,
   })
 }

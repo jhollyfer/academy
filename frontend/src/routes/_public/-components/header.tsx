@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { List, WhatsappLogo } from '@phosphor-icons/react'
 
 import { Button } from '#/components/ui/button'
+import { PillButton } from '#/components/common/pill-button'
 import {
   Sheet,
   SheetClose,
@@ -48,7 +49,7 @@ const HEADER_MESSAGE =
  */
 export function Header(): React.JSX.Element {
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-cream/85 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-18 max-w-7xl items-center gap-4 px-4 lg:grid lg:grid-cols-[1fr_auto_1fr]">
         <nav
           aria-label="Principal"
@@ -59,8 +60,8 @@ export function Header(): React.JSX.Element {
               key={link.label}
               to={link.to}
               params={link.params}
-              className="text-sm text-ink-soft transition-colors hover:text-ink"
-              activeProps={{ className: 'text-ink' }}
+              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              activeProps={{ className: 'text-foreground' }}
             >
               {link.label}
             </Link>
@@ -69,15 +70,15 @@ export function Header(): React.JSX.Element {
 
         <Link
           to="/"
-          className="text-lg font-semibold tracking-tight text-ink lg:justify-self-center"
+          className="text-lg font-semibold tracking-tight text-foreground lg:justify-self-center"
         >
           Maiyu Academy
         </Link>
 
         <div className="ml-auto flex items-center gap-2 lg:ml-0 lg:justify-self-end">
-          <Button
-            variant="pill-outline"
-            size="pill"
+          <PillButton
+            tone="outline"
+            scale="md"
             className="hidden md:inline-flex"
             render={
               <a
@@ -114,14 +115,14 @@ export function Header(): React.JSX.Element {
                 </Button>
               }
             />
-            <SheetContent side="right" className="w-80 bg-cream">
+            <SheetContent side="right" className="w-80 bg-background">
               {/*
                 `SheetHeader` e `SheetFooter` e não os filhos nus: o padding do
                 painel mora neles. Sem eles o título encostava na borda enquanto
                 a navegação logo abaixo tinha recuo próprio.
               */}
               <SheetHeader>
-                <SheetTitle className="text-lg font-semibold text-ink">
+                <SheetTitle className="text-lg font-semibold text-foreground">
                   Maiyu Academy
                 </SheetTitle>
                 <SheetDescription className="sr-only">
@@ -137,7 +138,7 @@ export function Header(): React.JSX.Element {
                       <Link
                         to={link.to}
                         params={link.params}
-                        className="rounded-md px-3 py-2.5 text-base text-ink-soft transition-colors hover:bg-ink/5 hover:text-ink"
+                        className="rounded-md px-3 py-2.5 text-base text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
                       >
                         {link.label}
                       </Link>
@@ -151,7 +152,7 @@ export function Header(): React.JSX.Element {
                       href={whatsappUrl(HEADER_MESSAGE)}
                       target="_blank"
                       rel="noreferrer"
-                      className="rounded-md px-3 py-2.5 text-base text-ink-soft transition-colors hover:bg-ink/5 hover:text-ink"
+                      className="rounded-md px-3 py-2.5 text-base text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
                     >
                       WhatsApp
                     </a>

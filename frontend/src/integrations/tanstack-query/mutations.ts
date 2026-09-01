@@ -2,7 +2,11 @@ import { useMutation } from '@tanstack/react-query'
 import { request } from './http'
 import type { UseMutationOptions } from '@tanstack/react-query'
 import type { HTTPError } from './http'
-import type { ClassResponse, CourseResponse, EnrollmentResponse } from '../response'
+import type {
+  ClassResponse,
+  CourseResponse,
+  EnrollmentResponse,
+} from '../response'
 import type {
   AdministratorClassCreatePayload,
   AdministratorClassUpdatePayload,
@@ -43,7 +47,9 @@ type MutationProps<TData, TPayload, TError = HTTPError> = Omit<
  * guard reusa a ausência de sessão que ele cacheou um segundo antes, e o login
  * "não funciona" sem erro nenhum na tela.
  */
-export function useSignIn(options?: MutationProps<void, AuthenticationSignInPayload>) {
+export function useSignIn(
+  options?: MutationProps<void, AuthenticationSignInPayload>,
+) {
   return useMutation<void, HTTPError, AuthenticationSignInPayload>({
     ...options,
     mutationFn: function (payload) {
@@ -69,9 +75,13 @@ export function useSignOut(options?: MutationProps<void, void>) {
 // ---------------------------------------------------------------------------
 
 export function useCourseCreate(
-  options?: MutationProps<CourseResponse, AdministratorCourseCreatePayload>
+  options?: MutationProps<CourseResponse, AdministratorCourseCreatePayload>,
 ) {
-  return useMutation<CourseResponse, HTTPError, AdministratorCourseCreatePayload>({
+  return useMutation<
+    CourseResponse,
+    HTTPError,
+    AdministratorCourseCreatePayload
+  >({
     ...options,
     mutationFn: function (payload) {
       return request<CourseResponse>('/administrator/courses', {
@@ -84,9 +94,13 @@ export function useCourseCreate(
 
 export function useCourseUpdate(
   id: string,
-  options?: MutationProps<CourseResponse, AdministratorCourseUpdatePayload>
+  options?: MutationProps<CourseResponse, AdministratorCourseUpdatePayload>,
 ) {
-  return useMutation<CourseResponse, HTTPError, AdministratorCourseUpdatePayload>({
+  return useMutation<
+    CourseResponse,
+    HTTPError,
+    AdministratorCourseUpdatePayload
+  >({
     ...options,
     mutationFn: function (payload) {
       return request<CourseResponse>(`/administrator/courses/${id}`, {
@@ -101,7 +115,9 @@ export function useCourseArchive(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>(`/administrator/courses/${id}/archive`, { method: 'PATCH' })
+      return request<void>(`/administrator/courses/${id}/archive`, {
+        method: 'PATCH',
+      })
     },
   })
 }
@@ -110,7 +126,9 @@ export function useCourseUnarchive(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>(`/administrator/courses/${id}/unarchive`, { method: 'PATCH' })
+      return request<void>(`/administrator/courses/${id}/unarchive`, {
+        method: 'PATCH',
+      })
     },
   })
 }
@@ -130,39 +148,45 @@ export function useCourseDelete(options?: MutationProps<void, string>) {
 // ---------------------------------------------------------------------------
 
 export function useClassCreate(
-  options?: MutationProps<ClassResponse, AdministratorClassCreatePayload>
+  options?: MutationProps<ClassResponse, AdministratorClassCreatePayload>,
 ) {
-  return useMutation<ClassResponse, HTTPError, AdministratorClassCreatePayload>({
-    ...options,
-    mutationFn: function (payload) {
-      return request<ClassResponse>('/administrator/classes', {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      })
+  return useMutation<ClassResponse, HTTPError, AdministratorClassCreatePayload>(
+    {
+      ...options,
+      mutationFn: function (payload) {
+        return request<ClassResponse>('/administrator/classes', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        })
+      },
     },
-  })
+  )
 }
 
 export function useClassUpdate(
   id: string,
-  options?: MutationProps<ClassResponse, AdministratorClassUpdatePayload>
+  options?: MutationProps<ClassResponse, AdministratorClassUpdatePayload>,
 ) {
-  return useMutation<ClassResponse, HTTPError, AdministratorClassUpdatePayload>({
-    ...options,
-    mutationFn: function (payload) {
-      return request<ClassResponse>(`/administrator/classes/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-      })
+  return useMutation<ClassResponse, HTTPError, AdministratorClassUpdatePayload>(
+    {
+      ...options,
+      mutationFn: function (payload) {
+        return request<ClassResponse>(`/administrator/classes/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(payload),
+        })
+      },
     },
-  })
+  )
 }
 
 export function useClassArchive(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>(`/administrator/classes/${id}/archive`, { method: 'PATCH' })
+      return request<void>(`/administrator/classes/${id}/archive`, {
+        method: 'PATCH',
+      })
     },
   })
 }
@@ -171,7 +195,9 @@ export function useClassUnarchive(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>(`/administrator/classes/${id}/unarchive`, { method: 'PATCH' })
+      return request<void>(`/administrator/classes/${id}/unarchive`, {
+        method: 'PATCH',
+      })
     },
   })
 }
@@ -198,9 +224,16 @@ export function useClassDelete(options?: MutationProps<void, string>) {
  */
 export function useEnrollmentUpdate(
   id: string,
-  options?: MutationProps<EnrollmentResponse, AdministratorEnrollmentUpdatePayload>
+  options?: MutationProps<
+    EnrollmentResponse,
+    AdministratorEnrollmentUpdatePayload
+  >,
 ) {
-  return useMutation<EnrollmentResponse, HTTPError, AdministratorEnrollmentUpdatePayload>({
+  return useMutation<
+    EnrollmentResponse,
+    HTTPError,
+    AdministratorEnrollmentUpdatePayload
+  >({
     ...options,
     mutationFn: function (payload) {
       return request<EnrollmentResponse>(`/administrator/enrollments/${id}`, {
@@ -215,7 +248,9 @@ export function useEnrollmentArchive(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>(`/administrator/enrollments/${id}/archive`, { method: 'PATCH' })
+      return request<void>(`/administrator/enrollments/${id}/archive`, {
+        method: 'PATCH',
+      })
     },
   })
 }
@@ -224,7 +259,9 @@ export function useEnrollmentUnarchive(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>(`/administrator/enrollments/${id}/unarchive`, { method: 'PATCH' })
+      return request<void>(`/administrator/enrollments/${id}/unarchive`, {
+        method: 'PATCH',
+      })
     },
   })
 }
@@ -233,7 +270,9 @@ export function useEnrollmentDelete(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>(`/administrator/enrollments/${id}`, { method: 'DELETE' })
+      return request<void>(`/administrator/enrollments/${id}`, {
+        method: 'DELETE',
+      })
     },
   })
 }
@@ -250,9 +289,16 @@ export function useEnrollmentDelete(options?: MutationProps<void, string>) {
  * pelos inputs.
  */
 export function useEnrollmentCreate(
-  options?: MutationProps<EnrollmentResponse, StorefrontEnrollmentCreatePayload>
+  options?: MutationProps<
+    EnrollmentResponse,
+    StorefrontEnrollmentCreatePayload
+  >,
 ) {
-  return useMutation<EnrollmentResponse, HTTPError, StorefrontEnrollmentCreatePayload>({
+  return useMutation<
+    EnrollmentResponse,
+    HTTPError,
+    StorefrontEnrollmentCreatePayload
+  >({
     ...options,
     mutationFn: function (payload) {
       return request<EnrollmentResponse>('/storefront/enrollments', {
@@ -269,15 +315,25 @@ export function useEnrollmentCreate(
  */
 export function useEnrollmentAttach(
   protocol: string,
-  options?: MutationProps<EnrollmentResponse, StorefrontEnrollmentAttachmentPayload>
+  options?: MutationProps<
+    EnrollmentResponse,
+    StorefrontEnrollmentAttachmentPayload
+  >,
 ) {
-  return useMutation<EnrollmentResponse, HTTPError, StorefrontEnrollmentAttachmentPayload>({
+  return useMutation<
+    EnrollmentResponse,
+    HTTPError,
+    StorefrontEnrollmentAttachmentPayload
+  >({
     ...options,
     mutationFn: function (payload) {
-      return request<EnrollmentResponse>(`/storefront/enrollments/${protocol}/attachments`, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      })
+      return request<EnrollmentResponse>(
+        `/storefront/enrollments/${protocol}/attachments`,
+        {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        },
+      )
     },
   })
 }

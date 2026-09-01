@@ -1,12 +1,30 @@
 import * as React from 'react'
-import { createFileRoute, Link, Outlet, redirect, useRouter } from '@tanstack/react-router'
-import { useQueryClient } from '@tanstack/react-query'
-import { SignOut } from '@phosphor-icons/react'
+import {
+  createFileRoute,
+  Link,
+  Outlet,
+  redirect,
+  useMatches,
+} from '@tanstack/react-router'
+
+import { Sidebar } from './-components/sidebar'
+import { ThemeToggle } from '#/components/common/theme-toggle'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '#/components/ui/breadcrumb'
+import { Separator } from '#/components/ui/separator'
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from '#/components/ui/sidebar'
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
-import { useSignOut } from '#/integrations/tanstack-query/mutations'
-import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import { Button } from '#/components/ui/button'
-import { cn } from '#/lib/utils'
+import { buildBreadcrumbs } from '#/lib/breadcrumbs'
 
 /**
  * O portão do painel. Fica no layout, e não em cada tela, porque assim rota nova
@@ -18,41 +36,37 @@ export const Route = createFileRoute('/_private')({
     try {
       // `ensureQueryData` e não `prefetchQuery`: o primeiro devolve o dado e
       // propaga o erro, o segundo engole os dois e o guard nunca reprovaria.
-      const account = await context.queryClient.ensureQueryData(accountQueryOptions())
+      const account = await context.queryClient.ensureQueryData(
+        accountQueryOptions(),
+      )
 
       return { account }
     } catch {
       // Qualquer falha aqui é ausência de sessão utilizável: o `request` já
       // tentou renovar com o refresh token antes de deixar o erro subir.
-      throw redirect({ to: '/authentication', search: { redirect: location.href } })
+      throw redirect({
+        to: '/authentication',
+        search: { redirect: location.href },
+      })
     }
   },
   component: RouteComponent,
 })
 
-/** Os destinos do painel. Uma lista e não JSX repetido: são três hoje e a
- *  navegação inteira sai daqui, incluindo o estado de "ativo". */
-const LINKS = [
-  { to: '/admin', label: 'Visão geral', exact: true },
-  { to: '/admin/cursos', label: 'Cursos', exact: false },
-  { to: '/admin/turmas', label: 'Turmas', exact: false },
-  { to: '/admin/matriculas', label: 'Matrículas', exact: false },
-] as const
-
-/** O alvo do "pular para o conteúdo". */
+/** O alvo do "pular para o conteúdo", e o `id` do `<main>` que o `SidebarInset` renderiza. */
 const MAIN_ID = 'conteudo'
 
 function RouteComponent(): React.JSX.Element {
-  const { account } = Route.useRouteContext()
-
   return (
-    // `light` fixo: o painel é onde alguém passa uma hora seguida numa tabela, e
-    // o escuro neon do site é feito para converter, não para trabalhar.
-    <div className="light min-h-svh bg-background text-foreground">
+    // `h-svh` sobre o `min-h-svh` do componente: com altura mínima o container
+    // cresce junto com o conteúdo, e uma altura que cresce não limita ninguém.
+    // Altura fixa dá o teto, e quem rola passa a ser a área interna.
+    <SidebarProvider className="h-svh overflow-hidden">
       {/*
         `sr-only` com `focus:not-sr-only`, e não `display: none`: escondido de
         verdade o link não receberia foco e deixaria de existir para quem ele
-        serve.
+        serve. Aqui ele rende mais que na vitrine - a sidebar vem antes do
+        conteúdo em toda tela, a cada navegação.
       */}
       <a
         href={'#'.concat(MAIN_ID)}
@@ -61,67 +75,68 @@ function RouteComponent(): React.JSX.Element {
         Pular para o conteúdo
       </a>
 
-      <header className="border-b bg-card">
-        <div className="mx-auto flex h-14 max-w-7xl items-center gap-6 px-4">
-          <Link to="/admin" className="font-semibold tracking-tight">
-            Maiyu <span className="text-primary">Academy</span>
-          </Link>
+      <Sidebar />
 
-          <nav aria-label="Painel" className="flex items-center gap-1">
-            {LINKS.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                activeOptions={{ exact: link.exact }}
-                className={cn(
-                  'rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground'
-                )}
-                activeProps={{ className: 'bg-secondary text-foreground font-medium' }}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="ml-auto flex items-center gap-3">
-            <span className="hidden text-sm text-muted-foreground sm:inline">
-              {account.name}
-            </span>
-            <SignOutButton />
+      {/* `tabIndex={-1}` para o alvo do salto poder receber o foco: sem ele o
+          navegador rola até aqui e deixa o foco no link, e a tabulação seguinte
+          volta para o topo da sidebar. */}
+      <SidebarInset id={MAIN_ID} tabIndex={-1} className="min-h-0">
+        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear motion-reduce:transition-none group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator
+              orientation="vertical"
+              className="mr-2 data-[orientation=vertical]:h-4"
+            />
+            <Trail />
           </div>
-        </div>
-      </header>
+          <div className="ml-auto flex items-center gap-2 px-4">
+            <ThemeToggle />
+          </div>
+        </header>
 
-      <main id={MAIN_ID} tabIndex={-1} className="mx-auto max-w-7xl px-4 py-8">
-        <Outlet />
-      </main>
-    </div>
+        {/*
+          `min-h-0` com `overflow-auto` é o par da altura fixa lá em cima: sem
+          ele um filho flex não encolhe abaixo do próprio conteúdo, a área de
+          rolagem interna nunca recebe altura limitada, e o scroll vaza para a
+          página inteira.
+        */}
+        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-auto p-4 pt-0">
+          <Outlet />
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }
 
-function SignOutButton(): React.JSX.Element {
-  const router = useRouter()
-  const queryClient = useQueryClient()
-
-  const mutation = useSignOut({
-    onSuccess: async function () {
-      // Invalidar **antes** de navegar: o guard de `_private` lê o cache no
-      // `beforeLoad`, e sem isto ele encontraria a sessão que acabou de morrer
-      // e deixaria passar.
-      await queryClient.invalidateQueries({ queryKey: queryKeys.account.all })
-      await router.navigate({ to: '/authentication' })
-    },
-  })
+/**
+ * A trilha da tela atual.
+ *
+ * `useMatches()` e não `location.pathname`: a lista de rotas que casaram é o que
+ * diz quais prefixos existem de verdade. A regra inteira mora em
+ * `lib/breadcrumbs.ts`, testada lá.
+ */
+function Trail(): React.JSX.Element {
+  const matches = useMatches()
+  const crumbs = buildBreadcrumbs(matches)
 
   return (
-    <Button
-      variant="ghost"
-      size="sm"
-      disabled={mutation.isPending}
-      onClick={() => mutation.mutate()}
-    >
-      <SignOut />
-      Sair
-    </Button>
+    <Breadcrumb>
+      <BreadcrumbList>
+        {crumbs.map((crumb, index) => (
+          <React.Fragment key={crumb.label.concat(String(index))}>
+            {index > 0 && <BreadcrumbSeparator />}
+            <BreadcrumbItem>
+              {crumb.to && (
+                <BreadcrumbLink render={<Link to={crumb.to} />}>
+                  {crumb.label}
+                </BreadcrumbLink>
+              )}
+              {!crumb.to && <BreadcrumbPage>{crumb.label}</BreadcrumbPage>}
+            </BreadcrumbItem>
+          </React.Fragment>
+        ))}
+      </BreadcrumbList>
+    </Breadcrumb>
   )
 }

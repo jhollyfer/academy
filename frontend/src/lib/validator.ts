@@ -124,12 +124,14 @@ function hasValidCpfDigits(digits: string): boolean {
   return true
 }
 
-const cpfCheckDigits = vine.createRule((value: unknown, _options, field: FieldContext) => {
-  if (typeof value !== 'string') return
-  if (hasValidCpfDigits(value)) return
+const cpfCheckDigits = vine.createRule(
+  (value: unknown, _options, field: FieldContext) => {
+    if (typeof value !== 'string') return
+    if (hasValidCpfDigits(value)) return
 
-  field.report('CPF inválido', 'checkDigits', field)
-})
+    field.report('CPF inválido', 'checkDigits', field)
+  },
+)
 
 /**
  * CPF do candidato ou do responsável legal.
@@ -227,9 +229,9 @@ export function trashedField() {
  * entregar a cláusula ao cliente. Coluna fora da lista é 422 apontando o campo,
  * e não um 500 do banco reclamando de coluna inexistente.
  */
-export function sortFields<const TColumns extends readonly [string, ...string[]]>(
-  columns: TColumns
-) {
+export function sortFields<
+  const TColumns extends readonly [string, ...string[]],
+>(columns: TColumns) {
   return {
     sort: vine.enum(columns).optional(),
     direction: vine.enum(SORT_DIRECTIONS).optional(),
@@ -243,8 +245,18 @@ export function sortFields<const TColumns extends readonly [string, ...string[]]
  * seria prometer no OpenAPI uma ordem que nenhum cabeçalho oferece.
  */
 export const COURSE_SORT_COLUMNS = ['name', 'position', 'createdAt'] as const
-export const CLASS_SORT_COLUMNS = ['name', 'startsAt', 'capacity', 'status', 'createdAt'] as const
-export const ENROLLMENT_SORT_COLUMNS = ['studentName', 'status', 'createdAt'] as const
+export const CLASS_SORT_COLUMNS = [
+  'name',
+  'startsAt',
+  'capacity',
+  'status',
+  'createdAt',
+] as const
+export const ENROLLMENT_SORT_COLUMNS = [
+  'studentName',
+  'status',
+  'createdAt',
+] as const
 /**
  * `position` é a ordem na grade e no FAQ - o que a tela mostra. Não há por que
  * ordenar por título: a sequência dos sábados é o conteúdo.
@@ -306,12 +318,13 @@ export const TrashablePaginationValidator = vine.create({
 export type IdentifierPayload = Infer<typeof IdentifierValidator>
 export type SlugPayload = Infer<typeof SlugValidator>
 export type PaginationPayload = Infer<typeof PaginationValidator>
-export type TrashablePaginationPayload = Infer<typeof TrashablePaginationValidator>
+export type TrashablePaginationPayload = Infer<
+  typeof TrashablePaginationValidator
+>
 
 // ---------------------------------------------------------------------------
 // administrator/courses
 // ---------------------------------------------------------------------------
-
 
 /**
  * Um encontro da grade. Sem `id` nem `position`: o módulo não tem identidade
@@ -327,7 +340,7 @@ function courseModuleFields() {
       vine.object({
         title: vine.string().trim().minLength(2).maxLength(200),
         description: vine.string().trim().maxLength(2000).nullable().optional(),
-      })
+      }),
     )
     .maxLength(60)
 }
@@ -339,7 +352,7 @@ function courseFaqFields() {
       vine.object({
         question: vine.string().trim().minLength(4).maxLength(300),
         answer: vine.string().trim().minLength(2).maxLength(4000),
-      })
+      }),
     )
     .maxLength(40)
 }
@@ -416,8 +429,12 @@ export const AdministratorCoursePaginationValidator = vine.create({
   accent: vine.enum(COURSE_ACCENTS).optional(),
 })
 
-export type AdministratorCourseCreatePayload = Infer<typeof AdministratorCourseCreateValidator>
-export type AdministratorCourseUpdatePayload = Infer<typeof AdministratorCourseUpdateValidator>
+export type AdministratorCourseCreatePayload = Infer<
+  typeof AdministratorCourseCreateValidator
+>
+export type AdministratorCourseUpdatePayload = Infer<
+  typeof AdministratorCourseUpdateValidator
+>
 export type AdministratorCoursePaginationPayload = Infer<
   typeof AdministratorCoursePaginationValidator
 >
@@ -433,7 +450,9 @@ export const AuthenticationSignInValidator = vine.create({
   password: vine.string().maxLength(128),
 })
 
-export type AuthenticationSignInPayload = Infer<typeof AuthenticationSignInValidator>
+export type AuthenticationSignInPayload = Infer<
+  typeof AuthenticationSignInValidator
+>
 
 // ---------------------------------------------------------------------------
 // administrator/classes
@@ -456,7 +475,11 @@ export const AdministratorClassCreateValidator = vine.create({
   // Nula enquanto a escola não fechou a data de encerramento. `afterField`
   // porque uma turma que termina antes de começar é erro de digitação, e o
   // banco aceitaria calado.
-  endsAt: vine.date({ formats: ['iso8601'] }).afterField('startsAt').nullable().optional(),
+  endsAt: vine
+    .date({ formats: ['iso8601'] })
+    .afterField('startsAt')
+    .nullable()
+    .optional(),
   weekday: vine.enum(WEEKDAYS),
   shift: vine.enum(SHIFTS),
   // A hora da aula: é ela que separa duas turmas do mesmo curso no mesmo
@@ -474,7 +497,10 @@ export const AdministratorClassUpdateValidator = vine.create({
   courseId: vine.string().uuid().optional(),
   name: vine.string().trim().minLength(2).maxLength(160).optional(),
   startsAt: vine.date().optional(),
-  endsAt: vine.date({ formats: ['iso8601'] }).nullable().optional(),
+  endsAt: vine
+    .date({ formats: ['iso8601'] })
+    .nullable()
+    .optional(),
   weekday: vine.enum(WEEKDAYS).optional(),
   shift: vine.enum(SHIFTS).optional(),
   startsAtTime: time(),
@@ -492,8 +518,12 @@ export const AdministratorClassPaginationValidator = vine.create({
   status: vine.enum(CLASS_STATUSES).optional(),
 })
 
-export type AdministratorClassCreatePayload = Infer<typeof AdministratorClassCreateValidator>
-export type AdministratorClassUpdatePayload = Infer<typeof AdministratorClassUpdateValidator>
+export type AdministratorClassCreatePayload = Infer<
+  typeof AdministratorClassCreateValidator
+>
+export type AdministratorClassUpdatePayload = Infer<
+  typeof AdministratorClassUpdateValidator
+>
 export type AdministratorClassPaginationPayload = Infer<
   typeof AdministratorClassPaginationValidator
 >
@@ -549,27 +579,34 @@ export type AdministratorEnrollmentUpdatePayload = Infer<
  * precisa.
  */
 export const StorefrontEnrollmentCreateValidator = vine.create(
-  vine
-    .object({
-      classId: vine.string().uuid(),
-      studentName: vine.string().trim().minLength(2).maxLength(160),
-      studentBirthDate: vine.date({ formats: ['iso8601'] }),
-      studentDocument: cpf().nullable().optional(),
-      email: email(),
-      phone: phone(),
+  vine.object({
+    classId: vine.string().uuid(),
+    studentName: vine.string().trim().minLength(2).maxLength(160),
+    studentBirthDate: vine.date({ formats: ['iso8601'] }),
+    studentDocument: cpf().nullable().optional(),
+    email: email(),
+    phone: phone(),
 
-      guardianName: vine.string().trim().minLength(2).maxLength(160).nullable().optional(),
-      guardianDocument: cpf().nullable().optional(),
-      guardianPhone: phone().nullable().optional(),
+    guardianName: vine
+      .string()
+      .trim()
+      .minLength(2)
+      .maxLength(160)
+      .nullable()
+      .optional(),
+    guardianDocument: cpf().nullable().optional(),
+    guardianPhone: phone().nullable().optional(),
 
-      // Aceites. `literal(true)` e não booleano: "false" não é um consentimento
-      // que valha gravar, é o formulário enviado sem a caixa marcada.
-      termsAccepted: vine.literal(true),
-      lgpdConsent: vine.literal(true),
-    })
+    // Aceites. `literal(true)` e não booleano: "false" não é um consentimento
+    // que valha gravar, é o formulário enviado sem a caixa marcada.
+    termsAccepted: vine.literal(true),
+    lgpdConsent: vine.literal(true),
+  }),
 )
 
-export type StorefrontEnrollmentCreatePayload = Infer<typeof StorefrontEnrollmentCreateValidator>
+export type StorefrontEnrollmentCreatePayload = Infer<
+  typeof StorefrontEnrollmentCreateValidator
+>
 
 /**
  * O comprovante do Pix, anexado depois de o binário já estar no bucket.
@@ -594,7 +631,6 @@ export type ProtocolPayload = Infer<typeof ProtocolValidator>
 // ---------------------------------------------------------------------------
 // storages
 // ---------------------------------------------------------------------------
-
 
 /**
  * O teto por arquivo, em bytes.
@@ -638,7 +674,7 @@ export const StorageCompleteValidator = vine.create({
       vine.object({
         partNumber: vine.number().min(1).max(10_000).withoutDecimals(),
         etag: vine.string().trim().maxLength(64).minLength(1),
-      })
+      }),
     )
     .optional(),
 })

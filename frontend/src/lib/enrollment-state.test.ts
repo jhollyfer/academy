@@ -136,13 +136,38 @@ describe('formatTimeRange', () => {
 describe('scheduleSummary', () => {
   const OFFER = [
     courseWith([
-      { capacity: 40, shift: 'MORNING', startsAtTime: '08:00', endsAtTime: '10:00' },
-      { capacity: 40, shift: 'MORNING', startsAtTime: '10:00', endsAtTime: '12:00' },
+      {
+        capacity: 40,
+        shift: 'MORNING',
+        startsAtTime: '08:00',
+        endsAtTime: '10:00',
+      },
+      {
+        capacity: 40,
+        shift: 'MORNING',
+        startsAtTime: '10:00',
+        endsAtTime: '12:00',
+      },
     ]),
     courseWith([
-      { capacity: 40, shift: 'AFTERNOON', startsAtTime: '13:00', endsAtTime: '15:00' },
-      { capacity: 40, shift: 'AFTERNOON', startsAtTime: '15:00', endsAtTime: '17:00' },
-      { capacity: 40, shift: 'NIGHT', startsAtTime: '18:00', endsAtTime: '20:00' },
+      {
+        capacity: 40,
+        shift: 'AFTERNOON',
+        startsAtTime: '13:00',
+        endsAtTime: '15:00',
+      },
+      {
+        capacity: 40,
+        shift: 'AFTERNOON',
+        startsAtTime: '15:00',
+        endsAtTime: '17:00',
+      },
+      {
+        capacity: 40,
+        shift: 'NIGHT',
+        startsAtTime: '18:00',
+        endsAtTime: '20:00',
+      },
     ]),
   ]
 

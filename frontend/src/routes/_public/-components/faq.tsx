@@ -34,12 +34,12 @@ export function Faq({
 
   return (
     <section data-slot="home-faq" className="px-3 py-3 sm:px-4 sm:py-4">
-      <div className="rounded-block border border-line bg-cream px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
+      <div className="rounded-block border border-border bg-background px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-20">
           <h2
             className={cn(
               REVEAL,
-              'text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-ink sm:text-4xl lg:text-5xl',
+              'text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-foreground sm:text-4xl lg:text-5xl',
             )}
           >
             {title} <Highlight variant="outline">{highlight}</Highlight>
@@ -48,15 +48,15 @@ export function Faq({
           <Accordion
             className={cn(
               REVEAL,
-              'delay-100 rounded-card border-line bg-paper',
+              'delay-100 rounded-card border-border bg-card',
             )}
           >
             {faqs.map((faq) => (
               <AccordionItem key={faq.id} value={faq.id} className="px-2">
-                <AccordionTrigger className="py-5 text-left text-base font-medium text-ink">
+                <AccordionTrigger className="py-5 text-left text-base font-medium text-foreground">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="pb-5 text-base leading-relaxed text-ink-soft">
+                <AccordionContent className="pb-5 text-base leading-relaxed text-muted-foreground">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>

@@ -21,7 +21,10 @@ export const Route = createLazyFileRoute('/_private/admin/turmas/')({
  * Um mapa e não uma cadeia de `if`: são três valores, e a variante do `Badge`
  * anda junto com o rótulo - separá-los daria duas listas para divergir.
  */
-const STATUS: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' }> = {
+const STATUS: Record<
+  string,
+  { label: string; variant: 'default' | 'secondary' | 'outline' }
+> = {
   OPEN: { label: 'Aberta', variant: 'default' },
   FULL: { label: 'Lotada', variant: 'secondary' },
   CLOSED: { label: 'Fechada', variant: 'outline' },
@@ -55,7 +58,8 @@ const COLUMNS: ReadonlyArray<Column<ClassResponse>> = [
     cell: (entity) => {
       // `seatsRemaining` some quando a leitura não contou. Mostrar a capacidade
       // sozinha daria a impressão de turma vazia.
-      if (entity.seatsRemaining === undefined) return `${entity.capacity} no total`
+      if (entity.seatsRemaining === undefined)
+        return `${entity.capacity} no total`
 
       return `${entity.seatsRemaining} de ${entity.capacity}`
     },
@@ -89,8 +93,13 @@ function RouteComponent(): React.JSX.Element {
       isPending={isPending}
       emptyTitle="Nenhuma turma cadastrada"
       emptyDescription="Sem turma aberta, a matrícula do site não tem o que oferecer."
-      rowTo={(entity) => ({ to: '/admin/turmas/$id', params: { id: entity.id } })}
-      onSearchChange={(term) => navigate({ search: { ...search, search: term, page: undefined } })}
+      rowTo={(entity) => ({
+        to: '/admin/turmas/$id',
+        params: { id: entity.id },
+      })}
+      onSearchChange={(term) =>
+        navigate({ search: { ...search, search: term, page: undefined } })
+      }
       onPageChange={(page) => navigate({ search: { ...search, page } })}
     />
   )

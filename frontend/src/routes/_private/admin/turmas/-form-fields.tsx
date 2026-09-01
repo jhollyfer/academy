@@ -1,7 +1,12 @@
 import type * as React from 'react'
 import { Controller } from 'react-hook-form'
 import { Input } from '#/components/ui/input'
-import { Field, FieldError, FieldGroup, FieldLabel } from '#/components/ui/field'
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '#/components/ui/field'
 import {
   Select,
   SelectContent,
@@ -57,7 +62,9 @@ export function ClassFormFields({
                 ))}
               </SelectContent>
             </Select>
-            {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+            {fieldState.error && (
+              <FieldError>{fieldState.error.message}</FieldError>
+            )}
           </Field>
         )}
       />
@@ -69,7 +76,9 @@ export function ClassFormFields({
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel htmlFor="name">Nome da turma</FieldLabel>
             <Input {...field} id="name" placeholder="Turma 1 / 2026" />
-            {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+            {fieldState.error && (
+              <FieldError>{fieldState.error.message}</FieldError>
+            )}
           </Field>
         )}
       />
@@ -81,8 +90,15 @@ export function ClassFormFields({
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="startsAt">Primeira aula</FieldLabel>
-              <Input {...field} id="startsAt" type="date" aria-invalid={fieldState.invalid} />
-              {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+              <Input
+                {...field}
+                id="startsAt"
+                type="date"
+                aria-invalid={fieldState.invalid}
+              />
+              {fieldState.error && (
+                <FieldError>{fieldState.error.message}</FieldError>
+              )}
             </Field>
           )}
         />
@@ -100,7 +116,9 @@ export function ClassFormFields({
                 id="endsAt"
                 type="date"
               />
-              {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+              {fieldState.error && (
+                <FieldError>{fieldState.error.message}</FieldError>
+              )}
             </Field>
           )}
         />
@@ -123,7 +141,9 @@ export function ClassFormFields({
                   ))}
                 </SelectContent>
               </Select>
-              {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+              {fieldState.error && (
+                <FieldError>{fieldState.error.message}</FieldError>
+              )}
             </Field>
           )}
         />
@@ -146,7 +166,9 @@ export function ClassFormFields({
                   ))}
                 </SelectContent>
               </Select>
-              {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+              {fieldState.error && (
+                <FieldError>{fieldState.error.message}</FieldError>
+              )}
             </Field>
           )}
         />
@@ -166,7 +188,9 @@ export function ClassFormFields({
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="startsAtTime">Começa às</FieldLabel>
               <Input {...field} id="startsAtTime" type="time" />
-              {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+              {fieldState.error && (
+                <FieldError>{fieldState.error.message}</FieldError>
+              )}
             </Field>
           )}
         />
@@ -178,7 +202,9 @@ export function ClassFormFields({
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="endsAtTime">Termina às</FieldLabel>
               <Input {...field} id="endsAtTime" type="time" />
-              {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+              {fieldState.error && (
+                <FieldError>{fieldState.error.message}</FieldError>
+              )}
             </Field>
           )}
         />
@@ -191,7 +217,9 @@ export function ClassFormFields({
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel htmlFor="location">Onde acontece</FieldLabel>
             <Input {...field} id="location" />
-            {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+            {fieldState.error && (
+              <FieldError>{fieldState.error.message}</FieldError>
+            )}
           </Field>
         )}
       />
@@ -225,7 +253,9 @@ export function ClassFormFields({
               diz quantas matrículas existem. Repeti-la aqui como aviso prévio
               exigiria a contagem no formulário, que é dado que ele não tem.
             */}
-            {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+            {fieldState.error && (
+              <FieldError>{fieldState.error.message}</FieldError>
+            )}
           </Field>
         )}
       />

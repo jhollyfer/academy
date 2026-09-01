@@ -91,7 +91,7 @@ function RouteComponent(): React.JSX.Element {
   return (
     <div className="relative">
       <div className="relative mx-auto max-w-2xl px-4 py-16 lg:py-20">
-        <div className="text-neon-ink [&_svg]:size-10">{view.icon}</div>
+        <div className="text-foreground [&_svg]:size-10">{view.icon}</div>
 
         <h1 className="mt-5 text-3xl leading-[1.05] font-semibold tracking-tight sm:text-4xl">
           {view.title}
@@ -105,7 +105,7 @@ function RouteComponent(): React.JSX.Element {
           vai ditar no WhatsApp, e dígito de largura variável se lê pior em voz
           alta.
         */}
-        <div className="rounded-card mt-10 border border-line bg-card p-6">
+        <div className="rounded-card mt-10 border border-border bg-card p-6">
           <p className="text-sm text-muted-foreground">Seu protocolo</p>
           <p className="mt-2 font-mono text-sm break-all tabular-nums">
             {enrollment.protocol}
@@ -134,7 +134,7 @@ function RouteComponent(): React.JSX.Element {
         )}
 
         {enrollment.status !== EnrollmentStatuses.CANCELLED && (
-          <section className="mt-12 border-t border-line pt-10">
+          <section className="mt-12 border-t border-border pt-10">
             <h2 className="text-xl font-bold">
               {enrollment.status === EnrollmentStatuses.WAITLIST &&
                 'Pagamento da inscrição'}
@@ -157,7 +157,7 @@ function RouteComponent(): React.JSX.Element {
                   Pague por Pix e anexe o comprovante aqui embaixo.
                 </p>
 
-                <div className="rounded-card mt-6 flex flex-wrap items-center justify-between gap-4 border border-line bg-card p-5">
+                <div className="rounded-card mt-6 flex flex-wrap items-center justify-between gap-4 border border-border bg-card p-5">
                   <div>
                     <p className="text-sm text-muted-foreground">Chave Pix</p>
                     <p className="mt-1 font-mono text-sm">{PIX_KEY}</p>
@@ -170,7 +170,7 @@ function RouteComponent(): React.JSX.Element {
 
                 <div className="mt-8">
                   {hasReceipt && (
-                    <p className="mb-4 inline-flex items-center gap-2 text-sm text-neon-ink">
+                    <p className="mb-4 inline-flex items-center gap-2 text-sm text-foreground">
                       <CheckCircle weight="fill" className="size-4" />
                       Comprovante enviado. A secretaria vai conferir.
                     </p>

@@ -35,12 +35,32 @@ export const Route = createLazyFileRoute('/_private/admin/matriculas/$id/')({
  */
 const STATUS: Record<
   EnrollmentStatus,
-  { label: string; action: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }
+  {
+    label: string
+    action: string
+    variant: 'default' | 'secondary' | 'outline' | 'destructive'
+  }
 > = {
-  PENDING: { label: 'Aguardando', action: 'Voltar para aguardando', variant: 'secondary' },
-  CONFIRMED: { label: 'Confirmada', action: 'Confirmar matrícula', variant: 'default' },
-  WAITLIST: { label: 'Fila de espera', action: 'Mandar para a fila', variant: 'outline' },
-  CANCELLED: { label: 'Cancelada', action: 'Cancelar matrícula', variant: 'destructive' },
+  PENDING: {
+    label: 'Aguardando',
+    action: 'Voltar para aguardando',
+    variant: 'secondary',
+  },
+  CONFIRMED: {
+    label: 'Confirmada',
+    action: 'Confirmar matrícula',
+    variant: 'default',
+  },
+  WAITLIST: {
+    label: 'Fila de espera',
+    action: 'Mandar para a fila',
+    variant: 'outline',
+  },
+  CANCELLED: {
+    label: 'Cancelada',
+    action: 'Cancelar matrícula',
+    variant: 'destructive',
+  },
 }
 
 /** Cancelar não pode parecer a ação principal, mesmo sendo a única disponível. */
@@ -52,7 +72,9 @@ function triggerVariant(status: EnrollmentStatus): 'outline' | 'default' {
 
 function RouteComponent(): React.JSX.Element {
   const { id } = EnrollmentRoute.useParams()
-  const { data: enrollment } = useSuspenseQuery(enrollmentDetailQueryOptions(id))
+  const { data: enrollment } = useSuspenseQuery(
+    enrollmentDetailQueryOptions(id),
+  )
   const queryClient = useQueryClient()
 
   const [notes, setNotes] = React.useState(enrollment.notes ?? '')
@@ -60,7 +82,9 @@ function RouteComponent(): React.JSX.Element {
   const mutation = useEnrollmentUpdate(id, {
     onSuccess: async function () {
       toast.success('Matrícula atualizada')
-      await queryClient.invalidateQueries({ queryKey: queryKeys.enrollments.all })
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.enrollments.all,
+      })
       // A turma também muda: confirmar ou cancelar mexe na ocupação.
       await queryClient.invalidateQueries({ queryKey: queryKeys.classes.all })
     },
@@ -77,13 +101,19 @@ function RouteComponent(): React.JSX.Element {
   return (
     <div className="grid gap-8">
       <div>
-        <Button variant="ghost" size="sm" render={<Link to="/admin/matriculas" />}>
+        <Button
+          variant="ghost"
+          size="sm"
+          render={<Link to="/admin/matriculas" />}
+        >
           <ArrowLeft />
           Matrículas
         </Button>
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight">{enrollment.studentName}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {enrollment.studentName}
+          </h1>
           <Badge variant={STATUS[enrollment.status].variant}>
             {STATUS[enrollment.status].label}
           </Badge>
@@ -102,8 +132,8 @@ function RouteComponent(): React.JSX.Element {
               <Row label="Curso">{enrollment.class?.course?.name ?? '-'}</Row>
               <Row label="Turma">{enrollment.class?.name ?? '-'}</Row>
               <Row label="Nascimento">
-                {formatDate(enrollment.studentBirthDate)} ({enrollment.ageAtEnrollment} anos na
-                inscrição)
+                {formatDate(enrollment.studentBirthDate)} (
+                {enrollment.ageAtEnrollment} anos na inscrição)
               </Row>
               <Row label="CPF">{formatCpf(enrollment.studentDocument)}</Row>
               <Row label="E-mail">{enrollment.email}</Row>
@@ -115,17 +145,25 @@ function RouteComponent(): React.JSX.Element {
                 <h3 className="mt-8 font-medium">Responsável legal</h3>
                 <dl className="mt-4 grid gap-4 sm:grid-cols-2">
                   <Row label="Nome">{enrollment.guardianName ?? '-'}</Row>
-                  <Row label="CPF">{formatCpf(enrollment.guardianDocument)}</Row>
-                  <Row label="Telefone">{formatPhone(enrollment.guardianPhone)}</Row>
+                  <Row label="CPF">
+                    {formatCpf(enrollment.guardianDocument)}
+                  </Row>
+                  <Row label="Telefone">
+                    {formatPhone(enrollment.guardianPhone)}
+                  </Row>
                 </dl>
               </>
             )}
 
             <dl className="mt-8 grid gap-4 border-t pt-6 sm:grid-cols-2">
               <Row label="Protocolo">
-                <span className="font-mono text-xs break-all">{enrollment.protocol}</span>
+                <span className="font-mono text-xs break-all">
+                  {enrollment.protocol}
+                </span>
               </Row>
-              <Row label="Consentimento LGPD">{formatDate(enrollment.lgpdConsentAt)}</Row>
+              <Row label="Consentimento LGPD">
+                {formatDate(enrollment.lgpdConsentAt)}
+              </Row>
             </dl>
           </section>
 
@@ -141,7 +179,8 @@ function RouteComponent(): React.JSX.Element {
             {receipt?.storage && (
               <div className="mt-4 grid gap-4">
                 <p className="text-sm text-muted-foreground">
-                  Enviado em {formatDate(receipt.createdAt)}. {receipt.storage.originalName}
+                  Enviado em {formatDate(receipt.createdAt)}.{' '}
+                  {receipt.storage.originalName}
                 </p>
 
                 {/*
@@ -162,7 +201,11 @@ function RouteComponent(): React.JSX.Element {
                   size="sm"
                   className="w-fit"
                   render={
-                    <a href={receipt.storage.url} target="_blank" rel="noreferrer">
+                    <a
+                      href={receipt.storage.url}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
                       <FileArrowDown />
                       Abrir arquivo
                     </a>
@@ -216,7 +259,9 @@ function RouteComponent(): React.JSX.Element {
                   </ConfirmDialogHeader>
                   <ConfirmDialogFooter>
                     <ConfirmDialogCancel />
-                    <ConfirmDialogConfirm>{STATUS[status].action}</ConfirmDialogConfirm>
+                    <ConfirmDialogConfirm>
+                      {STATUS[status].action}
+                    </ConfirmDialogConfirm>
                   </ConfirmDialogFooter>
                 </ConfirmDialog>
               ))}
@@ -240,7 +285,9 @@ function RouteComponent(): React.JSX.Element {
             <Button
               size="sm"
               className="mt-3"
-              disabled={mutation.isPending || notes === (enrollment.notes ?? '')}
+              disabled={
+                mutation.isPending || notes === (enrollment.notes ?? '')
+              }
               onClick={() => mutation.mutate({ notes: notes || null })}
             >
               Salvar anotação

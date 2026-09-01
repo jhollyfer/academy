@@ -1,13 +1,13 @@
 import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
-import { Button } from '#/components/ui/button'
+import { PillButton } from '#/components/common/pill-button'
 import { Highlight } from '#/components/common/highlight'
 import { Sparkles, Petal } from '#/components/common/marks'
 import { EnrollmentCta } from '#/components/common/enrollment-cta'
 import { storefrontCoursesQueryOptions } from '#/integrations/tanstack-query/queries'
 import { enrollmentStateFrom, scheduleSummary } from '#/lib/enrollment-state'
-import { formatDate } from '#/lib/format'
+import { formatDate, pluralize } from '#/lib/format'
 import { REVEAL } from './reveal'
 import { cn } from '#/lib/utils'
 
@@ -36,7 +36,8 @@ export function Hero(): React.JSX.Element {
   // Os turnos saem das turmas, não da frase: enquanto era uma turma de manhã, a
   // frase estava certa por coincidência, e passou a mentir no dia em que a
   // escola abriu turma à tarde e à noite.
-  const shifts = summary.shiftsLabel ? ` de ${summary.shiftsLabel}` : ''
+  let shifts = ''
+  if (summary.shiftsLabel) shifts = ` de ${summary.shiftsLabel}`
 
   // Sem turma anunciada a frase perde a data em vez de inventar uma. O que
   // sobra continua verdadeiro.
@@ -47,53 +48,56 @@ export function Hero(): React.JSX.Element {
 
   // "São cinco turmas de 40 vagas" quando todas têm a mesma capacidade; o total
   // quando não têm. Nenhum dos dois é escrito à mão.
+  let times = ''
+  if (summary.timesLabel) times = `, das ${summary.timesLabel}`
+
   let seats = ''
   if (summary.classCount > 0 && summary.seatsPerClass !== null) {
-    seats = `São ${summary.classCount} ${summary.classCount === 1 ? 'turma' : 'turmas'} de ${summary.seatsPerClass} vagas${summary.timesLabel ? `, das ${summary.timesLabel}` : ''}.`
+    seats = `São ${pluralize(summary.classCount, 'turma', 'turmas')} de ${summary.seatsPerClass} vagas${times}.`
   } else if (summary.classCount > 0) {
     seats = `São ${summary.totalSeats} vagas em ${summary.classCount} turmas.`
   }
 
   return (
     <section data-slot="home-hero" className="px-3 pt-3 sm:px-4 sm:pt-4">
-      <div className="relative overflow-hidden rounded-block bg-green px-6 pt-14 pb-0 sm:px-10 lg:px-14 lg:pt-20">
-        <Petal className="-top-24 -right-20 size-96 text-ink/5" />
+      <div className="relative overflow-hidden rounded-block bg-primary px-6 pt-14 pb-0 sm:px-10 lg:px-14 lg:pt-20">
+        <Petal className="-top-24 -right-20 size-96 text-primary-foreground/5" />
 
         <div className="relative mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.15fr_1fr] lg:items-end lg:gap-16">
           <h1
             className={cn(
               REVEAL,
-              'text-4xl leading-[1.12] font-semibold tracking-tight text-balance text-ink sm:text-5xl lg:text-6xl',
+              'text-4xl leading-[1.12] font-semibold tracking-tight text-balance text-primary-foreground sm:text-5xl lg:text-6xl',
             )}
           >
             Você não precisa sair daqui
             <br className="hidden sm:block" /> para aprender{' '}
             <Highlight variant="ink">tecnologia</Highlight>
-            <Sparkles className="ml-3 inline-block size-6 align-super text-ink/50" />
+            <Sparkles className="ml-3 inline-block size-6 align-super text-primary-foreground/50" />
           </h1>
 
           <div className={cn(REVEAL, 'delay-100')}>
-            <p className="max-w-[46ch] text-base leading-relaxed text-ink/75 sm:text-lg">
+            <p className="max-w-[46ch] text-base leading-relaxed text-primary-foreground sm:text-lg">
               {schedule}
             </p>
 
             {seats && (
-              <p className="mt-2 text-base leading-relaxed text-ink/75 sm:text-lg">
+              <p className="mt-2 text-base leading-relaxed text-primary-foreground sm:text-lg">
                 {seats}
               </p>
             )}
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <EnrollmentCta variant="pill" size="pill-lg" />
+              <EnrollmentCta tone="ink" scale="lg" />
 
               {/*
                 Âncora e não `Link`: os cursos são a seção logo abaixo, e não uma
                 rota. Trocar de tela para ver dois cards seria pior que rolar
                 até eles.
               */}
-              <Button
-                variant="pill-outline"
-                size="pill-lg"
+              <PillButton
+                tone="outline"
+                scale="lg"
                 render={<a href="#cursos">Ver os cursos</a>}
               />
             </div>

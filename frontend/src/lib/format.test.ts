@@ -19,8 +19,6 @@ describe('formatCpf', () => {
   })
 })
 
-
-
 describe('formatPhone', () => {
   it('distingue fixo de celular pelo tamanho do meio', () => {
     expect(formatPhone('9233334444')).toBe('(92) 3333-4444')

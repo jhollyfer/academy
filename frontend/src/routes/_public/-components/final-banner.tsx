@@ -6,7 +6,7 @@ import { Leaf } from '#/components/common/marks'
 import { EnrollmentCta } from '#/components/common/enrollment-cta'
 import { storefrontCoursesQueryOptions } from '#/integrations/tanstack-query/queries'
 import { enrollmentStateFrom, scheduleSummary } from '#/lib/enrollment-state'
-import { formatMonthYear } from '#/lib/format'
+import { formatMonthYear, pluralize } from '#/lib/format'
 import { REVEAL } from './reveal'
 import { cn } from '#/lib/utils'
 
@@ -41,10 +41,10 @@ export function FinalBanner(): React.JSX.Element {
     // As vagas vêm das turmas: "40 vagas por curso" estava escrito aqui e
     // deixou de valer quando o curso passou a ter mais de uma turma.
     const summary = scheduleSummary(data?.data)
-    const seats =
-      summary.seatsPerClass !== null
-        ? `São ${summary.classCount} ${summary.classCount === 1 ? 'turma' : 'turmas'} de ${summary.seatsPerClass} vagas`
-        : `São ${summary.totalSeats} vagas`
+    let seats = `São ${summary.totalSeats} vagas`
+    if (summary.seatsPerClass !== null) {
+      seats = `São ${pluralize(summary.classCount, 'turma', 'turmas')} de ${summary.seatsPerClass} vagas`
+    }
 
     support = `${seats}, e a inscrição é por Pix.`
   }
@@ -54,8 +54,8 @@ export function FinalBanner(): React.JSX.Element {
       data-slot="home-final-banner"
       className="px-3 py-3 sm:px-4 sm:py-4"
     >
-      <div className="relative overflow-hidden rounded-block bg-green px-6 py-14 sm:px-10 lg:px-14 lg:py-16">
-        <Leaf className="-top-20 -right-16 size-80 -rotate-12 text-ink/5" />
+      <div className="relative overflow-hidden rounded-block bg-primary px-6 py-14 sm:px-10 lg:px-14 lg:py-16">
+        <Leaf className="-top-20 -right-16 size-80 -rotate-12 text-primary-foreground/5" />
 
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[minmax(0,18rem)_1fr] lg:gap-16">
           <img
@@ -68,15 +68,15 @@ export function FinalBanner(): React.JSX.Element {
           />
 
           <div className={cn(REVEAL, 'delay-100')}>
-            <h2 className="max-w-[18ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-ink sm:text-4xl lg:text-5xl">
+            <h2 className="max-w-[18ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-primary-foreground sm:text-4xl lg:text-5xl">
               {heading}
             </h2>
 
-            <p className="mt-5 max-w-[52ch] text-base leading-relaxed text-ink/75 sm:text-lg">
+            <p className="mt-5 max-w-[52ch] text-base leading-relaxed text-primary-foreground sm:text-lg">
               {support}
             </p>
 
-            <EnrollmentCta variant="pill" size="pill-lg" className="mt-8" />
+            <EnrollmentCta tone="ink" scale="lg" className="mt-8" />
           </div>
         </div>
       </div>

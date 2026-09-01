@@ -179,7 +179,8 @@ export const EnrollmentStatuses = {
   CANCELLED: 'CANCELLED',
 } as const
 
-export type EnrollmentStatus = (typeof EnrollmentStatuses)[keyof typeof EnrollmentStatuses]
+export type EnrollmentStatus =
+  (typeof EnrollmentStatuses)[keyof typeof EnrollmentStatuses]
 
 export const ENROLLMENT_STATUSES = Object.values(EnrollmentStatuses)
 
@@ -190,10 +191,8 @@ export const ENROLLMENT_STATUSES = Object.values(EnrollmentStatuses)
  * Uma constante e não um literal repetido em cada consulta: a pergunta "o que
  * conta como vaga ocupada?" tem uma resposta só, e ela mora aqui.
  */
-export const SEAT_TAKING_ENROLLMENT_STATUSES: ReadonlyArray<EnrollmentStatus> = [
-  EnrollmentStatuses.PENDING,
-  EnrollmentStatuses.CONFIRMED,
-]
+export const SEAT_TAKING_ENROLLMENT_STATUSES: ReadonlyArray<EnrollmentStatus> =
+  [EnrollmentStatuses.PENDING, EnrollmentStatuses.CONFIRMED]
 
 /**
  * As transições que a aplicação aceita, por estado de origem.
@@ -206,7 +205,10 @@ export const SEAT_TAKING_ENROLLMENT_STATUSES: ReadonlyArray<EnrollmentStatus> = 
  * `PENDING` e não direto para `CONFIRMED` porque o comprovante do Pix continua
  * pendente.
  */
-export const ENROLLMENT_TRANSITIONS: Record<EnrollmentStatus, ReadonlyArray<EnrollmentStatus>> = {
+export const ENROLLMENT_TRANSITIONS: Record<
+  EnrollmentStatus,
+  ReadonlyArray<EnrollmentStatus>
+> = {
   PENDING: [EnrollmentStatuses.CONFIRMED, EnrollmentStatuses.CANCELLED],
   WAITLIST: [EnrollmentStatuses.PENDING, EnrollmentStatuses.CANCELLED],
   CONFIRMED: [EnrollmentStatuses.CANCELLED],
@@ -232,7 +234,8 @@ export const EnrollmentFileKinds = {
   DOCUMENT: 'DOCUMENT',
 } as const
 
-export type EnrollmentFileKind = (typeof EnrollmentFileKinds)[keyof typeof EnrollmentFileKinds]
+export type EnrollmentFileKind =
+  (typeof EnrollmentFileKinds)[keyof typeof EnrollmentFileKinds]
 
 export const ENROLLMENT_FILE_KINDS = Object.values(EnrollmentFileKinds)
 
@@ -350,5 +353,5 @@ export function isStorageMimetype(value: string): value is StorageMimetype {
  * divergirem.
  */
 export const IMAGE_MIMETYPES = STORAGE_MIMETYPES.filter((mimetype) =>
-  mimetype.startsWith('image/')
+  mimetype.startsWith('image/'),
 )

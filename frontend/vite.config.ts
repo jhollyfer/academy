@@ -51,7 +51,10 @@ const config = defineConfig({
       pages: [
         { path: '/sobre', prerender: { enabled: true, crawlLinks: false } },
         { path: '/termos', prerender: { enabled: true, crawlLinks: false } },
-        { path: '/privacidade', prerender: { enabled: true, crawlLinks: false } },
+        {
+          path: '/privacidade',
+          prerender: { enabled: true, crawlLinks: false },
+        },
       ],
     }),
     viteReact(),

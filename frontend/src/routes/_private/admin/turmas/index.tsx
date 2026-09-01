@@ -5,5 +5,6 @@ import { validateListSearch } from '#/lib/list-search'
 export const Route = createFileRoute('/_private/admin/turmas/')({
   validateSearch: validateListSearch,
   loaderDeps: ({ search }) => search,
-  loader: ({ context, deps }) => context.queryClient.ensureQueryData(classesListQueryOptions(deps)),
+  loader: ({ context, deps }) =>
+    context.queryClient.ensureQueryData(classesListQueryOptions(deps)),
 })

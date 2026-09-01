@@ -59,14 +59,14 @@ export function StatsBar(): React.JSX.Element {
           // `flex` no desktop e não uma grade de colunas fixas: a barra tem
           // três ou quatro números conforme haja turma anunciada, e um
           // `grid-cols` escrito para quatro deixaria uma coluna vazia.
-          'mx-auto grid max-w-7xl grid-cols-2 items-center gap-y-8 rounded-block border border-line bg-paper px-6 py-10 sm:px-10 lg:flex lg:justify-between',
+          'mx-auto grid max-w-7xl grid-cols-2 items-center gap-y-8 rounded-block border border-border bg-card px-6 py-10 sm:px-10 lg:flex lg:justify-between',
         )}
       >
         {facts.map((fact, index) => (
           <React.Fragment key={fact.label}>
             <div className="flex flex-col-reverse items-center gap-1 text-center lg:flex-1">
-              <dt className="text-sm text-ink-soft">{fact.label}</dt>
-              <dd className="text-4xl leading-none font-semibold tracking-tight text-ink sm:text-5xl">
+              <dt className="text-sm text-muted-foreground">{fact.label}</dt>
+              <dd className="text-4xl leading-none font-semibold tracking-tight text-foreground sm:text-5xl">
                 {fact.value}
               </dd>
             </div>
@@ -79,7 +79,7 @@ export function StatsBar(): React.JSX.Element {
             {index < facts.length - 1 && (
               <Separator
                 orientation="vertical"
-                className="hidden h-12 bg-line-strong lg:block"
+                className="hidden h-12 bg-input lg:block"
               />
             )}
           </React.Fragment>

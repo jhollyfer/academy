@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { validateListSearch} from './list-search'
+import { validateListSearch } from './list-search'
 import { TrashedModes } from './validator'
 
 /**

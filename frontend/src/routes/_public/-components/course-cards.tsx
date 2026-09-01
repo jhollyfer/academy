@@ -3,8 +3,9 @@ import { Link } from '@tanstack/react-router'
 import { ArrowRight, CalendarBlank, Clock, Users } from '@phosphor-icons/react'
 
 import { Badge } from '#/components/ui/badge'
-import { Button } from '#/components/ui/button'
-import { Card, CardContent, CardTitle } from '#/components/ui/card'
+import { PillButton } from '#/components/common/pill-button'
+import { CardContent, CardTitle } from '#/components/ui/card'
+import { SectionCard } from '#/components/common/section-card'
 import { Highlight } from '#/components/common/highlight'
 import { formatDate, formatMoney } from '#/lib/format'
 import {
@@ -30,7 +31,6 @@ const ILLUSTRATIONS: Record<string, string> = {
 
 const FALLBACK_ILLUSTRATION = '/ilustracoes/bancada-arduino.svg'
 
-
 /**
  * Os dois cursos, na única seção escura da página.
  *
@@ -50,22 +50,22 @@ export function CourseCards({
     <section
       data-slot="home-courses"
       id="cursos"
-      className="mt-3 scroll-mt-20 bg-ink px-4 py-20 sm:mt-4 lg:py-28"
+      className="mt-3 scroll-mt-20 bg-foreground px-4 py-20 sm:mt-4 lg:py-28"
     >
       <div className="mx-auto max-w-7xl">
         <h2
           className={cn(
             REVEAL,
-            'max-w-[16ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-cream sm:text-4xl lg:text-5xl',
+            'max-w-[16ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-background sm:text-4xl lg:text-5xl',
           )}
         >
-          Dois cursos, uma <Highlight variant="fill">turma</Highlight> só
+          Dois cursos, uma <Highlight variant="ink">turma</Highlight> só
         </h2>
 
         <p
           className={cn(
             REVEAL,
-            'delay-100 mt-6 max-w-[64ch] text-base leading-relaxed text-cream/70 sm:text-lg',
+            'delay-100 mt-6 max-w-[64ch] text-base leading-relaxed text-background/70 sm:text-lg',
           )}
         >
           Cada curso é o módulo 1 de uma trilha, e é completo por si. No fim
@@ -74,9 +74,8 @@ export function CourseCards({
 
         <div className="mt-12 grid gap-4 lg:grid-cols-2">
           {courses.map((course, index) => (
-            <Card
+            <SectionCard
               key={course.id}
-              size="lg"
               className={cn(REVEAL, 'h-full')}
               style={{ animationDelay: `${index * STAGGER}ms` }}
             >
@@ -86,40 +85,31 @@ export function CourseCards({
                 width={400}
                 height={300}
                 loading="lazy"
-                className="h-48 w-full bg-cream object-contain p-6 sm:h-56"
+                className="h-48 w-full bg-background object-contain p-6 sm:h-56"
               />
 
               <CardContent className="flex flex-1 flex-col gap-4">
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="green" size="lg">
-                    Módulo 1
-                  </Badge>
+                  <Badge className="h-6 px-3 text-xs">Módulo 1</Badge>
 
                   {courseClasses(course).length > 0 && (
-                    <Badge
-                      variant="outline"
-                      size="lg"
-                      className="border-line-strong text-ink-soft"
-                    >
-                      <Users />
-                      {courseSeatsRemaining(course)} de {courseCapacity(course)} vagas
-                    </Badge>
+                    <SeatsBadge course={course} />
                   )}
                 </div>
 
-                <CardTitle className="text-2xl font-semibold tracking-tight text-ink">
+                <CardTitle className="text-2xl font-semibold tracking-tight text-foreground">
                   {course.name}
                 </CardTitle>
 
                 {course.tagline && (
-                  <p className="text-sm leading-relaxed text-ink-soft">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
                     {course.tagline}
                   </p>
                 )}
 
-                <dl className="mt-1 grid gap-2 text-sm text-ink-soft">
+                <dl className="mt-1 grid gap-2 text-sm text-muted-foreground">
                   <div className="flex items-center gap-2">
-                    <Clock className="size-4 text-neon-ink" />
+                    <Clock className="size-4 text-muted-foreground" />
                     <dt className="sr-only">Carga horária</dt>
                     <dd>
                       {course.workloadHours}h em {course.durationMonths} meses,
@@ -129,7 +119,7 @@ export function CourseCards({
 
                   {course.nextClass && (
                     <div className="flex items-center gap-2">
-                      <CalendarBlank className="size-4 text-neon-ink" />
+                      <CalendarBlank className="size-4 text-muted-foreground" />
                       <dt className="sr-only">Início</dt>
                       <dd>Começa em {formatDate(course.nextClass.startsAt)}</dd>
                     </div>
@@ -143,7 +133,7 @@ export function CourseCards({
                   */}
                   {courseClasses(course).map((entity) => (
                     <div key={entity.id} className="flex items-center gap-2">
-                      <Clock className="size-4 text-neon-ink" />
+                      <Clock className="size-4 text-muted-foreground" />
                       <dt className="sr-only">Turma</dt>
                       <dd>
                         {formatTimeRange(
@@ -161,20 +151,20 @@ export function CourseCards({
                     terminarem na mesma linha mesmo com taglines de tamanhos
                     diferentes. */}
                 <div className="mt-auto pt-4">
-                  <p className="text-2xl font-semibold tracking-tight text-ink">
+                  <p className="text-2xl font-semibold tracking-tight text-foreground">
                     {formatMoney(course.monthlyFeeInCents)}
-                    <span className="ml-1 text-sm font-normal text-ink-soft">
+                    <span className="ml-1 text-sm font-normal text-muted-foreground">
                       por mês
                     </span>
                   </p>
-                  <p className="mt-1 text-sm text-ink-soft">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     Mais {formatMoney(course.enrollmentFeeInCents)} de
                     inscrição, uma vez só.
                   </p>
 
-                  <Button
-                    variant="pill-green"
-                    size="pill"
+                  <PillButton
+                    tone="slab"
+                    scale="md"
                     className="mt-5 w-full"
                     render={
                       <Link to="/cursos/$slug" params={{ slug: course.slug }}>
@@ -185,10 +175,36 @@ export function CourseCards({
                   />
                 </div>
               </CardContent>
-            </Card>
+            </SectionCard>
           ))}
         </div>
       </div>
     </section>
+  )
+}
+
+/**
+ * Quantas vagas sobraram, e a cor que diz se ainda dá tempo.
+ *
+ * Dois estados e não três. O desenho pedia um âmbar no meio - "acabando" -, e
+ * âmbar não existe na camada semântica do shadcn: entrariam um `--warning` e um
+ * `--warning-foreground` só para este badge, e este projeto não tem token fora
+ * dos nomes que o shadcn define. Com turma de quarenta lugares, "3 de 40" já se
+ * lê no próprio número.
+ *
+ * `destructive` quando zera, e a frase não muda: quem lê "0 de 40" não precisa
+ * de outra palavra para entender, e trocar a copy seria mudar conteúdo.
+ */
+function SeatsBadge({ course }: { course: CourseResponse }): React.JSX.Element {
+  const remaining = courseSeatsRemaining(course)
+
+  let variant: React.ComponentProps<typeof Badge>['variant'] = 'outline'
+  if (remaining === 0) variant = 'destructive'
+
+  return (
+    <Badge variant={variant} className="h-6 px-3 text-xs">
+      <Users />
+      {remaining} de {courseCapacity(course)} vagas
+    </Badge>
   )
 }

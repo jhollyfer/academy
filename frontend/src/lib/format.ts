@@ -87,9 +87,24 @@ export function formatMonthYear(iso: string | null | undefined): string {
 
   if (!year || !month) return iso
 
-  const label = new Intl.DateTimeFormat('pt-BR', { month: 'long', timeZone: 'UTC' }).format(
-    new Date(Date.UTC(Number(year), Number(month) - 1, 1))
-  )
+  const label = new Intl.DateTimeFormat('pt-BR', {
+    month: 'long',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(Number(year), Number(month) - 1, 1)))
 
   return `${label} de ${year}`
+}
+
+/**
+ * "1 turma", "5 turmas".
+ *
+ * O `count === 1 ? 'turma' : 'turmas'` estava escrito à mão no hero, no banner
+ * final e no "o que você leva", e a regra 1 do `code-pattern` proíbe o ternário
+ * como control flow. Um lugar só, e a contagem passa a vir junto: as três
+ * frases sempre imprimiam o número antes da palavra.
+ */
+export function pluralize(count: number, one: string, many: string): string {
+  if (count === 1) return `${count} ${one}`
+
+  return `${count} ${many}`
 }

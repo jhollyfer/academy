@@ -109,16 +109,16 @@ function RouteComponent(): React.JSX.Element {
             <RowActionsArchive onConfirm={() => archive.mutate(course.id)}>
               <ConfirmDialogTitle>Arquivar {course.name}?</ConfirmDialogTitle>
               <ConfirmDialogDescription>
-                O curso sai do site e da listagem. As turmas e as matrículas continuam onde
-                estão, e dá para restaurar depois.
+                O curso sai do site e da listagem. As turmas e as matrículas
+                continuam onde estão, e dá para restaurar depois.
               </ConfirmDialogDescription>
             </RowActionsArchive>
 
             <RowActionsDelete onConfirm={() => remove.mutate(course.id)}>
               <ConfirmDialogTitle>Apagar {course.name}?</ConfirmDialogTitle>
               <ConfirmDialogDescription>
-                Isto não tem volta: a grade e o FAQ vão junto. Só funciona em curso já arquivado
-                e sem turma.
+                Isto não tem volta: a grade e o FAQ vão junto. Só funciona em
+                curso já arquivado e sem turma.
               </ConfirmDialogDescription>
             </RowActionsDelete>
           </RowActions>

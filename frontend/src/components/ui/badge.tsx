@@ -1,7 +1,6 @@
 import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
-import { cva } from 'class-variance-authority'
-import type { VariantProps } from 'class-variance-authority'
+import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '#/lib/utils.ts'
 
@@ -20,23 +19,10 @@ const badgeVariants = cva(
         ghost:
           'hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50',
         link: 'text-primary underline-offset-4 hover:underline',
-
-        // As duas da landing. O par de cor anda junto por isso ser variante e
-        // não duas classes soltas em cada uso: `bg-green` sem `text-ink` é o
-        // tipo de descuido que só aparece no contraste.
-        green: 'bg-green text-ink',
-        ink: 'bg-ink text-cream',
-      },
-      size: {
-        default: '',
-        // A pastilha de "Módulo 1" e de "40 vagas". A do painel tem `h-5` e
-        // corpo de 10px, que numa seção de vitrine some.
-        lg: 'h-7 gap-1.5 px-3 text-xs [&>svg]:size-3.5!',
       },
     },
     defaultVariants: {
       variant: 'default',
-      size: 'default',
     },
   },
 )
@@ -44,7 +30,6 @@ const badgeVariants = cva(
 function Badge({
   className,
   variant = 'default',
-  size = 'default',
   render,
   ...props
 }: useRender.ComponentProps<'span'> & VariantProps<typeof badgeVariants>) {
@@ -52,7 +37,7 @@ function Badge({
     defaultTagName: 'span',
     props: mergeProps<'span'>(
       {
-        className: cn(badgeVariants({ variant, size }), className),
+        className: cn(badgeVariants({ variant }), className),
       },
       props,
     ),
@@ -60,7 +45,6 @@ function Badge({
     state: {
       slot: 'badge',
       variant,
-      size,
     },
   })
 }

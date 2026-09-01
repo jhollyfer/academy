@@ -7,5 +7,6 @@ export const Route = createFileRoute('/_private/admin/cursos/')({
   // `loaderDeps` porque a listagem depende do filtro: sem isto o loader roda
   // uma vez e nunca mais, e trocar de página não buscaria nada.
   loaderDeps: ({ search }) => search,
-  loader: ({ context, deps }) => context.queryClient.ensureQueryData(coursesListQueryOptions(deps)),
+  loader: ({ context, deps }) =>
+    context.queryClient.ensureQueryData(coursesListQueryOptions(deps)),
 })

@@ -9,16 +9,13 @@ import {
 } from '@phosphor-icons/react'
 import type { Icon } from '@phosphor-icons/react'
 
-import {
-  Card,
-  CardContent,
-  CardTitle,
-  CardDescription,
-} from '#/components/ui/card'
+import { CardContent, CardTitle, CardDescription } from '#/components/ui/card'
+import { SectionCard } from '#/components/common/section-card'
 import { Highlight } from '#/components/common/highlight'
 import { EnrollmentCta } from '#/components/common/enrollment-cta'
 import { storefrontCoursesQueryOptions } from '#/integrations/tanstack-query/queries'
 import { scheduleSummary } from '#/lib/enrollment-state'
+import { pluralize } from '#/lib/format'
 import { REVEAL, STAGGER } from './reveal'
 import { cn } from '#/lib/utils'
 
@@ -79,18 +76,19 @@ export function WhatYouGet(): React.JSX.Element {
    * Sem turma anunciada ele fala do tamanho da turma sem prometer número: a
    * frase continua verdadeira, e é a mesma escolha que o hero faz com a data.
    */
-  let seats =
-    'Turma pequena, sem sala lotada e sem fila para usar a bancada.'
+  let seats = 'Turma pequena, sem sala lotada e sem fila para usar a bancada.'
 
   if (summary.seatsPerClass !== null) {
-    seats = `${summary.classCount} ${summary.classCount === 1 ? 'turma' : 'turmas'} de ${summary.seatsPerClass} lugares. Sem sala lotada e sem fila para usar a bancada.`
+    seats = `${pluralize(summary.classCount, 'turma', 'turmas')} de ${summary.seatsPerClass} lugares. Sem sala lotada e sem fila para usar a bancada.`
   } else if (summary.classCount > 0) {
     seats = `${summary.totalSeats} lugares em ${summary.classCount} turmas. Sem sala lotada e sem fila para usar a bancada.`
   }
 
-  const items = ITEMS.map((item) =>
-    item.icon === UsersThree ? { ...item, description: seats } : item,
-  )
+  const items = ITEMS.map(function (item) {
+    if (item.icon === UsersThree) return { ...item, description: seats }
+
+    return item
+  })
 
   return (
     <section
@@ -107,22 +105,22 @@ export function WhatYouGet(): React.JSX.Element {
         <div
           className={cn(
             REVEAL,
-            'flex flex-col justify-between gap-10 rounded-block bg-ink p-8 sm:p-10',
+            'flex flex-col justify-between gap-10 rounded-block bg-foreground p-8 sm:p-10',
           )}
         >
-          <h2 className="text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-cream sm:text-4xl">
-            O que você <Highlight variant="fill">leva</Highlight> daqui
+          <h2 className="text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-background sm:text-4xl">
+            O que você <Highlight variant="ink">leva</Highlight> daqui
           </h2>
 
           <div>
-            <p className="mb-7 text-base leading-relaxed text-cream/70">
+            <p className="mb-7 text-base leading-relaxed text-background/70">
               Tudo o que a aula precisa já está no laboratório. Você leva o
               caderno e a vontade.
             </p>
 
             <EnrollmentCta
-              variant="pill-green"
-              size="pill-lg"
+              tone="slab"
+              scale="lg"
               className="w-full sm:w-auto"
             />
           </div>
@@ -130,9 +128,8 @@ export function WhatYouGet(): React.JSX.Element {
 
         <div className="grid gap-4 sm:grid-cols-2">
           {items.map((item, index) => (
-            <Card
+            <SectionCard
               key={item.title}
-              size="lg"
               className={cn(REVEAL, 'h-full')}
               style={{ animationDelay: `${index * STAGGER}ms` }}
             >
@@ -145,22 +142,22 @@ export function WhatYouGet(): React.JSX.Element {
                 <span className="relative inline-flex size-11 items-center justify-center">
                   <span
                     aria-hidden
-                    className="absolute -top-1 -left-1 size-9 rounded-full bg-green"
+                    className="absolute -top-1 -left-1 size-9 rounded-full bg-primary"
                   />
                   <item.icon
                     weight="duotone"
-                    className="relative size-7 text-ink"
+                    className="relative size-7 text-primary-foreground"
                   />
                 </span>
 
-                <CardTitle className="text-lg font-semibold text-ink">
+                <CardTitle className="text-lg font-semibold text-foreground">
                   {item.title}
                 </CardTitle>
-                <CardDescription className="text-sm leading-relaxed text-ink-soft">
+                <CardDescription className="text-sm leading-relaxed text-muted-foreground">
                   {item.description}
                 </CardDescription>
               </CardContent>
-            </Card>
+            </SectionCard>
           ))}
         </div>
       </div>

@@ -19,7 +19,10 @@ export const Route = createLazyFileRoute('/_private/admin/matriculas/')({
 
 const STATUS: Record<
   string,
-  { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }
+  {
+    label: string
+    variant: 'default' | 'secondary' | 'outline' | 'destructive'
+  }
 > = {
   PENDING: { label: 'Aguardando', variant: 'secondary' },
   CONFIRMED: { label: 'Confirmada', variant: 'default' },
@@ -41,7 +44,11 @@ const COLUMNS: ReadonlyArray<Column<EnrollmentResponse>> = [
     hideOnMobile: true,
     cell: (row) => formatPhone(row.phone),
   },
-  { key: 'sent', header: 'Enviada em', cell: (row) => formatDate(row.createdAt) },
+  {
+    key: 'sent',
+    header: 'Enviada em',
+    cell: (row) => formatDate(row.createdAt),
+  },
   {
     key: 'status',
     header: 'Situação',
@@ -76,7 +83,11 @@ function RouteComponent(): React.JSX.Element {
         <Button
           variant={variantFor(!search.status)}
           size="sm"
-          onClick={() => navigate({ search: { ...search, status: undefined, page: undefined } })}
+          onClick={() =>
+            navigate({
+              search: { ...search, status: undefined, page: undefined },
+            })
+          }
         >
           Todas
         </Button>
@@ -85,7 +96,9 @@ function RouteComponent(): React.JSX.Element {
             key={status}
             variant={variantFor(search.status === status)}
             size="sm"
-            onClick={() => navigate({ search: { ...search, status, page: undefined } })}
+            onClick={() =>
+              navigate({ search: { ...search, status, page: undefined } })
+            }
           >
             {STATUS[status].label}
           </Button>
@@ -120,8 +133,13 @@ function RouteComponent(): React.JSX.Element {
         isPending={isPending}
         emptyTitle="Nenhuma matrícula por aqui"
         emptyDescription="Quando alguém se inscrever pelo site, aparece nesta lista."
-        rowTo={(row) => ({ to: '/admin/matriculas/$id', params: { id: row.id } })}
-        onSearchChange={(term) => navigate({ search: { ...search, search: term, page: undefined } })}
+        rowTo={(row) => ({
+          to: '/admin/matriculas/$id',
+          params: { id: row.id },
+        })}
+        onSearchChange={(term) =>
+          navigate({ search: { ...search, search: term, page: undefined } })
+        }
         onPageChange={(page) => navigate({ search: { ...search, page } })}
       />
     </div>

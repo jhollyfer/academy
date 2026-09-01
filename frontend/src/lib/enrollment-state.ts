@@ -224,9 +224,14 @@ export function scheduleSummary(
 
   const capacities = new Set(classes.map((entity) => entity.capacity))
 
+  // Só existe "vagas por turma" quando as turmas têm a mesma capacidade. Com
+  // capacidades diferentes a frase seria falsa, e quem chama cai no total.
+  let seatsPerClass: number | null = null
+  if (capacities.size === 1) seatsPerClass = [...capacities][0]
+
   return {
     classCount: classes.length,
-    seatsPerClass: capacities.size === 1 ? [...capacities][0] : null,
+    seatsPerClass,
     totalSeats: classes.reduce((total, entity) => total + entity.capacity, 0),
     shiftsLabel: joinWords(shiftLabels(classes)),
     timesLabel: timesLabel(classes),
@@ -251,13 +256,17 @@ function timesLabel(classes: ReadonlyArray<ClassResponse>): string {
   if (withTime.length === 0) return ''
 
   const sorted = [...withTime].sort(function (first, second) {
-    return (first.startsAtTime ?? '') < (second.startsAtTime ?? '') ? -1 : 1
+    // `localeCompare` e não um ternário de -1/1: a hora vem como 'HH:mm', que
+    // ordena igual como texto, e o comparador passa a devolver 0 para o empate
+    // em vez de mentir que o primeiro vem depois.
+    return (first.startsAtTime ?? '').localeCompare(second.startsAtTime ?? '')
   })
 
   const first = sorted[0]
   const last = sorted[sorted.length - 1]
 
-  if (first === last) return formatTimeRange(first.startsAtTime, first.endsAtTime)
+  if (first === last)
+    return formatTimeRange(first.startsAtTime, first.endsAtTime)
 
   return `${formatTime(first.startsAtTime)} às ${formatTime(last.endsAtTime ?? last.startsAtTime)}`
 }

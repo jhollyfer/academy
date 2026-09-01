@@ -2,30 +2,17 @@ import * as React from 'react'
 
 import { cn } from '#/lib/utils.ts'
 
-/**
- * `lg` é o tamanho da vitrine.
- *
- * O `default` e o `sm` são densidade de painel: 8px de canto e respiro de 4, que
- * é o certo para um card dentro de uma tabela. Na landing o card tem 24px de
- * canto e o dobro de respiro, e o contorno é a borda fina de 1px em vez do anel
- * - a sombra da página é quase nula, então quem separa um bloco do outro é a
- * linha.
- *
- * O raio da imagem acompanha: `rounded-t-lg` num card de 24px deixa a foto com
- * o canto quadrado dentro de uma moldura arredondada.
- */
 function Card({
   className,
   size = 'default',
   ...props
-}: React.ComponentProps<'div'> & { size?: 'default' | 'sm' | 'lg' }) {
+}: React.ComponentProps<'div'> & { size?: 'default' | 'sm' }) {
   return (
     <div
       data-slot="card"
       data-size={size}
       className={cn(
         'group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-lg bg-card py-(--card-spacing) text-xs/relaxed text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] *:[img:first-child]:rounded-t-lg *:[img:last-child]:rounded-b-lg',
-        'data-[size=lg]:rounded-card data-[size=lg]:border data-[size=lg]:border-line data-[size=lg]:text-sm/relaxed data-[size=lg]:ring-0 data-[size=lg]:[--card-spacing:--spacing(6)] data-[size=lg]:*:[img:first-child]:rounded-t-card data-[size=lg]:*:[img:last-child]:rounded-b-card',
         className,
       )}
       {...props}

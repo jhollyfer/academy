@@ -1,11 +1,7 @@
 import type * as React from 'react'
 
-import {
-  Card,
-  CardContent,
-  CardTitle,
-  CardDescription,
-} from '#/components/ui/card'
+import { CardContent, CardTitle, CardDescription } from '#/components/ui/card'
+import { SectionCard } from '#/components/common/section-card'
 import { Highlight } from '#/components/common/highlight'
 import { REVEAL, STAGGER } from './reveal'
 import { cn } from '#/lib/utils'
@@ -42,12 +38,12 @@ const PROFILES = [
 export function WhoItsFor(): React.JSX.Element {
   return (
     <section data-slot="home-who-its-for" className="px-3 py-3 sm:px-4 sm:py-4">
-      <div className="rounded-block border border-line bg-cream px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
+      <div className="rounded-block border border-border bg-background px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
         <div className="mx-auto max-w-7xl">
           <h2
             className={cn(
               REVEAL,
-              'max-w-[18ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-ink sm:text-4xl lg:text-5xl',
+              'max-w-[18ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-foreground sm:text-4xl lg:text-5xl',
             )}
           >
             Para quem é esta <Highlight variant="fill">turma</Highlight>
@@ -55,32 +51,31 @@ export function WhoItsFor(): React.JSX.Element {
 
           <div className="mt-12 grid gap-4 lg:grid-cols-3">
             {PROFILES.map((profile, index) => (
-              <Card
+              <SectionCard
                 key={profile.title}
-                size="lg"
                 className={cn(REVEAL, 'h-full')}
                 style={{ animationDelay: `${index * STAGGER}ms` }}
               >
                 <CardContent className="flex flex-col gap-3">
-                  <CardTitle className="text-lg font-semibold text-ink">
+                  <CardTitle className="text-lg font-semibold text-foreground">
                     {profile.title}
                   </CardTitle>
-                  <CardDescription className="text-sm leading-relaxed text-ink-soft">
+                  <CardDescription className="text-sm leading-relaxed text-muted-foreground">
                     {profile.description}
                   </CardDescription>
                 </CardContent>
-              </Card>
+              </SectionCard>
             ))}
           </div>
 
           <div
             className={cn(
               REVEAL,
-              'delay-300 mt-4 rounded-card border border-dashed border-ink/25 px-6 py-7 sm:px-8',
+              'delay-300 mt-4 rounded-card border border-dashed border-foreground/25 px-6 py-7 sm:px-8',
             )}
           >
-            <p className="max-w-[76ch] text-base leading-relaxed text-ink-soft">
-              <strong className="font-semibold text-ink">
+            <p className="max-w-[76ch] text-base leading-relaxed text-muted-foreground">
+              <strong className="font-semibold text-foreground">
                 Não é para quem
               </strong>{' '}
               procura curso online, aula gravada ou certificado rápido. As aulas
