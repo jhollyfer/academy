@@ -105,15 +105,15 @@ export function WhatYouGet(): React.JSX.Element {
         <div
           className={cn(
             REVEAL,
-            'flex flex-col justify-between gap-10 rounded-block bg-ink p-8 sm:p-10',
+            'flex flex-col justify-between gap-10 rounded-block bg-foreground p-8 sm:p-10',
           )}
         >
-          <h2 className="text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-cream sm:text-4xl">
+          <h2 className="text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-background sm:text-4xl">
             O que você <Highlight variant="fill">leva</Highlight> daqui
           </h2>
 
           <div>
-            <p className="mb-7 text-base leading-relaxed text-cream/70">
+            <p className="mb-7 text-base leading-relaxed text-background/70">
               Tudo o que a aula precisa já está no laboratório. Você leva o
               caderno e a vontade.
             </p>
@@ -142,18 +142,18 @@ export function WhatYouGet(): React.JSX.Element {
                 <span className="relative inline-flex size-11 items-center justify-center">
                   <span
                     aria-hidden
-                    className="absolute -top-1 -left-1 size-9 rounded-full bg-green"
+                    className="absolute -top-1 -left-1 size-9 rounded-full bg-primary"
                   />
                   <item.icon
                     weight="duotone"
-                    className="relative size-7 text-ink"
+                    className="relative size-7 text-primary-foreground"
                   />
                 </span>
 
-                <CardTitle className="text-lg font-semibold text-ink">
+                <CardTitle className="text-lg font-semibold text-foreground">
                   {item.title}
                 </CardTitle>
-                <CardDescription className="text-sm leading-relaxed text-ink-soft">
+                <CardDescription className="text-sm leading-relaxed text-muted-foreground">
                   {item.description}
                 </CardDescription>
               </CardContent>

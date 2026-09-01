@@ -54,8 +54,8 @@ export function FinalBanner(): React.JSX.Element {
       data-slot="home-final-banner"
       className="px-3 py-3 sm:px-4 sm:py-4"
     >
-      <div className="relative overflow-hidden rounded-block bg-green px-6 py-14 sm:px-10 lg:px-14 lg:py-16">
-        <Leaf className="-top-20 -right-16 size-80 -rotate-12 text-ink/5" />
+      <div className="relative overflow-hidden rounded-block bg-primary px-6 py-14 sm:px-10 lg:px-14 lg:py-16">
+        <Leaf className="-top-20 -right-16 size-80 -rotate-12 text-primary-foreground/5" />
 
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[minmax(0,18rem)_1fr] lg:gap-16">
           <img
@@ -68,11 +68,11 @@ export function FinalBanner(): React.JSX.Element {
           />
 
           <div className={cn(REVEAL, 'delay-100')}>
-            <h2 className="max-w-[18ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-ink sm:text-4xl lg:text-5xl">
+            <h2 className="max-w-[18ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-primary-foreground sm:text-4xl lg:text-5xl">
               {heading}
             </h2>
 
-            <p className="mt-5 max-w-[52ch] text-base leading-relaxed text-ink/75 sm:text-lg">
+            <p className="mt-5 max-w-[52ch] text-base leading-relaxed text-primary-foreground/75 sm:text-lg">
               {support}
             </p>
 

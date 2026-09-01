@@ -50,13 +50,13 @@ export function CourseCards({
     <section
       data-slot="home-courses"
       id="cursos"
-      className="mt-3 scroll-mt-20 bg-ink px-4 py-20 sm:mt-4 lg:py-28"
+      className="mt-3 scroll-mt-20 bg-foreground px-4 py-20 sm:mt-4 lg:py-28"
     >
       <div className="mx-auto max-w-7xl">
         <h2
           className={cn(
             REVEAL,
-            'max-w-[16ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-cream sm:text-4xl lg:text-5xl',
+            'max-w-[16ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-background sm:text-4xl lg:text-5xl',
           )}
         >
           Dois cursos, uma <Highlight variant="fill">turma</Highlight> só
@@ -65,7 +65,7 @@ export function CourseCards({
         <p
           className={cn(
             REVEAL,
-            'delay-100 mt-6 max-w-[64ch] text-base leading-relaxed text-cream/70 sm:text-lg',
+            'delay-100 mt-6 max-w-[64ch] text-base leading-relaxed text-background/70 sm:text-lg',
           )}
         >
           Cada curso é o módulo 1 de uma trilha, e é completo por si. No fim
@@ -85,7 +85,7 @@ export function CourseCards({
                 width={400}
                 height={300}
                 loading="lazy"
-                className="h-48 w-full bg-cream object-contain p-6 sm:h-56"
+                className="h-48 w-full bg-background object-contain p-6 sm:h-56"
               />
 
               <CardContent className="flex flex-1 flex-col gap-4">
@@ -101,19 +101,19 @@ export function CourseCards({
                   )}
                 </div>
 
-                <CardTitle className="text-2xl font-semibold tracking-tight text-ink">
+                <CardTitle className="text-2xl font-semibold tracking-tight text-foreground">
                   {course.name}
                 </CardTitle>
 
                 {course.tagline && (
-                  <p className="text-sm leading-relaxed text-ink-soft">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
                     {course.tagline}
                   </p>
                 )}
 
-                <dl className="mt-1 grid gap-2 text-sm text-ink-soft">
+                <dl className="mt-1 grid gap-2 text-sm text-muted-foreground">
                   <div className="flex items-center gap-2">
-                    <Clock className="size-4 text-neon-ink" />
+                    <Clock className="size-4 text-muted-foreground" />
                     <dt className="sr-only">Carga horária</dt>
                     <dd>
                       {course.workloadHours}h em {course.durationMonths} meses,
@@ -123,7 +123,7 @@ export function CourseCards({
 
                   {course.nextClass && (
                     <div className="flex items-center gap-2">
-                      <CalendarBlank className="size-4 text-neon-ink" />
+                      <CalendarBlank className="size-4 text-muted-foreground" />
                       <dt className="sr-only">Início</dt>
                       <dd>Começa em {formatDate(course.nextClass.startsAt)}</dd>
                     </div>
@@ -137,7 +137,7 @@ export function CourseCards({
                   */}
                   {courseClasses(course).map((entity) => (
                     <div key={entity.id} className="flex items-center gap-2">
-                      <Clock className="size-4 text-neon-ink" />
+                      <Clock className="size-4 text-muted-foreground" />
                       <dt className="sr-only">Turma</dt>
                       <dd>
                         {formatTimeRange(
@@ -155,13 +155,13 @@ export function CourseCards({
                     terminarem na mesma linha mesmo com taglines de tamanhos
                     diferentes. */}
                 <div className="mt-auto pt-4">
-                  <p className="text-2xl font-semibold tracking-tight text-ink">
+                  <p className="text-2xl font-semibold tracking-tight text-foreground">
                     {formatMoney(course.monthlyFeeInCents)}
-                    <span className="ml-1 text-sm font-normal text-ink-soft">
+                    <span className="ml-1 text-sm font-normal text-muted-foreground">
                       por mês
                     </span>
                   </p>
-                  <p className="mt-1 text-sm text-ink-soft">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     Mais {formatMoney(course.enrollmentFeeInCents)} de
                     inscrição, uma vez só.
                   </p>

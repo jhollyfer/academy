@@ -70,12 +70,12 @@ export function WhereAndWhen(): React.JSX.Element {
       data-slot="home-where-and-when"
       className="px-3 py-3 sm:px-4 sm:py-4"
     >
-      <div className="rounded-block border border-line bg-paper px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
+      <div className="rounded-block border border-border bg-card px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
         <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-20">
           <h2
             className={cn(
               REVEAL,
-              'text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-ink sm:text-4xl lg:text-5xl',
+              'text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-foreground sm:text-4xl lg:text-5xl',
             )}
           >
             Onde e <Highlight variant="fill">quando</Highlight>
@@ -85,19 +85,19 @@ export function WhereAndWhen(): React.JSX.Element {
             <dl className="grid gap-5">
               {rows.map((row, index) => (
                 <div key={row.term}>
-                  {index > 0 && <Separator className="mb-5 bg-line" />}
+                  {index > 0 && <Separator className="mb-5 bg-border" />}
 
                   <div className="flex items-start gap-4">
                     <row.icon
                       weight="duotone"
                       aria-hidden
-                      className="mt-0.5 size-6 shrink-0 text-neon-ink"
+                      className="mt-0.5 size-6 shrink-0 text-foreground"
                     />
                     <div>
-                      <dt className="text-sm font-medium text-ink">
+                      <dt className="text-sm font-medium text-foreground">
                         {row.term}
                       </dt>
-                      <dd className="mt-0.5 text-base leading-relaxed text-ink-soft">
+                      <dd className="mt-0.5 text-base leading-relaxed text-muted-foreground">
                         {row.value}
                       </dd>
                     </div>
@@ -106,8 +106,8 @@ export function WhereAndWhen(): React.JSX.Element {
               ))}
             </dl>
 
-            <div className="mt-9 rounded-card bg-cream px-6 py-6">
-              <p className="text-base leading-relaxed text-ink-soft">
+            <div className="mt-9 rounded-card bg-background px-6 py-6">
+              <p className="text-base leading-relaxed text-muted-foreground">
                 Os dois prédios são referência na cidade. Se precisar de um
                 ponto de chegada, a secretaria envia a localização pelo
                 WhatsApp.

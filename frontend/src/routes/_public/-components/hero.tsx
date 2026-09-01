@@ -60,29 +60,29 @@ export function Hero(): React.JSX.Element {
 
   return (
     <section data-slot="home-hero" className="px-3 pt-3 sm:px-4 sm:pt-4">
-      <div className="relative overflow-hidden rounded-block bg-green px-6 pt-14 pb-0 sm:px-10 lg:px-14 lg:pt-20">
-        <Petal className="-top-24 -right-20 size-96 text-ink/5" />
+      <div className="relative overflow-hidden rounded-block bg-primary px-6 pt-14 pb-0 sm:px-10 lg:px-14 lg:pt-20">
+        <Petal className="-top-24 -right-20 size-96 text-primary-foreground/5" />
 
         <div className="relative mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.15fr_1fr] lg:items-end lg:gap-16">
           <h1
             className={cn(
               REVEAL,
-              'text-4xl leading-[1.12] font-semibold tracking-tight text-balance text-ink sm:text-5xl lg:text-6xl',
+              'text-4xl leading-[1.12] font-semibold tracking-tight text-balance text-primary-foreground sm:text-5xl lg:text-6xl',
             )}
           >
             Você não precisa sair daqui
             <br className="hidden sm:block" /> para aprender{' '}
             <Highlight variant="ink">tecnologia</Highlight>
-            <Sparkles className="ml-3 inline-block size-6 align-super text-ink/50" />
+            <Sparkles className="ml-3 inline-block size-6 align-super text-primary-foreground/50" />
           </h1>
 
           <div className={cn(REVEAL, 'delay-100')}>
-            <p className="max-w-[46ch] text-base leading-relaxed text-ink/75 sm:text-lg">
+            <p className="max-w-[46ch] text-base leading-relaxed text-primary-foreground/75 sm:text-lg">
               {schedule}
             </p>
 
             {seats && (
-              <p className="mt-2 text-base leading-relaxed text-ink/75 sm:text-lg">
+              <p className="mt-2 text-base leading-relaxed text-primary-foreground/75 sm:text-lg">
                 {seats}
               </p>
             )}

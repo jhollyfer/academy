@@ -20,19 +20,19 @@ const FOOTER_MESSAGE = 'Olá! Quero saber mais sobre os cursos da Maiyu Academy.
  */
 export function Footer(): React.JSX.Element {
   return (
-    <footer className="mt-3 rounded-t-block bg-ink px-4 pt-16 pb-10 sm:mt-4">
+    <footer className="mt-3 rounded-t-block bg-foreground px-4 pt-16 pb-10 sm:mt-4">
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <p className="text-lg font-semibold tracking-tight text-cream">
+            <p className="text-lg font-semibold tracking-tight text-background">
               Maiyu Academy
             </p>
-            <p className="mt-3 max-w-[38ch] text-sm leading-relaxed text-cream/60">
+            <p className="mt-3 max-w-[38ch] text-sm leading-relaxed text-background/70">
               Escola de tecnologia em {ADDRESS.city}, no Amazonas. Aulas
               presenciais aos sábados.
             </p>
             {/* TODO: acrescentar o logradouro quando `ADDRESS.street` for preenchido. */}
-            <p className="mt-4 text-sm text-cream/60">
+            <p className="mt-4 text-sm text-background/70">
               {ADDRESS.city}, {ADDRESS.state}
             </p>
           </div>
@@ -41,36 +41,36 @@ export function Footer(): React.JSX.Element {
             aria-label="Cursos"
             className="grid content-start gap-2.5 text-sm"
           >
-            <p className="font-medium text-cream">Cursos</p>
+            <p className="font-medium text-background">Cursos</p>
             <Link
               to="/cursos/$slug"
               params={{ slug: 'robotica' }}
-              className="text-cream/60 transition-colors hover:text-neon"
+              className="text-background/70 transition-colors hover:text-background"
             >
               Robótica
             </Link>
             <Link
               to="/cursos/$slug"
               params={{ slug: 'web-development' }}
-              className="text-cream/60 transition-colors hover:text-neon"
+              className="text-background/70 transition-colors hover:text-background"
             >
               Desenvolvimento web
             </Link>
             <Link
               to="/sobre"
-              className="text-cream/60 transition-colors hover:text-neon"
+              className="text-background/70 transition-colors hover:text-background"
             >
               A escola
             </Link>
           </nav>
 
           <div className="grid content-start gap-2.5 text-sm">
-            <p className="font-medium text-cream">Contato</p>
+            <p className="font-medium text-background">Contato</p>
             <a
               href={whatsappUrl(FOOTER_MESSAGE)}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 text-cream/60 transition-colors hover:text-neon"
+              className="inline-flex items-center gap-2 text-background/70 transition-colors hover:text-background"
             >
               <WhatsappLogo className="size-4" />
               {formatPhone(WHATSAPP_NUMBER.slice(2))}
@@ -79,7 +79,7 @@ export function Footer(): React.JSX.Element {
               href="https://instagram.com/maiyu.academy"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 text-cream/60 transition-colors hover:text-neon"
+              className="inline-flex items-center gap-2 text-background/70 transition-colors hover:text-background"
             >
               <InstagramLogo className="size-4" />
               maiyu.academy
@@ -90,25 +90,25 @@ export function Footer(): React.JSX.Element {
             aria-label="Legal"
             className="grid content-start gap-2.5 text-sm"
           >
-            <p className="font-medium text-cream">Legal</p>
+            <p className="font-medium text-background">Legal</p>
             <Link
               to="/privacidade"
-              className="text-cream/60 transition-colors hover:text-neon"
+              className="text-background/70 transition-colors hover:text-background"
             >
               Privacidade
             </Link>
             <Link
               to="/termos"
-              className="text-cream/60 transition-colors hover:text-neon"
+              className="text-background/70 transition-colors hover:text-background"
             >
               Termos de uso
             </Link>
           </nav>
         </div>
 
-        <Separator className="my-10 bg-cream/10" />
+        <Separator className="my-10 bg-background/20" />
 
-        <p className="text-sm text-cream/50">
+        <p className="text-sm text-background/70">
           © {new Date().getFullYear()} Maiyu Academy
         </p>
       </div>

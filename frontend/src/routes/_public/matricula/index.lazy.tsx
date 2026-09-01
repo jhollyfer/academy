@@ -267,10 +267,10 @@ function RouteComponent(): React.JSX.Element {
   if (options.length === 0) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-24 text-center">
-        <h1 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
           Nenhuma turma aberta <Highlight variant="fill">agora</Highlight>
         </h1>
-        <p className="mx-auto mt-5 max-w-[46ch] leading-relaxed text-ink-soft">
+        <p className="mx-auto mt-5 max-w-[46ch] leading-relaxed text-muted-foreground">
           As matrículas abrem junto com a próxima turma. Deixe seu contato com a
           secretaria e avisamos assim que as inscrições começarem.
         </p>
@@ -298,7 +298,7 @@ function RouteComponent(): React.JSX.Element {
     <div className="relative">
       <div className="relative mx-auto max-w-2xl px-4 py-16 lg:py-20">
         <h1 className="text-3xl leading-[1.05] font-semibold tracking-tight sm:text-4xl">
-          Sua <span className="text-neon-ink">matrícula</span>
+          Sua <span className="text-foreground">matrícula</span>
         </h1>
 
         {/*
@@ -327,7 +327,7 @@ function RouteComponent(): React.JSX.Element {
                         <label
                           key={entity.id}
                           data-accent={course.accent}
-                          className="rounded-card flex cursor-pointer items-start gap-4 border border-line bg-card p-5 transition-colors has-checked:border-[var(--neon-ink)] has-checked:bg-cream"
+                          className="rounded-card flex cursor-pointer items-start gap-4 border border-border bg-card p-5 transition-colors has-checked:border-primary has-checked:bg-background"
                         >
                           <input
                             type="radio"
@@ -336,13 +336,13 @@ function RouteComponent(): React.JSX.Element {
                             checked={field.value === entity.id}
                             onChange={() => field.onChange(entity.id)}
                             onBlur={field.onBlur}
-                            className="mt-1 size-4 accent-[var(--neon-ink)]"
+                            className="mt-1 size-4 accent-foreground"
                           />
                           <span className="grid gap-1">
                             <span className="font-bold tracking-tight">
                               {course.name}
                               {classTime(entity) && (
-                                <span className="ml-2 font-normal text-neon-ink">
+                                <span className="ml-2 font-normal text-foreground">
                                   {classTime(entity)}
                                 </span>
                               )}
@@ -566,7 +566,7 @@ function RouteComponent(): React.JSX.Element {
                 <legend className="text-xl font-bold">Confira e envie</legend>
 
                 {selected && (
-                  <dl className="rounded-card grid gap-3 border border-line bg-card p-5 text-sm">
+                  <dl className="rounded-card grid gap-3 border border-border bg-card p-5 text-sm">
                     <Row label="Curso">{selected.course.name}</Row>
                     <Row label="Turma">
                       {selected.entity.name}
@@ -602,7 +602,7 @@ function RouteComponent(): React.JSX.Element {
                           <a
                             href="/termos"
                             target="_blank"
-                            className="text-neon-ink hover:underline"
+                            className="text-foreground hover:underline"
                           >
                             termos de uso
                           </a>
@@ -635,7 +635,7 @@ function RouteComponent(): React.JSX.Element {
                           <a
                             href="/privacidade"
                             target="_blank"
-                            className="text-neon-ink hover:underline"
+                            className="text-foreground hover:underline"
                           >
                             política de privacidade
                           </a>

@@ -6,9 +6,9 @@
 ## Onde parou
 
 - [x] **Fase A** — tokens em `frontend/src/styles.css`
-- [ ] **Fase B** — vitrine: reconstruir os CTAs em `common/` e trocar os nomes
-      de marca pelos semânticos, rota por rota
-- [ ] **Fase B-fim** — cai o `className="light"` de `_public/layout.tsx:36`
+- [x] **Fase B** — vitrine migrada
+
+- [x] **Fase B-fim** — a trava `light` caiu
 - [ ] **Fase C** — painel com a casca de sidebar do simple-hub
 
 ## As regras que valem

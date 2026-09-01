@@ -33,7 +33,8 @@
  * nomes que o shadcn já define, e a paleta oficial entra como **valor** deles.
  * Um `--cream` que era `background`, um `--ink` que era `foreground`, um
  * `--line` que era `border` e um `--green` que era `primary` moravam aqui e
- * eram apelido: morreram.
+ * eram apelido: morreram, e a vitrine passou a ler os nomes semânticos como o
+ * painel sempre leu.
  *
  * O verde da marca é `--primary`, e é o mesmo #88FF9A nos dois temas, com
  * `--primary-foreground` #272221 nos dois. Um valor só, e não um par que
@@ -50,20 +51,7 @@
  * ============================================================================
  */
 
-/*
- * `.light.light`, com a classe repetida, e não `.light`.
- *
- * É o que deixa uma ilha clara viver **dentro** do `<html class="dark">`, que é
- * o que a vitrine precisa enquanto a migração não termina. Uma classe só
- * empataria em especificidade com `.dark`, e quem ganharia seria a que viesse
- * depois na folha - e `.dark` tem de vir depois daqui, senão perderia para o
- * `:root` no próprio `<html>`. Repetir a classe sobe para (0,2,0) e encerra o
- * assunto sem depender de ordem.
- *
- * Sai junto com a trava de `_public/layout.tsx`, na última rota migrada.
- */
-:root,
-.light.light {
+:root {
   color-scheme: light;
 
   /* --------------------------------------------------------------------
@@ -286,12 +274,8 @@
   }
 
   /*
-   * O chão da página vem dos nomes semânticos, e não de `bg-cream`/`text-ink`.
-   *
-   * É o que faz o painel responder ao tema sem que nenhuma tela dele mude uma
-   * classe. A vitrine não escurece junto porque suas seções pintam a própria
-   * superfície (`bg-paper`, `bg-cream`) e ficam trancadas no claro pelo
-   * `_public/layout.tsx` até a frente de migração chegar nelas.
+   * O chão da página. Vitrine e painel leem os mesmos dois nomes, e é isso que
+   * faz os dois responderem ao tema sem que nenhuma tela mude uma classe.
    */
   body {
     @apply bg-background font-sans text-foreground antialiased;

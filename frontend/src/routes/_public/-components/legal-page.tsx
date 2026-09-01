@@ -29,7 +29,7 @@ export function LegalPage({
         Última atualização: {updatedAt}
       </p>
 
-      <div className="prose prose-invert mt-12 max-w-[68ch] prose-headings:prose-headings:prose-a:text-neon-ink">
+      <div className="prose mt-12 max-w-[68ch] dark:prose-invert prose-a:text-foreground">
         {children}
       </div>
     </div>

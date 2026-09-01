@@ -19,14 +19,14 @@ function RouteComponent(): React.JSX.Element {
   return (
     <>
       <section className="px-3 pt-3 sm:px-4 sm:pt-4">
-        <div className="relative overflow-hidden rounded-block bg-green px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
-          <Leaf className="-top-24 -right-20 size-96 text-ink/5" />
+        <div className="relative overflow-hidden rounded-block bg-primary px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
+          <Leaf className="-top-24 -right-20 size-96 text-primary-foreground/5" />
 
           <div className="relative mx-auto max-w-7xl">
             <h1
               className={cn(
                 REVEAL,
-                'max-w-[20ch] text-4xl leading-[1.12] font-semibold tracking-tight text-balance text-ink sm:text-5xl lg:text-6xl',
+                'max-w-[20ch] text-4xl leading-[1.12] font-semibold tracking-tight text-balance text-primary-foreground sm:text-5xl lg:text-6xl',
               )}
             >
               Uma escola de tecnologia no{' '}
@@ -36,7 +36,7 @@ function RouteComponent(): React.JSX.Element {
             <div
               className={cn(
                 REVEAL,
-                'delay-100 mt-8 grid max-w-[62ch] gap-5 text-lg leading-relaxed text-ink/75',
+                'delay-100 mt-8 grid max-w-[62ch] gap-5 text-lg leading-relaxed text-primary-foreground/75',
               )}
             >
               <p>

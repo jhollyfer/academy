@@ -30,12 +30,13 @@ const highlightVariants = cva(
   {
     variants: {
       variant: {
-        /** Sobre creme e sobre papel. Ink no verde: 13,0:1. */
-        fill: 'bg-green text-ink',
-        /** Sobre o verde, e dentro de bloco escuro. Neon no ink: 10,8:1. */
-        ink: 'bg-ink text-neon',
+        /** Sobre a página e dentro de bloco escuro. O par de `--primary`: 12,58:1. */
+        fill: 'bg-primary text-primary-foreground',
+        /** Dentro do bloco verde, onde o `fill` sumiria. O mesmo par, virado. */
+        ink: 'bg-primary-foreground text-primary',
         /** Quando o fundo já carrega cor e mais um bloco chapado pesaria. */
-        outline: 'border-[1.5px] border-ink bg-transparent text-ink',
+        outline:
+          'border-[1.5px] border-foreground bg-transparent text-foreground',
       },
     },
     defaultVariants: {

@@ -74,12 +74,12 @@ const TEAM = [
 export function Team(): React.JSX.Element {
   return (
     <section data-slot="home-team" className="px-3 py-3 sm:px-4 sm:py-4">
-      <div className="rounded-block border border-line bg-cream px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
+      <div className="rounded-block border border-border bg-background px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
         <div className="mx-auto max-w-7xl">
           <h2
             className={cn(
               REVEAL,
-              'max-w-[16ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-ink sm:text-4xl lg:text-5xl',
+              'max-w-[16ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-foreground sm:text-4xl lg:text-5xl',
             )}
           >
             Quem vai <Highlight variant="outline">ensinar</Highlight> você
@@ -98,15 +98,15 @@ export function Team(): React.JSX.Element {
                   width={400}
                   height={300}
                   loading="lazy"
-                  className="aspect-4/3 w-full bg-paper object-contain"
+                  className="aspect-4/3 w-full bg-card object-contain"
                 />
 
                 <CardContent className="flex flex-col gap-3">
                   <div>
-                    <CardTitle className="text-lg font-semibold text-ink">
+                    <CardTitle className="text-lg font-semibold text-foreground">
                       {person.name}
                     </CardTitle>
-                    <p className="mt-1 text-xs leading-relaxed text-ink-soft">
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                       {person.role}
                     </p>
                   </div>
@@ -115,11 +115,11 @@ export function Team(): React.JSX.Element {
                     {person.skills.map((skill) => (
                       <li
                         key={skill}
-                        className="flex items-start gap-2 text-sm leading-relaxed text-ink-soft"
+                        className="flex items-start gap-2 text-sm leading-relaxed text-muted-foreground"
                       >
                         <span
                           aria-hidden
-                          className="mt-2 size-1.5 shrink-0 rounded-full bg-neon-ink"
+                          className="mt-2 size-1.5 shrink-0 rounded-full bg-foreground"
                         />
                         {skill}
                       </li>

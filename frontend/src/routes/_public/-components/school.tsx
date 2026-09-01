@@ -24,8 +24,8 @@ import { cn } from '#/lib/utils'
 export function School(): React.JSX.Element {
   return (
     <section data-slot="home-school" className="px-3 py-3 sm:px-4 sm:py-4">
-      <div className="relative overflow-hidden rounded-block border border-line bg-cream px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
-        <Leaf className="-bottom-24 -left-24 size-80 rotate-12 text-green/40" />
+      <div className="relative overflow-hidden rounded-block border border-border bg-background px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
+        <Leaf className="-bottom-24 -left-24 size-80 rotate-12 text-primary/40" />
 
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2 lg:gap-20">
           <img
@@ -38,12 +38,12 @@ export function School(): React.JSX.Element {
           />
 
           <div className={cn(REVEAL, 'delay-100')}>
-            <h2 className="text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-ink sm:text-4xl lg:text-5xl">
+            <h2 className="text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-foreground sm:text-4xl lg:text-5xl">
               Tecnologia se aprende{' '}
               <Highlight variant="outline">aqui</Highlight> mesmo
             </h2>
 
-            <div className="mt-7 space-y-5 text-base leading-relaxed text-ink-soft sm:text-lg">
+            <div className="mt-7 space-y-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
               <p>
                 A Maiyu Academy é uma escola de tecnologia presencial em
                 Benjamin Constant, no Alto Solimões. As aulas acontecem no{' '}

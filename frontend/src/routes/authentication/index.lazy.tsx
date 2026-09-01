@@ -67,7 +67,7 @@ function RouteComponent(): React.JSX.Element {
     <div className="relative flex min-h-svh items-center justify-center px-4 py-12">
       <div className="relative w-full max-w-sm">
         <h1 className="text-2xl font-semibold tracking-tight">
-          Maiyu <span className="text-neon-ink">Academy</span>
+          Maiyu <span className="text-foreground">Academy</span>
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Acesso da secretaria.
