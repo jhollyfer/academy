@@ -218,3 +218,79 @@ test.group('administrator/courses', (group) => {
     response.assertStatus(422)
   })
 })
+
+test.group('administrator/courses · grade e FAQ', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('grava a grade junto do curso, na ordem do array', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+
+    const course = await createCourse(client, session, {
+      modules: [
+        { title: 'Sábado 1 · Eletrônica básica' },
+        { title: 'Sábado 2 · Arduino', description: 'Primeiro sketch.' },
+      ],
+      faqs: [{ question: 'Preciso levar notebook?', answer: 'Não. O laboratório tem.' }],
+    })
+
+    assert.lengthOf(course.modules, 2)
+    // A ordem é o índice do array: ninguém digita `position`.
+    assert.equal(course.modules[0].position, 0)
+    assert.equal(course.modules[1].position, 1)
+    assert.equal(course.modules[1].description, 'Primeiro sketch.')
+    assert.lengthOf(course.faqs, 1)
+  })
+
+  test('reenviar a grade substitui a anterior inteira', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session, {
+      modules: [{ title: 'Sábado 1' }, { title: 'Sábado 2' }],
+    })
+
+    const response = await client
+      .put(`/administrator/courses/${course.id}`)
+      .cookies(session)
+      .json({ modules: [{ title: 'Sábado 1 · reescrito' }] })
+
+    response.assertStatus(200)
+
+    const updated = body(response)
+    // Apaga e recria: o módulo não tem identidade estável do lado do cliente.
+    assert.lengthOf(updated.modules, 1)
+    assert.equal(updated.modules[0].title, 'Sábado 1 · reescrito')
+  })
+
+  test('array ausente não mexe na grade; array vazio apaga', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session, { modules: [{ title: 'Sábado 1' }] })
+
+    const untouched = await client
+      .put(`/administrator/courses/${course.id}`)
+      .cookies(session)
+      .json({ tagline: 'Só mexendo na chamada' })
+
+    // Campo ausente nunca limpa - é a regra de todo PUT daqui.
+    assert.lengthOf(body(untouched).modules, 1)
+
+    const cleared = await client
+      .put(`/administrator/courses/${course.id}`)
+      .cookies(session)
+      .json({ modules: [] })
+
+    assert.lengthOf(body(cleared).modules, 0)
+  })
+
+  test('apagar o curso leva a grade junto por cascata', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session, { modules: [{ title: 'Sábado 1' }] })
+
+    await client.patch(`/administrator/courses/${course.id}/archive`).cookies(session)
+    const response = await client.delete(`/administrator/courses/${course.id}`).cookies(session)
+
+    response.assertStatus(204)
+
+    // Sem a cascata isto seria um erro de chave estrangeira virando 500.
+    const orphans = await client.get('/administrator/courses').cookies(session)
+    assert.equal(body(orphans).meta.total, 0)
+  })
+})

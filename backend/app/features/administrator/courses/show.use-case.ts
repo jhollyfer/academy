@@ -20,10 +20,10 @@ export default class CourseShowUseCase {
         // Ordenados por `position`: a grade é uma sequência de sábados, e
         // `createdAt` não descreve o programa.
         .preload('modules', function (modules) {
-          modules.whereNull('deletedAt').orderBy('position', 'asc')
+          modules.orderBy('position', 'asc')
         })
         .preload('faqs', function (faqs) {
-          faqs.whereNull('deletedAt').orderBy('position', 'asc')
+          faqs.orderBy('position', 'asc')
         })
         .preload('cover')
         .first()

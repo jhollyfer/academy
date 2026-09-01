@@ -64,7 +64,7 @@ export class ClassSchema extends BaseModel {
 }
 
 export class CourseFaqSchema extends BaseModel {
-  static $columns = ['answer', 'courseId', 'createdAt', 'deletedAt', 'id', 'position', 'question', 'updatedAt'] as const
+  static $columns = ['answer', 'courseId', 'createdAt', 'id', 'position', 'question', 'updatedAt'] as const
   $columns = CourseFaqSchema.$columns
   @column()
   declare answer: string
@@ -72,8 +72,6 @@ export class CourseFaqSchema extends BaseModel {
   declare courseId: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
-  @column.dateTime()
-  declare deletedAt: DateTime | null
   @column({ isPrimary: true })
   declare id: string
   @column()
@@ -85,14 +83,12 @@ export class CourseFaqSchema extends BaseModel {
 }
 
 export class CourseModuleSchema extends BaseModel {
-  static $columns = ['courseId', 'createdAt', 'deletedAt', 'description', 'id', 'position', 'title', 'updatedAt'] as const
+  static $columns = ['courseId', 'createdAt', 'description', 'id', 'position', 'title', 'updatedAt'] as const
   $columns = CourseModuleSchema.$columns
   @column()
   declare courseId: string
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
-  @column.dateTime()
-  declare deletedAt: DateTime | null
   @column()
   declare description: string | null
   @column({ isPrimary: true })

@@ -261,6 +261,38 @@ export type TrashablePaginationPayload = Infer<typeof TrashablePaginationValidat
 // administrator/courses
 // ---------------------------------------------------------------------------
 
+
+/**
+ * Um encontro da grade. Sem `id` nem `position`: o módulo não tem identidade
+ * estável do lado do cliente, e a ordem é o índice do array - quem arrasta um
+ * sábado na tela não renumera nada, só reordena a lista.
+ *
+ * O teto de itens não é zelo: `vine.array()` sem limite aceita o que couber no
+ * corpo da requisição, e o que chega vai inteiro para o banco.
+ */
+function courseModuleFields() {
+  return vine
+    .array(
+      vine.object({
+        title: vine.string().trim().minLength(2).maxLength(200),
+        description: vine.string().trim().maxLength(2000).nullable().optional(),
+      })
+    )
+    .maxLength(60)
+}
+
+/** Uma pergunta frequente do curso, pela mesma regra da grade. */
+function courseFaqFields() {
+  return vine
+    .array(
+      vine.object({
+        question: vine.string().trim().minLength(4).maxLength(300),
+        answer: vine.string().trim().minLength(2).maxLength(4000),
+      })
+    )
+    .maxLength(40)
+}
+
 export const AdministratorCourseCreateValidator = vine.create({
   name: vine.string().trim().minLength(2).maxLength(160),
   // Opcional: sem ele, o slug sai do nome. Quando vem preenchido ele vence, e
@@ -283,6 +315,12 @@ export const AdministratorCourseCreateValidator = vine.create({
   coverId: vine.string().uuid().nullable().optional(),
   position: vine.number().min(0).max(999).optional(),
   status: activeStatus().optional(),
+
+  // A grade e o FAQ chegam aqui e não em endpoints próprios: são sincronizados
+  // na mesma transação do curso (`_shared.syllabus.ts`). Ausentes = não mexer;
+  // lista vazia = apagar.
+  modules: courseModuleFields().optional(),
+  faqs: courseFaqFields().optional(),
 })
 
 /**
@@ -311,6 +349,12 @@ export const AdministratorCourseUpdateValidator = vine.create({
   coverId: vine.string().uuid().nullable().optional(),
   position: vine.number().min(0).max(999).optional(),
   status: activeStatus().optional(),
+
+  // A grade e o FAQ chegam aqui e não em endpoints próprios: são sincronizados
+  // na mesma transação do curso (`_shared.syllabus.ts`). Ausentes = não mexer;
+  // lista vazia = apagar.
+  modules: courseModuleFields().optional(),
+  faqs: courseFaqFields().optional(),
 })
 
 export const AdministratorCoursePaginationValidator = vine.create({
@@ -339,65 +383,6 @@ export const AuthenticationSignInValidator = vine.create({
 })
 
 export type AuthenticationSignInPayload = Infer<typeof AuthenticationSignInValidator>
-
-// ---------------------------------------------------------------------------
-// administrator/courses/:id/modules e :id/faqs
-// ---------------------------------------------------------------------------
-
-export const AdministratorCourseModuleCreateValidator = vine.create({
-  title: vine.string().trim().minLength(2).maxLength(200),
-  description: vine.string().trim().maxLength(2000).nullable().optional(),
-  position: vine.number().min(0).max(999).optional(),
-})
-
-export const AdministratorCourseModuleUpdateValidator = vine.create({
-  title: vine.string().trim().minLength(2).maxLength(200).optional(),
-  description: vine.string().trim().maxLength(2000).nullable().optional(),
-  position: vine.number().min(0).max(999).optional(),
-})
-
-export const AdministratorCourseFaqCreateValidator = vine.create({
-  question: vine.string().trim().minLength(4).maxLength(300),
-  answer: vine.string().trim().minLength(2),
-  position: vine.number().min(0).max(999).optional(),
-})
-
-export const AdministratorCourseFaqUpdateValidator = vine.create({
-  question: vine.string().trim().minLength(4).maxLength(300).optional(),
-  answer: vine.string().trim().minLength(2).optional(),
-  position: vine.number().min(0).max(999).optional(),
-})
-
-/**
- * O identificador de um filho aninhado: o curso no caminho e o próprio registro.
- *
- * Os dois juntos e não só o `id` porque o escopo vem do caminho: pedir o módulo
- * `X` do curso `Y` quando ele pertence ao curso `Z` é **404**, não 403 - a
- * resposta não confirma que o registro existe em outro lugar.
- */
-export const NestedIdentifierValidator = vine.create({
-  courseId: vine.string().uuid(),
-  id: vine.string().uuid(),
-})
-
-export const CourseScopeValidator = vine.create({
-  courseId: vine.string().uuid(),
-})
-
-export type AdministratorCourseModuleCreatePayload = Infer<
-  typeof AdministratorCourseModuleCreateValidator
->
-export type AdministratorCourseModuleUpdatePayload = Infer<
-  typeof AdministratorCourseModuleUpdateValidator
->
-export type AdministratorCourseFaqCreatePayload = Infer<
-  typeof AdministratorCourseFaqCreateValidator
->
-export type AdministratorCourseFaqUpdatePayload = Infer<
-  typeof AdministratorCourseFaqUpdateValidator
->
-export type NestedIdentifierPayload = Infer<typeof NestedIdentifierValidator>
-export type CourseScopePayload = Infer<typeof CourseScopeValidator>
 
 // ---------------------------------------------------------------------------
 // administrator/classes

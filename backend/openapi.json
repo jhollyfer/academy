@@ -3973,6 +3973,55 @@
               "ACTIVE",
               "INACTIVE"
             ]
+          },
+          "modules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 200
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 2000
+                }
+              },
+              "required": [
+                "title"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 60
+          },
+          "faqs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "minLength": 4,
+                  "maxLength": 300
+                },
+                "answer": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 4000
+                }
+              },
+              "required": [
+                "question",
+                "answer"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 40
           }
         },
         "required": [
@@ -4173,13 +4222,6 @@
                   "type": "string",
                   "format": "date-time"
                 },
-                "deletedAt": {
-                  "type": [
-                    "string",
-                    "null"
-                  ],
-                  "format": "date-time"
-                },
                 "description": {
                   "type": [
                     "string",
@@ -4206,7 +4248,6 @@
               "required": [
                 "courseId",
                 "createdAt",
-                "deletedAt",
                 "description",
                 "id",
                 "position",
@@ -4233,13 +4274,6 @@
                   "type": "string",
                   "format": "date-time"
                 },
-                "deletedAt": {
-                  "type": [
-                    "string",
-                    "null"
-                  ],
-                  "format": "date-time"
-                },
                 "id": {
                   "type": "string"
                 },
@@ -4261,7 +4295,6 @@
                 "answer",
                 "courseId",
                 "createdAt",
-                "deletedAt",
                 "id",
                 "position",
                 "question",
@@ -4479,13 +4512,6 @@
                   "type": "string",
                   "format": "date-time"
                 },
-                "deletedAt": {
-                  "type": [
-                    "string",
-                    "null"
-                  ],
-                  "format": "date-time"
-                },
                 "description": {
                   "type": [
                     "string",
@@ -4512,7 +4538,6 @@
               "required": [
                 "courseId",
                 "createdAt",
-                "deletedAt",
                 "description",
                 "id",
                 "position",
@@ -4539,13 +4564,6 @@
                   "type": "string",
                   "format": "date-time"
                 },
-                "deletedAt": {
-                  "type": [
-                    "string",
-                    "null"
-                  ],
-                  "format": "date-time"
-                },
                 "id": {
                   "type": "string"
                 },
@@ -4567,7 +4585,6 @@
                 "answer",
                 "courseId",
                 "createdAt",
-                "deletedAt",
                 "id",
                 "position",
                 "question",
@@ -4785,13 +4802,6 @@
                   "type": "string",
                   "format": "date-time"
                 },
-                "deletedAt": {
-                  "type": [
-                    "string",
-                    "null"
-                  ],
-                  "format": "date-time"
-                },
                 "description": {
                   "type": [
                     "string",
@@ -4818,7 +4828,6 @@
               "required": [
                 "courseId",
                 "createdAt",
-                "deletedAt",
                 "description",
                 "id",
                 "position",
@@ -4845,13 +4854,6 @@
                   "type": "string",
                   "format": "date-time"
                 },
-                "deletedAt": {
-                  "type": [
-                    "string",
-                    "null"
-                  ],
-                  "format": "date-time"
-                },
                 "id": {
                   "type": "string"
                 },
@@ -4873,7 +4875,6 @@
                 "answer",
                 "courseId",
                 "createdAt",
-                "deletedAt",
                 "id",
                 "position",
                 "question",
@@ -4992,6 +4993,55 @@
               "ACTIVE",
               "INACTIVE"
             ]
+          },
+          "modules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 200
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 2000
+                }
+              },
+              "required": [
+                "title"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 60
+          },
+          "faqs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "minLength": 4,
+                  "maxLength": 300
+                },
+                "answer": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 4000
+                }
+              },
+              "required": [
+                "question",
+                "answer"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 40
           }
         },
         "required": [],
@@ -5184,13 +5234,6 @@
                   "type": "string",
                   "format": "date-time"
                 },
-                "deletedAt": {
-                  "type": [
-                    "string",
-                    "null"
-                  ],
-                  "format": "date-time"
-                },
                 "description": {
                   "type": [
                     "string",
@@ -5217,7 +5260,6 @@
               "required": [
                 "courseId",
                 "createdAt",
-                "deletedAt",
                 "description",
                 "id",
                 "position",
@@ -5244,13 +5286,6 @@
                   "type": "string",
                   "format": "date-time"
                 },
-                "deletedAt": {
-                  "type": [
-                    "string",
-                    "null"
-                  ],
-                  "format": "date-time"
-                },
                 "id": {
                   "type": "string"
                 },
@@ -5272,7 +5307,6 @@
                 "answer",
                 "courseId",
                 "createdAt",
-                "deletedAt",
                 "id",
                 "position",
                 "question",

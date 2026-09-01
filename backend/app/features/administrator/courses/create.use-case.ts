@@ -2,6 +2,7 @@ import Course from '#models/course'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import SlugService from '#services/slug.service'
+import { saveWithSyllabus } from '#features/_shared.syllabus'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import type { AdministratorCourseCreatePayload } from '#core/validator'
@@ -13,7 +14,7 @@ type Response = Either<HTTPException, Course>
 export default class CourseCreateUseCase {
   constructor(private readonly slug: SlugService) {}
 
-  async execute(payload: Payload): Promise<Response> {
+  async execute({ modules, faqs, ...payload }: Payload): Promise<Response> {
     try {
       // O formulário tem input de slug. Quando vem preenchido ele vence, mas
       // passa pelo mesmo `normalize` - aceitar o valor cru deixaria a URL
@@ -28,7 +29,9 @@ export default class CourseCreateUseCase {
         // `id` e `created_at` - e com eles a grade e o FAQ, que apontam para o
         // `id`.
         course.merge({ ...payload, slug, deletedAt: null })
-        await course.save()
+        await saveWithSyllabus(course, modules, faqs)
+        await course.load('modules', (query) => query.orderBy('position', 'asc'))
+        await course.load('faqs', (query) => query.orderBy('position', 'asc'))
         return right(course)
       }
 
@@ -48,6 +51,10 @@ export default class CourseCreateUseCase {
       // do Lucid só devolve a chave primária - sem o refresh a resposta sairia
       // com eles indefinidos.
       await created.refresh()
+
+      await saveWithSyllabus(created, modules, faqs)
+      await created.load('modules', (query) => query.orderBy('position', 'asc'))
+      await created.load('faqs', (query) => query.orderBy('position', 'asc'))
 
       return right(created)
     } catch (error) {

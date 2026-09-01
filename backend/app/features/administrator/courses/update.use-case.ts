@@ -2,6 +2,7 @@ import Course from '#models/course'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import SlugService from '#services/slug.service'
+import { saveWithSyllabus } from '#features/_shared.syllabus'
 import type { Merge } from '#core/entity'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
@@ -14,7 +15,7 @@ type Response = Either<HTTPException, Course>
 export default class CourseUpdateUseCase {
   constructor(private readonly slug: SlugService) {}
 
-  async execute({ id, ...payload }: Payload): Promise<Response> {
+  async execute({ id, modules, faqs, ...payload }: Payload): Promise<Response> {
     try {
       const course = await Course.query().where('id', id).whereNull('deletedAt').first()
 
@@ -48,7 +49,13 @@ export default class CourseUpdateUseCase {
       // `rest` em vez de `payload`: o slug já foi normalizado acima e o merge
       // regravaria o valor cru por cima.
       course.merge(rest)
-      await course.save()
+
+      // O curso, a grade e o FAQ numa transação só: uma falha no meio deixaria
+      // o curso salvo e a ementa na versão anterior, e a página pública
+      // mostraria as duas metades de edições diferentes.
+      await saveWithSyllabus(course, modules, faqs)
+      await course.load('modules', (query) => query.orderBy('position', 'asc'))
+      await course.load('faqs', (query) => query.orderBy('position', 'asc'))
 
       return right(course)
     } catch (error) {

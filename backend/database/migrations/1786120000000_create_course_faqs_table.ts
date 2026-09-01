@@ -11,12 +11,13 @@ export default class extends BaseSchema {
       // pergunta e a resposta têm exatamente a mesma forma nos dois casos, e
       // duas tabelas obrigariam a duplicar o CRUD.
       table.uuid('course_id').nullable().references('id').inTable('courses').onDelete('CASCADE')
+      // Sem `deleted_at`, pelo mesmo motivo da grade: o FAQ é sincronizado com
+      // o curso, e pergunta reescrita é rascunho.
       table.integer('position').notNullable().defaultTo(0)
       table.string('question', 300).notNullable()
       table.text('answer').notNullable()
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()
-      table.timestamp('deleted_at').nullable()
       table.index(['course_id', 'position'], 'course_faqs_course_id_position_index')
     })
   }
