@@ -1,39 +1,47 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
-@import '@fontsource-variable/inter';
+@import '@fontsource-variable/outfit';
+/*
+ * Só o itálico da serifa.
+ *
+ * `wght-italic.css` e não `index.css`: a serifa aparece numa palavra por
+ * título, sempre em itálico, e o arquivo reto seria um segundo download que
+ * nada na página usa. A escola está numa cidade onde a conexão é ruim, e byte
+ * que não pinta pixel é byte tirado do LCP.
+ */
+@import '@fontsource-variable/playfair-display/wght-italic.css';
 
 @plugin '@tailwindcss/typography';
 
-@custom-variant dark (&:is(.dark *));
-
 /*
  * ============================================================================
- * PALETA MAIYU - extraída das artes de lançamento
+ * PALETA MAIYU
  * ============================================================================
  *
- * As peças do feed são três decisões e nada mais:
+ * O sistema é o da referência: base creme quente, blocos grandes arredondados
+ * em verde claro, tipografia geométrica, e uma palavra em serifa itálica dentro
+ * de uma pílula em todo título. A cor da referência é âmbar; aqui é o verde da
+ * Maiyu, e só isso muda.
  *
- *   fundo        preto azulado, quase #070C0A, com trilhas de circuito em
- *                verde escuro de baixíssima opacidade
- *   acento       verde neon #2BE31F, com glow
- *   título       primeira linha branca, segunda no acento
+ *   --cream  o chão da página, e o fundo das seções alternadas
+ *   --paper  o card, um degrau acima do creme
+ *   --ink    o texto, as seções escuras de contraste, o rodapé
+ *   --green  os blocos grandes e as pílulas, sempre com texto --ink por cima
+ *   --neon   o acento fino: ícone, check, sublinhado, detalhe
  *
- * O site é escuro por padrão e **não inverte**. Não é preferência: quem chega
- * aqui veio de um anúncio escuro com verde neon, e uma landing clara quebraria
- * o reconhecimento no instante em que ele mais vale. O tema claro existe para o
- * painel da secretaria, que é onde alguém passa uma hora seguida numa tabela.
+ * Antes daqui a folha tinha duas escalas convivendo: um `:root` escuro com
+ * `--surface: #0e1613` e um `.light` claro. Quem ligava um ou outro era o
+ * `next-themes` com `defaultTheme="system"`, então a landing invertia com o
+ * sistema operacional de quem abria - e `border-white/5`, escrita para o fundo
+ * escuro, sumia por completo na metade das visitas. Agora é uma escala só.
  *
- * A referência estrutural (Recode) confirma a leitura e acrescenta um gesto que
- * as artes não tinham: **um card de cada grupo preenchido em verde sólido, com
- * texto escuro**. É como ela cria hierarquia sem mudar de layout - o olho
- * encontra o item que importa antes de ler qualquer palavra. É o `filled` do
- * `NeonCard`.
- *
- * O verde neon puro não aguenta texto: #2BE31F sobre #070C0A dá contraste de
- * sobra, mas texto escuro sobre ele encosta no limite, e ele é claro demais
- * para ser texto sobre superfície clara. Por isso são dois tokens - o neon vive
- * em preenchimento, borda e glow; o `--accent-deep` é o que aguenta ser lido.
+ * O NEON NÃO É COR DE TEXTO SOBRE CLARO. #2be31f dá 10,8:1 sobre o ink e
+ * 1,6:1 sobre o creme: dentro de bloco escuro ele é excelente, e sobre a página
+ * ele é invisível - reprova até como elemento gráfico, que pede 3:1. Por isso
+ * existem dois verdes de acento, e não um. O `--neon` vive dentro dos blocos
+ * `--ink`; o `--neon-ink` é o que aguenta ser lido e visto sobre claro, com
+ * 5,2:1, e é ele em check, ícone e link de seção clara.
  * ============================================================================
  */
 
@@ -42,130 +50,108 @@
    * Tokens da marca
    * -------------------------------------------------------------------- */
 
-  /* O fundo das artes. Preto com uma gota de verde-azulado, nunca #000: preto
-     puro achata o glow e faz a borda neon parecer recortada. */
-  --base: #070c0a;
-  /* O card, um degrau acima do fundo. A diferença é pequena de propósito -
-     quem separa os blocos é a borda fina, não o salto de luminosidade. */
-  --surface: #0e1613;
-  --surface-soft: #16211d;
+  --cream: #fbf8f0;
+  --paper: #ffffff;
+  --ink: #101613;
+  --green: #a8e89b;
+  --neon: #2be31f;
 
-  /* O verde do feed. Preenchimento, borda e glow - não texto sobre claro. */
-  --accent: #2be31f;
-  /* A versão do glow, um passo mais clara e mais saturada. */
-  --accent-glow: #39ff14;
-  /* A que aguenta ser lida sobre superfície clara, no painel. */
-  --accent-deep: #167a10;
-  /* O que se escreve **sobre** o verde chapado do card invertido. */
-  --accent-fg: #061007;
+  /* A versão do neon que sobrevive a fundo claro. Ver o cabeçalho. */
+  --neon-ink: #167a10;
 
-  /* Os acentos por curso. Robótica fica com o verde da marca; web ganha um
-     ciano vizinho - perto o bastante para pertencer à mesma família, longe o
-     bastante para os dois cards não se confundirem no mesmo scroll. */
-  --course-robotics: #2be31f;
-  --course-web: #1fd8e3;
+  /* Texto secundário sobre creme e sobre papel: 6,9:1. Abaixo disso a legenda
+     de card some no celular, que é de onde vem quase todo o tráfego. */
+  --ink-soft: #4a5a52;
 
-  --line: rgba(43, 227, 31, 0.16);
-  --line-soft: rgba(255, 255, 255, 0.08);
-  /* O halo do neon. Usado em box-shadow, nunca em texto. */
-  --glow: rgba(43, 227, 31, 0.35);
+  /* A borda é o que separa bloco de bloco, porque a sombra é quase nula. Duas
+     forças: a fina fecha card e bloco, a forte desenha o divisor da barra de
+     números, que precisa ser visto sem virar traço preto. */
+  --line: rgba(16, 22, 19, 0.08);
+  --line-strong: rgba(16, 22, 19, 0.16);
 
   /* --------------------------------------------------------------------
-   * Tokens do shadcn - tema escuro como padrão
+   * Raio
    * -------------------------------------------------------------------- */
 
-  --background: var(--base);
-  --foreground: #f2f7f3;
-  --card: var(--surface);
-  --card-foreground: #f2f7f3;
-  --popover: var(--surface);
-  --popover-foreground: #f2f7f3;
-  --primary: var(--accent);
-  --primary-foreground: var(--accent-fg);
-  --secondary: var(--surface-soft);
-  --secondary-foreground: #f2f7f3;
-  --muted: var(--surface-soft);
-  /* 4.8:1 sobre o card. Abaixo disso a legenda de card some no celular, que é
-     de onde vem quase todo o tráfego de escola. */
-  --muted-foreground: #9bb0a4;
-  --accent-color: var(--surface-soft);
-  --accent-foreground: var(--accent);
-  --destructive: #f2544b;
-  --destructive-foreground: #140706;
-  --border: var(--line-soft);
-  --input: var(--line-soft);
-  --ring: var(--accent);
+  --radius-card-lg: 24px;
+  --radius-block-lg: 32px;
 
-  --chart-1: var(--accent);
-  --chart-2: var(--course-web);
-  --chart-3: #f2b705;
-  --chart-4: #8b6cf2;
-  --chart-5: #f2544b;
-
+  /* O do shadcn, que o painel da secretaria usa. Não é o da landing: um input
+     de tabela com 24px de canto vira pastilha. */
   --radius: 0.5rem;
 
-  --sidebar: var(--surface);
-  --sidebar-foreground: #f2f7f3;
-  --sidebar-primary: var(--accent);
-  --sidebar-primary-foreground: var(--accent-fg);
-  --sidebar-accent: var(--surface-soft);
-  --sidebar-accent-foreground: var(--accent);
-  --sidebar-border: var(--line-soft);
-  --sidebar-ring: var(--accent);
-}
+  /* --------------------------------------------------------------------
+   * Ponte shadcn
+   *
+   * O painel e a autenticação leem estes nomes, não os da marca. Eles ficam
+   * apontando para a escala nova em vez de sumirem: apagá-los redesenharia a
+   * secretaria inteira de lambuja, que não é o que este trabalho pediu.
+   * -------------------------------------------------------------------- */
 
-/*
- * O tema claro, para o painel.
- *
- * Invertido em relação ao resto do projeto de propósito: aqui `:root` é escuro
- * porque o site é escuro, então a classe carrega o **claro**. Quem lê o
- * `next-themes` no `__root.tsx` não precisa saber disso - `attribute="class"`
- * funciona igual nos dois sentidos.
- */
-.light {
-  --background: #f7f9f7;
-  --foreground: #0b1410;
-  --card: #ffffff;
-  --card-foreground: #0b1410;
-  --popover: #ffffff;
-  --popover-foreground: #0b1410;
-  /* O neon não sobrevive ao fundo claro: aqui a primária é a versão profunda,
-     que dá 5.4:1 sobre o card. */
-  --primary: var(--accent-deep);
-  --primary-foreground: #ffffff;
-  --secondary: #eef2ee;
-  --secondary-foreground: #0b1410;
-  --muted: #eef2ee;
-  --muted-foreground: #55635b;
-  --accent-color: #eef2ee;
-  --accent-foreground: var(--accent-deep);
+  --background: var(--cream);
+  --foreground: var(--ink);
+  --card: var(--paper);
+  --card-foreground: var(--ink);
+  --popover: var(--paper);
+  --popover-foreground: var(--ink);
+  /* O verde legível, e não o neon: ação primária do painel é botão cheio com
+     texto por cima, e o neon não aguenta texto. */
+  --primary: var(--neon-ink);
+  --primary-foreground: var(--paper);
+  --secondary: #eef1ea;
+  --secondary-foreground: var(--ink);
+  --muted: #eef1ea;
+  --muted-foreground: var(--ink-soft);
+  --accent-color: #eef1ea;
+  --accent-foreground: var(--neon-ink);
   --destructive: #c2251c;
-  --destructive-foreground: #ffffff;
-  --border: rgba(11, 20, 16, 0.12);
-  --input: rgba(11, 20, 16, 0.12);
-  --ring: var(--accent-deep);
+  --destructive-foreground: var(--paper);
+  --border: var(--line);
+  --input: var(--line-strong);
+  --ring: var(--neon-ink);
 
-  --sidebar: #ffffff;
-  --sidebar-foreground: #0b1410;
-  --sidebar-primary: var(--accent-deep);
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #eef2ee;
-  --sidebar-accent-foreground: var(--accent-deep);
-  --sidebar-border: rgba(11, 20, 16, 0.12);
-  --sidebar-ring: var(--accent-deep);
+  --chart-1: var(--neon-ink);
+  --chart-2: #1f7f8c;
+  --chart-3: #c47a1a;
+  --chart-4: #6b5bb5;
+  --chart-5: #c2251c;
+
+  --sidebar: var(--paper);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--neon-ink);
+  --sidebar-primary-foreground: var(--paper);
+  --sidebar-accent: #eef1ea;
+  --sidebar-accent-foreground: var(--neon-ink);
+  --sidebar-border: var(--line);
+  --sidebar-ring: var(--neon-ink);
 }
 
 @theme inline {
-  --font-sans: 'Inter Variable', sans-serif;
   /*
-   * A tipografia dos títulos das artes: condensada, pesada, itálica.
+   * Sans geométrica de terminação arredondada, variável e servida do próprio
+   * bundle.
    *
-   * `Archivo Narrow` como primeira escolha e a pilha do sistema atrás. A fonte
-   * **não** é carregada de CDN: o alvo é LCP abaixo de 2,5s em 4G, e a escola
-   * está numa cidade onde a conexão é isso mesmo - um `@import` de fonte
-   * externa bloqueia a renderização do título, que é justamente o LCP.
+   * Antes daqui `--font-display` pedia `Archivo Narrow` sem carregar arquivo
+   * nenhum: quem não tivesse a fonte instalada - ou seja, praticamente todo
+   * mundo - lia os títulos em Inter itálica esticada. O itálico condensado do
+   * projeto nunca existiu de fato.
+   *
+   * Título e corpo na mesma família de propósito: a hierarquia vem do peso e do
+   * tamanho, e a única quebra de família na página é a palavra da pílula.
    */
-  --font-display: 'Archivo Narrow', 'Inter Variable', system-ui, sans-serif;
+  --font-sans: 'Outfit Variable', system-ui, sans-serif;
+  --font-display: 'Outfit Variable', system-ui, sans-serif;
+  --font-serif: 'Playfair Display Variable', Georgia, serif;
+
+  --color-cream: var(--cream);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-green: var(--green);
+  --color-neon: var(--neon);
+  --color-neon-ink: var(--neon-ink);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -200,12 +186,9 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Os tokens da marca, disponíveis como utilitário Tailwind. */
-  --color-neon: var(--accent);
-  --color-neon-glow: var(--accent-glow);
-  --color-surface-soft: var(--surface-soft);
-  --color-course-robotics: var(--course-robotics);
-  --color-course-web: var(--course-web);
+  /* Os raios da landing, como utilitário: `rounded-card` e `rounded-block`. */
+  --radius-card: var(--radius-card-lg);
+  --radius-block: var(--radius-block-lg);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -218,57 +201,21 @@
     @apply border-border outline-ring/50;
   }
 
+  html {
+    @apply scroll-smooth;
+  }
+
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-cream font-sans text-ink antialiased;
   }
-
-  /*
-   * O acento por curso, injetado pelo `NeonCard` como variável local.
-   *
-   * Um data-attribute e não uma classe por curso: a variante vem do banco
-   * (`courses.accent`), e um mapa de classes no JSX obrigaria a tocar no CSS
-   * toda vez que a escola cadastrasse um curso novo. O fallback é o verde da
-   * marca, então curso com acento desconhecido não fica sem cor.
-   */
-  [data-accent='ROBOTICS'] {
-    --local-accent: var(--course-robotics);
-  }
-
-  [data-accent='WEB'] {
-    --local-accent: var(--course-web);
-  }
-}
-
-@utility neon-glow {
-  box-shadow:
-    0 0 0 1px color-mix(in oklab, var(--local-accent, var(--accent)) 40%, transparent),
-    0 0 24px -6px color-mix(in oklab, var(--local-accent, var(--accent)) 45%, transparent);
-}
-
-/*
- * O canto chanfrado dos cards das artes.
- *
- * `clip-path` e não uma borda desenhada: chanfro feito com pseudo-elemento
- * precisa de um triângulo da cor do fundo por cima, e isso quebra assim que o
- * card assenta sobre a trilha de circuito - o triângulo apaga o que está atrás.
- */
-@utility chamfer {
-  clip-path: polygon(
-    0 0,
-    calc(100% - 14px) 0,
-    100% 14px,
-    100% 100%,
-    14px 100%,
-    0 calc(100% - 14px)
-  );
 }
 
 /*
  * Respeita quem pediu menos movimento.
  *
- * O site usa reveal ao rolar e glow pulsante; para quem tem sensibilidade
- * vestibular isso não é enfeite, é sintoma. Uma regra só, no fim, alcança tudo
- * - inclusive a animação que alguém acrescentar amanhã sem lembrar disto.
+ * O site usa reveal ao rolar; para quem tem sensibilidade vestibular isso não é
+ * enfeite, é sintoma. Uma regra só, no fim, alcança tudo - inclusive a animação
+ * que alguém acrescentar amanhã sem lembrar disto.
  */
 @media (prefers-reduced-motion: reduce) {
   *,

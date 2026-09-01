@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none" role="img" aria-hidden="true">
+  <!-- TODO: placeholder no estilo certo, ate a arte final chegar. Ver _estilo.md -->
+  <g stroke="#101613" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M28 236c60 0 60-40 120-40s60 40 120 40 76-24 104-24" stroke="#4B8FE3" stroke-width="10"/>
+    <rect x="128" y="108" width="144" height="88" rx="14" fill="#A8E89B"/>
+    <circle cx="164" cy="140" r="12" fill="#FBF8F0"/>
+    <circle cx="236" cy="140" r="12" fill="#FBF8F0"/>
+    <path d="M164 168h72"/>
+    <circle cx="150" cy="204" r="18" fill="#101613"/>
+    <circle cx="250" cy="204" r="18" fill="#101613"/>
+    <path d="M200 108V76"/>
+    <circle cx="200" cy="66" r="12" fill="#F2954B"/>
+    <path d="M128 152H96M272 152h32"/>
+  </g>
+</svg>

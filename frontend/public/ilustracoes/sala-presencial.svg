@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none" role="img" aria-hidden="true">
+  <!-- TODO: placeholder no estilo certo, ate a arte final chegar. Ver _estilo.md -->
+  <g stroke="#101613" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="40" y="48" width="184" height="112" rx="10" fill="#FBF8F0"/>
+    <path d="M64 80h136M64 104h136M64 128h84"/>
+    <circle cx="286" cy="96" r="30" fill="#F2954B"/>
+    <path d="M256 160c0-18 14-30 30-30s30 12 30 30"/>
+    <rect x="36" y="196" width="128" height="60" rx="10" fill="#4B8FE3"/>
+    <rect x="196" y="196" width="128" height="60" rx="10" fill="#A8E89B"/>
+    <path d="M60 196v-16M140 196v-16M220 196v-16M300 196v-16"/>
+  </g>
+</svg>
