@@ -1,13 +1,13 @@
 import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
-import { Button } from '#/components/ui/button'
+import { PillButton } from '#/components/common/pill-button'
 import { Highlight } from '#/components/common/highlight'
 import { Sparkles, Petal } from '#/components/common/marks'
 import { EnrollmentCta } from '#/components/common/enrollment-cta'
 import { storefrontCoursesQueryOptions } from '#/integrations/tanstack-query/queries'
 import { enrollmentStateFrom, scheduleSummary } from '#/lib/enrollment-state'
-import { formatDate } from '#/lib/format'
+import { formatDate, pluralize } from '#/lib/format'
 import { REVEAL } from './reveal'
 import { cn } from '#/lib/utils'
 
@@ -36,7 +36,8 @@ export function Hero(): React.JSX.Element {
   // Os turnos saem das turmas, não da frase: enquanto era uma turma de manhã, a
   // frase estava certa por coincidência, e passou a mentir no dia em que a
   // escola abriu turma à tarde e à noite.
-  const shifts = summary.shiftsLabel ? ` de ${summary.shiftsLabel}` : ''
+  let shifts = ''
+  if (summary.shiftsLabel) shifts = ` de ${summary.shiftsLabel}`
 
   // Sem turma anunciada a frase perde a data em vez de inventar uma. O que
   // sobra continua verdadeiro.
@@ -47,9 +48,12 @@ export function Hero(): React.JSX.Element {
 
   // "São cinco turmas de 40 vagas" quando todas têm a mesma capacidade; o total
   // quando não têm. Nenhum dos dois é escrito à mão.
+  let times = ''
+  if (summary.timesLabel) times = `, das ${summary.timesLabel}`
+
   let seats = ''
   if (summary.classCount > 0 && summary.seatsPerClass !== null) {
-    seats = `São ${summary.classCount} ${summary.classCount === 1 ? 'turma' : 'turmas'} de ${summary.seatsPerClass} vagas${summary.timesLabel ? `, das ${summary.timesLabel}` : ''}.`
+    seats = `São ${pluralize(summary.classCount, 'turma', 'turmas')} de ${summary.seatsPerClass} vagas${times}.`
   } else if (summary.classCount > 0) {
     seats = `São ${summary.totalSeats} vagas em ${summary.classCount} turmas.`
   }
@@ -84,16 +88,16 @@ export function Hero(): React.JSX.Element {
             )}
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <EnrollmentCta variant="pill" size="pill-lg" />
+              <EnrollmentCta tone="ink" scale="lg" />
 
               {/*
                 Âncora e não `Link`: os cursos são a seção logo abaixo, e não uma
                 rota. Trocar de tela para ver dois cards seria pior que rolar
                 até eles.
               */}
-              <Button
-                variant="pill-outline"
-                size="pill-lg"
+              <PillButton
+                tone="outline"
+                scale="lg"
                 render={<a href="#cursos">Ver os cursos</a>}
               />
             </div>

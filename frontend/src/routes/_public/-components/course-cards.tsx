@@ -3,8 +3,9 @@ import { Link } from '@tanstack/react-router'
 import { ArrowRight, CalendarBlank, Clock, Users } from '@phosphor-icons/react'
 
 import { Badge } from '#/components/ui/badge'
-import { Button } from '#/components/ui/button'
-import { Card, CardContent, CardTitle } from '#/components/ui/card'
+import { PillButton } from '#/components/common/pill-button'
+import { CardContent, CardTitle } from '#/components/ui/card'
+import { SectionCard } from '#/components/common/section-card'
 import { Highlight } from '#/components/common/highlight'
 import { formatDate, formatMoney } from '#/lib/format'
 import {
@@ -29,7 +30,6 @@ const ILLUSTRATIONS: Record<string, string> = {
 }
 
 const FALLBACK_ILLUSTRATION = '/ilustracoes/bancada-arduino.svg'
-
 
 /**
  * Os dois cursos, na única seção escura da página.
@@ -74,9 +74,8 @@ export function CourseCards({
 
         <div className="mt-12 grid gap-4 lg:grid-cols-2">
           {courses.map((course, index) => (
-            <Card
+            <SectionCard
               key={course.id}
-              size="lg"
               className={cn(REVEAL, 'h-full')}
               style={{ animationDelay: `${index * STAGGER}ms` }}
             >
@@ -91,18 +90,13 @@ export function CourseCards({
 
               <CardContent className="flex flex-1 flex-col gap-4">
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="green" size="lg">
-                    Módulo 1
-                  </Badge>
+                  <Badge className="h-6 px-3 text-xs">Módulo 1</Badge>
 
                   {courseClasses(course).length > 0 && (
-                    <Badge
-                      variant="outline"
-                      size="lg"
-                      className="border-line-strong text-ink-soft"
-                    >
+                    <Badge variant="outline" className="h-6 px-3 text-xs">
                       <Users />
-                      {courseSeatsRemaining(course)} de {courseCapacity(course)} vagas
+                      {courseSeatsRemaining(course)} de {courseCapacity(course)}{' '}
+                      vagas
                     </Badge>
                   )}
                 </div>
@@ -172,9 +166,9 @@ export function CourseCards({
                     inscrição, uma vez só.
                   </p>
 
-                  <Button
-                    variant="pill-green"
-                    size="pill"
+                  <PillButton
+                    tone="primary"
+                    scale="md"
                     className="mt-5 w-full"
                     render={
                       <Link to="/cursos/$slug" params={{ slug: course.slug }}>
@@ -185,7 +179,7 @@ export function CourseCards({
                   />
                 </div>
               </CardContent>
-            </Card>
+            </SectionCard>
           ))}
         </div>
       </div>

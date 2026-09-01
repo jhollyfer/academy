@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowRight } from '@phosphor-icons/react'
 
-import { Button } from '#/components/ui/button'
+import { PillButton } from '#/components/common/pill-button'
 import { storefrontCoursesQueryOptions } from '#/integrations/tanstack-query/queries'
 import {
   ENROLLMENT_CTA_LABEL,
@@ -14,7 +14,7 @@ import { whatsappUrl } from '#/lib/site'
 import type { Merge } from '#/lib/interfaces'
 
 /**
- * O resto das props vai para o `Button` porque este botão é embrulhável: dentro
+ * O resto das props vai para a `PillButton` porque este botão é embrulhável: dentro
  * do menu mobile ele mora num `<SheetClose render={<EnrollmentCta />} />`, e o
  * Base UI funde `onClick` e `ref` no elemento do `render`. Um componente que
  * não espalha o resto descarta os dois em silêncio - a pessoa navega e o painel
@@ -24,7 +24,7 @@ import type { Merge } from '#/lib/interfaces'
  * que é o que ele existe para decidir.
  */
 type EnrollmentCtaProps = Merge<
-  Omit<React.ComponentProps<typeof Button>, 'render' | 'children'>,
+  Omit<React.ComponentProps<typeof PillButton>, 'render' | 'children'>,
   {
     /** O curso a pré-selecionar, quando o botão sai de dentro de um card. */
     courseSlug?: string
@@ -54,8 +54,8 @@ type EnrollmentCtaProps = Merge<
  * "ainda não sei" quanto para "não há turma".
  */
 export function EnrollmentCta({
-  variant = 'pill',
-  size = 'pill',
+  tone = 'ink',
+  scale = 'md',
   className,
   courseSlug,
   ...rest
@@ -72,10 +72,10 @@ export function EnrollmentCta({
 
   if (state.kind === 'NONE') {
     return (
-      <Button
+      <PillButton
         {...rest}
-        variant={variant}
-        size={size}
+        tone={tone}
+        scale={scale}
         className={className}
         render={
           <a
@@ -92,10 +92,10 @@ export function EnrollmentCta({
   }
 
   return (
-    <Button
+    <PillButton
       {...rest}
-      variant={variant}
-      size={size}
+      tone={tone}
+      scale={scale}
       className={className}
       render={
         // `search` e não caminho: a matrícula lê `?curso` para já abrir no curso

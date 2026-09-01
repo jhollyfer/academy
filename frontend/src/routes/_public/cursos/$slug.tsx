@@ -50,7 +50,10 @@ function courseJsonLd(course: CourseResponse) {
    * e o buscador mostra as ocorrências que a página declara. Declarar uma só
    * esconderia as outras exatamente como o card escondia.
    */
-  const classes = course.announcedClasses ?? (course.nextClass ? [course.nextClass] : [])
+  let fallback: Array<NonNullable<typeof course.nextClass>> = []
+  if (course.nextClass) fallback = [course.nextClass]
+
+  const classes = course.announcedClasses ?? fallback
 
   const instances = classes.map(function (entity) {
     const instance: Record<string, unknown> = {
@@ -95,7 +98,8 @@ function courseJsonLd(course: CourseResponse) {
   if (instances.length > 0) {
     // Um objeto quando é uma só: o formato de item único é o que os validadores
     // do buscador mostram nos exemplos, e um array de um item é ruído.
-    jsonLd.hasCourseInstance = instances.length === 1 ? instances[0] : instances
+    jsonLd.hasCourseInstance = instances
+    if (instances.length === 1) jsonLd.hasCourseInstance = instances[0]
   }
 
   return jsonLd

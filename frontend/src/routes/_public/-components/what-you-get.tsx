@@ -9,16 +9,13 @@ import {
 } from '@phosphor-icons/react'
 import type { Icon } from '@phosphor-icons/react'
 
-import {
-  Card,
-  CardContent,
-  CardTitle,
-  CardDescription,
-} from '#/components/ui/card'
+import { CardContent, CardTitle, CardDescription } from '#/components/ui/card'
+import { SectionCard } from '#/components/common/section-card'
 import { Highlight } from '#/components/common/highlight'
 import { EnrollmentCta } from '#/components/common/enrollment-cta'
 import { storefrontCoursesQueryOptions } from '#/integrations/tanstack-query/queries'
 import { scheduleSummary } from '#/lib/enrollment-state'
+import { pluralize } from '#/lib/format'
 import { REVEAL, STAGGER } from './reveal'
 import { cn } from '#/lib/utils'
 
@@ -79,18 +76,19 @@ export function WhatYouGet(): React.JSX.Element {
    * Sem turma anunciada ele fala do tamanho da turma sem prometer número: a
    * frase continua verdadeira, e é a mesma escolha que o hero faz com a data.
    */
-  let seats =
-    'Turma pequena, sem sala lotada e sem fila para usar a bancada.'
+  let seats = 'Turma pequena, sem sala lotada e sem fila para usar a bancada.'
 
   if (summary.seatsPerClass !== null) {
-    seats = `${summary.classCount} ${summary.classCount === 1 ? 'turma' : 'turmas'} de ${summary.seatsPerClass} lugares. Sem sala lotada e sem fila para usar a bancada.`
+    seats = `${pluralize(summary.classCount, 'turma', 'turmas')} de ${summary.seatsPerClass} lugares. Sem sala lotada e sem fila para usar a bancada.`
   } else if (summary.classCount > 0) {
     seats = `${summary.totalSeats} lugares em ${summary.classCount} turmas. Sem sala lotada e sem fila para usar a bancada.`
   }
 
-  const items = ITEMS.map((item) =>
-    item.icon === UsersThree ? { ...item, description: seats } : item,
-  )
+  const items = ITEMS.map(function (item) {
+    if (item.icon === UsersThree) return { ...item, description: seats }
+
+    return item
+  })
 
   return (
     <section
@@ -121,8 +119,8 @@ export function WhatYouGet(): React.JSX.Element {
             </p>
 
             <EnrollmentCta
-              variant="pill-green"
-              size="pill-lg"
+              tone="primary"
+              scale="lg"
               className="w-full sm:w-auto"
             />
           </div>
@@ -130,9 +128,8 @@ export function WhatYouGet(): React.JSX.Element {
 
         <div className="grid gap-4 sm:grid-cols-2">
           {items.map((item, index) => (
-            <Card
+            <SectionCard
               key={item.title}
-              size="lg"
               className={cn(REVEAL, 'h-full')}
               style={{ animationDelay: `${index * STAGGER}ms` }}
             >
@@ -160,7 +157,7 @@ export function WhatYouGet(): React.JSX.Element {
                   {item.description}
                 </CardDescription>
               </CardContent>
-            </Card>
+            </SectionCard>
           ))}
         </div>
       </div>

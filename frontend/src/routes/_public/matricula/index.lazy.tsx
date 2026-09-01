@@ -20,6 +20,7 @@ import {
 import { whatsappUrl } from '#/lib/site'
 import { Highlight } from '#/components/common/highlight'
 import { Button } from '#/components/ui/button'
+import { PillButton } from '#/components/common/pill-button'
 import { Input } from '#/components/ui/input'
 import { Checkbox } from '#/components/ui/checkbox'
 import {
@@ -274,9 +275,9 @@ function RouteComponent(): React.JSX.Element {
           secretaria e avisamos assim que as inscrições começarem.
         </p>
 
-        <Button
-          variant="pill"
-          size="pill-lg"
+        <PillButton
+          tone="ink"
+          scale="lg"
           className="mt-8"
           render={
             <a

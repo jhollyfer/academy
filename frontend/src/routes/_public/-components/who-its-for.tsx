@@ -1,11 +1,7 @@
 import type * as React from 'react'
 
-import {
-  Card,
-  CardContent,
-  CardTitle,
-  CardDescription,
-} from '#/components/ui/card'
+import { CardContent, CardTitle, CardDescription } from '#/components/ui/card'
+import { SectionCard } from '#/components/common/section-card'
 import { Highlight } from '#/components/common/highlight'
 import { REVEAL, STAGGER } from './reveal'
 import { cn } from '#/lib/utils'
@@ -55,9 +51,8 @@ export function WhoItsFor(): React.JSX.Element {
 
           <div className="mt-12 grid gap-4 lg:grid-cols-3">
             {PROFILES.map((profile, index) => (
-              <Card
+              <SectionCard
                 key={profile.title}
-                size="lg"
                 className={cn(REVEAL, 'h-full')}
                 style={{ animationDelay: `${index * STAGGER}ms` }}
               >
@@ -69,7 +64,7 @@ export function WhoItsFor(): React.JSX.Element {
                     {profile.description}
                   </CardDescription>
                 </CardContent>
-              </Card>
+              </SectionCard>
             ))}
           </div>
 

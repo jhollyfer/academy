@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { List, WhatsappLogo } from '@phosphor-icons/react'
 
 import { Button } from '#/components/ui/button'
+import { PillButton } from '#/components/common/pill-button'
 import {
   Sheet,
   SheetClose,
@@ -75,9 +76,9 @@ export function Header(): React.JSX.Element {
         </Link>
 
         <div className="ml-auto flex items-center gap-2 lg:ml-0 lg:justify-self-end">
-          <Button
-            variant="pill-outline"
-            size="pill"
+          <PillButton
+            tone="outline"
+            scale="md"
             className="hidden md:inline-flex"
             render={
               <a

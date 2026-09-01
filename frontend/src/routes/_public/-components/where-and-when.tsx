@@ -9,7 +9,7 @@ import {
 } from '@phosphor-icons/react'
 import type { Icon } from '@phosphor-icons/react'
 
-import { Button } from '#/components/ui/button'
+import { PillButton } from '#/components/common/pill-button'
 import { Separator } from '#/components/ui/separator'
 import { Highlight } from '#/components/common/highlight'
 import { storefrontCoursesQueryOptions } from '#/integrations/tanstack-query/queries'
@@ -113,9 +113,9 @@ export function WhereAndWhen(): React.JSX.Element {
                 WhatsApp.
               </p>
 
-              <Button
-                variant="pill-outline"
-                size="pill"
+              <PillButton
+                tone="outline"
+                scale="md"
                 className="mt-5"
                 render={
                   <a

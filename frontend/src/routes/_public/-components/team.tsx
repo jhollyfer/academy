@@ -1,6 +1,7 @@
 import type * as React from 'react'
 
-import { Card, CardContent, CardTitle } from '#/components/ui/card'
+import { CardContent, CardTitle } from '#/components/ui/card'
+import { SectionCard } from '#/components/common/section-card'
 import { Highlight } from '#/components/common/highlight'
 import { REVEAL, STAGGER } from './reveal'
 import { cn } from '#/lib/utils'
@@ -86,9 +87,8 @@ export function Team(): React.JSX.Element {
 
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {TEAM.map((person, index) => (
-              <Card
+              <SectionCard
                 key={person.name}
-                size="lg"
                 className={cn(REVEAL, 'h-full')}
                 style={{ animationDelay: `${index * STAGGER}ms` }}
               >
@@ -126,7 +126,7 @@ export function Team(): React.JSX.Element {
                     ))}
                   </ul>
                 </CardContent>
-              </Card>
+              </SectionCard>
             ))}
           </div>
         </div>

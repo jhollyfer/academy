@@ -4,7 +4,8 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { CalendarBlank, Clock, MapPin, Users } from '@phosphor-icons/react'
 
 import { Badge } from '#/components/ui/badge'
-import { Card, CardContent } from '#/components/ui/card'
+import { CardContent } from '#/components/ui/card'
+import { SectionCard } from '#/components/common/section-card'
 import { Separator } from '#/components/ui/separator'
 import { Highlight } from '#/components/common/highlight'
 import { Leaf } from '#/components/common/marks'
@@ -49,7 +50,7 @@ function RouteComponent(): React.JSX.Element {
 
           <div className="relative mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[1.2fr_1fr]">
             <div className={cn(REVEAL)}>
-              <Badge variant="ink" size="lg">
+              <Badge className="h-6 border-transparent bg-foreground px-3 text-xs text-background">
                 Módulo 1
               </Badge>
 
@@ -64,8 +65,8 @@ function RouteComponent(): React.JSX.Element {
               )}
 
               <EnrollmentCta
-                variant="pill"
-                size="pill-lg"
+                tone="ink"
+                scale="lg"
                 className="mt-8"
                 courseSlug={course.slug}
               />
@@ -207,7 +208,7 @@ function RouteComponent(): React.JSX.Element {
             </h2>
 
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:max-w-3xl">
-              <Card size="lg" className={cn(REVEAL)}>
+              <SectionCard className={cn(REVEAL)}>
                 <CardContent>
                   <p className="text-4xl leading-none font-semibold tracking-tight text-ink lg:text-5xl">
                     {formatMoney(course.enrollmentFeeInCents)}
@@ -216,9 +217,9 @@ function RouteComponent(): React.JSX.Element {
                     de inscrição, uma vez só.
                   </p>
                 </CardContent>
-              </Card>
+              </SectionCard>
 
-              <Card size="lg" className={cn(REVEAL, 'delay-100')}>
+              <SectionCard className={cn(REVEAL, 'delay-100')}>
                 <CardContent>
                   <p className="text-4xl leading-none font-semibold tracking-tight text-ink lg:text-5xl">
                     {formatMoney(course.monthlyFeeInCents)}
@@ -227,7 +228,7 @@ function RouteComponent(): React.JSX.Element {
                     por mês, durante os {course.durationMonths} meses.
                   </p>
                 </CardContent>
-              </Card>
+              </SectionCard>
             </div>
 
             <Separator className="my-10 bg-line" />
@@ -238,8 +239,8 @@ function RouteComponent(): React.JSX.Element {
             </p>
 
             <EnrollmentCta
-              variant="pill"
-              size="pill-lg"
+              tone="ink"
+              scale="lg"
               className="mt-8"
               courseSlug={course.slug}
             />

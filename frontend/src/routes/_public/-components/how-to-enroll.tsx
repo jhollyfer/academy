@@ -1,7 +1,7 @@
 import type * as React from 'react'
 import { CheckCircle, MapPin } from '@phosphor-icons/react'
 
-import { Button } from '#/components/ui/button'
+import { PillButton } from '#/components/common/pill-button'
 import { Highlight } from '#/components/common/highlight'
 import { EnrollmentCta } from '#/components/common/enrollment-cta'
 import { REVEAL } from './reveal'
@@ -64,11 +64,11 @@ export function HowToEnroll(): React.JSX.Element {
             </ol>
 
             <div className="mt-9 flex flex-wrap items-center gap-3">
-              <EnrollmentCta variant="pill" size="pill-lg" />
+              <EnrollmentCta tone="ink" scale="lg" />
 
-              <Button
-                variant="pill-outline"
-                size="pill-lg"
+              <PillButton
+                tone="outline"
+                scale="lg"
                 render={
                   <a
                     href={whatsappUrl(ENROLL_MESSAGE)}
