@@ -5,9 +5,9 @@ import {
   coursePayload,
   createCourse,
   resetDatabase,
-} from '#tests/helpers'
+} from '../helpers.ts'
 
-test.group('administrator/courses', (group) => {
+test.group('administrador > cursos', (group) => {
   group.each.setup(() => resetDatabase())
 
   test('recusa sem sessão com 401', async ({ client }) => {
@@ -219,7 +219,7 @@ test.group('administrator/courses', (group) => {
   })
 })
 
-test.group('administrator/courses · grade e FAQ', (group) => {
+test.group('administrador > cursos > grade e FAQ', (group) => {
   group.each.setup(() => resetDatabase())
 
   test('grava a grade junto do curso, na ordem do array', async ({ client, assert }) => {

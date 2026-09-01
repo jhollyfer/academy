@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
-import { body, resetDatabase } from '#tests/helpers'
+import { body, resetDatabase } from '../helpers.ts'
 
-test.group('storefront/faqs', (group) => {
+test.group('vitrine > FAQ', (group) => {
   group.each.setup(() => resetDatabase())
 
   /**

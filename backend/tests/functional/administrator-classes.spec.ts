@@ -6,9 +6,9 @@ import {
   createClass,
   createCourse,
   resetDatabase,
-} from '#tests/helpers'
+} from '../helpers.ts'
 
-test.group('administrator/classes', (group) => {
+test.group('administrador > turmas', (group) => {
   group.each.setup(() => resetDatabase())
 
   test('recusa sem sessão com 401', async ({ client }) => {

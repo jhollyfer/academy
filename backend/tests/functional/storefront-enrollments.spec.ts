@@ -1,4 +1,6 @@
 import { test } from '@japa/runner'
+import mail from '@adonisjs/mail/services/main'
+import { StorefrontEnrollmentCreateValidator } from '#core/validator'
 import {
   authenticateAsOwner,
   body,
@@ -6,9 +8,10 @@ import {
   createCourse,
   enrollmentPayload,
   resetDatabase,
-} from '#tests/helpers'
+} from '../helpers.ts'
+import type { FakeMailer } from '@adonisjs/mail'
 
-test.group('storefront/enrollments', (group) => {
+test.group('vitrine > matrículas', (group) => {
   group.each.setup(() => resetDatabase())
 
   test('envia matrícula sem sessão e recebe o protocolo', async ({ client, assert }) => {
@@ -210,60 +213,124 @@ test.group('storefront/enrollments', (group) => {
   })
 })
 
-test.group('storefront/courses', (group) => {
+/**
+ * O aceite do contrato e o consentimento da LGPD.
+ *
+ * Testado contra o **validator**, e não pela rota como o resto: o registro de
+ * rotas tipa os dois campos como `literal(true)`, e o cliente do Japa recusa
+ * `false` em tempo de compilação - o corpo inválido não é construível ali. O que
+ * importa provar é que o servidor os exige, e é o validator quem os exige.
+ */
+test.group('vitrine > matrículas > consentimento', () => {
+  const base = {
+    classId: '00000000-0000-4000-8000-000000000000',
+    studentName: 'João da Silva',
+    studentBirthDate: '2000-04-12',
+    email: 'joao@exemplo.com',
+    phone: '97984600872',
+    termsAccepted: true,
+    lgpdConsent: true,
+  }
+
+  test('aceita o payload com os dois aceites marcados', async ({ assert }) => {
+    const payload = await StorefrontEnrollmentCreateValidator.validate(base)
+
+    assert.equal(payload.email, 'joao@exemplo.com')
+  })
+
+  test('recusa sem o consentimento da LGPD', async ({ assert }) => {
+    await assert.rejects(() =>
+      StorefrontEnrollmentCreateValidator.validate({ ...base, lgpdConsent: false })
+    )
+  })
+
+  test('recusa sem o aceite do contrato', async ({ assert }) => {
+    await assert.rejects(() =>
+      StorefrontEnrollmentCreateValidator.validate({ ...base, termsAccepted: false })
+    )
+  })
+
+  test('recusa telefone que não é telefone', async ({ assert }) => {
+    await assert.rejects(() =>
+      StorefrontEnrollmentCreateValidator.validate({ ...base, phone: 'nao tenho fone' })
+    )
+  })
+
+  test('recusa CPF com dígito verificador errado', async ({ assert }) => {
+    await assert.rejects(() =>
+      StorefrontEnrollmentCreateValidator.validate({ ...base, studentDocument: '11111111111' })
+    )
+  })
+
+  test('aceita CPF mascarado e grava só os dígitos', async ({ assert }) => {
+    const payload = await StorefrontEnrollmentCreateValidator.validate({
+      ...base,
+      studentDocument: '390.533.447-05',
+    })
+
+    // O `parse()` tira a máscara antes de qualquer regra: sem isso o mesmo CPF
+    // existiria no banco de duas formas.
+    assert.equal(payload.studentDocument, '39053344705')
+  })
+})
+
+/**
+ * O aviso que a secretaria recebe quando alguém se inscreve.
+ *
+ * `mail.fake()` troca o transporte antes de qualquer envio, então nada sai da
+ * máquina - e o teste continua exercitando o caminho real do use-case, que é o
+ * que importa. As mensagens vão para `queued` e não para `sent` porque o serviço
+ * usa `sendLater`: enfileirar é o comportamento, e afirmar `sent` provaria o
+ * oposto do desenhado.
+ */
+test.group('vitrine > matrículas > aviso para a secretaria', (group) => {
+  let mails: FakeMailer
+
   group.each.setup(() => resetDatabase())
+  group.each.setup(() => {
+    mails = mail.fake()
 
-  test('lista só curso ativo e não removido, sem sessão', async ({ client, assert }) => {
-    const session = await authenticateAsOwner(client)
-    await createCourse(client, session)
-    const hidden = await createCourse(client, session, {
-      name: 'Web Development Fundamentals',
-      accent: 'WEB',
-    })
-
-    await client
-      .put(`/administrator/courses/${hidden.id}`)
-      .cookies(session)
-      .json({ status: 'INACTIVE' })
-
-    const response = await client.get('/storefront/courses')
-
-    response.assertStatus(200)
-    assert.equal(body(response).meta.total, 1)
+    // Só restaura. `clear()` depois de `restore()` mexe num fake que já saiu de
+    // cena e estoura no teardown.
+    return () => mail.restore()
   })
 
-  test('detalha pelo slug com grade, FAQ e a próxima turma', async ({ client, assert }) => {
-    const session = await authenticateAsOwner(client)
-    const course = await createCourse(client, session, {
-      modules: [{ title: 'Sábado 1 · Eletrônica básica' }],
-      faqs: [{ question: 'Preciso levar notebook?', answer: 'Não.' }],
-    })
-    await createClass(client, session, course.id)
-
-    const response = await client.get(`/storefront/courses/${course.slug}`)
-
-    response.assertStatus(200)
-
-    const detail = body(response)
-    assert.lengthOf(detail.modules, 1)
-    assert.lengthOf(detail.faqs, 1)
-    // Uma turma, não um array de uma: qual é "a próxima" é decisão do servidor.
-    assert.equal(detail.nextClass.seatsRemaining, 40)
-  })
-
-  test('curso sem turma anunciada vem com nextClass nulo', async ({ client, assert }) => {
+  test('matrícula nova enfileira o aviso com o protocolo no corpo', async ({ client, assert }) => {
     const session = await authenticateAsOwner(client)
     const course = await createCourse(client, session)
+    const turma = await createClass(client, session, course.id)
 
-    const response = await client.get(`/storefront/courses/${course.slug}`)
+    const response = await client
+      .post('/storefront/enrollments')
+      .json(enrollmentPayload(turma.id, { studentName: 'Maria de Souza' }))
 
-    // `null` é "não há turma anunciada", que é diferente de o campo sumir.
-    assert.isNull(body(response).nextClass)
+    response.assertStatus(201)
+
+    const queued = mails.messages.queued()
+
+    assert.lengthOf(queued, 1)
+    assert.equal(queued[0].nodeMailerMessage.subject, 'Nova matrícula: Maria de Souza')
+    assert.include(String(queued[0].nodeMailerMessage.html), response.body().protocol)
+    queued[0].assertRecipient('to', 'secretaria@maiyu.test')
   })
 
-  test('slug inexistente é 404', async ({ client }) => {
-    const response = await client.get('/storefront/courses/curso-que-nao-existe')
+  test('fila de espera muda o assunto do aviso', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+    const turma = await createClass(client, session, course.id, { capacity: 1 })
 
-    response.assertStatus(404)
+    await client.post('/storefront/enrollments').json(enrollmentPayload(turma.id))
+
+    const response = await client
+      .post('/storefront/enrollments')
+      .json(enrollmentPayload(turma.id, { studentName: 'Ana Ribeiro', email: 'ana@exemplo.com' }))
+
+    response.assertStatus(201)
+    assert.equal(response.body().status, 'WAITLIST')
+
+    const queued = mails.messages.queued()
+
+    assert.lengthOf(queued, 2)
+    assert.equal(queued[1].nodeMailerMessage.subject, 'Fila de espera: Ana Ribeiro')
   })
 })

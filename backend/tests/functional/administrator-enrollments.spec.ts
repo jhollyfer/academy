@@ -6,7 +6,7 @@ import {
   createCourse,
   enrollmentPayload,
   resetDatabase,
-} from '../../helpers.ts'
+} from '../helpers.ts'
 
 /**
  * O CSV que a secretaria abre no Excel.
