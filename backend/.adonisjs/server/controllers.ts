@@ -23,6 +23,15 @@ export const controllers = {
       Unarchive: () => import('#features/administrator/courses/unarchive.controller'),
       Update: () => import('#features/administrator/courses/update.controller'),
     },
+    enrollments: {
+      Archive: () => import('#features/administrator/enrollments/archive.controller'),
+      Delete: () => import('#features/administrator/enrollments/delete.controller'),
+      Export: () => import('#features/administrator/enrollments/export.controller'),
+      Paginate: () => import('#features/administrator/enrollments/paginate.controller'),
+      Show: () => import('#features/administrator/enrollments/show.controller'),
+      Unarchive: () => import('#features/administrator/enrollments/unarchive.controller'),
+      Update: () => import('#features/administrator/enrollments/update.controller'),
+    },
   },
   authentication: {
     SignIn: () => import('#features/authentication/sign-in.controller'),

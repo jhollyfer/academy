@@ -105,6 +105,19 @@ router
       .prefix('classes')
       .as('classes')
 
+    router
+      .group(() => {
+        router.get('/', [controllers.administrator.enrollments.Paginate])
+        // Antes de `:id`: o Adonis casa na ordem de declaração, e `export`
+        // cairia no parâmetro de identificador se viesse depois - virando um
+        // 422 de uuid inválido.
+        router.get('export', [controllers.administrator.enrollments.Export]).as('export')
+        router.get(':id', [controllers.administrator.enrollments.Show])
+        router.put(':id', [controllers.administrator.enrollments.Update])
+      })
+      .prefix('enrollments')
+      .as('enrollments')
+
     // O ciclo de vida do registro é privilégio do dono. As três operações são
     // distintas de propósito: `archive` manda para a lixeira (grava
     // `deletedAt`), `unarchive` traz de volta, e só o `DELETE` apaga a linha -
@@ -148,6 +161,22 @@ router
           })
           .prefix('classes')
           .as('classes')
+
+        router
+          .group(() => {
+            router
+              .patch(':id/archive', [controllers.administrator.enrollments.Archive])
+              .as('archive')
+            router
+              .patch(':id/unarchive', [controllers.administrator.enrollments.Unarchive])
+              .as('unarchive')
+            router
+              .delete(':id', [controllers.administrator.enrollments.Delete])
+              .as('purge')
+              .use(middleware.role(['OWNER']))
+          })
+          .prefix('enrollments')
+          .as('enrollments')
       })
       .as('lifecycle')
   })

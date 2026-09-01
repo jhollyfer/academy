@@ -19,6 +19,12 @@ export interface ApiDefinition {
       show: typeof routes['administrator.classes.show']
       update: typeof routes['administrator.classes.update']
     }
+    enrollments: {
+      paginate: typeof routes['administrator.enrollments.paginate']
+      export: typeof routes['administrator.enrollments.export']
+      show: typeof routes['administrator.enrollments.show']
+      update: typeof routes['administrator.enrollments.update']
+    }
     lifecycle: {
       courses: {
         archive: typeof routes['administrator.lifecycle.courses.archive']
@@ -29,6 +35,11 @@ export interface ApiDefinition {
         archive: typeof routes['administrator.lifecycle.classes.archive']
         unarchive: typeof routes['administrator.lifecycle.classes.unarchive']
         purge: typeof routes['administrator.lifecycle.classes.purge']
+      }
+      enrollments: {
+        archive: typeof routes['administrator.lifecycle.enrollments.archive']
+        unarchive: typeof routes['administrator.lifecycle.enrollments.unarchive']
+        purge: typeof routes['administrator.lifecycle.enrollments.purge']
       }
     }
   }
