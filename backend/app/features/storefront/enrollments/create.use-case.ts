@@ -12,6 +12,7 @@ import {
 } from '#core/entity'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
+import NotificationService from '#services/notification.service'
 import { DateTime } from 'luxon'
 import type { StorefrontEnrollmentCreatePayload } from '#core/validator'
 
@@ -32,6 +33,8 @@ const GUARDIAN_FIELDS = {
 
 @inject()
 export default class StorefrontEnrollmentCreateUseCase {
+  constructor(private readonly notification: NotificationService) {}
+
   async execute(payload: Payload): Promise<Response> {
     try {
       const turma = await Class.query()
@@ -114,6 +117,11 @@ export default class StorefrontEnrollmentCreateUseCase {
       // A vaga que acabou de sair pode ter sido a última. `FULL` é derivado, e
       // derivado precisa de quem o derive.
       await syncClassStatus(turma)
+
+      // Depois de tudo gravado, e nunca antes: um aviso de matrícula que não
+      // existe é pior do que aviso nenhum. O serviço não propaga erro - falha de
+      // SMTP não pode desfazer uma inscrição válida.
+      await this.notification.enrollmentCreated(enrollment, turma)
 
       return right(enrollment)
     } catch (error) {

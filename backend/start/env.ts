@@ -88,4 +88,25 @@ export default await Env.create(new URL('../', import.meta.url), {
    * produção é a única diferença de configuração entre os dois.
    */
   STORAGE_FORCE_PATH_STYLE: Env.schema.boolean.optional(),
+
+  /*
+  |----------------------------------------------------------------------------
+  | Envio de e-mail
+  |----------------------------------------------------------------------------
+  |
+  | Aviso de matrícula nova para a secretaria. Todas opcionais: sem `SMTP_HOST` a
+  | aplicação sobe igual, a matrícula continua sendo aceita e o aviso vira uma
+  | linha de log. E-mail é notificação, não parte do fluxo - e o site não pode
+  | recusar uma inscrição porque o servidor de e-mail não foi configurado.
+  |
+  | `MAIL_TO` é o endereço da secretaria, que é quem lê. `MAIL_FROM` precisa ser
+  | um endereço do domínio autenticado no SMTP; fornecedor nenhum entrega e-mail
+  | assinado como endereço de terceiro.
+  */
+  SMTP_HOST: Env.schema.string.optional(),
+  SMTP_PORT: Env.schema.number.optional(),
+  SMTP_USERNAME: Env.schema.string.optional(),
+  SMTP_PASSWORD: Env.schema.string.optional(),
+  MAIL_FROM: Env.schema.string.optional(),
+  MAIL_TO: Env.schema.string.optional(),
 })
