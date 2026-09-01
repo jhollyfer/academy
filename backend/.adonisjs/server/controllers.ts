@@ -3,4 +3,20 @@
  * DO NOT EDIT manually
  */
 
-export const controllers = {}
+export const controllers = {
+  administrator: {
+    courses: {
+      Archive: () => import('#features/administrator/courses/archive.controller'),
+      Create: () => import('#features/administrator/courses/create.controller'),
+      Delete: () => import('#features/administrator/courses/delete.controller'),
+      Paginate: () => import('#features/administrator/courses/paginate.controller'),
+      Show: () => import('#features/administrator/courses/show.controller'),
+      Unarchive: () => import('#features/administrator/courses/unarchive.controller'),
+      Update: () => import('#features/administrator/courses/update.controller'),
+    },
+  },
+  authentication: {
+    SignIn: () => import('#features/authentication/sign-in.controller'),
+    SignOut: () => import('#features/authentication/sign-out.controller'),
+  },
+}
