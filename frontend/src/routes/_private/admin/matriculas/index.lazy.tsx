@@ -111,6 +111,7 @@ function RouteComponent(): React.JSX.Element {
           navegação de mesma origem lógica.
         */}
         <Button
+          nativeButton={false}
           variant="outline"
           size="sm"
           className="ml-auto"

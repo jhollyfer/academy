@@ -66,6 +66,7 @@ export function FormShellDiscard({
 
   return (
     <Button
+      nativeButton={false}
       data-slot="form-shell-discard"
       variant="outline"
       type="button"

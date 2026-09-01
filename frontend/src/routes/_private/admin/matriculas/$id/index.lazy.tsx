@@ -102,6 +102,7 @@ function RouteComponent(): React.JSX.Element {
     <div className="grid gap-8">
       <div>
         <Button
+          nativeButton={false}
           variant="ghost"
           size="sm"
           render={<Link to="/admin/matriculas" />}
@@ -197,6 +198,7 @@ function RouteComponent(): React.JSX.Element {
                 )}
 
                 <Button
+                  nativeButton={false}
                   variant="outline"
                   size="sm"
                   className="w-fit"

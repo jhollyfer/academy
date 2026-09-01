@@ -162,6 +162,7 @@ export function NotFoundPageHomeButton({
 }): React.JSX.Element {
   return (
     <Button
+      nativeButton={false}
       data-slot="not-found-page-home-button"
       className="w-fit rounded-control"
       render={<Link to={to}>{children}</Link>}

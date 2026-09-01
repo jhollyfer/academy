@@ -190,6 +190,7 @@ export function PageHeaderBack({
 }: PageHeaderBackProps): React.JSX.Element {
   return (
     <Button
+      nativeButton={false}
       data-slot="page-header-back"
       variant="ghost"
       size="icon"
