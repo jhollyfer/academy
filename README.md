@@ -12,9 +12,9 @@ Dockerfile. Não há workspace na raiz, e é de propósito.
 | `backend/`  | API em AdonisJS, vertical slice. Landing, matrícula e painel          |
 | `frontend/` | TanStack Start. Site público e painel da secretaria                   |
 
-Os diretórios `backend-old/`, `frontend-old/` e `aulas/` são o produto anterior
-("Tech Class") e o material de origem dele. Estão fora do escopo atual e seguem
-no repositório até a fase 2 decidir o que fazer com eles.
+O produto anterior ("Tech Class") - `backend-old/`, `frontend-old/` e `aulas/` -
+foi removido do repositório. Está no histórico, no commit anterior à remoção,
+para quem precisar recuperar alguma coisa.
 
 ## Subindo local
 
