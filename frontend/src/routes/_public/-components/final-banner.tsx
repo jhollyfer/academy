@@ -72,7 +72,7 @@ export function FinalBanner(): React.JSX.Element {
               {heading}
             </h2>
 
-            <p className="mt-5 max-w-[52ch] text-base leading-relaxed text-primary-foreground/75 sm:text-lg">
+            <p className="mt-5 max-w-[52ch] text-base leading-relaxed text-primary-foreground sm:text-lg">
               {support}
             </p>
 

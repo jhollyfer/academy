@@ -77,12 +77,12 @@ export function Hero(): React.JSX.Element {
           </h1>
 
           <div className={cn(REVEAL, 'delay-100')}>
-            <p className="max-w-[46ch] text-base leading-relaxed text-primary-foreground/75 sm:text-lg">
+            <p className="max-w-[46ch] text-base leading-relaxed text-primary-foreground sm:text-lg">
               {schedule}
             </p>
 
             {seats && (
-              <p className="mt-2 text-base leading-relaxed text-primary-foreground/75 sm:text-lg">
+              <p className="mt-2 text-base leading-relaxed text-primary-foreground sm:text-lg">
                 {seats}
               </p>
             )}

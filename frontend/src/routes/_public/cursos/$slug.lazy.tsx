@@ -59,7 +59,7 @@ function RouteComponent(): React.JSX.Element {
               </h1>
 
               {course.tagline && (
-                <p className="mt-6 max-w-[52ch] text-lg leading-relaxed text-primary-foreground/75">
+                <p className="mt-6 max-w-[52ch] text-lg leading-relaxed text-primary-foreground">
                   {course.tagline}
                 </p>
               )}
@@ -270,7 +270,7 @@ function Fact({
 }): React.JSX.Element {
   return (
     <div className="flex flex-col-reverse gap-1">
-      <dt className="inline-flex items-center gap-2 text-sm text-primary-foreground/70 [&_svg]:size-4">
+      <dt className="inline-flex items-center gap-2 text-sm text-primary-foreground [&_svg]:size-4">
         {icon}
         {label}
       </dt>

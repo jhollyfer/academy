@@ -18,9 +18,13 @@ import type { Merge } from '#/lib/interfaces'
  *
  * Três tons, que são os três lugares onde a página põe um CTA:
  *
- *   ink      sobre a página clara - o contraste máximo, a ação principal
- *   primary  dentro de bloco escuro, onde o `ink` sumiria - o verde da marca
+ *   ink      sobre a página - o contraste máximo, a ação principal
+ *   slab     dentro de bloco escuro, onde o `ink` sumiria: o mesmo par virado
  *   outline  a ação secundária ao lado de uma das duas
+ *
+ * O `slab` não é verde, e isso é conta, não gosto: `--primary` é #178528 no
+ * tema claro, e um botão desse verde sobre o bloco `bg-foreground` (#272221)
+ * daria 1,74:1 de contorno. O par invertido dá 15,05:1 nos dois temas.
  *
  * Não há tom para "outline dentro de bloco escuro": a página não usa nenhum
  * hoje, e um quarto tom sem chamada é um tom para alguém manter à toa.
@@ -32,9 +36,8 @@ const pillVariants = cva(
       tone: {
         /** Sobre a página clara. 15,05:1 nos dois temas - o par inverte junto. */
         ink: 'border-transparent bg-foreground text-background hover:bg-foreground/90 hover:text-background',
-        /** Dentro de bloco escuro. O verde da marca, com a tinta escura por cima: 12,58:1. */
-        primary:
-          'border-transparent bg-primary text-primary-foreground hover:bg-primary/85 hover:text-primary-foreground',
+        /** Dentro de bloco escuro. O par do `ink` virado: 15,05:1 nos dois temas. */
+        slab: 'border-transparent bg-background text-foreground hover:bg-background/90 hover:text-foreground',
         /** A secundária. Só a borda, para não competir com a pílula ao lado. */
         outline:
           'border-foreground bg-transparent text-foreground hover:bg-foreground/8 hover:text-foreground',

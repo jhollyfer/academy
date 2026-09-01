@@ -32,7 +32,12 @@ const highlightVariants = cva(
       variant: {
         /** Sobre a página e dentro de bloco escuro. O par de `--primary`: 12,58:1. */
         fill: 'bg-primary text-primary-foreground',
-        /** Dentro do bloco verde, onde o `fill` sumiria. O mesmo par, virado. */
+        /**
+         * Onde o `fill` sumiria: dentro do bloco `bg-primary` e dentro da placa
+         * `bg-foreground`. É o mesmo par virado, e ele separa nos quatro casos -
+         * 15,05:1 de pílula contra a placa, 4,75:1 de texto no claro e 12,58:1
+         * no escuro.
+         */
         ink: 'bg-primary-foreground text-primary',
         /** Quando o fundo já carrega cor e mais um bloco chapado pesaria. */
         outline:

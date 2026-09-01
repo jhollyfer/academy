@@ -36,7 +36,7 @@ function RouteComponent(): React.JSX.Element {
             <div
               className={cn(
                 REVEAL,
-                'delay-100 mt-8 grid max-w-[62ch] gap-5 text-lg leading-relaxed text-primary-foreground/75',
+                'delay-100 mt-8 grid max-w-[62ch] gap-5 text-lg leading-relaxed text-primary-foreground',
               )}
             >
               <p>

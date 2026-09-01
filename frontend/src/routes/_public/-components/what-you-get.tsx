@@ -109,7 +109,7 @@ export function WhatYouGet(): React.JSX.Element {
           )}
         >
           <h2 className="text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-background sm:text-4xl">
-            O que você <Highlight variant="fill">leva</Highlight> daqui
+            O que você <Highlight variant="ink">leva</Highlight> daqui
           </h2>
 
           <div>
@@ -119,7 +119,7 @@ export function WhatYouGet(): React.JSX.Element {
             </p>
 
             <EnrollmentCta
-              tone="primary"
+              tone="slab"
               scale="lg"
               className="w-full sm:w-auto"
             />

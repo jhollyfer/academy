@@ -36,18 +36,18 @@
  * eram apelido: morreram, e a vitrine passou a ler os nomes semânticos como o
  * painel sempre leu.
  *
- * O verde da marca é `--primary`, e é o mesmo #88FF9A nos dois temas, com
- * `--primary-foreground` #272221 nos dois. Um valor só, e não um par que
- * inverte, porque ele é **preenchimento**: é o bloco do hero, o banner final, a
- * pílula do título e o botão cheio. Sobre o fundo escuro ele dá 12,58:1; sobre
- * o claro a borda do botão fica fraca, e o que resolve isso é o texto por
- * dentro, que dá os mesmos 12,58:1.
+ * O verde da marca é `--primary`, e ele troca de valor com o tema: #178528 no
+ * claro, #88FF9A no escuro, matiz 129° nos dois. É o mesmo desenho do
+ * simple-hub, e a razão é a mesma - o verde puro dá **1,20:1** sobre o #FAFAFA
+ * e reprova até como elemento gráfico, que pede 3:1. Um botão pintado com ele
+ * no claro não teria contorno, e o painel inteiro é botão cheio.
  *
- * O VERDE PURO NÃO É COR DE TEXTO SOBRE CLARO: #88FF9A dá 1,20:1 sobre o
- * #FAFAFA, e reprova até como elemento gráfico, que pede 3:1. Por isso `--ring`,
- * `--accent-foreground` e `--chart-1` - os três papéis em que o verde é traço e
- * não superfície - carregam o mesmo matiz escurecido no claro, #178528, com
- * 4,55:1. No escuro os três voltam ao verde puro.
+ * O preço aparece no bloco do hero, que é `bg-primary`: ele é verde-escuro no
+ * tema claro e verde-vivo no escuro. `--primary-foreground` acompanha - branco
+ * no claro, #272221 no escuro - e o par dá 4,75:1 e 12,58:1.
+ *
+ * `--ring`, `--accent-foreground` e `--chart-1` seguem os mesmos dois valores:
+ * são os papéis em que o verde é traço, e traço é onde o puro reprova.
  * ============================================================================
  */
 
@@ -79,10 +79,11 @@
   --card-foreground: #272221;
   --popover: #ffffff;
   --popover-foreground: #272221;
-  /* O verde da marca, puro. Ele é preenchimento em todo papel que ocupa, e a
-     tinta por cima dele é sempre a escura: 12,58:1. */
-  --primary: #88ff9a;
-  --primary-foreground: #272221;
+  /* O verde da marca escurecido no mesmo matiz (129°) até aguentar ser botão
+     sobre a base clara: 4,55:1 de borda contra o #FAFAFA e 4,75:1 de texto
+     branco por dentro. O puro daria 1,20:1 e o botão não teria contorno. */
+  --primary: #178528;
+  --primary-foreground: #ffffff;
   --secondary: #efefef;
   --secondary-foreground: #272221;
   --muted: #efefef;
@@ -118,8 +119,8 @@
 
   --sidebar: #ffffff;
   --sidebar-foreground: #272221;
-  --sidebar-primary: #88ff9a;
-  --sidebar-primary-foreground: #272221;
+  --sidebar-primary: #178528;
+  --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #efefef;
   --sidebar-accent-foreground: #178528;
   --sidebar-border: rgba(39, 34, 33, 0.1);
@@ -154,8 +155,8 @@
   --popover: #403937;
   --popover-foreground: #fafafa;
 
-  /* Igual ao claro, e de propósito: o verde é preenchimento, e o mesmo
-     preenchimento serve os dois temas. 12,58:1 sobre a base. */
+  /* Aqui o verde entra puro: 12,58:1 sobre a base, e a tinta por cima dele
+     volta a ser a escura. É o mesmo papel do claro, com o pé trocado. */
   --primary: #88ff9a;
   --primary-foreground: #272221;
 
@@ -196,8 +197,8 @@
 
   --sidebar: #403937;
   --sidebar-foreground: #fafafa;
-  --sidebar-primary: #88ff9a;
-  --sidebar-primary-foreground: #272221;
+  --sidebar-primary: #178528;
+  --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #4a4341;
   --sidebar-accent-foreground: #88ff9a;
   --sidebar-border: rgba(255, 255, 255, 0.12);

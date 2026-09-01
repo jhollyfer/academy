@@ -59,7 +59,7 @@ export function CourseCards({
             'max-w-[16ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-background sm:text-4xl lg:text-5xl',
           )}
         >
-          Dois cursos, uma <Highlight variant="fill">turma</Highlight> só
+          Dois cursos, uma <Highlight variant="ink">turma</Highlight> só
         </h2>
 
         <p
@@ -167,7 +167,7 @@ export function CourseCards({
                   </p>
 
                   <PillButton
-                    tone="primary"
+                    tone="slab"
                     scale="md"
                     className="mt-5 w-full"
                     render={

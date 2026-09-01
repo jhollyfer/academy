@@ -70,23 +70,34 @@ decorativos, não texto.
 
 ## Contraste medido, os dois temas
 
+`--primary` é #178528 no claro e #88FF9A no escuro, com `--primary-foreground`
+branco e #272221. É o desenho do simple-hub, e a razão é a mesma: o verde puro
+dá 1,20:1 sobre o #FAFAFA e um botão pintado com ele não teria contorno.
+
 | Par | Claro | Escuro | Mínimo |
 | --- | --- | --- | --- |
 | foreground / background | 15,05 ✅ | 15,05 ✅ | 4,5 |
 | foreground / card | 15,71 ✅ | 10,83 ✅ | 4,5 |
 | muted-foreground / background | 10,83 ✅ | 8,04 ✅ | 4,5 |
-| primary-foreground / primary | 12,58 ✅ | 12,58 ✅ | 4,5 |
-| background/70 / slab invertido | 8,04 ✅ | 5,71 ✅ | 4,5 |
-| destructive / background | 5,63 ✅ | 4,51 ✅ | 4,5 |
+| muted-foreground / card | 11,30 ✅ | 5,79 ✅ | 4,5 |
+| primary-foreground / primary | 4,75 ✅ | 12,58 ✅ | 4,5 |
+| primary / background | 4,55 ✅ | 12,58 ✅ | 3 |
+| primary / card | 4,75 ✅ | 9,05 ✅ | 3 |
 | ring / background | 4,55 ✅ | 12,58 ✅ | 3 |
 | input / card | 3,06 ✅ | 3,06 ✅ | 3 |
-| primary / background | 1,20 ❌ | 12,58 ✅ | 3 |
+| destructive / background | 5,63 ✅ | 4,51 ✅ | 4,5 |
+| destructive-foreground / destructive | 5,87 ✅ | 4,51 ✅ | 4,5 |
+| background/70 sobre a placa (rodapé) | 8,04 ✅ | 5,71 ✅ | 4,5 |
+| CTA `slab` sobre a placa | 15,05 ✅ | 15,05 ✅ | 3 |
+| Highlight `ink`: pílula / bloco verde | 4,75 ✅ | 12,58 ✅ | 3 |
+| Highlight `ink`: texto / pílula | 4,75 ✅ | 12,58 ✅ | 4,5 |
 | border / background | 1,22 ❌ | 1,46 ❌ | 3 |
 
-Os dois vermelhos são conhecidos e aceitos. `primary/background` no claro é a
-borda do botão verde contra o #FAFAFA - o preço de manter o bloco verde vivo do
-hero; o texto dentro dele dá 12,58:1. `border/background` é a borda decorativa
-de card, valor de fábrica do shadcn, e não delimita controle nenhum.
+O único vermelho é a borda decorativa de card, e ela é o valor de fábrica do
+shadcn: no simple-hub o mesmo par dá 1,28:1 no claro. A 1.4.11 pede 3:1 de
+**componente de interface**, e borda de card não identifica controle nenhum -
+quem identifica é `--input`, que aqui tem valor próprio e passa nos dois temas
+(no simple-hub `--input` é igual a `--border` e reprovaria).
 
 ## Riscos anotados
 
