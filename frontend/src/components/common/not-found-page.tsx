@@ -65,7 +65,13 @@ export function NotFoundPage({
         <span className="display-title leading-none text-[8rem] font-black text-white select-none md:text-[10rem]">
           {code}
         </span>
-        <AstronautIllustration className="absolute inset-0 m-auto size-40 md:size-56" />
+        {/*
+          `text-white/30` sobre o `text-border` que o componente traz por padrão.
+          O traço dele é `currentColor`, e este painel é preto fixo nos dois
+          temas: com a cor de borda o astronauta some - ela é o #272221 a 10% no
+          claro, preto sobre preto.
+        */}
+        <AstronautIllustration className="absolute inset-0 m-auto size-40 text-white/30 md:size-56" />
       </div>
     </div>
   )

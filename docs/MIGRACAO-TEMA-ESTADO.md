@@ -104,7 +104,10 @@ quem identifica é `--input`, que aqui tem valor próprio e passa nos dois temas
 - Os três blocos escuros (`footer.tsx:23`, `course-cards.tsx:53`,
   `what-you-get.tsx:110`) **invertem**: no escuro o rodapé vira placa clara.
   Decidir olhando.
-- `astronaut-illustration.tsx:120` tem `stroke="white"` cravado. **Aberto.**
+- `astronaut-illustration.tsx` era falso alarme: o `stroke="white"` dele vive
+  sobre o painel `bg-black` do 404, que é preto fixo nos dois temas de
+  propósito. O bug de verdade era o `text-border` padrão do componente, que
+  sobre esse preto some no tema claro - agora a chamada passa `text-white/30`.
 - Falta ver na tela: rodapé, seção de cursos e coluna do "o que você leva" no
   tema escuro; teclado do início ao fim em `/matricula`; e as capturas das
   cinco rotas em 390px e 1440px nos dois temas.
