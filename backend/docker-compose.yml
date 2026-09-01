@@ -1,0 +1,91 @@
+name: academy-backend
+
+services:
+  database:
+    image: postgres:16-alpine
+    container_name: academy-backend-database
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_PASSWORD: academy
+      POSTGRES_DB: academy
+      POSTGRES_USER: academy
+    # 5434 no host por default, e não 5432: `simple-hub` (5432) e `adacaibs`
+    # (5433) rodam nesta mesma máquina e já ocupam as anteriores. Porta própria
+    # deixa os três projetos convivendo sem ninguém ter de derrubar o container
+    # do outro (AD-013). Dentro da rede do compose o Postgres segue em 5432.
+    ports:
+      - "${DB_PORT:-5434}:5432"
+    volumes:
+      - academy-backend-database-volume:/var/lib/postgresql/data
+    # networks:
+    #   - academy-backend-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U academy -d academy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Bucket S3-compatível para desenvolvimento e testes. Existe porque o upload
+  # passou a ser presigned multipart, e multipart é uma API do S3 que o disco
+  # `local` (driver `fs`) não tem. Sem isto, dev exercitaria um caminho de
+  # código que produção não usa - que é justamente o que RNF-20 quer evitar.
+  storage:
+    image: minio/minio:latest
+    container_name: academy-backend-storage
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${STORAGE_KEY:-academy}
+      MINIO_ROOT_PASSWORD: ${STORAGE_SECRET:-academy-secret}
+      # O navegador envia cada parte direto para cá: sem CORS liberado, o
+      # preflight do PUT morre antes de qualquer byte sair.
+      MINIO_API_CORS_ALLOW_ORIGIN: ${STORAGE_CORS_ORIGIN:-*}
+    # 9004/9005 por default, pelo mesmo motivo do 5434 acima (AD-013): 9000/9001
+    # são do `simple-hub` e 9002/9003 do `adacaibs`. Console em
+    # http://localhost:9005.
+    ports:
+      - "${STORAGE_PORT:-9004}:9000"
+      - "${STORAGE_CONSOLE_PORT:-9005}:9001"
+    volumes:
+      - academy-backend-storage-volume:/data
+    healthcheck:
+      test: ["CMD-SHELL", "mc ready local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Cria os dois buckets (dev e teste, separados pelo mesmo motivo do
+  # DATABASE_URL) e libera leitura anônima: o comprovante de matrícula é lido
+  # pela secretaria por `<img>`/`<a href>`, e requisição assinada não serve aí.
+  # Roda uma vez e sai.
+  storage-bootstrap:
+    image: minio/mc:latest
+    container_name: academy-backend-storage-bootstrap
+    depends_on:
+      storage:
+        condition: service_healthy
+    entrypoint:
+      - sh
+      - -c
+      - |
+        set -e
+        mc alias set target http://storage:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}"
+        for bucket in "$${STORAGE_BUCKET}" "$${STORAGE_BUCKET}-test"; do
+          mc mb --ignore-existing "target/$${bucket}"
+          mc anonymous set download "target/$${bucket}"
+        done
+    environment:
+      MINIO_ROOT_USER: ${STORAGE_KEY:-academy}
+      MINIO_ROOT_PASSWORD: ${STORAGE_SECRET:-academy-secret}
+      STORAGE_BUCKET: ${STORAGE_BUCKET:-academy}
+
+# networks:
+#   academy-backend-network:
+#     driver: bridge
+
+volumes:
+  academy-backend-database-volume:
+    driver: local
+  academy-backend-storage-volume:
+    driver: local

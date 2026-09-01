@@ -1,0 +1,9 @@
+[
+  {
+    "AllowedOrigins": ["https://marketplace.simple.tec.br"],
+    "AllowedMethods": ["PUT", "GET", "HEAD"],
+    "AllowedHeaders": ["content-type"],
+    "ExposeHeaders": ["ETag"],
+    "MaxAgeSeconds": 3600
+  }
+]
