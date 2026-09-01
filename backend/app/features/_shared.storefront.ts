@@ -25,8 +25,9 @@ export function visibleCourses<TQuery extends ModelQueryBuilderContract<typeof C
 }
 
 /**
- * A próxima turma de um curso, como a landing a mostra: a mais próxima que
- * ainda recebe matrícula, com as vagas contadas.
+ * As turmas anunciáveis dos cursos pedidos, como a landing as mostra: as que
+ * ainda recebem matrícula, com as vagas contadas, da mais próxima para a mais
+ * distante.
  *
  * `OPEN` e `FULL` juntos, e não só `OPEN`: turma lotada continua aparecendo,
  * porque a fila de espera existe justamente para ela. `CLOSED` some - não
@@ -34,11 +35,37 @@ export function visibleCourses<TQuery extends ModelQueryBuilderContract<typeof C
  *
  * Ordena por `startsAt` e não por `createdAt`: a próxima é a mais próxima no
  * calendário, não a cadastrada por último.
+ *
+ * Recebe uma lista de cursos e não um só porque a home mostra dois cards e a
+ * matrícula lista todos: um `nextClassQuery(id)` por curso seria uma consulta
+ * por card, e a página inteira paga isso antes de pintar.
  */
-export function nextClassQuery(courseId: string) {
+export function announceableClassesQuery(courseIds: ReadonlyArray<string>) {
   return withSeatsTaken(Class.query())
-    .where('courseId', courseId)
+    .whereIn('courseId', [...courseIds])
     .whereNull('deletedAt')
     .whereIn('status', [ClassStatuses.OPEN, ClassStatuses.FULL])
     .orderBy('startsAt', 'asc')
+}
+
+/**
+ * Carrega a próxima turma de cada curso e a pendura em `$extras.nextClass`.
+ *
+ * Uma consulta para a página toda, e a escolha da "próxima" feita em memória
+ * sobre um resultado já ordenado: o primeiro que aparece de um curso é o dele.
+ * O SQL equivalente seria uma janela por curso, e ele custaria mais para ler do
+ * que estas quatro linhas.
+ *
+ * Curso sem turma anunciável recebe `null` explícito, e não fica ausente:
+ * ausente é "esta leitura não procurou", e é justamente a ambiguidade que fazia
+ * a página de matrícula concluir que não havia turma nenhuma.
+ */
+export async function attachNextClass(courses: ReadonlyArray<Course>): Promise<void> {
+  if (courses.length === 0) return
+
+  const classes = await announceableClassesQuery(courses.map((course) => course.id))
+
+  for (const course of courses) {
+    course.$extras.nextClass = classes.find((entity) => entity.courseId === course.id) ?? null
+  }
 }

@@ -1,5 +1,5 @@
 import Course from '#models/course'
-import { visibleCourses } from '#features/_shared.storefront'
+import { attachNextClass, visibleCourses } from '#features/_shared.storefront'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'
@@ -28,7 +28,17 @@ export default class StorefrontCourseListUseCase {
         .orderBy('name', 'asc')
         .paginate(payload.page ?? PAGE, payload.perPage ?? PER_PAGE)
 
-      return right({ meta: courses.getMeta(), data: courses.all() })
+      // A mesma turma que a página do curso anuncia, e pelo mesmo caminho.
+      //
+      // Sem isto o `nextClass` some do JSON desta leitura - `@computed` que
+      // devolve `undefined` não é serializado -, e quem consome a listagem
+      // conclui que nenhum curso tem turma. Era o que fazia a página de
+      // matrícula dizer "nenhuma turma aberta" enquanto `/cursos/robotica`
+      // anunciava a mesma turma com data e vagas.
+      const data = courses.all()
+      await attachNextClass(data)
+
+      return right({ meta: courses.getMeta(), data })
     } catch (error) {
       logger.error({ err: error }, '[storefront > courses > list][error]')
       return left(

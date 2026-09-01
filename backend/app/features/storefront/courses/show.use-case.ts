@@ -1,5 +1,5 @@
 import Course from '#models/course'
-import { nextClassQuery, visibleCourses } from '#features/_shared.storefront'
+import { attachNextClass, visibleCourses } from '#features/_shared.storefront'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'
@@ -30,8 +30,7 @@ export default class StorefrontCourseShowUseCase {
       // é `hasMany`, e um `preload` limitado a uma linha ainda devolveria um
       // array - a landing mostra uma turma, e um array de um item convida a tela
       // a decidir qual é "a próxima", que é decisão do servidor.
-      const next = await nextClassQuery(course.id).first()
-      course.$extras.nextClass = next ?? null
+      await attachNextClass([course])
 
       return right(course)
     } catch (error) {
