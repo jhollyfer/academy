@@ -7,6 +7,12 @@ import { Button } from '#/components/ui/button'
 import { Card, CardContent, CardTitle } from '#/components/ui/card'
 import { Highlight } from '#/components/common/highlight'
 import { formatDate, formatMoney } from '#/lib/format'
+import {
+  courseCapacity,
+  courseClasses,
+  courseSeatsRemaining,
+  formatTimeRange,
+} from '#/lib/enrollment-state'
 import { REVEAL, STAGGER } from './reveal'
 import { cn } from '#/lib/utils'
 import type { CourseResponse } from '#/integrations/response'
@@ -23,6 +29,7 @@ const ILLUSTRATIONS: Record<string, string> = {
 }
 
 const FALLBACK_ILLUSTRATION = '/ilustracoes/bancada-arduino.svg'
+
 
 /**
  * Os dois cursos, na única seção escura da página.
@@ -88,16 +95,14 @@ export function CourseCards({
                     Módulo 1
                   </Badge>
 
-                  {course.nextClass && (
+                  {courseClasses(course).length > 0 && (
                     <Badge
                       variant="outline"
                       size="lg"
                       className="border-line-strong text-ink-soft"
                     >
                       <Users />
-                      {course.nextClass.seatsRemaining ??
-                        course.nextClass.capacity}{' '}
-                      de {course.nextClass.capacity} vagas
+                      {courseSeatsRemaining(course)} de {courseCapacity(course)} vagas
                     </Badge>
                   )}
                 </div>
@@ -129,6 +134,27 @@ export function CourseCards({
                       <dd>Começa em {formatDate(course.nextClass.startsAt)}</dd>
                     </div>
                   )}
+
+                  {/*
+                    Uma linha por turma, e não só a próxima: são duas de
+                    programação e três de robótica, e o horário é o que separa
+                    uma da outra. O card que mostrava só a primeira escondia as
+                    outras de quem escolhe pelo horário que cabe na semana.
+                  */}
+                  {courseClasses(course).map((entity) => (
+                    <div key={entity.id} className="flex items-center gap-2">
+                      <Clock className="size-4 text-neon-ink" />
+                      <dt className="sr-only">Turma</dt>
+                      <dd>
+                        {formatTimeRange(
+                          entity.startsAtTime,
+                          entity.endsAtTime,
+                        ) || entity.name}
+                        {entity.seatsRemaining !== undefined &&
+                          ` · ${entity.seatsRemaining} vagas`}
+                      </dd>
+                    </div>
+                  ))}
                 </dl>
 
                 {/* `mt-auto` prende o preço e o botão na base, para os dois cards

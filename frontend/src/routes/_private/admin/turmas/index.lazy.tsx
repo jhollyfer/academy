@@ -5,6 +5,7 @@ import { classesListQueryOptions } from '#/integrations/tanstack-query/queries'
 import { ListShell } from '#/components/common/list-shell'
 import { Badge } from '#/components/ui/badge'
 import { formatDate } from '#/lib/format'
+import { formatTimeRange } from '#/lib/enrollment-state'
 import { ClassStatuses } from '#/lib/entity'
 import { Route as ClassesRoute } from './index'
 import type { Column } from '#/components/common/list-shell'
@@ -38,6 +39,15 @@ const COLUMNS: ReadonlyArray<Column<ClassResponse>> = [
     key: 'starts',
     header: 'Começa em',
     cell: (entity) => formatDate(entity.startsAt),
+  },
+  {
+    // O horário é o que separa duas turmas do mesmo curso na mesma manhã: sem
+    // esta coluna a lista mostra duas linhas que parecem a mesma turma.
+    key: 'time',
+    header: 'Horário',
+    hideOnMobile: true,
+    cell: (entity) =>
+      formatTimeRange(entity.startsAtTime, entity.endsAtTime) || '-',
   },
   {
     key: 'seats',

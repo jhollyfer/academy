@@ -1,5 +1,5 @@
 import Course from '#models/course'
-import { attachNextClass, visibleCourses } from '#features/_shared.storefront'
+import { attachAnnounceableClasses, visibleCourses } from '#features/_shared.storefront'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'
@@ -36,7 +36,7 @@ export default class StorefrontCourseListUseCase {
       // matrícula dizer "nenhuma turma aberta" enquanto `/cursos/robotica`
       // anunciava a mesma turma com data e vagas.
       const data = courses.all()
-      await attachNextClass(data)
+      await attachAnnounceableClasses(data)
 
       return right({ meta: courses.getMeta(), data })
     } catch (error) {

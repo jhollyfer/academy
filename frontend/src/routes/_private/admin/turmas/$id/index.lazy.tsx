@@ -35,7 +35,12 @@ import {
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
 import { ClassFormFields } from '../-form-fields'
-import { CLASS_FIELDS, classToValues, optionalDate } from '../-form-config'
+import {
+  CLASS_FIELDS,
+  classToValues,
+  optionalDate,
+  optionalTime,
+} from '../-form-config'
 import { Route as ClassRoute } from './index'
 import type { ClassFormValues } from '../-form-config'
 import type { AdministratorClassUpdatePayload } from '#/lib/validator'
@@ -69,10 +74,12 @@ function RouteComponent(): React.JSX.Element {
     // O formulário segura data como `string` (é o que o `<input type="date">`
     // fala) e a API a quer como `Date`. A conversão é aqui, na borda, e não no
     // campo: converter na digitação faria cada tecla criar um `Date` inválido.
-    payload: ({ startsAt, endsAt, ...rest }) => ({
+    payload: ({ startsAt, endsAt, startsAtTime, endsAtTime, ...rest }) => ({
       ...rest,
       startsAt: new Date(startsAt),
       endsAt: optionalDate(endsAt),
+      startsAtTime: optionalTime(startsAtTime),
+      endsAtTime: optionalTime(endsAtTime),
     }),
   })
 

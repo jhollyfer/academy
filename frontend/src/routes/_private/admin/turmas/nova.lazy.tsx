@@ -18,7 +18,12 @@ import {
   FormShellTitle,
 } from '#/components/common/form-shell'
 import { ClassFormFields } from './-form-fields'
-import { CLASS_FIELDS, classDefaults, optionalDate } from './-form-config'
+import {
+  CLASS_FIELDS,
+  classDefaults,
+  optionalDate,
+  optionalTime,
+} from './-form-config'
 import type { ClassFormValues } from './-form-config'
 import type { AdministratorClassCreatePayload } from '#/lib/validator'
 import type { ClassResponse } from '#/integrations/response'
@@ -45,10 +50,12 @@ function RouteComponent(): React.JSX.Element {
     success: (entity) => `${entity.name} cadastrada.`,
     // Mesma conversão da edição: `<input type="date">` fala `string`, o
     // `vine.date()` quer `Date`.
-    payload: ({ startsAt, endsAt, ...rest }) => ({
+    payload: ({ startsAt, endsAt, startsAtTime, endsAtTime, ...rest }) => ({
       ...rest,
       startsAt: new Date(startsAt),
       endsAt: optionalDate(endsAt),
+      startsAtTime: optionalTime(startsAtTime),
+      endsAtTime: optionalTime(endsAtTime),
     }),
   })
 

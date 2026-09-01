@@ -3567,6 +3567,20 @@
               "NIGHT"
             ]
           },
+          "startsAtTime": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^([01]\\d|2[0-3]):[0-5]\\d(:[0-5]\\d)?$"
+          },
+          "endsAtTime": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^([01]\\d|2[0-3]):[0-5]\\d(:[0-5]\\d)?$"
+          },
           "location": {
             "type": "string",
             "minLength": 2,
@@ -3622,6 +3636,12 @@
             ],
             "format": "date-time"
           },
+          "endsAtTime": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "id": {
             "type": "string"
           },
@@ -3642,6 +3662,12 @@
           "startsAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "startsAtTime": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "status": {
             "type": "string",
@@ -3771,7 +3797,8 @@
               "classesCount": {
                 "type": "number"
               },
-              "nextClass": {}
+              "nextClass": {},
+              "announcedClasses": {}
             },
             "required": [
               "accent",
@@ -3802,11 +3829,13 @@
           "createdAt",
           "deletedAt",
           "endsAt",
+          "endsAtTime",
           "id",
           "location",
           "name",
           "shift",
           "startsAt",
+          "startsAtTime",
           "status",
           "updatedAt",
           "weekday"
@@ -3839,6 +3868,12 @@
             ],
             "format": "date-time"
           },
+          "endsAtTime": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "id": {
             "type": "string"
           },
@@ -3859,6 +3894,12 @@
           "startsAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "startsAtTime": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "status": {
             "type": "string",
@@ -3988,7 +4029,8 @@
               "classesCount": {
                 "type": "number"
               },
-              "nextClass": {}
+              "nextClass": {},
+              "announcedClasses": {}
             },
             "required": [
               "accent",
@@ -4019,11 +4061,13 @@
           "createdAt",
           "deletedAt",
           "endsAt",
+          "endsAtTime",
           "id",
           "location",
           "name",
           "shift",
           "startsAt",
+          "startsAtTime",
           "status",
           "updatedAt",
           "weekday"
@@ -4056,6 +4100,12 @@
             ],
             "format": "date-time"
           },
+          "endsAtTime": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "id": {
             "type": "string"
           },
@@ -4076,6 +4126,12 @@
           "startsAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "startsAtTime": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "status": {
             "type": "string",
@@ -4205,7 +4261,8 @@
               "classesCount": {
                 "type": "number"
               },
-              "nextClass": {}
+              "nextClass": {},
+              "announcedClasses": {}
             },
             "required": [
               "accent",
@@ -4236,11 +4293,13 @@
           "createdAt",
           "deletedAt",
           "endsAt",
+          "endsAtTime",
           "id",
           "location",
           "name",
           "shift",
           "startsAt",
+          "startsAtTime",
           "status",
           "updatedAt",
           "weekday"
@@ -4286,6 +4345,20 @@
               "AFTERNOON",
               "NIGHT"
             ]
+          },
+          "startsAtTime": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^([01]\\d|2[0-3]):[0-5]\\d(:[0-5]\\d)?$"
+          },
+          "endsAtTime": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^([01]\\d|2[0-3]):[0-5]\\d(:[0-5]\\d)?$"
           },
           "location": {
             "type": "string",
@@ -4334,6 +4407,12 @@
             ],
             "format": "date-time"
           },
+          "endsAtTime": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "id": {
             "type": "string"
           },
@@ -4354,6 +4433,12 @@
           "startsAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "startsAtTime": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "status": {
             "type": "string",
@@ -4483,7 +4568,8 @@
               "classesCount": {
                 "type": "number"
               },
-              "nextClass": {}
+              "nextClass": {},
+              "announcedClasses": {}
             },
             "required": [
               "accent",
@@ -4514,11 +4600,13 @@
           "createdAt",
           "deletedAt",
           "endsAt",
+          "endsAtTime",
           "id",
           "location",
           "name",
           "shift",
           "startsAt",
+          "startsAtTime",
           "status",
           "updatedAt",
           "weekday"
@@ -4771,6 +4859,7 @@
             "type": "number"
           },
           "nextClass": {},
+          "announcedClasses": {},
           "cover": {
             "type": "object",
             "properties": {
@@ -5062,6 +5151,7 @@
             "type": "number"
           },
           "nextClass": {},
+          "announcedClasses": {},
           "cover": {
             "type": "object",
             "properties": {
@@ -5353,6 +5443,7 @@
             "type": "number"
           },
           "nextClass": {},
+          "announcedClasses": {},
           "cover": {
             "type": "object",
             "properties": {
@@ -5787,6 +5878,7 @@
             "type": "number"
           },
           "nextClass": {},
+          "announcedClasses": {},
           "cover": {
             "type": "object",
             "properties": {
@@ -6105,6 +6197,12 @@
                 ],
                 "format": "date-time"
               },
+              "endsAtTime": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "id": {
                 "type": "string"
               },
@@ -6125,6 +6223,12 @@
               "startsAt": {
                 "type": "string",
                 "format": "date-time"
+              },
+              "startsAtTime": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "status": {
                 "type": "string",
@@ -6254,7 +6358,8 @@
                   "classesCount": {
                     "type": "number"
                   },
-                  "nextClass": {}
+                  "nextClass": {},
+                  "announcedClasses": {}
                 },
                 "required": [
                   "accent",
@@ -6285,11 +6390,13 @@
               "createdAt",
               "deletedAt",
               "endsAt",
+              "endsAtTime",
               "id",
               "location",
               "name",
               "shift",
               "startsAt",
+              "startsAtTime",
               "status",
               "updatedAt",
               "weekday"
@@ -6563,6 +6670,12 @@
                 ],
                 "format": "date-time"
               },
+              "endsAtTime": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "id": {
                 "type": "string"
               },
@@ -6583,6 +6696,12 @@
               "startsAt": {
                 "type": "string",
                 "format": "date-time"
+              },
+              "startsAtTime": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "status": {
                 "type": "string",
@@ -6712,7 +6831,8 @@
                   "classesCount": {
                     "type": "number"
                   },
-                  "nextClass": {}
+                  "nextClass": {},
+                  "announcedClasses": {}
                 },
                 "required": [
                   "accent",
@@ -6743,11 +6863,13 @@
               "createdAt",
               "deletedAt",
               "endsAt",
+              "endsAtTime",
               "id",
               "location",
               "name",
               "shift",
               "startsAt",
+              "startsAtTime",
               "status",
               "updatedAt",
               "weekday"
@@ -7021,6 +7143,12 @@
                 ],
                 "format": "date-time"
               },
+              "endsAtTime": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "id": {
                 "type": "string"
               },
@@ -7041,6 +7169,12 @@
               "startsAt": {
                 "type": "string",
                 "format": "date-time"
+              },
+              "startsAtTime": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "status": {
                 "type": "string",
@@ -7170,7 +7304,8 @@
                   "classesCount": {
                     "type": "number"
                   },
-                  "nextClass": {}
+                  "nextClass": {},
+                  "announcedClasses": {}
                 },
                 "required": [
                   "accent",
@@ -7201,11 +7336,13 @@
               "createdAt",
               "deletedAt",
               "endsAt",
+              "endsAtTime",
               "id",
               "location",
               "name",
               "shift",
               "startsAt",
+              "startsAtTime",
               "status",
               "updatedAt",
               "weekday"
@@ -7501,6 +7638,12 @@
                 ],
                 "format": "date-time"
               },
+              "endsAtTime": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "id": {
                 "type": "string"
               },
@@ -7521,6 +7664,12 @@
               "startsAt": {
                 "type": "string",
                 "format": "date-time"
+              },
+              "startsAtTime": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "status": {
                 "type": "string",
@@ -7650,7 +7799,8 @@
                   "classesCount": {
                     "type": "number"
                   },
-                  "nextClass": {}
+                  "nextClass": {},
+                  "announcedClasses": {}
                 },
                 "required": [
                   "accent",
@@ -7681,11 +7831,13 @@
               "createdAt",
               "deletedAt",
               "endsAt",
+              "endsAtTime",
               "id",
               "location",
               "name",
               "shift",
               "startsAt",
+              "startsAtTime",
               "status",
               "updatedAt",
               "weekday"
@@ -10239,6 +10391,7 @@
             "type": "number"
           },
           "nextClass": {},
+          "announcedClasses": {},
           "cover": {
             "type": "object",
             "properties": {
@@ -10530,6 +10683,7 @@
             "type": "number"
           },
           "nextClass": {},
+          "announcedClasses": {},
           "cover": {
             "type": "object",
             "properties": {
@@ -10867,6 +11021,12 @@
                 ],
                 "format": "date-time"
               },
+              "endsAtTime": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "id": {
                 "type": "string"
               },
@@ -10887,6 +11047,12 @@
               "startsAt": {
                 "type": "string",
                 "format": "date-time"
+              },
+              "startsAtTime": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "status": {
                 "type": "string",
@@ -11016,7 +11182,8 @@
                   "classesCount": {
                     "type": "number"
                   },
-                  "nextClass": {}
+                  "nextClass": {},
+                  "announcedClasses": {}
                 },
                 "required": [
                   "accent",
@@ -11047,11 +11214,13 @@
               "createdAt",
               "deletedAt",
               "endsAt",
+              "endsAtTime",
               "id",
               "location",
               "name",
               "shift",
               "startsAt",
+              "startsAtTime",
               "status",
               "updatedAt",
               "weekday"
@@ -11407,6 +11576,12 @@
                 ],
                 "format": "date-time"
               },
+              "endsAtTime": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "id": {
                 "type": "string"
               },
@@ -11427,6 +11602,12 @@
               "startsAt": {
                 "type": "string",
                 "format": "date-time"
+              },
+              "startsAtTime": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "status": {
                 "type": "string",
@@ -11556,7 +11737,8 @@
                   "classesCount": {
                     "type": "number"
                   },
-                  "nextClass": {}
+                  "nextClass": {},
+                  "announcedClasses": {}
                 },
                 "required": [
                   "accent",
@@ -11587,11 +11769,13 @@
               "createdAt",
               "deletedAt",
               "endsAt",
+              "endsAtTime",
               "id",
               "location",
               "name",
               "shift",
               "startsAt",
+              "startsAtTime",
               "status",
               "updatedAt",
               "weekday"
@@ -11865,6 +12049,12 @@
                 ],
                 "format": "date-time"
               },
+              "endsAtTime": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "id": {
                 "type": "string"
               },
@@ -11885,6 +12075,12 @@
               "startsAt": {
                 "type": "string",
                 "format": "date-time"
+              },
+              "startsAtTime": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "status": {
                 "type": "string",
@@ -12014,7 +12210,8 @@
                   "classesCount": {
                     "type": "number"
                   },
-                  "nextClass": {}
+                  "nextClass": {},
+                  "announcedClasses": {}
                 },
                 "required": [
                   "accent",
@@ -12045,11 +12242,13 @@
               "createdAt",
               "deletedAt",
               "endsAt",
+              "endsAtTime",
               "id",
               "location",
               "name",
               "shift",
               "startsAt",
+              "startsAtTime",
               "status",
               "updatedAt",
               "weekday"

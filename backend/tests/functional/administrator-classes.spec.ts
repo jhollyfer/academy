@@ -228,3 +228,75 @@ test.group('administrador > turmas > atualização parcial', (group) => {
     assert.equal(body(response).name, 'Turma 1 / 2026')
   })
 })
+
+test.group('administrador > turmas > horário', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  /**
+   * O que `weekday` e `shift` não separam.
+   *
+   * A escola abre duas turmas de programação no mesmo sábado de manhã, e a
+   * única coisa diferente entre elas é a hora. Sem estas colunas as duas seriam
+   * a mesma turma para quem lê o painel.
+   */
+  test('guarda a hora de início e de fim da turma', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+
+    const response = await client
+      .post('/administrator/classes')
+      .cookies(session)
+      .json(classPayload(course.id, { startsAtTime: '08:00', endsAtTime: '10:00' }))
+
+    response.assertStatus(201)
+
+    const entity = body(response)
+    // O Postgres devolve `time` com segundos; o formulário manda sem. Os dois
+    // formatos passam pelo validator, e é o do banco que volta na resposta.
+    assert.equal(entity.startsAtTime.slice(0, 5), '08:00')
+    assert.equal(entity.endsAtTime.slice(0, 5), '10:00')
+  })
+
+  test('turma sem horário fechado é estado legítimo, e vem nulo', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+    const turma = await createClass(client, session, course.id)
+
+    assert.isNull(turma.startsAtTime)
+    assert.isNull(turma.endsAtTime)
+  })
+
+  test('recusa hora fora do relógio com 422 apontando o campo', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+
+    const response = await client
+      .post('/administrator/classes')
+      .cookies(session)
+      .json(classPayload(course.id, { startsAtTime: '25:00' }))
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'startsAtTime')
+  })
+
+  test('a edição troca o horário sem tocar no resto', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+    const turma = await createClass(client, session, course.id, {
+      startsAtTime: '13:00',
+      endsAtTime: '15:00',
+    })
+
+    const response = await client
+      .put(`/administrator/classes/${turma.id}`)
+      .cookies(session)
+      .json({ startsAtTime: '18:00', endsAtTime: '20:00' })
+
+    response.assertStatus(200)
+
+    const entity = body(response)
+    assert.equal(entity.startsAtTime.slice(0, 5), '18:00')
+    assert.equal(entity.endsAtTime.slice(0, 5), '20:00')
+    assert.equal(entity.capacity, 40)
+  })
+})

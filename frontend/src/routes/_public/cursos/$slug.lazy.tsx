@@ -11,6 +11,11 @@ import { Leaf } from '#/components/common/marks'
 import { EnrollmentCta } from '#/components/common/enrollment-cta'
 import { storefrontCourseQueryOptions } from '#/integrations/tanstack-query/queries'
 import { formatDate, formatMoney } from '#/lib/format'
+import {
+  courseCapacity,
+  courseSeatsRemaining,
+  courseTimesLabel,
+} from '#/lib/enrollment-state'
 import { Faq } from '../-components/faq'
 import { REVEAL, STAGGER } from '../-components/reveal'
 import { WhatsappFloat } from '../-components/whatsapp-float'
@@ -95,9 +100,17 @@ function RouteComponent(): React.JSX.Element {
                 <Fact icon={<CalendarBlank />} label="Começa em">
                   {formatDate(course.nextClass.startsAt)}
                 </Fact>
+                {/*
+                  Vagas e horários somados sobre todas as turmas do curso: são
+                  duas de manhã ou três à tarde, e quem lê a faixa quer saber se
+                  cabe alguém no curso, não numa turma específica. A escolha da
+                  turma é o primeiro passo da matrícula.
+                */}
                 <Fact icon={<Users />} label="Vagas restantes">
-                  {course.nextClass.seatsRemaining ?? course.nextClass.capacity}{' '}
-                  de {course.nextClass.capacity}
+                  {courseSeatsRemaining(course)} de {courseCapacity(course)}
+                </Fact>
+                <Fact icon={<Clock />} label="Turmas">
+                  {courseTimesLabel(course)}
                 </Fact>
                 <Fact icon={<MapPin />} label="Onde">
                   {course.nextClass.location}

@@ -152,6 +152,38 @@ export function ClassFormFields({
         />
       </div>
 
+      {/*
+        O horário, que o turno não diz.
+        `<input type="time">` nativo: o navegador já dá teclado de hora no
+        celular, relógio no desktop e o formato de 24h que o servidor espera.
+        Em branco é turma sem horário fechado, e o envio o manda como nulo.
+      */}
+      <div className="grid gap-6 sm:grid-cols-2">
+        <Controller
+          control={form.control}
+          name="startsAtTime"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="startsAtTime">Começa às</FieldLabel>
+              <Input {...field} id="startsAtTime" type="time" />
+              {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="endsAtTime"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="endsAtTime">Termina às</FieldLabel>
+              <Input {...field} id="endsAtTime" type="time" />
+              {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+            </Field>
+          )}
+        />
+      </div>
+
       <Controller
         control={form.control}
         name="location"

@@ -43,17 +43,26 @@ function courseJsonLd(course: CourseResponse) {
     },
   }
 
-  if (course.nextClass) {
+  /*
+   * Uma `CourseInstance` por turma anunciada, e não só pela próxima.
+   *
+   * O curso tem duas turmas de manhã ou três à tarde, com horários diferentes,
+   * e o buscador mostra as ocorrências que a página declara. Declarar uma só
+   * esconderia as outras exatamente como o card escondia.
+   */
+  const classes = course.announcedClasses ?? (course.nextClass ? [course.nextClass] : [])
+
+  const instances = classes.map(function (entity) {
     const instance: Record<string, unknown> = {
       '@type': 'CourseInstance',
       // `onsite` é o argumento da escola inteira, e é o campo que faz o
       // resultado de busca dizer "presencial" antes de alguém clicar.
       courseMode: 'onsite',
-      startDate: course.nextClass.startsAt,
-      maximumAttendeeCapacity: course.nextClass.capacity,
+      startDate: entity.startsAt,
+      maximumAttendeeCapacity: entity.capacity,
       location: {
         '@type': 'Place',
-        name: course.nextClass.location,
+        name: entity.location,
       },
       offers: {
         '@type': 'Offer',
@@ -66,9 +75,27 @@ function courseJsonLd(course: CourseResponse) {
 
     // Só quando a turma tem fim marcado: `endDate` nulo é um campo que o
     // buscador lê como dado e mostra vazio.
-    if (course.nextClass.endsAt) instance.endDate = course.nextClass.endsAt
+    if (entity.endsAt) instance.endDate = entity.endsAt
 
-    jsonLd.hasCourseInstance = instance
+    // `courseSchedule` é como o schema.org expressa "sábado, das 8h às 10h" -
+    // e é a única forma de duas turmas do mesmo curso não parecerem a mesma.
+    if (entity.startsAtTime) {
+      instance.courseSchedule = {
+        '@type': 'Schedule',
+        byDay: 'https://schema.org/Saturday',
+        startTime: entity.startsAtTime,
+        endTime: entity.endsAtTime ?? undefined,
+        repeatFrequency: 'P1W',
+      }
+    }
+
+    return instance
+  })
+
+  if (instances.length > 0) {
+    // Um objeto quando é uma só: o formato de item único é o que os validadores
+    // do buscador mostram nos exemplos, e um array de um item é ruído.
+    jsonLd.hasCourseInstance = instances.length === 1 ? instances[0] : instances
   }
 
   return jsonLd

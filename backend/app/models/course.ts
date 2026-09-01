@@ -61,4 +61,21 @@ export default class Course extends CourseSchema {
   get nextClass(): Class | null | undefined {
     return this.$extras.nextClass
   }
+
+  /**
+   * Todas as turmas anunciadas do curso, para a vitrine e a matrícula.
+   *
+   * `nextClass` responde "quando começa"; esta responde "quais são as opções", e
+   * são perguntas diferentes desde que a escola passou a abrir mais de uma turma
+   * por curso - duas de web pela manhã, três de robótica à tarde e à noite.
+   * Anunciar só a primeira esconderia as outras do candidato.
+   *
+   * Não se chama `classes`: esse nome já é a relação `hasMany`, que é *todas* as
+   * turmas, inclusive as fechadas e as removidas. Aqui só entra o que o site
+   * pode anunciar - a regra está em `_shared.storefront.ts`.
+   */
+  @computed()
+  get announcedClasses(): Array<Class> | undefined {
+    return this.$extras.announcedClasses
+  }
 }

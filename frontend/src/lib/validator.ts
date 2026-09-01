@@ -439,6 +439,16 @@ export type AuthenticationSignInPayload = Infer<typeof AuthenticationSignInValid
 // administrator/classes
 // ---------------------------------------------------------------------------
 
+/**
+ * Uma hora de parede, `HH:MM` ou `HH:MM:SS` - espelha o backend. Os segundos
+ * entram porque é o que o Postgres devolve; o `<input type="time">` manda sem.
+ */
+const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/
+
+function time() {
+  return vine.string().trim().regex(TIME_PATTERN).nullable().optional()
+}
+
 export const AdministratorClassCreateValidator = vine.create({
   courseId: vine.string().uuid(),
   name: vine.string().trim().minLength(2).maxLength(160),
@@ -449,6 +459,10 @@ export const AdministratorClassCreateValidator = vine.create({
   endsAt: vine.date({ formats: ['iso8601'] }).afterField('startsAt').nullable().optional(),
   weekday: vine.enum(WEEKDAYS),
   shift: vine.enum(SHIFTS),
+  // A hora da aula: é ela que separa duas turmas do mesmo curso no mesmo
+  // sábado de manhã. Nula enquanto a secretaria não fechou o horário.
+  startsAtTime: time(),
+  endsAtTime: time(),
   location: vine.string().trim().minLength(2).maxLength(200),
   capacity: vine.number().min(1).max(10_000),
   // `FULL` não entra: é derivado da ocupação, e digitá-lo criaria uma segunda
@@ -463,6 +477,8 @@ export const AdministratorClassUpdateValidator = vine.create({
   endsAt: vine.date({ formats: ['iso8601'] }).nullable().optional(),
   weekday: vine.enum(WEEKDAYS).optional(),
   shift: vine.enum(SHIFTS).optional(),
+  startsAtTime: time(),
+  endsAtTime: time(),
   location: vine.string().trim().minLength(2).maxLength(200).optional(),
   capacity: vine.number().min(1).max(10_000).optional(),
   status: vine.enum([ClassStatuses.OPEN, ClassStatuses.CLOSED]).optional(),

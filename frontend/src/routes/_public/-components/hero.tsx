@@ -6,7 +6,7 @@ import { Highlight } from '#/components/common/highlight'
 import { Sparkles, Petal } from '#/components/common/marks'
 import { EnrollmentCta } from '#/components/common/enrollment-cta'
 import { storefrontCoursesQueryOptions } from '#/integrations/tanstack-query/queries'
-import { enrollmentStateFrom } from '#/lib/enrollment-state'
+import { enrollmentStateFrom, scheduleSummary } from '#/lib/enrollment-state'
 import { formatDate } from '#/lib/format'
 import { REVEAL } from './reveal'
 import { cn } from '#/lib/utils'
@@ -31,11 +31,27 @@ export function Hero(): React.JSX.Element {
   const { data } = useQuery(storefrontCoursesQueryOptions())
   const state = enrollmentStateFrom(data?.data)
 
+  const summary = scheduleSummary(data?.data)
+
+  // Os turnos saem das turmas, não da frase: enquanto era uma turma de manhã, a
+  // frase estava certa por coincidência, e passou a mentir no dia em que a
+  // escola abriu turma à tarde e à noite.
+  const shifts = summary.shiftsLabel ? ` de ${summary.shiftsLabel}` : ''
+
   // Sem turma anunciada a frase perde a data em vez de inventar uma. O que
   // sobra continua verdadeiro.
-  let schedule = 'Aulas presenciais aos sábados de manhã, em Benjamin Constant.'
+  let schedule = `Aulas presenciais aos sábados${shifts}, em Benjamin Constant.`
   if (state.kind !== 'NONE') {
-    schedule = `A turma de estreia começa em ${formatDate(state.startsAt)}. Aulas presenciais aos sábados de manhã, em Benjamin Constant.`
+    schedule = `A próxima turma começa em ${formatDate(state.startsAt)}. Aulas presenciais aos sábados${shifts}, em Benjamin Constant.`
+  }
+
+  // "São cinco turmas de 40 vagas" quando todas têm a mesma capacidade; o total
+  // quando não têm. Nenhum dos dois é escrito à mão.
+  let seats = ''
+  if (summary.classCount > 0 && summary.seatsPerClass !== null) {
+    seats = `São ${summary.classCount} ${summary.classCount === 1 ? 'turma' : 'turmas'} de ${summary.seatsPerClass} vagas${summary.timesLabel ? `, das ${summary.timesLabel}` : ''}.`
+  } else if (summary.classCount > 0) {
+    seats = `São ${summary.totalSeats} vagas em ${summary.classCount} turmas.`
   }
 
   return (
@@ -61,10 +77,11 @@ export function Hero(): React.JSX.Element {
               {schedule}
             </p>
 
-            {/* TODO: trocar por "das 8h às 10h" quando a secretaria fechar o horário. */}
-            <p className="mt-2 text-base leading-relaxed text-ink/75 sm:text-lg">
-              São 40 vagas por turma.
-            </p>
+            {seats && (
+              <p className="mt-2 text-base leading-relaxed text-ink/75 sm:text-lg">
+                {seats}
+              </p>
+            )}
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <EnrollmentCta variant="pill" size="pill-lg" />

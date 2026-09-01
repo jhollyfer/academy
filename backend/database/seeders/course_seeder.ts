@@ -63,6 +63,60 @@ const WEB_MODULES = [
 ] as const
 
 /**
+ * As cinco turmas da oferta: duas de programação pela manhã e três de robótica
+ * à tarde e à noite, todas aos sábados, todas com quarenta vagas.
+ *
+ * O que separa duas turmas do mesmo curso e turno é a hora, e só ela - por isso
+ * `startsAtTime` existe como coluna e aparece no nome. Sem a hora, "Programação
+ * de sábado de manhã" seria a mesma turma duas vezes.
+ *
+ * Como todo o resto deste seeder, é ponto de partida: a secretaria muda horário,
+ * sala e vagas pelo painel.
+ */
+const CLASSES = [
+  {
+    course: 'web',
+    name: 'Programação 08h / 2026',
+    shift: Shifts.MORNING,
+    startsAtTime: '08:00',
+    endsAtTime: '10:00',
+    location: 'Sala 01 — Laboratório de Informática',
+  },
+  {
+    course: 'web',
+    name: 'Programação 10h / 2026',
+    shift: Shifts.MORNING,
+    startsAtTime: '10:00',
+    endsAtTime: '12:00',
+    location: 'Sala 01 — Laboratório de Informática',
+  },
+  {
+    course: 'robotics',
+    name: 'Robótica 13h / 2026',
+    shift: Shifts.AFTERNOON,
+    startsAtTime: '13:00',
+    endsAtTime: '15:00',
+    location: 'Laboratório de Robótica',
+  },
+  {
+    course: 'robotics',
+    name: 'Robótica 15h / 2026',
+    shift: Shifts.AFTERNOON,
+    startsAtTime: '15:00',
+    endsAtTime: '17:00',
+    location: 'Laboratório de Robótica',
+  },
+  {
+    course: 'robotics',
+    name: 'Robótica 18h / 2026',
+    shift: Shifts.NIGHT,
+    startsAtTime: '18:00',
+    endsAtTime: '20:00',
+    location: 'Laboratório de Robótica',
+  },
+] as const
+
+/**
  * O FAQ da escola, o que a home mostra. `courseId` nulo, servido por
  * `GET /storefront/faqs`.
  *
@@ -182,18 +236,46 @@ export default class extends BaseSeeder {
       })
     )
 
-    // A turma de estreia. `updateOrCreate` pelo par curso + nome: rodar o seeder
-    // duas vezes não pode criar duas turmas iguais e dobrar as vagas anunciadas.
-    for (const course of [robotics, web]) {
+    /*
+     * A turma única de estreia, de quando a escola abria uma turma por curso.
+     *
+     * Some agora que a oferta é de cinco: deixá-la no banco anunciaria no site
+     * uma turma sem horário ao lado das que têm. Só a que ninguém preencheu -
+     * turma com matrícula fica, porque apagá-la levaria o candidato junto, e é
+     * o mesmo motivo do `RESTRICT` na chave estrangeira.
+     */
+    const legacy = await Class.query()
+      .whereIn('courseId', [robotics.id, web.id])
+      .where('name', 'Turma 1 / 2026')
+      .withCount('enrollments')
+
+    for (const entity of legacy) {
+      if (Number(entity.$extras.enrollments_count) > 0) continue
+
+      await entity.delete()
+    }
+
+    // As cinco turmas da oferta. `updateOrCreate` pelo par curso + nome: rodar o
+    // seeder duas vezes não pode criar turmas iguais e dobrar as vagas
+    // anunciadas.
+    //
+    // O nome carrega a hora porque é o que separa duas turmas do mesmo curso no
+    // mesmo sábado de manhã na tela da secretaria - a coluna `startsAtTime` é o
+    // dado, o nome é como a pessoa a chama.
+    for (const entry of CLASSES) {
+      const course = entry.course === 'robotics' ? robotics : web
+
       await Class.updateOrCreate(
-        { courseId: course.id, name: 'Turma 1 / 2026' },
+        { courseId: course.id, name: entry.name },
         {
           courseId: course.id,
-          name: 'Turma 1 / 2026',
+          name: entry.name,
           startsAt: DateTime.fromISO('2026-03-07'),
           weekday: Weekdays.SATURDAY,
-          shift: Shifts.MORNING,
-          location: 'Benjamin Constant/AM',
+          shift: entry.shift,
+          startsAtTime: entry.startsAtTime,
+          endsAtTime: entry.endsAtTime,
+          location: entry.location,
           capacity: 40,
           status: ClassStatuses.OPEN,
         }

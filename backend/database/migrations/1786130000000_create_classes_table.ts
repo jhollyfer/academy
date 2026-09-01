@@ -25,6 +25,18 @@ export default class extends BaseSchema {
       table.date('ends_at').nullable()
       table.enum('weekday', WEEKDAYS).notNullable()
       table.enum('shift', SHIFTS).notNullable()
+      // A hora da aula, que `weekday` + `shift` não distinguem: duas turmas de
+      // programação no mesmo sábado de manhã só diferem por aqui - uma às 8h,
+      // outra às 10h. Sem estas colunas as duas seriam a mesma linha para quem
+      // lê.
+      //
+      // `time` e não `timestamp`: é hora de parede, repetida toda semana, e um
+      // timestamp obrigaria a inventar uma data para ela.
+      //
+      // Nulas porque a turma pode ser cadastrada antes de a secretaria fechar o
+      // horário - e nulo aqui é "ainda não fechou", não "não tem".
+      table.time('starts_at_time').nullable()
+      table.time('ends_at_time').nullable()
       // Onde a aula acontece, por extenso - "Benjamin Constant/AM".
       // Texto e não FK: é uma unidade só, e uma tabela de locais hoje seria uma
       // tabela de uma linha.

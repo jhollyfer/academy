@@ -46,26 +46,37 @@ export function announceableClassesQuery(courseIds: ReadonlyArray<string>) {
     .whereNull('deletedAt')
     .whereIn('status', [ClassStatuses.OPEN, ClassStatuses.FULL])
     .orderBy('startsAt', 'asc')
+    // Desempate pela hora: as turmas de um curso caem todas no mesmo sábado, e
+    // sem isto a ordem entre a de 8h e a de 10h seria a que o banco entregasse.
+    .orderBy('startsAtTime', 'asc')
 }
 
 /**
- * Carrega a próxima turma de cada curso e a pendura em `$extras.nextClass`.
+ * Pendura as turmas anunciáveis de cada curso: todas em
+ * `$extras.announcedClasses`, e a primeira também em `$extras.nextClass`.
  *
- * Uma consulta para a página toda, e a escolha da "próxima" feita em memória
- * sobre um resultado já ordenado: o primeiro que aparece de um curso é o dele.
- * O SQL equivalente seria uma janela por curso, e ele custaria mais para ler do
- * que estas quatro linhas.
+ * Uma consulta para a página toda, e o recorte por curso feito em memória sobre
+ * um resultado já ordenado. O SQL equivalente seria uma janela por curso, e ele
+ * custaria mais para ler do que estas linhas.
  *
- * Curso sem turma anunciável recebe `null` explícito, e não fica ausente:
- * ausente é "esta leitura não procurou", e é justamente a ambiguidade que fazia
- * a página de matrícula concluir que não havia turma nenhuma.
+ * As duas formas convivem porque as telas perguntam duas coisas. O título da
+ * home e o JSON-LD querem *a* próxima - uma data, uma frase. A vitrine e a
+ * matrícula querem a oferta inteira: são cinco turmas, e escolher entre elas é
+ * a decisão do candidato. Anunciar só a primeira esconderia quatro.
+ *
+ * Curso sem turma anunciável recebe `null` e `[]` explícitos, e não fica
+ * ausente: ausente é "esta leitura não procurou", e é justamente a ambiguidade
+ * que fazia a página de matrícula concluir que não havia turma nenhuma.
  */
-export async function attachNextClass(courses: ReadonlyArray<Course>): Promise<void> {
+export async function attachAnnounceableClasses(courses: ReadonlyArray<Course>): Promise<void> {
   if (courses.length === 0) return
 
   const classes = await announceableClassesQuery(courses.map((course) => course.id))
 
   for (const course of courses) {
-    course.$extras.nextClass = classes.find((entity) => entity.courseId === course.id) ?? null
+    const announced = classes.filter((entity) => entity.courseId === course.id)
+
+    course.$extras.announcedClasses = announced
+    course.$extras.nextClass = announced.at(0) ?? null
   }
 }

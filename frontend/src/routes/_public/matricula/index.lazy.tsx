@@ -12,7 +12,11 @@ import type { StorefrontEnrollmentCreatePayload } from '#/lib/validator'
 import type { Merge } from '#/lib/interfaces'
 import { LEGAL_AGE } from '#/lib/entity'
 import { applyMutationError } from '#/lib/form-errors'
-import { WAITING_LIST_MESSAGE } from '#/lib/enrollment-state'
+import {
+  WAITING_LIST_MESSAGE,
+  courseClasses,
+  formatTimeRange,
+} from '#/lib/enrollment-state'
 import { whatsappUrl } from '#/lib/site'
 import { Highlight } from '#/components/common/highlight'
 import { Button } from '#/components/ui/button'
@@ -26,7 +30,7 @@ import {
 } from '#/components/ui/field'
 import { formatMoney, formatDate } from '#/lib/format'
 import { Route as EnrollmentRoute } from './index'
-import type { ClassResponse, CourseResponse } from '#/integrations/response'
+import type { ClassResponse } from '#/integrations/response'
 
 export const Route = createLazyFileRoute('/_public/matricula/')({
   component: RouteComponent,
@@ -131,6 +135,15 @@ function ageFrom(birthDate: string): number | null {
  * Turma cheia não some da lista: quem chega depois das quarenta entra na fila de
  * espera, e esconder a opção o mandaria embora.
  */
+/**
+ * O horário da turma, quando ela tem um. Turma sem horário fechado aparece só
+ * com nome e data - anunciar "das 8h" que ninguém decidiu é o defeito que a
+ * coluna veio consertar.
+ */
+function classTime(entity: ClassResponse): string {
+  return formatTimeRange(entity.startsAtTime, entity.endsAtTime)
+}
+
 function seatsLabel(remaining: number | undefined): string {
   if (remaining === undefined) return ''
   if (remaining === 0) return 'Turma cheia: você entra na fila de espera.'
@@ -145,21 +158,32 @@ function RouteComponent(): React.JSX.Element {
 
   const courses = data.data
 
-  // Só cursos com turma aberta entram: oferecer um curso sem turma levaria a
-  // pessoa a preencher treze campos para ouvir que não há vaga.
-  const options = courses.filter(function (course): course is CourseResponse & {
-    nextClass: ClassResponse
-  } {
-    return Boolean(course.nextClass)
+  /*
+   * Uma opção por **turma**, e não por curso.
+   *
+   * A escola abre cinco: duas de programação pela manhã e três de robótica à
+   * tarde e à noite. Enquanto era uma por curso, escolher o curso escolhia a
+   * turma junto; agora são coisas diferentes, e quem decide qual das três de
+   * robótica cabe na semana dele é o candidato, não o servidor.
+   *
+   * Curso sem turma anunciada não entra: pedir treze campos para responder que
+   * não há vaga é gastar o tempo de alguém para não entregar nada.
+   */
+  const options = courses.flatMap(function (course) {
+    const classes = courseClasses(course)
+
+    return classes.map((entity) => ({ course, entity }))
   })
 
-  const preselected = options.find((course) => course.slug === search.curso)
+  const preselected = options.find(
+    (option) => option.course.slug === search.curso,
+  )
 
   const form = useForm<FormValues, unknown, StorefrontEnrollmentCreatePayload>({
     resolver: vineResolver(StorefrontEnrollmentCreateValidator),
     mode: 'onTouched',
     defaultValues: {
-      classId: preselected?.nextClass.id ?? options.at(0)?.nextClass.id ?? '',
+      classId: preselected?.entity.id ?? options.at(0)?.entity.id ?? '',
       studentName: '',
       studentBirthDate: '',
       studentDocument: null,
@@ -191,7 +215,7 @@ function RouteComponent(): React.JSX.Element {
   const steps = STEPS.filter((name) => name !== 'responsavel' || isMinor)
   const index = steps.indexOf(step)
 
-  const selected = options.find((course) => course.nextClass.id === classId)
+  const selected = options.find((option) => option.entity.id === classId)
 
   const mutation = useEnrollmentCreate({
     onSuccess: async function (enrollment) {
@@ -290,7 +314,7 @@ function RouteComponent(): React.JSX.Element {
             <FieldGroup>
               <fieldset>
                 <legend className="text-xl font-bold">
-                  Qual curso você quer fazer?
+                  Qual turma você quer?
                 </legend>
 
                 <Controller
@@ -298,29 +322,34 @@ function RouteComponent(): React.JSX.Element {
                   name="classId"
                   render={({ field, fieldState }) => (
                     <div className="mt-5 grid gap-3">
-                      {options.map((course) => (
+                      {options.map(({ course, entity }) => (
                         <label
-                          key={course.id}
+                          key={entity.id}
                           data-accent={course.accent}
                           className="rounded-card flex cursor-pointer items-start gap-4 border border-line bg-card p-5 transition-colors has-checked:border-[var(--neon-ink)] has-checked:bg-cream"
                         >
                           <input
                             type="radio"
                             name={field.name}
-                            value={course.nextClass.id}
-                            checked={field.value === course.nextClass.id}
-                            onChange={() => field.onChange(course.nextClass.id)}
+                            value={entity.id}
+                            checked={field.value === entity.id}
+                            onChange={() => field.onChange(entity.id)}
                             onBlur={field.onBlur}
                             className="mt-1 size-4 accent-[var(--neon-ink)]"
                           />
                           <span className="grid gap-1">
                             <span className="font-bold tracking-tight">
                               {course.name}
+                              {classTime(entity) && (
+                                <span className="ml-2 font-normal text-neon-ink">
+                                  {classTime(entity)}
+                                </span>
+                              )}
                             </span>
                             <span className="text-sm text-muted-foreground">
-                              {course.nextClass.name}, começa em{' '}
-                              {formatDate(course.nextClass.startsAt)}.{' '}
-                              {seatsLabel(course.nextClass.seatsRemaining)}
+                              {entity.name}, começa em{' '}
+                              {formatDate(entity.startsAt)}. {entity.location}.{' '}
+                              {seatsLabel(entity.seatsRemaining)}
                             </span>
                           </span>
                         </label>
@@ -537,15 +566,19 @@ function RouteComponent(): React.JSX.Element {
 
                 {selected && (
                   <dl className="rounded-card grid gap-3 border border-line bg-card p-5 text-sm">
-                    <Row label="Curso">{selected.name}</Row>
+                    <Row label="Curso">{selected.course.name}</Row>
                     <Row label="Turma">
-                      {selected.nextClass.name}, a partir de{' '}
-                      {formatDate(selected.nextClass.startsAt)}
+                      {selected.entity.name}
+                      {classTime(selected.entity) &&
+                        `, ${classTime(selected.entity)}`}
+                      , a partir de {formatDate(selected.entity.startsAt)}
                     </Row>
+                    <Row label="Onde">{selected.entity.location}</Row>
                     <Row label="Aluno">{form.getValues('studentName')}</Row>
                     <Row label="Investimento">
-                      {formatMoney(selected.enrollmentFeeInCents)} de inscrição,
-                      depois {formatMoney(selected.monthlyFeeInCents)} por mês
+                      {formatMoney(selected.course.enrollmentFeeInCents)} de
+                      inscrição, depois{' '}
+                      {formatMoney(selected.course.monthlyFeeInCents)} por mês
                     </Row>
                   </dl>
                 )}

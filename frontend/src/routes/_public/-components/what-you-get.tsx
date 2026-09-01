@@ -1,4 +1,5 @@
 import type * as React from 'react'
+import { useQuery } from '@tanstack/react-query'
 import {
   CirclesThreePlus,
   Cpu,
@@ -16,6 +17,8 @@ import {
 } from '#/components/ui/card'
 import { Highlight } from '#/components/common/highlight'
 import { EnrollmentCta } from '#/components/common/enrollment-cta'
+import { storefrontCoursesQueryOptions } from '#/integrations/tanstack-query/queries'
+import { scheduleSummary } from '#/lib/enrollment-state'
 import { REVEAL, STAGGER } from './reveal'
 import { cn } from '#/lib/utils'
 
@@ -46,9 +49,11 @@ const ITEMS: ReadonlyArray<{ icon: Icon; title: string; description: string }> =
     },
     {
       icon: UsersThree,
-      title: 'Turma de 40',
-      description:
-        'Uma turma por curso, com quarenta lugares. Sem sala lotada e sem fila para usar a bancada.',
+      title: 'Turma pequena',
+      // O tamanho da turma sai do dado, e por isso este card é montado no
+      // componente: o texto dizia "uma turma por curso, com quarenta lugares" e
+      // deixou de valer quando a escola abriu cinco turmas.
+      description: '',
     },
     {
       icon: PresentationChart,
@@ -65,6 +70,28 @@ const ITEMS: ReadonlyArray<{ icon: Icon; title: string; description: string }> =
   ]
 
 export function WhatYouGet(): React.JSX.Element {
+  const { data } = useQuery(storefrontCoursesQueryOptions())
+  const summary = scheduleSummary(data?.data)
+
+  /*
+   * O card das vagas, preenchido com o que as turmas dizem.
+   *
+   * Sem turma anunciada ele fala do tamanho da turma sem prometer número: a
+   * frase continua verdadeira, e é a mesma escolha que o hero faz com a data.
+   */
+  let seats =
+    'Turma pequena, sem sala lotada e sem fila para usar a bancada.'
+
+  if (summary.seatsPerClass !== null) {
+    seats = `${summary.classCount} ${summary.classCount === 1 ? 'turma' : 'turmas'} de ${summary.seatsPerClass} lugares. Sem sala lotada e sem fila para usar a bancada.`
+  } else if (summary.classCount > 0) {
+    seats = `${summary.totalSeats} lugares em ${summary.classCount} turmas. Sem sala lotada e sem fila para usar a bancada.`
+  }
+
+  const items = ITEMS.map((item) =>
+    item.icon === UsersThree ? { ...item, description: seats } : item,
+  )
+
   return (
     <section
       data-slot="home-what-you-get"
@@ -102,7 +129,7 @@ export function WhatYouGet(): React.JSX.Element {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          {ITEMS.map((item, index) => (
+          {items.map((item, index) => (
             <Card
               key={item.title}
               size="lg"

@@ -51,8 +51,8 @@ export function School(): React.JSX.Element {
                 professor está na sala e o kit fica na sua mão.
               </p>
               <p>
-                São dois cursos na turma de estreia. Robótica e desenvolvimento
-                web, os dois começando do zero.
+                São dois cursos, em turmas de manhã, tarde e noite. Robótica e
+                desenvolvimento web, os dois começando do zero.
               </p>
             </div>
           </div>

@@ -7,7 +7,7 @@ import { Button } from '#/components/ui/button'
 import { Separator } from '#/components/ui/separator'
 import { Highlight } from '#/components/common/highlight'
 import { storefrontCoursesQueryOptions } from '#/integrations/tanstack-query/queries'
-import { enrollmentStateFrom } from '#/lib/enrollment-state'
+import { enrollmentStateFrom, scheduleSummary } from '#/lib/enrollment-state'
 import { formatDate } from '#/lib/format'
 import { ADDRESS, whatsappUrl } from '#/lib/site'
 import { REVEAL } from './reveal'
@@ -25,18 +25,26 @@ const DIRECTIONS_MESSAGE =
  * falar com a secretaria em vez de mostrar um mapa que apontaria para o lugar
  * errado.
  *
- * TODO: preencher o logradouro em `ADDRESS.street` e trocar o horário por
- * "das 8h às 10h" quando a secretaria fechar os dois.
+ * TODO: preencher o logradouro em `ADDRESS.street` quando a secretaria fechar
+ * o endereço. O horário deixou de ser TODO: sai das turmas.
  */
 export function WhereAndWhen(): React.JSX.Element {
   const { data } = useQuery(storefrontCoursesQueryOptions())
   const state = enrollmentStateFrom(data?.data)
 
+  const summary = scheduleSummary(data?.data)
+
   let start = 'A definir com a próxima turma.'
   if (state.kind !== 'NONE') start = formatDate(state.startsAt)
 
+  // "Sábados, das 08h às 20h." O intervalo é o das turmas anunciadas: com uma
+  // turma de manhã ele diz manhã, com cinco espalhadas ele diz o dia inteiro.
+  let lessons = 'Sábados.'
+  if (summary.timesLabel) lessons = `Sábados, das ${summary.timesLabel}.`
+  else if (summary.shiftsLabel) lessons = `Sábados de ${summary.shiftsLabel}.`
+
   const rows: ReadonlyArray<{ icon: Icon; term: string; value: string }> = [
-    { icon: Clock, term: 'Aulas', value: 'Sábados de manhã.' },
+    { icon: Clock, term: 'Aulas', value: lessons },
     {
       icon: MapPin,
       term: 'Endereço',

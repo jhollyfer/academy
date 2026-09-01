@@ -115,6 +115,8 @@ export const FIELD_LABELS = {
   endsAt: 'a data de término',
   weekday: 'o dia da semana',
   shift: 'o turno',
+  startsAtTime: 'a hora de início',
+  endsAtTime: 'a hora de término',
   location: 'o local',
   capacity: 'o número de vagas',
 

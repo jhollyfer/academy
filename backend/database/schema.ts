@@ -33,7 +33,7 @@ export class AuthAccessTokenSchema extends BaseModel {
 }
 
 export class ClassSchema extends BaseModel {
-  static $columns = ['capacity', 'courseId', 'createdAt', 'deletedAt', 'endsAt', 'id', 'location', 'name', 'shift', 'startsAt', 'status', 'updatedAt', 'weekday'] as const
+  static $columns = ['capacity', 'courseId', 'createdAt', 'deletedAt', 'endsAt', 'endsAtTime', 'id', 'location', 'name', 'shift', 'startsAt', 'startsAtTime', 'status', 'updatedAt', 'weekday'] as const
   $columns = ClassSchema.$columns
   @column()
   declare capacity: number
@@ -45,6 +45,8 @@ export class ClassSchema extends BaseModel {
   declare deletedAt: DateTime | null
   @column.date()
   declare endsAt: DateTime | null
+  @column()
+  declare endsAtTime: string | null
   @column({ isPrimary: true })
   declare id: string
   @column()
@@ -55,6 +57,8 @@ export class ClassSchema extends BaseModel {
   declare shift: string
   @column.date()
   declare startsAt: DateTime
+  @column()
+  declare startsAtTime: string | null
   @column()
   declare status: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })

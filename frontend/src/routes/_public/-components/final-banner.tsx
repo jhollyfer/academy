@@ -5,7 +5,7 @@ import { Highlight } from '#/components/common/highlight'
 import { Leaf } from '#/components/common/marks'
 import { EnrollmentCta } from '#/components/common/enrollment-cta'
 import { storefrontCoursesQueryOptions } from '#/integrations/tanstack-query/queries'
-import { enrollmentStateFrom } from '#/lib/enrollment-state'
+import { enrollmentStateFrom, scheduleSummary } from '#/lib/enrollment-state'
 import { formatMonthYear } from '#/lib/format'
 import { REVEAL } from './reveal'
 import { cn } from '#/lib/utils'
@@ -33,11 +33,20 @@ export function FinalBanner(): React.JSX.Element {
   if (state.kind !== 'NONE') {
     heading = (
       <>
-        A turma de estreia começa em{' '}
+        A próxima turma começa em{' '}
         <Highlight variant="ink">{formatMonthYear(state.startsAt)}</Highlight>
       </>
     )
-    support = 'São 40 vagas por curso, e a inscrição é por Pix.'
+
+    // As vagas vêm das turmas: "40 vagas por curso" estava escrito aqui e
+    // deixou de valer quando o curso passou a ter mais de uma turma.
+    const summary = scheduleSummary(data?.data)
+    const seats =
+      summary.seatsPerClass !== null
+        ? `São ${summary.classCount} ${summary.classCount === 1 ? 'turma' : 'turmas'} de ${summary.seatsPerClass} vagas`
+        : `São ${summary.totalSeats} vagas`
+
+    support = `${seats}, e a inscrição é por Pix.`
   }
 
   return (

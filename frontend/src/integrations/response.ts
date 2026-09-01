@@ -138,6 +138,13 @@ export type ClassResponse = {
   endsAt: string | null
   weekday: Weekday
   shift: Shift
+  /**
+   * A hora da aula, `"HH:MM:SS"` como o Postgres devolve. `null` enquanto a
+   * secretaria não fechou o horário - o que `weekday` e `shift` não separam,
+   * estas duas separam: duas turmas de web no mesmo sábado de manhã.
+   */
+  startsAtTime: string | null
+  endsAtTime: string | null
   location: string
   capacity: number
   status: ClassStatus
@@ -176,6 +183,12 @@ export type CourseResponse = {
    * turma anunciada" - diferente de ausente, que é "esta leitura não a buscou".
    */
   nextClass?: ClassResponse | null
+  /**
+   * Todas as turmas anunciadas do curso, na vitrine e na matrícula. `nextClass`
+   * é a primeira desta lista; esta é a oferta inteira, que é o que o candidato
+   * escolhe. Ausente é "esta leitura não as buscou".
+   */
+  announcedClasses?: Array<ClassResponse>
   createdAt: string
   updatedAt: string | null
   deletedAt: string | null

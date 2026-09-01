@@ -9,7 +9,7 @@ import { whatsappUrl } from '#/lib/site'
 import { cn } from '#/lib/utils'
 
 const STEPS = [
-  'Escolha o curso: robótica ou desenvolvimento web.',
+  'Escolha a turma: robótica ou programação, no horário que cabe na sua semana.',
   'Preencha o formulário. Leva menos de cinco minutos.',
   'Pague os R$ 150 de inscrição por Pix.',
   'Envie o comprovante pela própria página.',

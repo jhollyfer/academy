@@ -133,3 +133,108 @@ test.group('vitrine > cursos > detalhe', (group) => {
     response.assertStatus(404)
   })
 })
+
+test.group('vitrine > cursos > turmas anunciadas', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  /**
+   * A oferta inteira, e não só a próxima.
+   *
+   * A escola abre cinco turmas - duas de programação pela manhã, três de
+   * robótica à tarde e à noite -, e anunciar só a primeira esconderia quatro do
+   * candidato. `nextClass` continua existindo porque o título da home e o
+   * JSON-LD perguntam outra coisa: uma data, não a lista.
+   */
+  test('a listagem traz todas as turmas anunciáveis do curso', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+
+    const early = await createClass(client, session, course.id, {
+      name: 'Programação 08h / 2026',
+      startsAtTime: '08:00',
+      endsAtTime: '10:00',
+    })
+    const late = await createClass(client, session, course.id, {
+      name: 'Programação 10h / 2026',
+      startsAtTime: '10:00',
+      endsAtTime: '12:00',
+    })
+
+    const response = await client.get('/storefront/courses')
+
+    response.assertStatus(200)
+
+    const listed = body(response).data.find((entity: any) => entity.id === course.id)
+
+    assert.lengthOf(listed.announcedClasses, 2)
+    // Ordenadas pela hora: as duas começam no mesmo sábado, e sem o desempate a
+    // ordem entre a de 8h e a de 10h seria a que o banco entregasse.
+    assert.deepEqual(
+      listed.announcedClasses.map((entity: any) => entity.id),
+      [early.id, late.id]
+    )
+    // A primeira da lista é a mesma que `nextClass` anuncia.
+    assert.equal(listed.nextClass.id, early.id)
+    assert.equal(listed.announcedClasses[0].seatsRemaining, 40)
+  })
+
+  test('curso sem turma anunciável vem com a lista vazia, e não ausente', async ({
+    client,
+    assert,
+  }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+
+    const response = await client.get('/storefront/courses')
+
+    response.assertStatus(200)
+
+    const listed = body(response).data.find((entity: any) => entity.id === course.id)
+
+    // Vazio é "procurei e não há"; ausente seria "esta leitura não procurou", e
+    // é a ambiguidade que fazia a matrícula concluir que não havia turma.
+    assert.deepEqual(listed.announcedClasses, [])
+    assert.isNull(listed.nextClass)
+  })
+
+  test('o detalhe do curso anuncia as mesmas turmas que a listagem', async ({
+    client,
+    assert,
+  }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+
+    await createClass(client, session, course.id, { name: 'Robótica 13h / 2026' })
+    await createClass(client, session, course.id, { name: 'Robótica 18h / 2026' })
+
+    const response = await client.get(`/storefront/courses/${course.slug}`)
+
+    response.assertStatus(200)
+    assert.lengthOf(body(response).announcedClasses, 2)
+  })
+
+  /**
+   * Turma fechada não é oferta.
+   *
+   * `CLOSED` é decisão da secretaria - turma que já começou, ou que não vai
+   * abrir. Anunciá-la mandaria o candidato escolher uma turma que não recebe
+   * matrícula.
+   */
+  test('turma fechada não entra na lista anunciada', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+
+    await createClass(client, session, course.id, { name: 'Turma aberta' })
+    await createClass(client, session, course.id, {
+      name: 'Turma fechada',
+      status: 'CLOSED',
+    })
+
+    const response = await client.get('/storefront/courses')
+
+    const listed = body(response).data.find((entity: any) => entity.id === course.id)
+
+    assert.lengthOf(listed.announcedClasses, 1)
+    assert.equal(listed.announcedClasses[0].name, 'Turma aberta')
+  })
+})

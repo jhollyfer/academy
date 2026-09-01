@@ -1,4 +1,4 @@
-import { ClassStatuses } from '#/lib/entity'
+import { ClassStatuses, Shifts } from '#/lib/entity'
 import type { ClassResponse, CourseResponse } from '#/integrations/response'
 
 /**
@@ -55,16 +55,58 @@ export const WAITING_LIST_MESSAGE =
  * proposital: para quem desenha o botão, "esta leitura não procurou" e "não há
  * turma" levam ao mesmo botão. A diferença entre os dois importa no servidor.
  */
-function announcedClasses(
+export function announcedClasses(
   courses: ReadonlyArray<CourseResponse>,
 ): Array<ClassResponse> {
-  const classes: Array<ClassResponse> = []
+  return courses.flatMap(courseClasses)
+}
 
-  for (const course of courses) {
-    if (course.nextClass) classes.push(course.nextClass)
-  }
+/**
+ * As turmas anunciadas de um curso.
+ *
+ * `announcedClasses` quando o servidor a mandou; a próxima turma quando a
+ * resposta é do formato anterior, que só trazia `nextClass`. O curso tem cinco
+ * turmas hoje, e ler só a primeira ignoraria quatro.
+ */
+export function courseClasses(course: CourseResponse): Array<ClassResponse> {
+  if (course.announcedClasses) return course.announcedClasses
+  if (course.nextClass) return [course.nextClass]
 
-  return classes
+  return []
+}
+
+/**
+ * As vagas do curso somadas sobre as turmas, e não as de uma turma: quem lê o
+ * card quer saber se ainda cabe alguém no curso; em qual das turmas é a decisão
+ * do primeiro passo da matrícula.
+ *
+ * `seatsRemaining` some das leituras que não contaram, e aí a capacidade é o
+ * melhor palpite honesto - é o mesmo `??` que o card sempre fez.
+ */
+export function courseSeatsRemaining(course: CourseResponse): number {
+  return courseClasses(course).reduce(function (total, entity) {
+    return total + (entity.seatsRemaining ?? entity.capacity)
+  }, 0)
+}
+
+export function courseCapacity(course: CourseResponse): number {
+  return courseClasses(course).reduce(
+    (total, entity) => total + entity.capacity,
+    0,
+  )
+}
+
+/**
+ * Os horários das turmas do curso numa frase: `"08h–10h e 10h–12h"`. Turma sem
+ * horário fechado entra pelo nome, que é o que a secretaria escreveu.
+ */
+export function courseTimesLabel(course: CourseResponse): string {
+  return joinWords(
+    courseClasses(course).map(
+      (entity) =>
+        formatTimeRange(entity.startsAtTime, entity.endsAtTime) || entity.name,
+    ),
+  )
 }
 
 /**
@@ -103,4 +145,130 @@ function earliestStart(classes: ReadonlyArray<ClassResponse>): string {
     if (entity.startsAt < earliest) return entity.startsAt
     return earliest
   }, classes[0].startsAt)
+}
+
+/**
+ * O horário de uma turma, como a página o escreve: `"08h–10h"`.
+ *
+ * A hora chega `"08:00:00"` do Postgres e vira `08h`; minuto quebrado aparece
+ * (`"08h30"`), porque uma turma das 8h30 não pode ser anunciada como das 8h.
+ * Sem horário devolve string vazia, e quem chama omite o trecho em vez de
+ * escrever um travessão solto.
+ */
+export function formatTimeRange(
+  startsAtTime: string | null,
+  endsAtTime: string | null,
+): string {
+  const start = formatTime(startsAtTime)
+
+  if (!start) return ''
+
+  const end = formatTime(endsAtTime)
+
+  if (!end) return start
+
+  return `${start}–${end}`
+}
+
+function formatTime(value: string | null): string {
+  if (!value) return ''
+
+  const [hour, minute] = value.split(':')
+
+  if (!hour) return ''
+  if (minute && minute !== '00') return `${hour}h${minute}`
+
+  return `${hour}h`
+}
+
+/**
+ * Os turnos em que a escola tem aula, na ordem do dia.
+ *
+ * Um `Set` e não `filter` de igualdade: são três turnos possíveis e cinco
+ * turmas, e o que a frase precisa é da lista sem repetição.
+ */
+const SHIFT_LABELS: Record<string, string> = {
+  [Shifts.MORNING]: 'manhã',
+  [Shifts.AFTERNOON]: 'tarde',
+  [Shifts.NIGHT]: 'noite',
+}
+
+/**
+ * O que a landing diz sobre a oferta, derivado das turmas anunciadas.
+ *
+ * Existe pelo mesmo motivo que `enrollmentStateFrom`: a página escrevia "40
+ * vagas por turma" e "uma turma por curso" à mão em cinco arquivos, e nenhum
+ * deles lia o dado. Quando a escola abriu cinco turmas em três turnos, os cinco
+ * passaram a mentir ao mesmo tempo.
+ *
+ * `seatsPerClass` é `null` quando as turmas têm capacidades diferentes: aí não
+ * existe "vagas por turma", e a frase fala do total.
+ */
+export type ScheduleSummary = {
+  /** Quantas turmas o site anuncia. Zero quando não há nenhuma. */
+  classCount: number
+  /** As vagas de cada turma, quando todas têm a mesma. Senão `null`. */
+  seatsPerClass: number | null
+  /** A soma das vagas anunciadas. */
+  totalSeats: number
+  /** `"manhã, tarde e noite"`, na ordem do dia. Vazio sem turma. */
+  shiftsLabel: string
+  /** `"08h–10h"` da primeira turma do dia à última. Vazio sem horário. */
+  timesLabel: string
+}
+
+export function scheduleSummary(
+  courses: ReadonlyArray<CourseResponse> | undefined,
+): ScheduleSummary {
+  const classes = announcedClasses(courses ?? [])
+
+  const capacities = new Set(classes.map((entity) => entity.capacity))
+
+  return {
+    classCount: classes.length,
+    seatsPerClass: capacities.size === 1 ? [...capacities][0] : null,
+    totalSeats: classes.reduce((total, entity) => total + entity.capacity, 0),
+    shiftsLabel: joinWords(shiftLabels(classes)),
+    timesLabel: timesLabel(classes),
+  }
+}
+
+function shiftLabels(classes: ReadonlyArray<ClassResponse>): Array<string> {
+  const shifts = new Set(classes.map((entity) => entity.shift))
+
+  return [Shifts.MORNING, Shifts.AFTERNOON, Shifts.NIGHT]
+    .filter((shift) => shifts.has(shift))
+    .map((shift) => SHIFT_LABELS[shift])
+}
+
+/**
+ * Da primeira hora à última: `"08h às 20h"`. Uma turma só, ou horários que não
+ * variam, devolve o intervalo dela - `"08h–10h"`.
+ */
+function timesLabel(classes: ReadonlyArray<ClassResponse>): string {
+  const withTime = classes.filter((entity) => entity.startsAtTime)
+
+  if (withTime.length === 0) return ''
+
+  const sorted = [...withTime].sort(function (first, second) {
+    return (first.startsAtTime ?? '') < (second.startsAtTime ?? '') ? -1 : 1
+  })
+
+  const first = sorted[0]
+  const last = sorted[sorted.length - 1]
+
+  if (first === last) return formatTimeRange(first.startsAtTime, first.endsAtTime)
+
+  return `${formatTime(first.startsAtTime)} às ${formatTime(last.endsAtTime ?? last.startsAtTime)}`
+}
+
+/**
+ * `["manhã", "tarde", "noite"]` vira `"manhã, tarde e noite"`. O "e" antes do
+ * último é o que faz a frase soar escrita por alguém.
+ */
+function joinWords(words: ReadonlyArray<string>): string {
+  if (words.length === 0) return ''
+  if (words.length === 1) return words[0]
+
+  return `${words.slice(0, -1).join(', ')} e ${words[words.length - 1]}`
 }
