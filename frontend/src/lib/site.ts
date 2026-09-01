@@ -11,6 +11,19 @@
 export const SITE_TITLE = 'Maiyu Academy'
 
 /**
+ * O endereço público do site, sem barra no fim.
+ *
+ * Existe para o que precisa de URL **absoluta**: o sitemap, que é lido por um
+ * rastreador de fora, e qualquer metadado de compartilhamento. Dentro do site
+ * nada usa isto - link interno é caminho relativo, e cravar o domínio neles
+ * quebraria a navegação em qualquer ambiente que não fosse produção.
+ *
+ * Não vem de variável de ambiente de propósito: o domínio do site é fixo, e uma
+ * variável a mais seria mais uma coisa para configurar errado no dia do deploy.
+ */
+export const SITE_URL = 'https://academy.maiyu.com.br'
+
+/**
  * A descrição da raiz, herdada por rota que não escreva a sua.
  *
  * Nomeia a cidade de propósito: a busca que traz aluno é local ("curso de

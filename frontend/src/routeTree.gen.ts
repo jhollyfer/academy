@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PrivateLayoutRouteImport } from './routes/_private/layout'
 import { Route as PublicLayoutRouteImport } from './routes/_public/layout'
 import { Route as AuthenticationLayoutRouteImport } from './routes/authentication/layout'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as PublicPrivacidadeRouteImport } from './routes/_public/privacidade'
 import { Route as PublicSobreRouteImport } from './routes/_public/sobre'
@@ -41,6 +42,11 @@ const PublicLayoutRoute = PublicLayoutRouteImport.update({
 const AuthenticationLayoutRoute = AuthenticationLayoutRouteImport.update({
   id: '/authentication',
   path: '/authentication',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PublicIndexRoute = PublicIndexRouteImport.update({
@@ -174,6 +180,7 @@ const PrivateAdminTurmasIdIndexRoute =
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/authentication': typeof AuthenticationLayoutRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/privacidade': typeof PublicPrivacidadeRoute
   '/sobre': typeof PublicSobreRoute
   '/termos': typeof PublicTermosRoute
@@ -193,6 +200,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/privacidade': typeof PublicPrivacidadeRoute
   '/sobre': typeof PublicSobreRoute
   '/termos': typeof PublicTermosRoute
@@ -215,6 +223,7 @@ export interface FileRoutesById {
   '/_private': typeof PrivateLayoutRouteWithChildren
   '/_public': typeof PublicLayoutRouteWithChildren
   '/authentication': typeof AuthenticationLayoutRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_public/privacidade': typeof PublicPrivacidadeRoute
   '/_public/sobre': typeof PublicSobreRoute
   '/_public/termos': typeof PublicTermosRoute
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/authentication'
+    | '/sitemap.xml'
     | '/privacidade'
     | '/sobre'
     | '/termos'
@@ -257,6 +267,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/sitemap.xml'
     | '/privacidade'
     | '/sobre'
     | '/termos'
@@ -278,6 +289,7 @@ export interface FileRouteTypes {
     | '/_private'
     | '/_public'
     | '/authentication'
+    | '/sitemap.xml'
     | '/_public/privacidade'
     | '/_public/sobre'
     | '/_public/termos'
@@ -301,6 +313,7 @@ export interface RootRouteChildren {
   PrivateLayoutRoute: typeof PrivateLayoutRouteWithChildren
   PublicLayoutRoute: typeof PublicLayoutRouteWithChildren
   AuthenticationLayoutRoute: typeof AuthenticationLayoutRouteWithChildren
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -324,6 +337,13 @@ declare module '@tanstack/react-router' {
       path: '/authentication'
       fullPath: '/authentication'
       preLoaderRoute: typeof AuthenticationLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_public/': {
@@ -515,6 +535,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivateLayoutRoute: PrivateLayoutRouteWithChildren,
   PublicLayoutRoute: PublicLayoutRouteWithChildren,
   AuthenticationLayoutRoute: AuthenticationLayoutRouteWithChildren,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
