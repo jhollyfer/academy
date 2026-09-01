@@ -132,3 +132,99 @@ test.group('administrador > turmas', (group) => {
     assert.equal(body(response).code, 'COURSE_HAS_CLASSES')
   })
 })
+
+/**
+ * Arquivar não é apagar, e restaurar tem de trazer de volta inteiro.
+ *
+ * `courses` cobria isto desde o piloto e `classes` não cobria nada - as duas
+ * rotas existem no mesmo grupo de ciclo de vida em `start/routes.ts`, e uma
+ * delas nunca foi exercitada.
+ */
+test.group('administrador > turmas > ciclo de vida', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('arquiva, some da listagem e volta com ?trashed=only', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+    const turma = await createClass(client, session, course.id)
+
+    const archive = await client
+      .patch(`/administrator/classes/${turma.id}/archive`)
+      .cookies(session)
+
+    archive.assertStatus(204)
+
+    const listed = await client.get('/administrator/classes').cookies(session)
+    assert.isEmpty(body(listed).data)
+
+    const trashed = await client
+      .get('/administrator/classes')
+      .qs({ trashed: 'only' })
+      .cookies(session)
+
+    assert.lengthOf(body(trashed).data, 1)
+  })
+
+  test('unarchive traz de volta, e turma viva é 404 lá', async ({ client }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+    const turma = await createClass(client, session, course.id)
+
+    await client.patch(`/administrator/classes/${turma.id}/archive`).cookies(session)
+
+    const unarchive = await client
+      .patch(`/administrator/classes/${turma.id}/unarchive`)
+      .cookies(session)
+
+    unarchive.assertStatus(204)
+
+    // Restaurar o que já está vivo não é operação: para quem chama, aquela linha
+    // não existe na lixeira.
+    const again = await client
+      .patch(`/administrator/classes/${turma.id}/unarchive`)
+      .cookies(session)
+
+    again.assertStatus(404)
+  })
+})
+
+/**
+ * O `PUT` é merge parcial, e a distinção que importa é entre **ausente** e
+ * **`null` explícito**: o primeiro não toca no campo, o segundo o limpa. Sem
+ * ela, editar o nome da turma apagaria a data de término que ninguém mencionou.
+ */
+test.group('administrador > turmas > atualização parcial', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('campo ausente não toca no que já estava lá', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+    const turma = await createClass(client, session, course.id, { endsAt: '2026-06-27' })
+
+    const response = await client
+      .put(`/administrator/classes/${turma.id}`)
+      .cookies(session)
+      .json({ name: 'Turma 2 / 2026' })
+
+    response.assertStatus(200)
+    assert.equal(body(response).name, 'Turma 2 / 2026')
+    assert.isNotNull(body(response).endsAt)
+    // O que não veio no corpo continua igual ao que estava.
+    assert.equal(body(response).capacity, 40)
+  })
+
+  test('null explícito limpa o campo', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+    const turma = await createClass(client, session, course.id, { endsAt: '2026-06-27' })
+
+    const response = await client
+      .put(`/administrator/classes/${turma.id}`)
+      .cookies(session)
+      .json({ endsAt: null })
+
+    response.assertStatus(200)
+    assert.isNull(body(response).endsAt)
+    assert.equal(body(response).name, 'Turma 1 / 2026')
+  })
+})
