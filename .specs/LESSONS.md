@@ -38,6 +38,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: backend/tests/functional:1 (testes)
 - last seen: 2026-09-01T13:04:08Z
 
+### L-005 - Contar arquivos de teste esconde ação sem cobertura; contar ação por recurso (paginate/show/create/update/archive/unarchive/delete) é o que acha o buraco.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `testes` · harmful: 0
+- features: migracao-simple-hub
+- evidence: backend/app/features/administrator/enrollments/paginate.use-case.ts:59 (testes)
+- last seen: 2026-09-01T13:38:27Z
+
+### L-006 - Regra de autorização escrita só em JSDoc não falha quando alguém a quebra; toda linha de role() precisa do par 'quem pode' e 'quem não pode'.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `seguranca` · harmful: 0
+- features: migracao-simple-hub
+- evidence: backend/start/routes.ts:259 (seguranca)
+- last seen: 2026-09-01T13:38:27Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

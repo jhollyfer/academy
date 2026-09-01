@@ -2,7 +2,7 @@
 
 **Date**: 2026-09-01
 **Spec**: `/home/jhollyfer/.claude/plans/concurrent-skipping-wall.md` (o plano faz papel de spec)
-**Diff range**: `7226e1a..234bc91` — auditoria em `7226e1a`, sete commits de correção depois dela
+**Diff range**: `7226e1a..0cd041a` — duas rodadas de correção: sete commits na primeira, quatro na segunda
 **Verifier**: passe independente fresh-eyes (sem sub-agentes, por instrução da sessão)
 
 ---
@@ -37,7 +37,7 @@ navegador, que é manual.
 
 | Critério (plano § Verificação) | Resultado esperado | Evidência | Resultado |
 | ------------------------------ | ------------------ | --------- | --------- |
-| 1. `node ace test` verde, com 401/404/409/422 por feature | todas passando | 77 testes. 401: `backend/tests/functional/storages.spec.ts:34`; 409 duplicata: `administrator-courses.spec.ts:48`; 409 não arquivado: `administrator-courses.spec.ts:192`; 422 em `?sort`: `administrator-courses.spec.ts:97`; 404: `storages.spec.ts:168` | ✅ |
+| 1. `node ace test` verde, com 401/403/404/409/422 por feature | todas passando | 98 testes. 401: `backend/tests/functional/storages.spec.ts:34`; **403**: `papeis.spec.ts:72`; 409 duplicata: `administrator-courses.spec.ts:48`; 409 não arquivado: `administrator-enrollments.spec.ts:305`; 422 em `?sort`: `administrator-courses.spec.ts:97`; 404: `storages.spec.ts:168` | ✅ |
 | 2. Contrato OpenAPI bate com `start/routes.ts` | `openapi.json` gerado | `backend/openapi.json` presente e commitado | ✅ |
 | 3. `pnpm build` + `pnpm lint` + `vitest` limpos no frontend | zero erro | build Nitro com 3 páginas prerenderizadas; eslint e `tsc --noEmit` limpos; 95 testes em 13 arquivos | ✅ |
 | 4. Ponta a ponta local no navegador | fluxo completo home→admin | **não executado** — exige operação manual | ⏭️ |
@@ -97,7 +97,7 @@ Da primeira rodada, ainda válidos: idade legal (`create.use-case.ts:66`), vaga
 
 | Gate | Comando | Resultado |
 | ---- | ------- | --------- |
-| Backend testes | `node ace test` | 77 passaram, 0 falharam (era 49) |
+| Backend testes | `node ace test` | 98 passaram, 0 falharam (era 49 na auditoria inicial) |
 | Backend tipos | `pnpm typecheck` | limpo |
 | Backend lint | `pnpm lint` | limpo |
 | Frontend tipos | `pnpm typecheck` | limpo |
@@ -133,8 +133,33 @@ Nenhum teste pulado, nenhuma asserção enfraquecida, nenhum teste removido.
 | Casa com o padrão de referência | ✅ |
 | Testes mapeiam critérios do plano, não a implementação | ✅ |
 | Valor afirmado bate com o resultado definido no plano | ✅ |
-| Cobertura por camada: domínio 1:1, rotas com feliz + borda + erro | ✅ |
+| Cobertura por camada: domínio 1:1, rotas com feliz + borda + erro | ✅ (na primeira rodada esta linha passou generosa: contava arquivos de teste, não ações exercitadas — corrigido na segunda) |
 | Todo teste mapeia um requisito do plano | ✅ |
+
+---
+
+## Segunda rodada — o que a contagem por ação revelou
+
+A primeira rodada marcou a cobertura por camada como ✅ contando **arquivos** de teste. Contando
+**ação por ação**, dois buracos apareceram, e um deles escondia um defeito em produção.
+
+| Achado | Consequência | Fechamento |
+| ------ | ------------ | ---------- |
+| **Zero `assertStatus(403)` na suíte inteira** | A matriz de papel de `start/routes.ts:241` — administrador arquiva, só o dono apaga — vivia só em JSDoc. Trocar `role(['OWNER'])` por `role(['OWNER','ADMINISTRATOR'])` passaria por teste, typecheck e lint | `84454ac` — `papeis.spec.ts` e a `database/factories/` que as referências têm e este repositório não tinha (sem uma segunda conta não existe o outro lado da asserção) |
+| **`?search` na listagem de matrículas respondia 500** | `protocol` é `uuid` e o Postgres não tem `ILIKE` para o tipo: `operator does not exist: uuid ~~*` derrubava o `OR` inteiro. Qualquer busca do painel — por nome, e-mail ou protocolo — falhava. O JSDoc do use-case chama a busca por protocolo de "caso mais comum do balcão" | `cab9b05` — `protocol::text ILIKE ?`, mais a cobertura de `paginate` que teria pego isto no dia em que foi escrito |
+| `administrator/enrollments` com `paginate`, `archive`, `unarchive` e `delete` sem um teste | O recurso central do painel era o menos coberto; `show` e `update` estavam no arquivo da vitrine desde o achatamento | `cab9b05` |
+| `administrator/classes` sem `archive`/`unarchive` e sem merge parcial | As mesmas rotas de `courses`, no mesmo grupo, sem exercício | `0cd041a` |
+
+### Discriminação (terceira rodada)
+
+| # | Mutação | Morto? |
+| - | ------- | ------ |
+| 1 | `start/routes.ts:259` — `DELETE` de curso passa a aceitar `ADMINISTRATOR` | ✅ Morto |
+| 2 | `enrollments/paginate.use-case.ts:28` — listagem deixa de filtrar a lixeira | ✅ Morto |
+| 3 | `enrollments/delete.use-case.ts:28` — `DELETE` aceita linha viva | ✅ Morto |
+| 4 | `enrollments/paginate.use-case.ts:59` — busca por protocolo volta ao `ILIKE` sem cast | ✅ Morto |
+
+4/4 mortos. Somando as três rodadas: **10/10**.
 
 ---
 
@@ -151,10 +176,10 @@ contador de vagas. É operação manual e depende de quem opera.
 
 **Geral**: ✅ Pronto, com uma passagem manual pendente.
 
-**O que funciona**: 20 commits atômicos, sete deles desta rodada; 77 testes de
+**O que funciona**: onze commits de correção em duas rodadas; 98 testes de
 backend e 95 de frontend verdes; tipos e lint limpos nos dois projetos; build
-Nitro com prerender; sensor 6/6; e-mail, sitemap, limpeza e cobertura fechados;
-camada de teste de volta ao formato das referências.
+Nitro com prerender; sensor 10/10; e-mail, sitemap, limpeza, cobertura e matriz
+de papel fechados; camada de teste no formato das referências.
 
 **Próximo passo**: rodar o fluxo no navegador uma vez antes do deploy, e definir
 `SMTP_HOST`/`MAIL_TO` no painel do Coolify para o aviso sair de verdade.

@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 5,
+  "next_id": 7,
   "lessons": [
     {
       "id": "L-001",
@@ -76,6 +76,42 @@
       ],
       "created": "2026-09-01T13:04:08Z",
       "last_seen": "2026-09-01T13:04:08Z"
+    },
+    {
+      "id": "L-005",
+      "key": "ac_gap::contar arquivos de teste esconde acao sem cobertura contar acao por recurso paginate show create update archive unarchive delete e o que acha o buraco",
+      "text": "Contar arquivos de teste esconde ação sem cobertura; contar ação por recurso (paginate/show/create/update/archive/unarchive/delete) é o que acha o buraco.",
+      "signal": "ac_gap",
+      "scope": "testes",
+      "status": "candidate",
+      "features": [
+        "migracao-simple-hub"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "backend/app/features/administrator/enrollments/paginate.use-case.ts:59 (testes)"
+      ],
+      "created": "2026-09-01T13:38:27Z",
+      "last_seen": "2026-09-01T13:38:27Z"
+    },
+    {
+      "id": "L-006",
+      "key": "ac_gap::regra de autorizacao escrita so em jsdoc nao falha quando alguem a quebra toda linha de role precisa do par quem pode e quem nao pode",
+      "text": "Regra de autorização escrita só em JSDoc não falha quando alguém a quebra; toda linha de role() precisa do par 'quem pode' e 'quem não pode'.",
+      "signal": "ac_gap",
+      "scope": "seguranca",
+      "status": "candidate",
+      "features": [
+        "migracao-simple-hub"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "backend/start/routes.ts:259 (seguranca)"
+      ],
+      "created": "2026-09-01T13:38:27Z",
+      "last_seen": "2026-09-01T13:38:27Z"
     }
   ]
 }
