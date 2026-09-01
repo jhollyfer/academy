@@ -6,6 +6,14 @@ export type ScannedRoutes = {
   ALL: {
     'authentication.sign-in': { paramsTuple?: []; params?: {} }
     'authentication.sign-out': { paramsTuple?: []; params?: {} }
+    'storefront.courses.paginate': { paramsTuple?: []; params?: {} }
+    'storefront.courses.show': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
+    'storefront.enrollments.create': { paramsTuple?: []; params?: {} }
+    'storefront.enrollments.show': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
+    'storefront.enrollments.attach': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
+    'storefront.enrollments.uploads.create': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
+    'storefront.enrollments.uploads.complete': { paramsTuple: [ParamValue,ParamValue]; params: {'protocol': ParamValue,'id': ParamValue} }
+    'storefront.enrollments.uploads.parts': { paramsTuple: [ParamValue,ParamValue]; params: {'protocol': ParamValue,'id': ParamValue} }
     'storages.create': { paramsTuple?: []; params?: {} }
     'storages.complete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'storages.parts': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -35,6 +43,10 @@ export type ScannedRoutes = {
     'administrator.lifecycle.enrollments.purge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
+    'storefront.courses.paginate': { paramsTuple?: []; params?: {} }
+    'storefront.courses.show': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
+    'storefront.enrollments.show': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
+    'storefront.enrollments.uploads.parts': { paramsTuple: [ParamValue,ParamValue]; params: {'protocol': ParamValue,'id': ParamValue} }
     'storages.parts': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'storages.download': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'account.profile': { paramsTuple?: []; params?: {} }
@@ -47,6 +59,10 @@ export type ScannedRoutes = {
     'administrator.enrollments.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
+    'storefront.courses.paginate': { paramsTuple?: []; params?: {} }
+    'storefront.courses.show': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
+    'storefront.enrollments.show': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
+    'storefront.enrollments.uploads.parts': { paramsTuple: [ParamValue,ParamValue]; params: {'protocol': ParamValue,'id': ParamValue} }
     'storages.parts': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'storages.download': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'account.profile': { paramsTuple?: []; params?: {} }
@@ -61,6 +77,10 @@ export type ScannedRoutes = {
   POST: {
     'authentication.sign-in': { paramsTuple?: []; params?: {} }
     'authentication.sign-out': { paramsTuple?: []; params?: {} }
+    'storefront.enrollments.create': { paramsTuple?: []; params?: {} }
+    'storefront.enrollments.attach': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
+    'storefront.enrollments.uploads.create': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
+    'storefront.enrollments.uploads.complete': { paramsTuple: [ParamValue,ParamValue]; params: {'protocol': ParamValue,'id': ParamValue} }
     'storages.create': { paramsTuple?: []; params?: {} }
     'storages.complete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.courses.create': { paramsTuple?: []; params?: {} }

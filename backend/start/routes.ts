@@ -77,6 +77,58 @@ router
   .as('authentication')
 
 /**
+ * O site.
+ *
+ * Única superfície da API que responde sem sessão, junto do sign-in. A leitura é
+ * somente leitura; a escrita é uma só - a matrícula - e nasce sem dono.
+ *
+ * Sem middleware nenhum nas leituras, e não por esquecimento: é a característica
+ * do bloco. O que limita o que sai daqui é a condição de visibilidade
+ * (`_shared.storefront.ts`), não a autenticação.
+ */
+router
+  .group(() => {
+    router
+      .group(() => {
+        router.get('/', [controllers.storefront.courses.Paginate])
+        // Pelo `slug`, que é o identificador público - o `id` é interno e não
+        // aparece na URL da landing.
+        router.get(':slug', [controllers.storefront.courses.Show])
+      })
+      .prefix('courses')
+      .as('courses')
+
+    router
+      .group(() => {
+        router.post('/', [controllers.storefront.enrollments.Create])
+        router.get(':protocol', [controllers.storefront.enrollments.Show]).as('show')
+        router
+          .post(':protocol/attachments', [controllers.storefront.enrollments.Attach])
+          .as('attach')
+
+        // O upload do comprovante, para quem não tem sessão.
+        //
+        // São os **mesmos** controllers de `/storages`, montados atrás do
+        // middleware que resolve o `:protocol`. O upload presigned multipart é
+        // um só: duplicá-lo para o público daria dois caminhos de código para o
+        // mesmo problema, com um deles recebendo correção e o outro não.
+        router
+          .group(() => {
+            router.post('/', [controllers.storages.Create])
+            router.post(':id/complete', [controllers.storages.Complete]).as('complete')
+            router.get(':id/parts', [controllers.storages.Parts]).as('parts')
+          })
+          .prefix(':protocol/uploads')
+          .as('uploads')
+          .use(middleware.enrollmentProtocol())
+      })
+      .prefix('enrollments')
+      .as('enrollments')
+  })
+  .prefix('storefront')
+  .as('storefront')
+
+/**
  * Arquivos.
  *
  * O upload tem três passos, e não um, porque o binário não passa por aqui: o

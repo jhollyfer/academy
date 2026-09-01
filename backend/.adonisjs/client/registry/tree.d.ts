@@ -6,6 +6,22 @@ export interface ApiDefinition {
     signIn: typeof routes['authentication.sign-in']
     signOut: typeof routes['authentication.sign-out']
   }
+  storefront: {
+    courses: {
+      paginate: typeof routes['storefront.courses.paginate']
+      show: typeof routes['storefront.courses.show']
+    }
+    enrollments: {
+      create: typeof routes['storefront.enrollments.create']
+      show: typeof routes['storefront.enrollments.show']
+      attach: typeof routes['storefront.enrollments.attach']
+      uploads: {
+        create: typeof routes['storefront.enrollments.uploads.create']
+        complete: typeof routes['storefront.enrollments.uploads.complete']
+        parts: typeof routes['storefront.enrollments.uploads.parts']
+      }
+    }
+  }
   storages: {
     create: typeof routes['storages.create']
     complete: typeof routes['storages.complete']

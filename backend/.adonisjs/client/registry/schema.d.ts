@@ -31,6 +31,102 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/authentication/sign-out.controller').default['handle']>>>
     }
   }
+  'storefront.courses.paginate': {
+    methods: ["GET","HEAD"]
+    pattern: '/storefront/courses'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#core/validator').PaginationValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/storefront/courses/paginate.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storefront/courses/paginate.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'storefront.courses.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/storefront/courses/:slug'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { slug: ParamValue }
+      query: ExtractQueryForGet<InferInput<(typeof import('#core/validator').SlugValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/storefront/courses/show.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storefront/courses/show.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'storefront.enrollments.create': {
+    methods: ["POST"]
+    pattern: '/storefront/enrollments'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').StorefrontEnrollmentCreateValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').StorefrontEnrollmentCreateValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/storefront/enrollments/create.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storefront/enrollments/create.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'storefront.enrollments.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/storefront/enrollments/:protocol'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { protocol: ParamValue }
+      query: ExtractQueryForGet<InferInput<(typeof import('#core/validator').ProtocolValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/storefront/enrollments/show.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storefront/enrollments/show.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'storefront.enrollments.attach': {
+    methods: ["POST"]
+    pattern: '/storefront/enrollments/:protocol/attachments'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').StorefrontEnrollmentAttachmentValidator)>|InferInput<(typeof import('#core/validator').ProtocolValidator)>>
+      paramsTuple: [ParamValue]
+      params: { protocol: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').StorefrontEnrollmentAttachmentValidator)>|InferInput<(typeof import('#core/validator').ProtocolValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/storefront/enrollments/attach.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storefront/enrollments/attach.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'storefront.enrollments.uploads.create': {
+    methods: ["POST"]
+    pattern: '/storefront/enrollments/:protocol/uploads'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').StorageCreateValidator)>>
+      paramsTuple: [ParamValue]
+      params: { protocol: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').StorageCreateValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/storages/create.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storages/create.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'storefront.enrollments.uploads.complete': {
+    methods: ["POST"]
+    pattern: '/storefront/enrollments/:protocol/uploads/:id/complete'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').StorageCompleteValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { protocol: ParamValue; id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').StorageCompleteValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/storages/complete.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storages/complete.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'storefront.enrollments.uploads.parts': {
+    methods: ["GET","HEAD"]
+    pattern: '/storefront/enrollments/:protocol/uploads/:id/parts'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { protocol: ParamValue; id: ParamValue }
+      query: ExtractQueryForGet<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/storages/parts.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storages/parts.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'storages.create': {
     methods: ["POST"]
     pattern: '/storages'

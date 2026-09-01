@@ -244,6 +244,15 @@ export const IdentifierValidator = vine.create({
 export const PaginationValidator = vine.create(vine.object(paginationFields()))
 
 /**
+ * O identificador público de um recurso do site. Slug e não uuid: é o que
+ * aparece em `/cursos/:slug`, e trocar um pelo outro na URL da landing seria
+ * expor a chave interna sem ganho nenhum.
+ */
+export const SlugValidator = vine.create({
+  slug: vine.string().trim().maxLength(140),
+})
+
+/**
  * A paginação dos recursos que têm lixeira. É o `PaginationValidator` mais o
  * `trashed`, e existe como schema próprio porque as leituras públicas do site
  * seguem sem ele.
@@ -254,6 +263,7 @@ export const TrashablePaginationValidator = vine.create({
 })
 
 export type IdentifierPayload = Infer<typeof IdentifierValidator>
+export type SlugPayload = Infer<typeof SlugValidator>
 export type PaginationPayload = Infer<typeof PaginationValidator>
 export type TrashablePaginationPayload = Infer<typeof TrashablePaginationValidator>
 

@@ -17,6 +17,14 @@
       "description": "Entrada e saída da secretaria. O par de tokens viaja em cookie `httpOnly`, então estas rotas respondem `204` sem corpo - o que importa é o `Set-Cookie`."
     },
     {
+      "name": "Site · Cursos",
+      "description": "Os cursos como o candidato os vê, sem autenticação. Só curso `ACTIVE` e não removido, com a grade, o FAQ, a próxima turma e as vagas restantes. É o que a landing consome."
+    },
+    {
+      "name": "Site · Matrícula",
+      "description": "A matrícula virtual, sem autenticação - quem se inscreve não tem conta e não vai ter. A criação devolve um `protocol`, e é só por ele que o candidato acompanha o próprio pedido depois. Turma lotada não recusa a inscrição: ela entra como `WAITLIST`."
+    },
+    {
       "name": "Arquivos",
       "description": "Upload presigned multipart: o binário vai do navegador direto ao bucket e nunca atravessa esta API. `POST /storages` abre a sessão de upload, `/parts` assina as partes, `/complete` fecha. Só arquivo `UPLOADED` pode ser anexado a uma matrícula."
     },
@@ -2730,6 +2738,568 @@
           }
         ]
       }
+    },
+    "/storefront/courses": {
+      "get": {
+        "operationId": "storefrontCoursesPaginate",
+        "summary": "Listar cursos",
+        "tags": [
+          "Site · Cursos"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMeta"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/StorefrontCoursesPaginateItem"
+                      }
+                    }
+                  },
+                  "required": [
+                    "meta",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500CourseListError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Os cursos como o candidato os vê, sem sessão. Só curso `ACTIVE` e não removido, na ordem que a escola definiu para os cards da home.\n\nSem `?trashed` e sem `?status`: a vitrine não tem lixeira nem enxerga rascunho, e aceitar o parâmetro para ignorá-lo prometeria no OpenAPI um filtro que não existe.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        ]
+      }
+    },
+    "/storefront/courses/{slug}": {
+      "get": {
+        "operationId": "storefrontCoursesShow",
+        "summary": "Detalhar curso",
+        "tags": [
+          "Site · Cursos"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontCoursesShowResponse200"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Curso não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404CourseNotFound"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500CourseShowError"
+                }
+              }
+            }
+          }
+        },
+        "description": "O curso pelo `slug`, que é o identificador público - o `id` é interno e não aparece na URL da landing.\n\nVem com a grade, o FAQ e a **próxima turma**, com as vagas restantes calculadas. Turma lotada continua aparecendo: a fila de espera existe para ela, e esconder a turma cheia faria o candidato achar que o curso acabou.",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 140
+            }
+          }
+        ]
+      }
+    },
+    "/storefront/enrollments": {
+      "post": {
+        "operationId": "storefrontEnrollmentsCreate",
+        "summary": "Enviar matrícula",
+        "tags": [
+          "Site · Matrícula"
+        ],
+        "responses": {
+          "201": {
+            "description": "Recurso criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontEnrollmentsCreateResponse201"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos · Turma indisponível · Responsável legal obrigatório",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ClassUnavailableGuardianRequiredValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500EnrollmentCreateError"
+                }
+              }
+            }
+          }
+        },
+        "description": "A matrícula virtual, sem sessão - quem se inscreve não tem conta e não vai ter.\n\nDevolve 201 com o `protocol`, que é a **única** credencial do candidato: é por ele que ele acompanha o pedido e anexa o comprovante depois.\n\nCandidato menor de 18 anos exige nome, CPF e telefone do responsável legal - `422` com um erro por campo faltante. Turma lotada **não** recusa a inscrição: ela entra como `WAITLIST`, e o 201 diz isso no `status`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StorefrontEnrollmentsCreateBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/storefront/enrollments/{protocol}": {
+      "get": {
+        "operationId": "storefrontEnrollmentsShow",
+        "summary": "Detalhar matrícula",
+        "tags": [
+          "Site · Matrícula"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontEnrollmentsShowResponse200"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Matrícula não encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404EnrollmentNotFound"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500EnrollmentShowError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Acompanhamento pelo `protocol`. Sem sessão de propósito: o protocolo **é** a credencial - um uuid que só quem se inscreveu recebeu, e que não se adivinha.\n\nNão devolve as anotações internas da secretaria: elas são sobre o candidato, não para ele.",
+        "parameters": [
+          {
+            "name": "protocol",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/storefront/enrollments/{protocol}/attachments": {
+      "post": {
+        "operationId": "storefrontEnrollmentsAttach",
+        "summary": "Anexar comprovante à matrícula",
+        "tags": [
+          "Site · Matrícula"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontEnrollmentsAttachResponse200"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Matrícula não encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404EnrollmentNotFound"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Matrícula cancelada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error409EnrollmentCancelled"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos · Arquivo não encontrado · Upload não concluído",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422StorageNotFoundStorageNotUploadedValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500EnrollmentAttachError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Recebe o `id` de um arquivo já enviado, **não** o binário: o upload é presigned multipart e o arquivo vai do navegador direto ao bucket.\n\nSó aceita arquivo já confirmado (`UPLOADED`) - anexar um upload pela metade deixaria a secretaria olhando um comprovante truncado.\n\nReenviar é permitido e não substitui: o histórico do que foi mandado importa numa conferência manual, e a secretaria pode ter recusado o primeiro.",
+        "parameters": [
+          {
+            "name": "protocol",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StorefrontEnrollmentsAttachBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/storefront/enrollments/{protocol}/uploads": {
+      "post": {
+        "operationId": "storefrontEnrollmentsUploadsCreate",
+        "summary": "Abrir upload de arquivo",
+        "tags": [
+          "Site · Matrícula"
+        ],
+        "responses": {
+          "201": {
+            "description": "Recurso criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontEnrollmentsUploadsCreateResponse201"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500StorageCreateError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Abre um upload e devolve por onde subi-lo. **Não recebe bytes** - só os metadados do arquivo (RF-59).\n\nO binário vai do navegador direto ao bucket, por URL assinada, e nunca atravessa esta aplicação: um arquivo grande num corpo HTTP esbarra no limite do proxy, ocupa a aplicação pelo tempo do upload, e não tem como ser retomado quando a conexão cai.\n\nAceita image/jpeg, image/png, image/webp, image/gif, image/svg+xml, application/pdf, até 1073741824 bytes, recusados **antes** de qualquer assinatura (RN-47): arquivo proibido não ganha URL, então não chega ao bucket. Que o tamanho declarado seja verdade é o que `POST /storages/:id/complete` confere, contra o objeto real.\n\nO arquivo é fatiado em partes de 10485760 bytes. Quando cabe numa parte só, `uploadId` vem nulo e a única URL aceita um `PUT` com o arquivo inteiro. Quando não cabe, cada URL aceita a sua parte, o cliente guarda o `ETag` que cada `PUT` devolve, e `parts` pode trazer só o primeiro lote - o resto sai em `GET /storages/:id/parts`, que é o mesmo endpoint da retomada.\n\nA linha nasce `PENDING` e não pode ser anexada a nada até ser confirmada. O arquivo nasce sem dono: quem anexa guarda a referência (RF-60), informando o `id` em `avatarId`, `logoId` ou `imageIds`.",
+        "parameters": [
+          {
+            "name": "protocol",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StorefrontEnrollmentsUploadsCreateBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/storefront/enrollments/{protocol}/uploads/{id}/complete": {
+      "post": {
+        "operationId": "storefrontEnrollmentsUploadsComplete",
+        "summary": "Confirmar upload de arquivo",
+        "tags": [
+          "Site · Matrícula"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontEnrollmentsUploadsCompleteResponse200"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Arquivo não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404StorageNotFound"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos · Arquivo incompleto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422StorageSizeMismatchValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500StorageCompleteError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Fecha o upload aberto por `POST /storages`: o bucket remonta as partes e a linha passa a `UPLOADED`, que é o único estado que pode ser anexado a alguma coisa.\n\nO corpo traz o `ETag` que cada `PUT` de parte devolveu - é assim que o storage confere que nenhuma parte se perdeu ou chegou pela metade. Upload de parte única não tem parte para confirmar, e `parts` vem ausente.\n\nÉ aqui que o tamanho **declarado** no `POST /storages` é comparado com o do objeto que de fato subiu. Divergiu, o objeto é apagado, a linha morre junto e a resposta é `422` (RN-47). O `mimetype` não é conferido porque não tem como divergir: ele entra na assinatura da URL, e o bucket recusa um `PUT` que não bata com ela.\n\nChamar duas vezes é seguro: a segunda devolve o mesmo registro.",
+        "parameters": [
+          {
+            "name": "protocol",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StorefrontEnrollmentsUploadsCompleteBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/storefront/enrollments/{protocol}/uploads/{id}/parts": {
+      "get": {
+        "operationId": "storefrontEnrollmentsUploadsParts",
+        "summary": "Retomar upload de arquivo",
+        "tags": [
+          "Site · Matrícula"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontEnrollmentsUploadsPartsResponse200"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Arquivo não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404StorageNotFound"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500StoragePartsError"
+                }
+              }
+            }
+          }
+        },
+        "description": "De onde continuar: em `uploaded`, o que o bucket já recebeu; em `parts`, URL nova para o que falta.\n\nServe a dois casos que são o mesmo problema. **Retomada**: a conexão caiu na parte 900 de mil, e sem isto a única saída seria recomeçar do zero. **Próximo lote**: as URLs saem em lotes, porque assinar mil de uma vez seria meio megabyte de JSON antes do primeiro byte subir.\n\nAssinar de novo é o ponto, e não um efeito colateral: URL assinada expira, e um upload que durou mais que a validade encontra aqui um endereço novo para a mesma parte.\n\nArquivo já confirmado responde `200` com as duas listas vazias - quem pergunta é um cliente retomando, e ler o `status` e parar é o desfecho certo.",
+        "parameters": [
+          {
+            "name": "protocol",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -3135,7 +3705,8 @@
               },
               "classesCount": {
                 "type": "number"
-              }
+              },
+              "nextClass": {}
             },
             "required": [
               "accent",
@@ -3351,7 +3922,8 @@
               },
               "classesCount": {
                 "type": "number"
-              }
+              },
+              "nextClass": {}
             },
             "required": [
               "accent",
@@ -3567,7 +4139,8 @@
               },
               "classesCount": {
                 "type": "number"
-              }
+              },
+              "nextClass": {}
             },
             "required": [
               "accent",
@@ -3844,7 +4417,8 @@
               },
               "classesCount": {
                 "type": "number"
-              }
+              },
+              "nextClass": {}
             },
             "required": [
               "accent",
@@ -4130,6 +4704,7 @@
           "classesCount": {
             "type": "number"
           },
+          "nextClass": {},
           "cover": {
             "type": "object",
             "properties": {
@@ -4420,6 +4995,7 @@
           "classesCount": {
             "type": "number"
           },
+          "nextClass": {},
           "cover": {
             "type": "object",
             "properties": {
@@ -4710,6 +5286,7 @@
           "classesCount": {
             "type": "number"
           },
+          "nextClass": {},
           "cover": {
             "type": "object",
             "properties": {
@@ -5142,6 +5719,7 @@
           "classesCount": {
             "type": "number"
           },
+          "nextClass": {},
           "cover": {
             "type": "object",
             "properties": {
@@ -5608,7 +6186,8 @@
                   },
                   "classesCount": {
                     "type": "number"
-                  }
+                  },
+                  "nextClass": {}
                 },
                 "required": [
                   "accent",
@@ -6065,7 +6644,8 @@
                   },
                   "classesCount": {
                     "type": "number"
-                  }
+                  },
+                  "nextClass": {}
                 },
                 "required": [
                   "accent",
@@ -6522,7 +7102,8 @@
                   },
                   "classesCount": {
                     "type": "number"
-                  }
+                  },
+                  "nextClass": {}
                 },
                 "required": [
                   "accent",
@@ -7001,7 +7582,8 @@
                   },
                   "classesCount": {
                     "type": "number"
-                  }
+                  },
+                  "nextClass": {}
                 },
                 "required": [
                   "accent",
@@ -7637,6 +8219,40 @@
           "code"
         ]
       },
+      "Error409EnrollmentCancelled": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              409
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ENROLLMENT_CANCELLED"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error409EnrollmentInvalidTransitionEnrollmentReceiptMissing": {
         "type": "object",
         "properties": {
@@ -7740,6 +8356,43 @@
           "code"
         ]
       },
+      "Error422ClassUnavailableGuardianRequiredValidationError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              422
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "CLASS_UNAVAILABLE",
+              "GUARDIAN_REQUIRED",
+              "VALIDATION_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code",
+          "errors"
+        ]
+      },
       "Error422CourseNotFoundValidationError": {
         "type": "object",
         "properties": {
@@ -7758,6 +8411,43 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "COURSE_NOT_FOUND",
+              "VALIDATION_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code",
+          "errors"
+        ]
+      },
+      "Error422StorageNotFoundStorageNotUploadedValidationError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              422
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "STORAGE_NOT_FOUND",
+              "STORAGE_NOT_UPLOADED",
               "VALIDATION_ERROR"
             ]
           },
@@ -8375,6 +9065,74 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "ENROLLMENT_ARCHIVE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500EnrollmentAttachError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ENROLLMENT_ATTACH_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500EnrollmentCreateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ENROLLMENT_CREATE_ERROR"
             ]
           },
           "errors": {
@@ -9155,6 +9913,2464 @@
         "additionalProperties": false
       },
       "StoragesPartsResponse200": {
+        "type": "object",
+        "properties": {
+          "storage": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "originalName": {
+                "type": "string"
+              },
+              "mimetype": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "path": {
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "PENDING",
+                  "UPLOADED"
+                ]
+              },
+              "url": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "id",
+              "filename",
+              "originalName",
+              "mimetype",
+              "size",
+              "path",
+              "status",
+              "url",
+              "createdAt"
+            ],
+            "additionalProperties": false
+          },
+          "uploadId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "partSize": {
+            "type": "number"
+          },
+          "totalParts": {
+            "type": "number"
+          },
+          "parts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "partNumber": {
+                  "type": "number"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "partNumber",
+                "url"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "uploaded": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "partNumber": {
+                  "type": "number"
+                },
+                "size": {
+                  "type": "number"
+                },
+                "etag": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "partNumber",
+                "size",
+                "etag"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "storage",
+          "partSize",
+          "totalParts",
+          "parts",
+          "uploaded"
+        ],
+        "additionalProperties": false
+      },
+      "StorefrontCoursesPaginateItem": {
+        "type": "object",
+        "properties": {
+          "accent": {
+            "type": "string",
+            "enum": [
+              "WEB",
+              "ROBOTICS"
+            ]
+          },
+          "coverId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "description": {
+            "type": "string"
+          },
+          "durationMonths": {
+            "type": "number"
+          },
+          "enrollmentFeeInCents": {
+            "type": "number"
+          },
+          "id": {
+            "type": "string"
+          },
+          "minimumAge": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "monthlyFeeInCents": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "position": {
+            "type": "number"
+          },
+          "projectOutcome": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "requirements": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "slug": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "tagline": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "workloadHours": {
+            "type": "number"
+          },
+          "classesCount": {
+            "type": "number"
+          },
+          "nextClass": {},
+          "cover": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "mimetype": {
+                "type": "string"
+              },
+              "originalName": {
+                "type": "string"
+              },
+              "partSize": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "path": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "UPLOADED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "uploadId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "createdAt",
+              "deletedAt",
+              "filename",
+              "id",
+              "mimetype",
+              "originalName",
+              "partSize",
+              "path",
+              "size",
+              "status",
+              "updatedAt",
+              "uploadId"
+            ]
+          },
+          "modules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "courseId": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": "number"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "courseId",
+                "createdAt",
+                "description",
+                "id",
+                "position",
+                "title",
+                "updatedAt"
+              ]
+            }
+          },
+          "faqs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "string"
+                },
+                "courseId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": "number"
+                },
+                "question": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "answer",
+                "courseId",
+                "createdAt",
+                "id",
+                "position",
+                "question",
+                "updatedAt"
+              ]
+            }
+          }
+        },
+        "required": [
+          "accent",
+          "coverId",
+          "createdAt",
+          "deletedAt",
+          "description",
+          "durationMonths",
+          "enrollmentFeeInCents",
+          "id",
+          "minimumAge",
+          "monthlyFeeInCents",
+          "name",
+          "position",
+          "projectOutcome",
+          "requirements",
+          "slug",
+          "status",
+          "tagline",
+          "updatedAt",
+          "workloadHours"
+        ]
+      },
+      "StorefrontCoursesShowResponse200": {
+        "type": "object",
+        "properties": {
+          "accent": {
+            "type": "string",
+            "enum": [
+              "WEB",
+              "ROBOTICS"
+            ]
+          },
+          "coverId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "description": {
+            "type": "string"
+          },
+          "durationMonths": {
+            "type": "number"
+          },
+          "enrollmentFeeInCents": {
+            "type": "number"
+          },
+          "id": {
+            "type": "string"
+          },
+          "minimumAge": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "monthlyFeeInCents": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "position": {
+            "type": "number"
+          },
+          "projectOutcome": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "requirements": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "slug": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "tagline": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "workloadHours": {
+            "type": "number"
+          },
+          "classesCount": {
+            "type": "number"
+          },
+          "nextClass": {},
+          "cover": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "mimetype": {
+                "type": "string"
+              },
+              "originalName": {
+                "type": "string"
+              },
+              "partSize": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "path": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "UPLOADED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "uploadId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "createdAt",
+              "deletedAt",
+              "filename",
+              "id",
+              "mimetype",
+              "originalName",
+              "partSize",
+              "path",
+              "size",
+              "status",
+              "updatedAt",
+              "uploadId"
+            ]
+          },
+          "modules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "courseId": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": "number"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "courseId",
+                "createdAt",
+                "description",
+                "id",
+                "position",
+                "title",
+                "updatedAt"
+              ]
+            }
+          },
+          "faqs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "string"
+                },
+                "courseId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": "number"
+                },
+                "question": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "answer",
+                "courseId",
+                "createdAt",
+                "id",
+                "position",
+                "question",
+                "updatedAt"
+              ]
+            }
+          }
+        },
+        "required": [
+          "accent",
+          "coverId",
+          "createdAt",
+          "deletedAt",
+          "description",
+          "durationMonths",
+          "enrollmentFeeInCents",
+          "id",
+          "minimumAge",
+          "monthlyFeeInCents",
+          "name",
+          "position",
+          "projectOutcome",
+          "requirements",
+          "slug",
+          "status",
+          "tagline",
+          "updatedAt",
+          "workloadHours"
+        ]
+      },
+      "StorefrontEnrollmentsAttachBody": {
+        "type": "object",
+        "properties": {
+          "storageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "enum": [
+              "PAYMENT_RECEIPT",
+              "DOCUMENT"
+            ]
+          }
+        },
+        "required": [
+          "storageId"
+        ],
+        "additionalProperties": false
+      },
+      "StorefrontEnrollmentsAttachResponse200": {
+        "type": "object",
+        "properties": {
+          "classId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "email": {
+            "type": "string"
+          },
+          "guardianDocument": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "guardianName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "guardianPhone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "lgpdConsentAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "phone": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "CONFIRMED",
+              "WAITLIST",
+              "CANCELLED"
+            ]
+          },
+          "studentBirthDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "studentDocument": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "studentName": {
+            "type": "string"
+          },
+          "termsAcceptedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "ageAtEnrollment": {
+            "type": "number"
+          },
+          "requiresGuardian": {
+            "type": "boolean"
+          },
+          "class": {
+            "type": "object",
+            "properties": {
+              "capacity": {
+                "type": "number"
+              },
+              "courseId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "endsAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "shift": {
+                "type": "string",
+                "enum": [
+                  "MORNING",
+                  "AFTERNOON",
+                  "NIGHT"
+                ]
+              },
+              "startsAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "OPEN",
+                  "FULL",
+                  "CLOSED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "weekday": {
+                "type": "string",
+                "enum": [
+                  "MONDAY",
+                  "TUESDAY",
+                  "WEDNESDAY",
+                  "THURSDAY",
+                  "FRIDAY",
+                  "SATURDAY",
+                  "SUNDAY"
+                ]
+              },
+              "seatsTaken": {
+                "type": "number"
+              },
+              "seatsRemaining": {
+                "type": "number"
+              },
+              "course": {
+                "type": "object",
+                "properties": {
+                  "accent": {
+                    "type": "string",
+                    "enum": [
+                      "WEB",
+                      "ROBOTICS"
+                    ]
+                  },
+                  "coverId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "deletedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "durationMonths": {
+                    "type": "number"
+                  },
+                  "enrollmentFeeInCents": {
+                    "type": "number"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "minimumAge": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "monthlyFeeInCents": {
+                    "type": "number"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "position": {
+                    "type": "number"
+                  },
+                  "projectOutcome": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "requirements": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "slug": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "INACTIVE"
+                    ]
+                  },
+                  "tagline": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "workloadHours": {
+                    "type": "number"
+                  },
+                  "classesCount": {
+                    "type": "number"
+                  },
+                  "nextClass": {}
+                },
+                "required": [
+                  "accent",
+                  "coverId",
+                  "createdAt",
+                  "deletedAt",
+                  "description",
+                  "durationMonths",
+                  "enrollmentFeeInCents",
+                  "id",
+                  "minimumAge",
+                  "monthlyFeeInCents",
+                  "name",
+                  "position",
+                  "projectOutcome",
+                  "requirements",
+                  "slug",
+                  "status",
+                  "tagline",
+                  "updatedAt",
+                  "workloadHours"
+                ]
+              }
+            },
+            "required": [
+              "capacity",
+              "courseId",
+              "createdAt",
+              "deletedAt",
+              "endsAt",
+              "id",
+              "location",
+              "name",
+              "shift",
+              "startsAt",
+              "status",
+              "updatedAt",
+              "weekday"
+            ]
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "enrollmentId": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "PAYMENT_RECEIPT",
+                    "DOCUMENT"
+                  ]
+                },
+                "storageId": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "storage": {
+                  "type": "object",
+                  "properties": {
+                    "createdAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "date-time"
+                    },
+                    "deletedAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "date-time"
+                    },
+                    "filename": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "mimetype": {
+                      "type": "string"
+                    },
+                    "originalName": {
+                      "type": "string"
+                    },
+                    "partSize": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "PENDING",
+                        "UPLOADED"
+                      ]
+                    },
+                    "updatedAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "date-time"
+                    },
+                    "uploadId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "createdAt",
+                    "deletedAt",
+                    "filename",
+                    "id",
+                    "mimetype",
+                    "originalName",
+                    "partSize",
+                    "path",
+                    "size",
+                    "status",
+                    "updatedAt",
+                    "uploadId"
+                  ]
+                }
+              },
+              "required": [
+                "createdAt",
+                "enrollmentId",
+                "id",
+                "kind",
+                "storageId",
+                "updatedAt"
+              ]
+            }
+          }
+        },
+        "required": [
+          "classId",
+          "createdAt",
+          "deletedAt",
+          "email",
+          "guardianDocument",
+          "guardianName",
+          "guardianPhone",
+          "id",
+          "lgpdConsentAt",
+          "notes",
+          "phone",
+          "protocol",
+          "status",
+          "studentBirthDate",
+          "studentDocument",
+          "studentName",
+          "termsAcceptedAt",
+          "updatedAt"
+        ]
+      },
+      "StorefrontEnrollmentsCreateBody": {
+        "type": "object",
+        "properties": {
+          "classId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "studentName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 160
+          },
+          "studentBirthDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "studentDocument": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 11,
+            "maxLength": 11
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^[1-9]{2}[0-9]{8,9}$",
+            "maxLength": 11
+          },
+          "guardianName": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 2,
+            "maxLength": 160
+          },
+          "guardianDocument": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 11,
+            "maxLength": 11
+          },
+          "guardianPhone": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[1-9]{2}[0-9]{8,9}$",
+            "maxLength": 11
+          },
+          "termsAccepted": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "lgpdConsent": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          }
+        },
+        "required": [
+          "classId",
+          "studentName",
+          "studentBirthDate",
+          "email",
+          "phone",
+          "termsAccepted",
+          "lgpdConsent"
+        ],
+        "additionalProperties": false
+      },
+      "StorefrontEnrollmentsCreateResponse201": {
+        "type": "object",
+        "properties": {
+          "classId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "email": {
+            "type": "string"
+          },
+          "guardianDocument": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "guardianName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "guardianPhone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "lgpdConsentAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "phone": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "CONFIRMED",
+              "WAITLIST",
+              "CANCELLED"
+            ]
+          },
+          "studentBirthDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "studentDocument": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "studentName": {
+            "type": "string"
+          },
+          "termsAcceptedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "ageAtEnrollment": {
+            "type": "number"
+          },
+          "requiresGuardian": {
+            "type": "boolean"
+          },
+          "class": {
+            "type": "object",
+            "properties": {
+              "capacity": {
+                "type": "number"
+              },
+              "courseId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "endsAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "shift": {
+                "type": "string",
+                "enum": [
+                  "MORNING",
+                  "AFTERNOON",
+                  "NIGHT"
+                ]
+              },
+              "startsAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "OPEN",
+                  "FULL",
+                  "CLOSED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "weekday": {
+                "type": "string",
+                "enum": [
+                  "MONDAY",
+                  "TUESDAY",
+                  "WEDNESDAY",
+                  "THURSDAY",
+                  "FRIDAY",
+                  "SATURDAY",
+                  "SUNDAY"
+                ]
+              },
+              "seatsTaken": {
+                "type": "number"
+              },
+              "seatsRemaining": {
+                "type": "number"
+              },
+              "course": {
+                "type": "object",
+                "properties": {
+                  "accent": {
+                    "type": "string",
+                    "enum": [
+                      "WEB",
+                      "ROBOTICS"
+                    ]
+                  },
+                  "coverId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "deletedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "durationMonths": {
+                    "type": "number"
+                  },
+                  "enrollmentFeeInCents": {
+                    "type": "number"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "minimumAge": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "monthlyFeeInCents": {
+                    "type": "number"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "position": {
+                    "type": "number"
+                  },
+                  "projectOutcome": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "requirements": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "slug": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "INACTIVE"
+                    ]
+                  },
+                  "tagline": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "workloadHours": {
+                    "type": "number"
+                  },
+                  "classesCount": {
+                    "type": "number"
+                  },
+                  "nextClass": {}
+                },
+                "required": [
+                  "accent",
+                  "coverId",
+                  "createdAt",
+                  "deletedAt",
+                  "description",
+                  "durationMonths",
+                  "enrollmentFeeInCents",
+                  "id",
+                  "minimumAge",
+                  "monthlyFeeInCents",
+                  "name",
+                  "position",
+                  "projectOutcome",
+                  "requirements",
+                  "slug",
+                  "status",
+                  "tagline",
+                  "updatedAt",
+                  "workloadHours"
+                ]
+              }
+            },
+            "required": [
+              "capacity",
+              "courseId",
+              "createdAt",
+              "deletedAt",
+              "endsAt",
+              "id",
+              "location",
+              "name",
+              "shift",
+              "startsAt",
+              "status",
+              "updatedAt",
+              "weekday"
+            ]
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "enrollmentId": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "PAYMENT_RECEIPT",
+                    "DOCUMENT"
+                  ]
+                },
+                "storageId": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "storage": {
+                  "type": "object",
+                  "properties": {
+                    "createdAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "date-time"
+                    },
+                    "deletedAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "date-time"
+                    },
+                    "filename": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "mimetype": {
+                      "type": "string"
+                    },
+                    "originalName": {
+                      "type": "string"
+                    },
+                    "partSize": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "PENDING",
+                        "UPLOADED"
+                      ]
+                    },
+                    "updatedAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "date-time"
+                    },
+                    "uploadId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "createdAt",
+                    "deletedAt",
+                    "filename",
+                    "id",
+                    "mimetype",
+                    "originalName",
+                    "partSize",
+                    "path",
+                    "size",
+                    "status",
+                    "updatedAt",
+                    "uploadId"
+                  ]
+                }
+              },
+              "required": [
+                "createdAt",
+                "enrollmentId",
+                "id",
+                "kind",
+                "storageId",
+                "updatedAt"
+              ]
+            }
+          }
+        },
+        "required": [
+          "classId",
+          "createdAt",
+          "deletedAt",
+          "email",
+          "guardianDocument",
+          "guardianName",
+          "guardianPhone",
+          "id",
+          "lgpdConsentAt",
+          "notes",
+          "phone",
+          "protocol",
+          "status",
+          "studentBirthDate",
+          "studentDocument",
+          "studentName",
+          "termsAcceptedAt",
+          "updatedAt"
+        ]
+      },
+      "StorefrontEnrollmentsShowResponse200": {
+        "type": "object",
+        "properties": {
+          "classId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "email": {
+            "type": "string"
+          },
+          "guardianDocument": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "guardianName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "guardianPhone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "lgpdConsentAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "phone": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "CONFIRMED",
+              "WAITLIST",
+              "CANCELLED"
+            ]
+          },
+          "studentBirthDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "studentDocument": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "studentName": {
+            "type": "string"
+          },
+          "termsAcceptedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "ageAtEnrollment": {
+            "type": "number"
+          },
+          "requiresGuardian": {
+            "type": "boolean"
+          },
+          "class": {
+            "type": "object",
+            "properties": {
+              "capacity": {
+                "type": "number"
+              },
+              "courseId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "endsAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "shift": {
+                "type": "string",
+                "enum": [
+                  "MORNING",
+                  "AFTERNOON",
+                  "NIGHT"
+                ]
+              },
+              "startsAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "OPEN",
+                  "FULL",
+                  "CLOSED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "weekday": {
+                "type": "string",
+                "enum": [
+                  "MONDAY",
+                  "TUESDAY",
+                  "WEDNESDAY",
+                  "THURSDAY",
+                  "FRIDAY",
+                  "SATURDAY",
+                  "SUNDAY"
+                ]
+              },
+              "seatsTaken": {
+                "type": "number"
+              },
+              "seatsRemaining": {
+                "type": "number"
+              },
+              "course": {
+                "type": "object",
+                "properties": {
+                  "accent": {
+                    "type": "string",
+                    "enum": [
+                      "WEB",
+                      "ROBOTICS"
+                    ]
+                  },
+                  "coverId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "deletedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "durationMonths": {
+                    "type": "number"
+                  },
+                  "enrollmentFeeInCents": {
+                    "type": "number"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "minimumAge": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "monthlyFeeInCents": {
+                    "type": "number"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "position": {
+                    "type": "number"
+                  },
+                  "projectOutcome": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "requirements": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "slug": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "INACTIVE"
+                    ]
+                  },
+                  "tagline": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "workloadHours": {
+                    "type": "number"
+                  },
+                  "classesCount": {
+                    "type": "number"
+                  },
+                  "nextClass": {}
+                },
+                "required": [
+                  "accent",
+                  "coverId",
+                  "createdAt",
+                  "deletedAt",
+                  "description",
+                  "durationMonths",
+                  "enrollmentFeeInCents",
+                  "id",
+                  "minimumAge",
+                  "monthlyFeeInCents",
+                  "name",
+                  "position",
+                  "projectOutcome",
+                  "requirements",
+                  "slug",
+                  "status",
+                  "tagline",
+                  "updatedAt",
+                  "workloadHours"
+                ]
+              }
+            },
+            "required": [
+              "capacity",
+              "courseId",
+              "createdAt",
+              "deletedAt",
+              "endsAt",
+              "id",
+              "location",
+              "name",
+              "shift",
+              "startsAt",
+              "status",
+              "updatedAt",
+              "weekday"
+            ]
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "enrollmentId": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "PAYMENT_RECEIPT",
+                    "DOCUMENT"
+                  ]
+                },
+                "storageId": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "storage": {
+                  "type": "object",
+                  "properties": {
+                    "createdAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "date-time"
+                    },
+                    "deletedAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "date-time"
+                    },
+                    "filename": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "mimetype": {
+                      "type": "string"
+                    },
+                    "originalName": {
+                      "type": "string"
+                    },
+                    "partSize": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "PENDING",
+                        "UPLOADED"
+                      ]
+                    },
+                    "updatedAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "date-time"
+                    },
+                    "uploadId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "createdAt",
+                    "deletedAt",
+                    "filename",
+                    "id",
+                    "mimetype",
+                    "originalName",
+                    "partSize",
+                    "path",
+                    "size",
+                    "status",
+                    "updatedAt",
+                    "uploadId"
+                  ]
+                }
+              },
+              "required": [
+                "createdAt",
+                "enrollmentId",
+                "id",
+                "kind",
+                "storageId",
+                "updatedAt"
+              ]
+            }
+          }
+        },
+        "required": [
+          "classId",
+          "createdAt",
+          "deletedAt",
+          "email",
+          "guardianDocument",
+          "guardianName",
+          "guardianPhone",
+          "id",
+          "lgpdConsentAt",
+          "notes",
+          "phone",
+          "protocol",
+          "status",
+          "studentBirthDate",
+          "studentDocument",
+          "studentName",
+          "termsAcceptedAt",
+          "updatedAt"
+        ]
+      },
+      "StorefrontEnrollmentsUploadsCompleteBody": {
+        "type": "object",
+        "properties": {
+          "parts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "partNumber": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 10000
+                },
+                "etag": {
+                  "type": "string",
+                  "maxLength": 64,
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "partNumber",
+                "etag"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "StorefrontEnrollmentsUploadsCompleteResponse200": {
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "mimetype": {
+            "type": "string"
+          },
+          "originalName": {
+            "type": "string"
+          },
+          "partSize": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "path": {
+            "type": "string"
+          },
+          "size": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "UPLOADED"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "uploadId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "createdAt",
+          "deletedAt",
+          "filename",
+          "id",
+          "mimetype",
+          "originalName",
+          "partSize",
+          "path",
+          "size",
+          "status",
+          "updatedAt",
+          "uploadId"
+        ]
+      },
+      "StorefrontEnrollmentsUploadsCreateBody": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "mimetype": {
+            "enum": [
+              "image/jpeg",
+              "image/png",
+              "image/webp",
+              "image/gif",
+              "image/svg+xml",
+              "application/pdf"
+            ]
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1073741824
+          }
+        },
+        "required": [
+          "fileName",
+          "mimetype",
+          "size"
+        ],
+        "additionalProperties": false
+      },
+      "StorefrontEnrollmentsUploadsCreateResponse201": {
+        "type": "object",
+        "properties": {
+          "storage": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "originalName": {
+                "type": "string"
+              },
+              "mimetype": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "path": {
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "PENDING",
+                  "UPLOADED"
+                ]
+              },
+              "url": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "id",
+              "filename",
+              "originalName",
+              "mimetype",
+              "size",
+              "path",
+              "status",
+              "url",
+              "createdAt"
+            ],
+            "additionalProperties": false
+          },
+          "uploadId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "partSize": {
+            "type": "number"
+          },
+          "totalParts": {
+            "type": "number"
+          },
+          "parts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "partNumber": {
+                  "type": "number"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "partNumber",
+                "url"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "uploaded": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "partNumber": {
+                  "type": "number"
+                },
+                "size": {
+                  "type": "number"
+                },
+                "etag": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "partNumber",
+                "size",
+                "etag"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "storage",
+          "partSize",
+          "totalParts",
+          "parts",
+          "uploaded"
+        ],
+        "additionalProperties": false
+      },
+      "StorefrontEnrollmentsUploadsPartsResponse200": {
         "type": "object",
         "properties": {
           "storage": {

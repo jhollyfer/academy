@@ -47,4 +47,15 @@ export const controllers = {
     Download: () => import('#features/storages/download.controller'),
     Parts: () => import('#features/storages/parts.controller'),
   },
+  storefront: {
+    courses: {
+      Paginate: () => import('#features/storefront/courses/paginate.controller'),
+      Show: () => import('#features/storefront/courses/show.controller'),
+    },
+    enrollments: {
+      Attach: () => import('#features/storefront/enrollments/attach.controller'),
+      Create: () => import('#features/storefront/enrollments/create.controller'),
+      Show: () => import('#features/storefront/enrollments/show.controller'),
+    },
+  },
 }

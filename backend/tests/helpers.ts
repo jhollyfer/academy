@@ -141,3 +141,23 @@ export async function createClass(
 
   return body(response)
 }
+
+/**
+ * O payload mínimo de uma matrícula. Maior de idade por padrão - o caso do menor
+ * é o que cada teste sobrescreve, porque é o que tem regra.
+ */
+export function enrollmentPayload(
+  classId: string,
+  overrides: Record<string, unknown> = {}
+): Record<string, unknown> {
+  return {
+    classId,
+    studentName: 'João da Silva',
+    studentBirthDate: '2000-04-12',
+    email: 'joao@exemplo.com',
+    phone: '97984600872',
+    termsAccepted: true,
+    lgpdConsent: true,
+    ...overrides,
+  }
+}
