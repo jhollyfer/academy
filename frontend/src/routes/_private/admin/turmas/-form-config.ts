@@ -33,7 +33,7 @@ export function classDefaults(): ClassFormValues {
     endsAt: null,
     weekday: 'SATURDAY',
     shift: 'MORNING',
-    location: 'FAMETRO, Benjamin Constant/AM',
+    location: 'Benjamin Constant/AM',
     capacity: 40,
     status: 'OPEN',
   }

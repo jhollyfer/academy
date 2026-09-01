@@ -31,12 +31,13 @@ export function Hero(): React.JSX.Element {
             faz quem clicou no anúncio reconhecer a página antes de ler.
           */}
           <h1 className="font-display text-4xl leading-[1.05] font-extrabold tracking-tight text-balance italic sm:text-5xl lg:text-6xl">
-            A Maiyu Academy chegou em{' '}
-            <span className="text-neon">Benjamin Constant</span>
+            Você não precisa sair daqui{' '}
+            <span className="text-neon">para aprender tecnologia</span>
           </h1>
 
           <p className="mt-6 max-w-[52ch] text-lg leading-relaxed text-muted-foreground">
-            Robótica e desenvolvimento web, presencial, aos sábados, dentro da FAMETRO.
+            Robótica e desenvolvimento web, presencial, aos sábados. Quatro meses, do zero ao
+            projeto pronto.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -44,11 +45,16 @@ export function Hero(): React.JSX.Element {
               Garanta sua vaga
               <ArrowRight />
             </Button>
-            <Button
-              render={<Link to="/cursos/$slug" params={{ slug: 'robotica' }} />}
-              size="lg"
-              variant="outline"
-            >
+            {/*
+              Âncora para a seção dos dois cards, e não link para um curso.
+              "Ver os cursos" no plural levando a robótica escolhia pela pessoa
+              justamente na hora em que ela ainda está decidindo - e não existe
+              índice de cursos: são dois, e eles cabem na home.
+
+              `<a href="#">` e não `<Link>`: é navegação dentro da mesma página,
+              e o roteador não tem o que resolver aqui.
+            */}
+            <Button render={<a href="#cursos" />} size="lg" variant="outline">
               Ver os cursos
             </Button>
           </div>
@@ -60,7 +66,7 @@ export function Hero(): React.JSX.Element {
           banco de imagens numa cidade pequena é reconhecida como falsa por quem
           mora lá, e o efeito é o oposto do pretendido.
 
-          TODO: trocar por foto real do laboratório na FAMETRO, 1200x900.
+          TODO: trocar por foto real do laboratório, 1200x900.
         */}
         <div className="chamfer neon-glow relative aspect-[4/3] overflow-hidden bg-surface">
           <img

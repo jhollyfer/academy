@@ -25,7 +25,7 @@ export default class extends BaseSchema {
       table.date('ends_at').nullable()
       table.enum('weekday', WEEKDAYS).notNullable()
       table.enum('shift', SHIFTS).notNullable()
-      // Onde a aula acontece, por extenso - "FAMETRO, Benjamin Constant/AM".
+      // Onde a aula acontece, por extenso - "Benjamin Constant/AM".
       // Texto e não FK: é uma unidade só, e uma tabela de locais hoje seria uma
       // tabela de uma linha.
       table.string('location', 200).notNullable()

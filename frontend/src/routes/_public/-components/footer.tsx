@@ -14,7 +14,8 @@ export function Footer(): React.JSX.Element {
               Maiyu <span className="text-neon">Academy</span>
             </p>
             <p className="mt-3 max-w-[38ch] text-sm text-muted-foreground">
-              Escola de tecnologia em {ADDRESS.city}, no Amazonas. Aulas na {ADDRESS.street}.
+              Escola de tecnologia em {ADDRESS.city}, no Amazonas. Aulas presenciais aos
+              sábados.
             </p>
           </div>
 

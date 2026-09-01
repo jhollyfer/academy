@@ -1,7 +1,7 @@
 # Maiyu Academy
 
 Escola de tecnologia em Benjamin Constant, no Amazonas. Cursos presenciais de
-robótica e desenvolvimento web, aos sábados, na FAMETRO.
+robótica e desenvolvimento web, aos sábados.
 
 O repositório tem dois projetos independentes, no padrão de `simple-hub` e
 `adacaibs`: cada um tem o próprio `package.json`, o próprio lockfile e o próprio

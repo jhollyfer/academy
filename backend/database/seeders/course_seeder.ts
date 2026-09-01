@@ -65,7 +65,7 @@ const WEB_MODULES = [
 const GENERAL_FAQS = [
   [
     'As aulas são presenciais mesmo?',
-    'São. Todo sábado, na FAMETRO, em Benjamin Constant. O que pode ser feito de casa é a matrícula.',
+    'São. Todo sábado, em Benjamin Constant. O que pode ser feito de casa é a matrícula.',
   ],
   [
     'Preciso levar computador?',
@@ -168,7 +168,7 @@ export default class extends BaseSeeder {
           startsAt: DateTime.fromISO('2026-03-07'),
           weekday: Weekdays.SATURDAY,
           shift: Shifts.MORNING,
-          location: 'FAMETRO, Benjamin Constant/AM',
+          location: 'Benjamin Constant/AM',
           capacity: 40,
           status: ClassStatuses.OPEN,
         }

@@ -19,7 +19,7 @@ export const SITE_TITLE = 'Maiyu Academy'
  */
 export const SITE_DESCRIPTION =
   'Escola de tecnologia em Benjamin Constant, no Amazonas. Cursos presenciais de robótica e ' +
-  'desenvolvimento web, aos sábados, na FAMETRO.'
+  'desenvolvimento web, aos sábados.'
 
 /**
  * O título da raiz, que é o nome mais o posicionamento.
@@ -40,9 +40,17 @@ export const SITE_TAGLINE = 'Maiyu Academy - Escola de Tecnologia em Benjamin Co
  */
 export const WHATSAPP_NUMBER = '5597984600872'
 
-/** O endereço da unidade, para o bloco de matrícula presencial e o JSON-LD. */
+/**
+ * O endereço da unidade, para o bloco de matrícula presencial e o JSON-LD.
+ *
+ * `street` está vazio até a escola fechar o endereço. Quem lê trata vazio como
+ * "só a cidade": anunciar um logradouro errado é pior que não anunciar nenhum,
+ * porque alguém vai até lá.
+ *
+ * TODO: preencher com o logradouro e o número quando estiverem definidos.
+ */
 export const ADDRESS = {
-  street: 'FAMETRO',
+  street: '',
   city: 'Benjamin Constant',
   state: 'AM',
   country: 'BR',

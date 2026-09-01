@@ -24,7 +24,9 @@ import type { CourseResponse } from '#/integrations/response'
  */
 export function CourseCards({ courses }: { courses: Array<CourseResponse> }): React.JSX.Element {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-20 lg:py-28">
+    // `scroll-mt` porque o cabeçalho é `sticky`: sem a margem, a âncora do hero
+    // para com o título embaixo da barra.
+    <section id="cursos" className="mx-auto max-w-7xl scroll-mt-20 px-4 py-20 lg:py-28">
       <SectionTitle eyebrow="Turma de estreia" first="Dois cursos," second="uma turma só" />
 
       <div className="mt-12 grid gap-6 lg:grid-cols-2">

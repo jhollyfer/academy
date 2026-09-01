@@ -39,7 +39,8 @@ export function Lab(): React.JSX.Element {
               Aula com a placa <span className="text-neon">na mão</span>
             </h2>
             <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-              Kit de eletrônica, bancada e computador na FAMETRO. Você não precisa levar nada.
+              Kit de eletrônica, bancada e computador no laboratório. Você não precisa levar
+              nada.
             </p>
           </Reveal>
         </div>

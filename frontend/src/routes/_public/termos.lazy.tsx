@@ -11,8 +11,8 @@ export const Route = createLazyFileRoute('/_public/termos')({
 /**
  * Os termos de uso.
  *
- * TODO jurídico: revisar com a FAMETRO antes de publicar, principalmente a
- * política de cancelamento e devolução da inscrição.
+ * TODO jurídico: revisar antes de publicar, principalmente a política de
+ * cancelamento e devolução da inscrição.
  */
 function RouteComponent(): React.JSX.Element {
   return (
@@ -43,8 +43,8 @@ function RouteComponent(): React.JSX.Element {
 
       <h2>As aulas</h2>
       <p>
-        As aulas são presenciais, na {ADDRESS.street}, em {ADDRESS.city}/{ADDRESS.state}. A escola
-        pode remanejar data de aula por motivo de força maior, avisando com antecedência.
+        As aulas são presenciais, em {ADDRESS.city}/{ADDRESS.state}. A escola pode remanejar data
+        de aula por motivo de força maior, avisando com antecedência.
       </p>
 
       <h2>Cancelamento</h2>

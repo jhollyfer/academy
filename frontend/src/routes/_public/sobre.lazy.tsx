@@ -27,7 +27,7 @@ function RouteComponent(): React.JSX.Element {
               {ADDRESS.city} e quer trabalhar com tecnologia hoje precisa sair daqui para aprender.
             </p>
             <p>
-              As aulas são presenciais, aos sábados, na {ADDRESS.street}. São quatro meses, com
+              As aulas são presenciais, aos sábados, em {ADDRESS.city}. São quatro meses, com
               bancada, kit de eletrônica e computador no lugar. Ninguém precisa levar equipamento.
             </p>
           </div>

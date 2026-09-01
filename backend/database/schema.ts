@@ -8,18 +8,7 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class AuthAccessTokenSchema extends BaseModel {
-  static $columns = [
-    'abilities',
-    'createdAt',
-    'expiresAt',
-    'hash',
-    'id',
-    'lastUsedAt',
-    'name',
-    'tokenableId',
-    'type',
-    'updatedAt',
-  ] as const
+  static $columns = ['abilities', 'createdAt', 'expiresAt', 'hash', 'id', 'lastUsedAt', 'name', 'tokenableId', 'type', 'updatedAt'] as const
   $columns = AuthAccessTokenSchema.$columns
   @column()
   declare abilities: string
@@ -44,21 +33,7 @@ export class AuthAccessTokenSchema extends BaseModel {
 }
 
 export class ClassSchema extends BaseModel {
-  static $columns = [
-    'capacity',
-    'courseId',
-    'createdAt',
-    'deletedAt',
-    'endsAt',
-    'id',
-    'location',
-    'name',
-    'shift',
-    'startsAt',
-    'status',
-    'updatedAt',
-    'weekday',
-  ] as const
+  static $columns = ['capacity', 'courseId', 'createdAt', 'deletedAt', 'endsAt', 'id', 'location', 'name', 'shift', 'startsAt', 'status', 'updatedAt', 'weekday'] as const
   $columns = ClassSchema.$columns
   @column()
   declare capacity: number
@@ -89,15 +64,7 @@ export class ClassSchema extends BaseModel {
 }
 
 export class CourseFaqSchema extends BaseModel {
-  static $columns = [
-    'answer',
-    'courseId',
-    'createdAt',
-    'id',
-    'position',
-    'question',
-    'updatedAt',
-  ] as const
+  static $columns = ['answer', 'courseId', 'createdAt', 'id', 'position', 'question', 'updatedAt'] as const
   $columns = CourseFaqSchema.$columns
   @column()
   declare answer: string
@@ -116,15 +83,7 @@ export class CourseFaqSchema extends BaseModel {
 }
 
 export class CourseModuleSchema extends BaseModel {
-  static $columns = [
-    'courseId',
-    'createdAt',
-    'description',
-    'id',
-    'position',
-    'title',
-    'updatedAt',
-  ] as const
+  static $columns = ['courseId', 'createdAt', 'description', 'id', 'position', 'title', 'updatedAt'] as const
   $columns = CourseModuleSchema.$columns
   @column()
   declare courseId: string
@@ -143,27 +102,7 @@ export class CourseModuleSchema extends BaseModel {
 }
 
 export class CourseSchema extends BaseModel {
-  static $columns = [
-    'accent',
-    'coverId',
-    'createdAt',
-    'deletedAt',
-    'description',
-    'durationMonths',
-    'enrollmentFeeInCents',
-    'id',
-    'minimumAge',
-    'monthlyFeeInCents',
-    'name',
-    'position',
-    'projectOutcome',
-    'requirements',
-    'slug',
-    'status',
-    'tagline',
-    'updatedAt',
-    'workloadHours',
-  ] as const
+  static $columns = ['accent', 'coverId', 'createdAt', 'deletedAt', 'description', 'durationMonths', 'enrollmentFeeInCents', 'id', 'minimumAge', 'monthlyFeeInCents', 'name', 'position', 'projectOutcome', 'requirements', 'slug', 'status', 'tagline', 'updatedAt', 'workloadHours'] as const
   $columns = CourseSchema.$columns
   @column()
   declare accent: string
@@ -223,26 +162,7 @@ export class EnrollmentFileSchema extends BaseModel {
 }
 
 export class EnrollmentSchema extends BaseModel {
-  static $columns = [
-    'classId',
-    'createdAt',
-    'deletedAt',
-    'email',
-    'guardianDocument',
-    'guardianName',
-    'guardianPhone',
-    'id',
-    'lgpdConsentAt',
-    'notes',
-    'phone',
-    'protocol',
-    'status',
-    'studentBirthDate',
-    'studentDocument',
-    'studentName',
-    'termsAcceptedAt',
-    'updatedAt',
-  ] as const
+  static $columns = ['classId', 'createdAt', 'deletedAt', 'email', 'guardianDocument', 'guardianName', 'guardianPhone', 'id', 'lgpdConsentAt', 'notes', 'phone', 'protocol', 'status', 'studentBirthDate', 'studentDocument', 'studentName', 'termsAcceptedAt', 'updatedAt'] as const
   $columns = EnrollmentSchema.$columns
   @column()
   declare classId: string
@@ -283,20 +203,7 @@ export class EnrollmentSchema extends BaseModel {
 }
 
 export class StorageSchema extends BaseModel {
-  static $columns = [
-    'createdAt',
-    'deletedAt',
-    'filename',
-    'id',
-    'mimetype',
-    'originalName',
-    'partSize',
-    'path',
-    'size',
-    'status',
-    'updatedAt',
-    'uploadId',
-  ] as const
+  static $columns = ['createdAt', 'deletedAt', 'filename', 'id', 'mimetype', 'originalName', 'partSize', 'path', 'size', 'status', 'updatedAt', 'uploadId'] as const
   $columns = StorageSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime | null
@@ -325,19 +232,7 @@ export class StorageSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = [
-    'avatarId',
-    'createdAt',
-    'deletedAt',
-    'email',
-    'id',
-    'name',
-    'password',
-    'phone',
-    'role',
-    'status',
-    'updatedAt',
-  ] as const
+  static $columns = ['avatarId', 'createdAt', 'deletedAt', 'email', 'id', 'name', 'password', 'phone', 'role', 'status', 'updatedAt'] as const
   $columns = UserSchema.$columns
   @column()
   declare avatarId: string | null

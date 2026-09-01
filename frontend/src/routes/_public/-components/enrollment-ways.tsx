@@ -46,15 +46,15 @@ export function EnrollmentWays(): React.JSX.Element {
             <div className="grid gap-3">
               <NeonCardTitle className="text-2xl">Ou presencialmente</NeonCardTitle>
               <NeonCardDescription className="text-base">
-                As aulas são na {ADDRESS.street}, em {ADDRESS.city}/{ADDRESS.state}. Passe lá para
-                se matricular no balcão.
+                As aulas são em {ADDRESS.city}/{ADDRESS.state}. Passe na secretaria para se
+                matricular no balcão.
               </NeonCardDescription>
             </div>
 
             <div className="grid gap-3 text-sm">
               <span className="inline-flex items-start gap-2 text-muted-foreground">
                 <MapPin className="mt-0.5 size-4 shrink-0 text-neon" />
-                {ADDRESS.street}, {ADDRESS.city}/{ADDRESS.state}
+                {ADDRESS.city}/{ADDRESS.state}
               </span>
               <a
                 href={whatsappUrl('Olá! Quero saber como me matricular na Maiyu Academy.')}

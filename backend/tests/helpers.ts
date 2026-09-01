@@ -119,7 +119,7 @@ export function classPayload(
     startsAt: '2026-03-07',
     weekday: 'SATURDAY',
     shift: 'MORNING',
-    location: 'FAMETRO, Benjamin Constant/AM',
+    location: 'Benjamin Constant/AM',
     capacity: 40,
     ...overrides,
   }

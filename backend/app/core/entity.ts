@@ -229,8 +229,8 @@ export const LEGAL_AGE = 18
  * O que um arquivo anexado a uma matrícula é.
  *
  * `PAYMENT_RECEIPT` é o comprovante do Pix da inscrição, o único obrigatório no
- * fluxo. `DOCUMENT` é RG/CPF, opcional, e existe porque a FAMETRO pode passar a
- * pedir - a coluna já aceita sem migration nova.
+ * fluxo. `DOCUMENT` é RG/CPF, opcional, e existe porque a secretaria pode passar
+ * a pedir - a coluna já aceita sem migration nova.
  */
 export const EnrollmentFileKinds = {
   PAYMENT_RECEIPT: 'PAYMENT_RECEIPT',

@@ -15,8 +15,8 @@ export const Route = createLazyFileRoute('/_public/privacidade')({
  * adolescente e pai de adolescente decidindo se entrega o CPF do filho num
  * formulário. Uma política que ninguém lê não cumpre o que a LGPD pede dela.
  *
- * TODO jurídico: revisar com a FAMETRO antes de publicar, principalmente o
- * tratamento de dado de menor e o prazo de guarda.
+ * TODO jurídico: revisar antes de publicar, principalmente o tratamento de dado
+ * de menor e o prazo de guarda.
  */
 function RouteComponent(): React.JSX.Element {
   return (
@@ -62,8 +62,8 @@ function RouteComponent(): React.JSX.Element {
 
       <h2>Como falar com a gente</h2>
       <p>
-        WhatsApp {formatPhone(WHATSAPP_NUMBER.slice(2))}, ou presencialmente na {ADDRESS.street},
-        em {ADDRESS.city}/{ADDRESS.state}.
+        WhatsApp {formatPhone(WHATSAPP_NUMBER.slice(2))}, ou presencialmente na secretaria, em{' '}
+        {ADDRESS.city}/{ADDRESS.state}.
       </p>
     </LegalPage>
   )

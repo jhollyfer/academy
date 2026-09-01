@@ -16,9 +16,11 @@ function organizationJsonLd() {
     'name': SITE_TITLE,
     'description': SITE_DESCRIPTION,
     'telephone': `+${WHATSAPP_NUMBER}`,
+    // `streetAddress` fica de fora enquanto o logradouro não está definido:
+    // schema.org aceita endereço sem ele, e uma chave vazia é pior que a
+    // ausência - o buscador a trata como dado, e mostra um endereço em branco.
     'address': {
       '@type': 'PostalAddress',
-      'streetAddress': ADDRESS.street,
       'addressLocality': ADDRESS.city,
       'addressRegion': ADDRESS.state,
       'addressCountry': ADDRESS.country,
