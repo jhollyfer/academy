@@ -194,6 +194,50 @@ export type CourseResponse = {
   deletedAt: string | null
 }
 
+/**
+ * A matrícula **como o site público a recebe**, que é bem menos do que o painel
+ * recebe.
+ *
+ * Tipo separado de `EnrollmentResponse` e não um `Partial` dele: as três rotas
+ * de `storefront/enrollments` não têm sessão, e o servidor devolve nelas uma
+ * projeção declarada campo a campo (`publicEnrollmentView`, no backend). Um
+ * `Partial` diria "estes campos podem faltar"; o que é verdade é mais forte -
+ * eles **não vêm**, e uma tela pública que tentar ler o CPF daqui deve parar de
+ * compilar em vez de renderizar `undefined`.
+ *
+ * Não há `studentName`, `email`, `phone`, `studentDocument` nem nada do
+ * responsável legal. O primeiro nome basta para quem abriu o link reconhecer
+ * que a tela é dele.
+ */
+export type StorefrontEnrollmentResponse = {
+  id: string
+  protocol: string
+  status: EnrollmentStatus
+  studentFirstName: string
+  class: {
+    id: string
+    name: string
+    startsAt: string
+    location: string
+    course: {
+      id: string
+      name: string
+      slug: string
+      enrollmentFeeInCents: number
+      monthlyFeeInCents: number
+    }
+  } | null
+  /**
+   * Os comprovantes anexados, sem o `storage`: a tela só precisa saber **se**
+   * há algum, e o objeto de storage carrega o caminho do arquivo no bucket.
+   */
+  files: Array<{
+    id: string
+    kind: EnrollmentFileKind
+    createdAt: string | null
+  }>
+}
+
 export type EnrollmentFileResponse = {
   id: string
   enrollmentId: string

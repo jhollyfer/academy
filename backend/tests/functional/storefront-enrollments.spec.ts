@@ -29,8 +29,27 @@ test.group('vitrine > matrículas', (group) => {
     // sem o `refresh` do use-case sairia indefinida.
     assert.isString(enrollment.protocol)
     assert.notEqual(enrollment.protocol, enrollment.id)
+
+    /*
+     * O instante do consentimento é conferido pelo painel, e não aqui.
+     *
+     * A resposta sem sessão passou a ser uma projeção mínima, e `lgpdConsentAt`
+     * não está nela - nem precisa: quem acabou de consentir não precisa que o
+     * servidor lhe conte a hora. Quem precisa é a escola, se alguém questionar
+     * o consentimento.
+     *
+     * `isNotNull` sobre a resposta pública teria continuado **passando** depois
+     * da projeção, porque `undefined !== null` - o teste seguiria verde
+     * atestando algo que a resposta deixou de dizer. Ler pelo painel é o que
+     * mantém a asserção ligada ao fato.
+     */
+    const secretaria = await client
+      .get(`/administrator/enrollments/${enrollment.id}`)
+      .cookies(session)
+
     // Instante e não booleano: a LGPD pede saber quando o titular consentiu.
-    assert.isNotNull(enrollment.lgpdConsentAt)
+    assert.isNotNull(body(secretaria).lgpdConsentAt)
+    assert.isNotNull(body(secretaria).termsAcceptedAt)
   })
 
   test('menor de idade sem responsável é 422 com um erro por campo', async ({ client, assert }) => {
@@ -119,7 +138,7 @@ test.group('vitrine > matrículas', (group) => {
     assert.equal(body(response).code, 'CLASS_UNAVAILABLE')
   })
 
-  test('acompanha pelo protocolo e não vê a anotação da secretaria', async ({ client, assert }) => {
+  test('acompanha pelo protocolo sem receber o cadastro', async ({ client, assert }) => {
     const session = await authenticateAsOwner(client)
     const course = await createCourse(client, session)
     const turma = await createClass(client, session, course.id)
@@ -135,12 +154,52 @@ test.group('vitrine > matrículas', (group) => {
     const response = await client.get(`/storefront/enrollments/${enrollment.protocol}`)
 
     response.assertStatus(200)
-    assert.equal(body(response).protocol, enrollment.protocol)
-    // A anotação é sobre o candidato, não para ele.
-    assert.isNull(body(response).notes)
-    // Mas a secretaria continua vendo.
+
+    const publico = body(response)
+
+    // O que a tela de acompanhamento precisa, e chega.
+    assert.equal(publico.protocol, enrollment.protocol)
+    assert.equal(publico.status, 'PENDING')
+    assert.equal(publico.studentFirstName, 'João')
+    assert.equal(publico.class.course.name, course.name)
+
+    /*
+     * E o que não chega.
+     *
+     * O link desta rota viaja por WhatsApp - é encaminhado, fica no histórico
+     * da conversa e sobrevive à troca de aparelho. Enquanto a rota serializava
+     * o model inteiro, cada uma dessas cópias carregava o cadastro completo de
+     * quem se inscreveu, inclusive de menores de idade com os dados do
+     * responsável legal junto.
+     *
+     * A lista é escrita campo a campo de propósito: uma coluna nova em
+     * `enrollments` nasce fora da projeção, e é este teste que precisa falhar
+     * se alguém a colocar lá dentro sem querer.
+     */
+    for (const campo of [
+      'studentName',
+      'studentDocument',
+      'studentBirthDate',
+      'email',
+      'phone',
+      'guardianName',
+      'guardianDocument',
+      'guardianPhone',
+      'notes',
+    ]) {
+      assert.notProperty(publico, campo, `\`${campo}\` não pode sair na rota sem sessão`)
+    }
+
+    // O comprovante entra como "existe ou não": o caminho do arquivo no bucket
+    // é o dado mais sensível do pedido, e a tela só pergunta se há anexo.
+    assert.isArray(publico.files)
+
+    // A secretaria continua vendo tudo, que é o ponto: o dado não sumiu do
+    // banco, só deixou de sair por uma URL que qualquer um pode abrir.
     const admin = await client.get(`/administrator/enrollments/${enrollment.id}`).cookies(session)
     assert.equal(body(admin).notes, 'Ligar para confirmar o Pix')
+    assert.equal(body(admin).studentName, 'João da Silva')
+    assert.equal(body(admin).email, 'joao@exemplo.com')
   })
 
   test('protocolo inexistente é 404', async ({ client }) => {

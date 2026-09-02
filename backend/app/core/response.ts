@@ -166,6 +166,59 @@ export const StorageUploadResponse = vine.create({
   ),
 })
 
+/**
+ * A matrícula como as **rotas sem sessão** a devolvem, que é bem menos do que o
+ * painel recebe.
+ *
+ * Declarado em VineJS e não derivado do model de propósito, e é a única forma
+ * honesta de documentar isto: as três rotas de `storefront/enrollments`
+ * respondem com `publicEnrollmentView` (`_shared.storefront.ts`), uma projeção
+ * escrita campo a campo. Apontar a feature para o `ENROLLMENT` derivado do model
+ * faria o documento anunciar CPF, e-mail, telefone e os dados do responsável
+ * legal - justamente os campos que a projeção existe para não devolver -, e
+ * quem gerasse cliente a partir daqui escreveria código para ler algo que nunca
+ * chega.
+ *
+ * As duas declarações precisam andar juntas. Se um campo entrar na projeção e
+ * não aqui, o documento fica devendo; o contrário publica um campo que não
+ * existe.
+ */
+const StorefrontEnrollmentResponse = vine.create({
+  id: identifier(),
+  protocol: identifier(),
+  status: vine.enum(ENROLLMENT_STATUSES),
+  /** Só o primeiro nome: é o que basta para quem abriu o link se reconhecer. */
+  studentFirstName: vine.string(),
+  /** Nula quando a turma saiu do ar. A oferta, que a vitrine já publica. */
+  class: vine
+    .object({
+      id: identifier(),
+      name: vine.string(),
+      startsAt: vine.date(),
+      location: vine.string(),
+      course: vine.object({
+        id: identifier(),
+        name: vine.string(),
+        slug: vine.string(),
+        enrollmentFeeInCents: vine.number(),
+        monthlyFeeInCents: vine.number(),
+      }),
+    })
+    .nullable(),
+  /**
+   * Sem `storage`: a tela só pergunta **se** há comprovante, e o objeto de
+   * storage carrega o caminho do arquivo no bucket - o comprovante bancário em
+   * si, que é o dado mais sensível do pedido inteiro.
+   */
+  files: vine.array(
+    vine.object({
+      id: identifier(),
+      kind: vine.enum(ENROLLMENT_FILE_KINDS),
+      createdAt: vine.date().nullable(),
+    })
+  ),
+})
+
 // ---------------------------------------------------------------------------
 // Registro
 // ---------------------------------------------------------------------------
@@ -181,5 +234,7 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'administrator/enrollments': ENROLLMENT,
 
   'storefront/courses': COURSE,
-  'storefront/enrollments': ENROLLMENT,
+  // Projeção declarada, e não o `ENROLLMENT` do painel: estas rotas não têm
+  // sessão, e devolvem só o que a tela de acompanhamento mostra.
+  'storefront/enrollments': StorefrontEnrollmentResponse,
 }
