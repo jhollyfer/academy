@@ -8,6 +8,7 @@ import { CardContent, CardTitle } from '#/components/ui/card'
 import { SectionCard } from '#/components/common/section-card'
 import { Highlight } from '#/components/common/highlight'
 import { formatDate, formatMoney } from '#/lib/format'
+import { courseIllustration } from '#/lib/course-illustration'
 import {
   courseCapacity,
   courseClasses,
@@ -17,19 +18,6 @@ import {
 import { REVEAL, STAGGER } from './reveal'
 import { cn } from '#/lib/utils'
 import type { CourseResponse } from '#/integrations/response'
-
-/**
- * A ilustração de cada curso, por `slug`.
- *
- * Um mapa e não uma coluna no banco: a arte é decisão de design e vive com o
- * design. Curso novo sem entrada aqui cai no fallback e não fica sem imagem.
- */
-const ILLUSTRATIONS: Record<string, string> = {
-  robotica: '/ilustracoes/robo-seguidor-de-linha.svg',
-  'web-development': '/ilustracoes/notebook-com-codigo.svg',
-}
-
-const FALLBACK_ILLUSTRATION = '/ilustracoes/bancada-arduino.svg'
 
 /**
  * Os dois cursos, na única seção escura da página.
@@ -80,7 +68,7 @@ export function CourseCards({
               style={{ animationDelay: `${index * STAGGER}ms` }}
             >
               <img
-                src={ILLUSTRATIONS[course.slug] ?? FALLBACK_ILLUSTRATION}
+                src={courseIllustration(course.slug)}
                 alt=""
                 width={400}
                 height={300}
