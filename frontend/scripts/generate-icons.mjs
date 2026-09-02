@@ -79,4 +79,5 @@ for (const { name, size, wrap } of targets) {
 // Uma conferência barata: o `.ico` precisa começar pelo diretório de ícone, e
 // um erro de offset só apareceria como aba sem ícone meses depois.
 const written = await readFile(join(PUBLIC, 'favicon.ico'))
-if (written.readUInt16LE(2) !== 1) throw new Error('favicon.ico não é um ícone válido')
+if (written.readUInt16LE(2) !== 1)
+  throw new Error('favicon.ico não é um ícone válido')
