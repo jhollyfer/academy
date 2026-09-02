@@ -93,10 +93,10 @@ function RouteComponent(): React.JSX.Element {
       <div className="relative mx-auto max-w-2xl px-4 py-16 lg:py-20">
         <div className="text-foreground [&_svg]:size-10">{view.icon}</div>
 
-        <h1 className="mt-5 text-3xl leading-[1.05] font-semibold tracking-tight sm:text-4xl">
+        <h1 className="display-title mt-5 text-heading-lg font-semibold sm:text-display-md">
           {view.title}
         </h1>
-        <p className="mt-4 max-w-[52ch] leading-relaxed text-muted-foreground">
+        <p className="mt-4 max-w-[52ch] text-body-md text-muted-foreground">
           {view.description}
         </p>
 
@@ -135,7 +135,7 @@ function RouteComponent(): React.JSX.Element {
 
         {enrollment.status !== EnrollmentStatuses.CANCELLED && (
           <section className="mt-12 border-t border-border pt-10">
-            <h2 className="text-xl font-bold">
+            <h2 className="text-heading-md font-bold">
               {enrollment.status === EnrollmentStatuses.WAITLIST &&
                 'Pagamento da inscrição'}
               {enrollment.status !== EnrollmentStatuses.WAITLIST &&

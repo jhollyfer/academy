@@ -267,10 +267,10 @@ function RouteComponent(): React.JSX.Element {
   if (options.length === 0) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-24 text-center">
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+        <h1 className="display-title text-heading-lg font-semibold text-foreground sm:text-display-md">
           Nenhuma turma aberta <Highlight variant="fill">agora</Highlight>
         </h1>
-        <p className="mx-auto mt-5 max-w-[46ch] leading-relaxed text-muted-foreground">
+        <p className="mx-auto mt-5 max-w-[46ch] text-body-md text-muted-foreground">
           As matrículas abrem junto com a próxima turma. Deixe seu contato com a
           secretaria e avisamos assim que as inscrições começarem.
         </p>
@@ -297,7 +297,7 @@ function RouteComponent(): React.JSX.Element {
   return (
     <div className="relative">
       <div className="relative mx-auto max-w-2xl px-4 py-16 lg:py-20">
-        <h1 className="text-3xl leading-[1.05] font-semibold tracking-tight sm:text-4xl">
+        <h1 className="display-title text-heading-lg font-semibold sm:text-display-md">
           Sua <span className="text-foreground">matrícula</span>
         </h1>
 
@@ -314,7 +314,7 @@ function RouteComponent(): React.JSX.Element {
           {step === 'curso' && (
             <FieldGroup>
               <fieldset>
-                <legend className="text-xl font-bold">
+                <legend className="text-heading-md font-bold">
                   Qual turma você quer?
                 </legend>
 
@@ -368,7 +368,7 @@ function RouteComponent(): React.JSX.Element {
           {step === 'aluno' && (
             <FieldGroup>
               <fieldset className="grid gap-6">
-                <legend className="text-xl font-bold">
+                <legend className="text-heading-md font-bold">
                   Dados de quem vai estudar
                 </legend>
 
@@ -487,7 +487,7 @@ function RouteComponent(): React.JSX.Element {
           {step === 'responsavel' && (
             <FieldGroup>
               <fieldset className="grid gap-6">
-                <legend className="text-xl font-bold">
+                <legend className="text-heading-md font-bold">
                   Dados do responsável legal
                 </legend>
                 <p className="text-sm text-muted-foreground">
@@ -563,7 +563,7 @@ function RouteComponent(): React.JSX.Element {
           {step === 'revisao' && (
             <FieldGroup>
               <fieldset className="grid gap-6">
-                <legend className="text-xl font-bold">Confira e envie</legend>
+                <legend className="text-heading-md font-bold">Confira e envie</legend>
 
                 {selected && (
                   <dl className="rounded-card grid gap-3 border border-border bg-card p-5 text-sm">

@@ -68,11 +68,11 @@ export function FinalBanner(): React.JSX.Element {
           />
 
           <div className={cn(REVEAL, 'delay-100')}>
-            <h2 className="max-w-[18ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-primary-foreground sm:text-4xl lg:text-5xl">
+            <h2 className="display-title max-w-[18ch] text-heading-lg font-semibold text-balance text-primary-foreground sm:text-display-md lg:text-display-lg">
               {heading}
             </h2>
 
-            <p className="mt-5 max-w-[52ch] text-base leading-relaxed text-primary-foreground sm:text-lg">
+            <p className="mt-5 max-w-[52ch] text-body-md text-primary-foreground sm:text-body-lg">
               {support}
             </p>
 

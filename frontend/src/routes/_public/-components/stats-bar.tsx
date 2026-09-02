@@ -66,7 +66,7 @@ export function StatsBar(): React.JSX.Element {
           <React.Fragment key={fact.label}>
             <div className="flex flex-col-reverse items-center gap-1 text-center lg:flex-1">
               <dt className="text-sm text-muted-foreground">{fact.label}</dt>
-              <dd className="text-4xl leading-none font-semibold tracking-tight text-foreground sm:text-5xl">
+              <dd className="display-title text-display-md leading-none font-semibold text-foreground sm:text-display-lg">
                 {fact.value}
               </dd>
             </div>

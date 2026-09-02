@@ -214,7 +214,7 @@ export function PageHeaderTitle({
     <h1
       data-slot="page-header-title"
       className={cn(
-        'col-start-2 row-start-1 flex flex-wrap items-center gap-3 text-2xl font-bold',
+        'col-start-2 row-start-1 flex flex-wrap items-center gap-3 text-2xl font-semibold tracking-tight',
         className,
       )}
       {...props}

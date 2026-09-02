@@ -22,7 +22,7 @@ export function LegalPage({
 }): React.JSX.Element {
   return (
     <div className="mx-auto max-w-7xl px-4 py-16 lg:py-24">
-      <h1 className="text-4xl leading-[1.05] font-semibold tracking-tight sm:text-5xl">
+      <h1 className="display-title text-display-md font-semibold sm:text-display-lg">
         {title}
       </h1>
       <p className="mt-4 text-sm text-muted-foreground">

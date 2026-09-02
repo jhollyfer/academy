@@ -24,10 +24,10 @@ export function Footer(): React.JSX.Element {
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <p className="text-lg font-semibold tracking-tight text-background dark:text-card-foreground">
+            <p className="text-heading-sm text-background dark:text-card-foreground">
               Maiyu Academy
             </p>
-            <p className="mt-3 max-w-[38ch] text-sm leading-relaxed text-background/70 dark:text-muted-foreground">
+            <p className="mt-3 max-w-[38ch] text-body-sm text-background/70 dark:text-muted-foreground">
               Escola de tecnologia em {ADDRESS.city}, no Amazonas. Aulas
               presenciais aos sábados.
             </p>

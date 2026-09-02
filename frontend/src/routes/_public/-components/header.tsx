@@ -71,7 +71,7 @@ export function Header(): React.JSX.Element {
 
         <Link
           to="/"
-          className="text-lg font-semibold tracking-tight text-foreground lg:justify-self-center"
+          className="text-heading-sm text-foreground lg:justify-self-center"
         >
           Maiyu Academy
         </Link>
@@ -131,7 +131,7 @@ export function Header(): React.JSX.Element {
                 a navegação logo abaixo tinha recuo próprio.
               */}
               <SheetHeader>
-                <SheetTitle className="text-lg font-semibold text-foreground">
+                <SheetTitle className="text-heading-sm text-foreground">
                   Maiyu Academy
                 </SheetTitle>
                 <SheetDescription className="sr-only">

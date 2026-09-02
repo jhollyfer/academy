@@ -43,7 +43,7 @@ export function HowToEnroll(): React.JSX.Element {
       <div className="rounded-block border border-border bg-card px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
         <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2 lg:gap-20">
           <div className={cn(REVEAL)}>
-            <h2 className="max-w-[16ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-foreground sm:text-4xl lg:text-5xl">
+            <h2 className="display-title max-w-[16ch] text-heading-lg font-semibold text-balance text-foreground sm:text-display-md lg:text-display-lg">
               A matrícula cabe no{' '}
               <Highlight variant="outline">celular</Highlight>
             </h2>
@@ -56,7 +56,7 @@ export function HowToEnroll(): React.JSX.Element {
                     aria-hidden
                     className="mt-0.5 size-5 shrink-0 text-foreground"
                   />
-                  <span className="text-base leading-relaxed text-muted-foreground">
+                  <span className="text-body-md text-muted-foreground">
                     {step}
                   </span>
                 </li>
@@ -81,7 +81,7 @@ export function HowToEnroll(): React.JSX.Element {
               />
             </div>
 
-            <p className="mt-8 flex items-start gap-3 rounded-card bg-background px-5 py-4 text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-8 flex items-start gap-3 rounded-card bg-background px-5 py-4 text-body-sm text-muted-foreground">
               <MapPin
                 weight="duotone"
                 aria-hidden

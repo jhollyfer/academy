@@ -79,7 +79,7 @@ export function Team(): React.JSX.Element {
           <h2
             className={cn(
               REVEAL,
-              'max-w-[16ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-foreground sm:text-4xl lg:text-5xl',
+              'display-title max-w-[16ch] text-heading-lg font-semibold text-balance text-foreground sm:text-display-md lg:text-display-lg',
             )}
           >
             Quem vai <Highlight variant="outline">ensinar</Highlight> você
@@ -103,7 +103,7 @@ export function Team(): React.JSX.Element {
 
                 <CardContent className="flex flex-col gap-3">
                   <div>
-                    <CardTitle className="text-lg font-semibold text-foreground">
+                    <CardTitle className="text-heading-sm text-foreground">
                       {person.name}
                     </CardTitle>
                     <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
@@ -115,7 +115,7 @@ export function Team(): React.JSX.Element {
                     {person.skills.map((skill) => (
                       <li
                         key={skill}
-                        className="flex items-start gap-2 text-sm leading-relaxed text-muted-foreground"
+                        className="flex items-start gap-2 text-body-sm text-muted-foreground"
                       >
                         <span
                           aria-hidden

@@ -26,7 +26,7 @@ function RouteComponent(): React.JSX.Element {
             <h1
               className={cn(
                 REVEAL,
-                'max-w-[20ch] text-4xl leading-[1.12] font-semibold tracking-tight text-balance text-primary-foreground sm:text-5xl lg:text-6xl',
+                'display-title max-w-[20ch] text-display-md font-semibold text-balance text-primary-foreground sm:text-display-lg lg:text-display-xl',
               )}
             >
               Uma escola de tecnologia no{' '}
@@ -36,7 +36,7 @@ function RouteComponent(): React.JSX.Element {
             <div
               className={cn(
                 REVEAL,
-                'delay-100 mt-8 grid max-w-[62ch] gap-5 text-lg leading-relaxed text-primary-foreground',
+                'delay-100 mt-8 grid max-w-[62ch] gap-5 text-body-lg text-primary-foreground',
               )}
             >
               <p>

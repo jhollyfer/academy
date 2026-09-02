@@ -38,12 +38,12 @@ export function School(): React.JSX.Element {
           />
 
           <div className={cn(REVEAL, 'delay-100')}>
-            <h2 className="text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-foreground sm:text-4xl lg:text-5xl">
+            <h2 className="display-title text-heading-lg font-semibold text-balance text-foreground sm:text-display-md lg:text-display-lg">
               Tecnologia se aprende{' '}
               <Highlight variant="outline">aqui</Highlight> mesmo
             </h2>
 
-            <div className="mt-7 space-y-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
+            <div className="mt-7 space-y-5 text-body-md text-muted-foreground sm:text-body-lg">
               <p>
                 A Maiyu Academy é uma escola de tecnologia presencial em
                 Benjamin Constant, no Alto Solimões. As aulas acontecem no{' '}

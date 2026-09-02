@@ -43,7 +43,7 @@ export function WhoItsFor(): React.JSX.Element {
           <h2
             className={cn(
               REVEAL,
-              'max-w-[18ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-foreground sm:text-4xl lg:text-5xl',
+              'display-title max-w-[18ch] text-heading-lg font-semibold text-balance text-foreground sm:text-display-md lg:text-display-lg',
             )}
           >
             Para quem é esta <Highlight variant="fill">turma</Highlight>
@@ -57,10 +57,10 @@ export function WhoItsFor(): React.JSX.Element {
                 style={{ animationDelay: `${index * STAGGER}ms` }}
               >
                 <CardContent className="flex flex-col gap-3">
-                  <CardTitle className="text-lg font-semibold text-foreground">
+                  <CardTitle className="text-heading-sm text-foreground">
                     {profile.title}
                   </CardTitle>
-                  <CardDescription className="text-sm leading-relaxed text-muted-foreground">
+                  <CardDescription className="text-body-sm text-muted-foreground">
                     {profile.description}
                   </CardDescription>
                 </CardContent>
@@ -74,7 +74,7 @@ export function WhoItsFor(): React.JSX.Element {
               'delay-300 mt-4 rounded-card border border-dashed border-foreground/25 px-6 py-7 sm:px-8',
             )}
           >
-            <p className="max-w-[76ch] text-base leading-relaxed text-muted-foreground">
+            <p className="max-w-[76ch] text-body-md text-muted-foreground">
               <strong className="font-semibold text-foreground">
                 Não é para quem
               </strong>{' '}

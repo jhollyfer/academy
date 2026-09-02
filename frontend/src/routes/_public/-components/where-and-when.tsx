@@ -75,7 +75,7 @@ export function WhereAndWhen(): React.JSX.Element {
           <h2
             className={cn(
               REVEAL,
-              'text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-foreground sm:text-4xl lg:text-5xl',
+              'display-title text-heading-lg font-semibold text-balance text-foreground sm:text-display-md lg:text-display-lg',
             )}
           >
             Onde e <Highlight variant="fill">quando</Highlight>
@@ -97,7 +97,7 @@ export function WhereAndWhen(): React.JSX.Element {
                       <dt className="text-sm font-medium text-foreground">
                         {row.term}
                       </dt>
-                      <dd className="mt-0.5 text-base leading-relaxed text-muted-foreground">
+                      <dd className="mt-0.5 text-body-md text-muted-foreground">
                         {row.value}
                       </dd>
                     </div>
@@ -107,7 +107,7 @@ export function WhereAndWhen(): React.JSX.Element {
             </dl>
 
             <div className="mt-9 rounded-card bg-background px-6 py-6">
-              <p className="text-base leading-relaxed text-muted-foreground">
+              <p className="text-body-md text-muted-foreground">
                 Os dois prédios são referência na cidade. Se precisar de um
                 ponto de chegada, a secretaria envia a localização pelo
                 WhatsApp.

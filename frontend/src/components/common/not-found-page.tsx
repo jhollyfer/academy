@@ -85,7 +85,7 @@ export function NotFoundPageTitle({
     <h1
       data-slot="not-found-page-title"
       className={cn(
-        'display-title text-4xl font-bold text-foreground md:text-5xl',
+        'display-title text-display-md font-bold text-foreground md:text-display-lg',
         className,
       )}
       {...props}

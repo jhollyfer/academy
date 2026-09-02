@@ -54,7 +54,7 @@ export function CourseFormFields({
   return (
     <FieldGroup className="gap-8">
       <fieldset className="grid gap-6">
-        <legend className="text-lg font-semibold">Identificação</legend>
+        <legend className="text-heading-sm">Identificação</legend>
 
         <Controller
           control={form.control}
@@ -186,7 +186,7 @@ export function CourseFormFields({
       </fieldset>
 
       <fieldset className="grid gap-6">
-        <legend className="text-lg font-semibold">
+        <legend className="text-heading-sm">
           Formato e investimento
         </legend>
 
@@ -265,7 +265,7 @@ export function CourseFormFields({
       </fieldset>
 
       <fieldset className="grid gap-4">
-        <legend className="text-lg font-semibold">Grade</legend>
+        <legend className="text-heading-sm">Grade</legend>
         <p className="text-sm text-muted-foreground">
           Um item por encontro, na ordem em que acontecem. A ordem da lista é a
           ordem no site.
@@ -333,7 +333,7 @@ export function CourseFormFields({
       </fieldset>
 
       <fieldset className="grid gap-4">
-        <legend className="text-lg font-semibold">Perguntas frequentes</legend>
+        <legend className="text-heading-sm">Perguntas frequentes</legend>
 
         {faqs.fields.map((entry, index) => (
           <div key={entry.id} className="grid gap-3 rounded-lg border p-4">

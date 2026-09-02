@@ -108,12 +108,12 @@ export function WhatYouGet(): React.JSX.Element {
             'flex flex-col justify-between gap-10 rounded-block bg-foreground dark:bg-card p-8 sm:p-10',
           )}
         >
-          <h2 className="text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-background dark:text-card-foreground sm:text-4xl">
+          <h2 className="display-title text-heading-lg font-semibold text-balance text-background dark:text-card-foreground sm:text-display-md">
             O que você <Highlight variant="slab">leva</Highlight> daqui
           </h2>
 
           <div>
-            <p className="mb-7 text-base leading-relaxed text-background/70 dark:text-muted-foreground">
+            <p className="mb-7 text-body-md text-background/70 dark:text-muted-foreground">
               Tudo o que a aula precisa já está no laboratório. Você leva o
               caderno e a vontade.
             </p>
@@ -150,10 +150,10 @@ export function WhatYouGet(): React.JSX.Element {
                   />
                 </span>
 
-                <CardTitle className="text-lg font-semibold text-foreground">
+                <CardTitle className="text-heading-sm text-foreground">
                   {item.title}
                 </CardTitle>
-                <CardDescription className="text-sm leading-relaxed text-muted-foreground">
+                <CardDescription className="text-body-sm text-muted-foreground">
                   {item.description}
                 </CardDescription>
               </CardContent>

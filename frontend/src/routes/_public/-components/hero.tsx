@@ -67,7 +67,7 @@ export function Hero(): React.JSX.Element {
           <h1
             className={cn(
               REVEAL,
-              'text-4xl leading-[1.12] font-semibold tracking-tight text-balance text-primary-foreground sm:text-5xl lg:text-6xl',
+              'display-title text-display-md font-semibold text-balance text-primary-foreground sm:text-display-lg lg:text-display-xl',
             )}
           >
             Você não precisa sair daqui
@@ -77,12 +77,12 @@ export function Hero(): React.JSX.Element {
           </h1>
 
           <div className={cn(REVEAL, 'delay-100')}>
-            <p className="max-w-[46ch] text-base leading-relaxed text-primary-foreground sm:text-lg">
+            <p className="max-w-[46ch] text-body-md text-primary-foreground sm:text-body-lg">
               {schedule}
             </p>
 
             {seats && (
-              <p className="mt-2 text-base leading-relaxed text-primary-foreground sm:text-lg">
+              <p className="mt-2 text-body-md text-primary-foreground sm:text-body-lg">
                 {seats}
               </p>
             )}

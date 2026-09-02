@@ -39,7 +39,7 @@ export function Faq({
           <h2
             className={cn(
               REVEAL,
-              'text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-foreground sm:text-4xl lg:text-5xl',
+              'display-title text-heading-lg font-semibold text-balance text-foreground sm:text-display-md lg:text-display-lg',
             )}
           >
             {title} <Highlight variant="outline">{highlight}</Highlight>
@@ -56,7 +56,7 @@ export function Faq({
                 <AccordionTrigger className="py-5 text-left text-base font-medium text-foreground">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="pb-5 text-base leading-relaxed text-muted-foreground">
+                <AccordionContent className="pb-5 text-body-md text-muted-foreground">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>

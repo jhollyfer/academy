@@ -56,7 +56,7 @@ export function CourseCards({
         <h2
           className={cn(
             REVEAL,
-            'max-w-[16ch] text-3xl leading-[1.15] font-semibold tracking-tight text-balance text-background dark:text-card-foreground sm:text-4xl lg:text-5xl',
+            'display-title max-w-[16ch] text-heading-lg font-semibold text-balance text-background dark:text-card-foreground sm:text-display-md lg:text-display-lg',
           )}
         >
           Dois cursos, uma <Highlight variant="slab">turma</Highlight> só
@@ -65,7 +65,7 @@ export function CourseCards({
         <p
           className={cn(
             REVEAL,
-            'delay-100 mt-6 max-w-[64ch] text-base leading-relaxed text-background/70 dark:text-muted-foreground sm:text-lg',
+            'delay-100 mt-6 max-w-[64ch] text-body-md text-background/70 dark:text-muted-foreground sm:text-body-lg',
           )}
         >
           Cada curso é o módulo 1 de uma trilha, e é completo por si. No fim
@@ -102,7 +102,7 @@ export function CourseCards({
                 </CardTitle>
 
                 {course.tagline && (
-                  <p className="text-sm leading-relaxed text-muted-foreground">
+                  <p className="text-body-sm text-muted-foreground">
                     {course.tagline}
                   </p>
                 )}
