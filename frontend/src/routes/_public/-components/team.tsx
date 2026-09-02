@@ -17,8 +17,8 @@ import { cn } from '#/lib/utils'
  * decidindo se essa gente sabe o que vai ensinar, e a lista responde isso em
  * dois segundos de leitura.
  *
- * TODO: faltam os sobrenomes de Leonardo e de Victor. Enquanto não chegarem, a
- * página mostra o primeiro nome em vez de inventar um.
+ * TODO: falta o sobrenome do Leonardo. Enquanto não chegar, a página mostra o
+ * primeiro nome em vez de inventar um.
  */
 const TEAM = [
   {
@@ -58,15 +58,15 @@ const TEAM = [
     ],
   },
   {
-    name: 'Victor',
-    role: 'Analista de sistemas',
+    name: 'Victor Rodrigues',
+    role: 'Analista de sistemas e cibersegurança',
     portrait: '/ilustracoes/retrato-victor.svg',
     skills: [
       'Análise de sistemas',
       'Cibersegurança',
-      'Suporte e processos',
-      'Documentação e modelagem',
-      'Soluções digitais',
+      'Segurança de aplicações',
+      'Testes de segurança',
+      'Modelagem de ameaças',
     ],
   },
 ] as const
