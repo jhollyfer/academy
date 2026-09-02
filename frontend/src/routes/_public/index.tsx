@@ -13,6 +13,9 @@ import {
   WHATSAPP_NUMBER,
   absoluteUrl,
 } from '#/lib/site'
+// `?url` pelo mesmo motivo do `__root.tsx`: o arquivo entra no build com hash
+// de conteúdo, e um caminho escrito à mão quebraria no build seguinte.
+import playfairLatinItalic from '@fontsource-variable/playfair-display/files/playfair-display-latin-wght-italic.woff2?url'
 
 /**
  * Os dados estruturados da escola.
@@ -91,6 +94,24 @@ export const Route = createFileRoute('/_public/')({
       { property: 'og:url', content: absoluteUrl('/') },
     ],
     links: [
+      /*
+       * A serifa, pedida já na primeira resposta da home.
+       *
+       * Ela cai dentro do `h1` do hero - o `Highlight` é `font-serif` itálico -,
+       * e esse `h1` é o maior elemento da primeira tela, ou seja o que o LCP
+       * mede. Descoberta só depois do CSS, a palavra troca de fonte no meio do
+       * carregamento e a linha inteira se reflui.
+       *
+       * Aqui e não na raiz porque `/termos` e `/privacidade` não usam o
+       * `Highlight`: na raiz, as duas baixariam uma fonte que não pintam.
+       */
+      {
+        rel: 'preload',
+        as: 'font',
+        type: 'font/woff2',
+        href: playfairLatinItalic,
+        crossOrigin: 'anonymous',
+      },
       /*
        * O canônico da home.
        *

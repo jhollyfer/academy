@@ -84,6 +84,35 @@ const STEPS = ['curso', 'aluno', 'responsavel', 'revisao'] as const
 
 type Step = (typeof STEPS)[number]
 
+/**
+ * O id da mensagem de erro de um campo.
+ *
+ * Derivado do nome e não escrito à mão em dois lugares: o `id` do parágrafo e o
+ * `aria-describedby` do input precisam ser a mesma string, e duas strings iguais
+ * digitadas separadamente divergem na primeira renomeação - sem quebrar nada
+ * visível, porque um `aria-describedby` órfão não aparece na tela. Ele só some
+ * para quem depende dele.
+ */
+function errorId(name: keyof FormValues): string {
+  return `${name}-erro`
+}
+
+/**
+ * Para onde o campo aponta quando está inválido, e `undefined` quando não está.
+ *
+ * `undefined` e não a string sempre: `aria-describedby` apontando para um
+ * elemento que não existe faz o leitor de tela anunciar o campo sem descrição
+ * alguma - pior do que não ter o atributo, porque cala também o que existia.
+ */
+function errorDescribedBy(
+  invalid: boolean,
+  name: keyof FormValues,
+): string | undefined {
+  if (!invalid) return undefined
+
+  return errorId(name)
+}
+
 /** Os campos que cada passo valida antes de deixar avançar. */
 const STEP_FIELDS = {
   curso: ['classId'],
@@ -202,6 +231,11 @@ function RouteComponent(): React.JSX.Element {
   })
 
   const registerWithMask = useHookFormMask(form.register)
+
+  // Desestruturado e não lido inteiro a cada uso: o `formState` do react-hook-
+  // form é um Proxy que registra a assinatura no acesso, e ler `errors` uma vez
+  // assina uma vez.
+  const { errors } = form.formState
   const [step, setStep] = React.useState<Step>('curso')
 
   const birthDate = form.watch('studentBirthDate')
@@ -383,11 +417,19 @@ function RouteComponent(): React.JSX.Element {
                       <Input
                         {...field}
                         id="studentName"
+                        required
+                        maxLength={160}
                         autoComplete="name"
                         aria-invalid={fieldState.invalid}
+                        aria-describedby={errorDescribedBy(
+                          fieldState.invalid,
+                          'studentName',
+                        )}
                       />
                       {fieldState.error && (
-                        <FieldError>{fieldState.error.message}</FieldError>
+                        <FieldError id={errorId('studentName')}>
+                          {fieldState.error.message}
+                        </FieldError>
                       )}
                     </Field>
                   )}
@@ -411,17 +453,24 @@ function RouteComponent(): React.JSX.Element {
                         {...field}
                         id="studentBirthDate"
                         type="date"
+                        required
                         autoComplete="bday"
                         aria-invalid={fieldState.invalid}
+                        aria-describedby={errorDescribedBy(
+                          fieldState.invalid,
+                          'studentBirthDate',
+                        )}
                       />
                       {fieldState.error && (
-                        <FieldError>{fieldState.error.message}</FieldError>
+                        <FieldError id={errorId('studentBirthDate')}>
+                          {fieldState.error.message}
+                        </FieldError>
                       )}
                     </Field>
                   )}
                 />
 
-                <Field>
+                <Field data-invalid={Boolean(errors.studentDocument)}>
                   <FieldLabel htmlFor="studentDocument">
                     CPF (opcional)
                   </FieldLabel>
@@ -431,11 +480,21 @@ function RouteComponent(): React.JSX.Element {
                     })}
                     id="studentDocument"
                     inputMode="numeric"
+                    // Sem token de preenchimento automático: não existe um para
+                    // CPF, e `off` impede o navegador de oferecer o campo
+                    // errado - foi o que ele fez com "documento" e o número do
+                    // cartão salvo.
+                    autoComplete="off"
                     placeholder="000.000.000-00"
+                    aria-invalid={Boolean(errors.studentDocument)}
+                    aria-describedby={errorDescribedBy(
+                      Boolean(errors.studentDocument),
+                      'studentDocument',
+                    )}
                   />
-                  {form.formState.errors.studentDocument && (
-                    <FieldError>
-                      {form.formState.errors.studentDocument.message}
+                  {errors.studentDocument && (
+                    <FieldError id={errorId('studentDocument')}>
+                      {errors.studentDocument.message}
                     </FieldError>
                   )}
                 </Field>
@@ -450,17 +509,24 @@ function RouteComponent(): React.JSX.Element {
                         {...field}
                         id="email"
                         type="email"
+                        required
                         autoComplete="email"
                         aria-invalid={fieldState.invalid}
+                        aria-describedby={errorDescribedBy(
+                          fieldState.invalid,
+                          'email',
+                        )}
                       />
                       {fieldState.error && (
-                        <FieldError>{fieldState.error.message}</FieldError>
+                        <FieldError id={errorId('email')}>
+                          {fieldState.error.message}
+                        </FieldError>
                       )}
                     </Field>
                   )}
                 />
 
-                <Field>
+                <Field data-invalid={Boolean(errors.phone)}>
                   <FieldLabel htmlFor="phone">Telefone com DDD</FieldLabel>
                   <Input
                     {...registerWithMask(
@@ -472,11 +538,18 @@ function RouteComponent(): React.JSX.Element {
                     )}
                     id="phone"
                     inputMode="tel"
+                    required
+                    autoComplete="tel"
                     placeholder="(97) 98460-0872"
+                    aria-invalid={Boolean(errors.phone)}
+                    aria-describedby={errorDescribedBy(
+                      Boolean(errors.phone),
+                      'phone',
+                    )}
                   />
-                  {form.formState.errors.phone && (
-                    <FieldError>
-                      {form.formState.errors.phone.message}
+                  {errors.phone && (
+                    <FieldError id={errorId('phone')}>
+                      {errors.phone.message}
                     </FieldError>
                   )}
                 </Field>
@@ -508,16 +581,32 @@ function RouteComponent(): React.JSX.Element {
                         {...field}
                         value={field.value ?? ''}
                         id="guardianName"
+                        required
+                        maxLength={160}
+                        /*
+                          `section-responsavel` na frente do token: sem a seção,
+                          o navegador trata este campo como o mesmo "nome" do
+                          passo anterior e oferece o nome do aluno para o
+                          responsável - dois campos que precisam justamente ser
+                          pessoas diferentes.
+                        */
+                        autoComplete="section-responsavel name"
                         aria-invalid={fieldState.invalid}
+                        aria-describedby={errorDescribedBy(
+                          fieldState.invalid,
+                          'guardianName',
+                        )}
                       />
                       {fieldState.error && (
-                        <FieldError>{fieldState.error.message}</FieldError>
+                        <FieldError id={errorId('guardianName')}>
+                          {fieldState.error.message}
+                        </FieldError>
                       )}
                     </Field>
                   )}
                 />
 
-                <Field>
+                <Field data-invalid={Boolean(errors.guardianDocument)}>
                   <FieldLabel htmlFor="guardianDocument">CPF</FieldLabel>
                   <Input
                     {...registerWithMask('guardianDocument', 'cpf', {
@@ -525,16 +614,23 @@ function RouteComponent(): React.JSX.Element {
                     })}
                     id="guardianDocument"
                     inputMode="numeric"
+                    required
+                    autoComplete="off"
                     placeholder="000.000.000-00"
+                    aria-invalid={Boolean(errors.guardianDocument)}
+                    aria-describedby={errorDescribedBy(
+                      Boolean(errors.guardianDocument),
+                      'guardianDocument',
+                    )}
                   />
-                  {form.formState.errors.guardianDocument && (
-                    <FieldError>
-                      {form.formState.errors.guardianDocument.message}
+                  {errors.guardianDocument && (
+                    <FieldError id={errorId('guardianDocument')}>
+                      {errors.guardianDocument.message}
                     </FieldError>
                   )}
                 </Field>
 
-                <Field>
+                <Field data-invalid={Boolean(errors.guardianPhone)}>
                   <FieldLabel htmlFor="guardianPhone">
                     Telefone com DDD
                   </FieldLabel>
@@ -548,11 +644,18 @@ function RouteComponent(): React.JSX.Element {
                     )}
                     id="guardianPhone"
                     inputMode="tel"
+                    required
+                    autoComplete="section-responsavel tel"
                     placeholder="(97) 98460-0872"
+                    aria-invalid={Boolean(errors.guardianPhone)}
+                    aria-describedby={errorDescribedBy(
+                      Boolean(errors.guardianPhone),
+                      'guardianPhone',
+                    )}
                   />
-                  {form.formState.errors.guardianPhone && (
-                    <FieldError>
-                      {form.formState.errors.guardianPhone.message}
+                  {errors.guardianPhone && (
+                    <FieldError id={errorId('guardianPhone')}>
+                      {errors.guardianPhone.message}
                     </FieldError>
                   )}
                 </Field>
