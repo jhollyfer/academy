@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createLazyFileRoute } from '@tanstack/react-router'
+import { Link, createLazyFileRoute } from '@tanstack/react-router'
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { CheckCircle, Copy, Hourglass, Warning } from '@phosphor-icons/react'
@@ -8,6 +8,8 @@ import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { Button } from '#/components/ui/button'
 import { Alert, AlertTitle } from '#/components/ui/alert'
 import { Card, CardContent } from '#/components/ui/card'
+import { PillButton } from '#/components/common/pill-button'
+import { whatsappUrl } from '#/lib/site'
 import { formatDate, formatMoney } from '#/lib/format'
 import { EnrollmentStatuses } from '#/lib/entity'
 import { Route as ProtocolRoute } from './$protocol'
@@ -16,7 +18,76 @@ import type { EnrollmentStatus } from '#/lib/entity'
 
 export const Route = createLazyFileRoute('/_public/matricula/$protocol')({
   component: RouteComponent,
+  notFoundComponent: ProtocolNotFound,
 })
+
+/**
+ * O protocolo que não existe.
+ *
+ * Separado do 404 genérico do site porque a pergunta é outra: quem chega aqui
+ * não digitou um endereço errado, chegou por um link que tinha um número - e o
+ * que ele precisa saber é que aquele número não corresponde a matrícula
+ * nenhuma, e que a inscrição pode ser refeita.
+ *
+ * Os dois motivos possíveis vêm escritos porque mudam o que a pessoa faz a
+ * seguir: link cortado pelo aplicativo de mensagem se resolve pedindo o link
+ * inteiro de novo; matrícula que nunca foi enviada se resolve preenchendo o
+ * formulário. Mandar direto ao formulário quem só perdeu metade do link o faria
+ * se inscrever duas vezes.
+ */
+function ProtocolNotFound(): React.JSX.Element {
+  return (
+    <div className="mx-auto max-w-2xl px-4 py-24 text-center">
+      <div className="text-foreground [&_svg]:mx-auto [&_svg]:size-10">
+        <Warning weight="fill" />
+      </div>
+
+      <h1 className="mt-5 text-3xl leading-[1.05] font-semibold tracking-tight text-foreground sm:text-4xl">
+        Matrícula não encontrada
+      </h1>
+
+      <p className="mx-auto mt-5 max-w-[52ch] leading-relaxed text-muted-foreground">
+        Este protocolo não corresponde a nenhuma matrícula. Ou o link veio
+        cortado - o que costuma acontecer quando ele é encaminhado -, ou a
+        inscrição não chegou a ser enviada.
+      </p>
+
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <PillButton
+          tone="ink"
+          scale="lg"
+          render={<Link to="/matricula">Fazer minha matrícula</Link>}
+        />
+
+        <Button
+          variant="outline"
+          nativeButton={false}
+          render={
+            <a
+              href={whatsappUrl(PROTOCOL_HELP_MESSAGE)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Falar com a secretaria
+            </a>
+          }
+        />
+      </div>
+    </div>
+  )
+}
+
+/**
+ * A conversa que a secretaria recebe de quem tem o link e não a matrícula.
+ *
+ * Ela existe porque a secretaria **tem** o pedido: quem se inscreveu está no
+ * painel, e é ela que consegue reencontrar o protocolo pelo nome. Mandar essa
+ * pessoa preencher tudo de novo criaria uma segunda matrícula para a mesma
+ * vaga.
+ */
+const PROTOCOL_HELP_MESSAGE =
+  'Olá! Abri o link da minha matrícula na Maiyu Academy e ele diz que o protocolo não existe. ' +
+  'Podem me ajudar a localizar?'
 
 /**
  * O que cada estado significa **para o candidato**.
@@ -74,7 +145,10 @@ function RouteComponent(): React.JSX.Element {
 
   const view = STATUS_VIEW[enrollment.status]
   const course = enrollment.class?.course
-  const hasReceipt = (enrollment.files ?? []).length > 0
+  // Sem `?? []`: a projeção pública sempre manda a lista, vazia quando não há
+  // anexo. O `??` cobria o `files?` opcional do tipo antigo, que descrevia a
+  // resposta do painel e não esta.
+  const hasReceipt = enrollment.files.length > 0
 
   async function copyPix() {
     try {

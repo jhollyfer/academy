@@ -3,6 +3,7 @@ import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import StorefrontEnrollmentAttachUseCase from './attach.use-case.ts'
 import { ProtocolValidator, StorefrontEnrollmentAttachmentValidator } from '#core/validator'
+import { publicEnrollmentView } from '#features/_shared.storefront'
 
 @inject()
 export default class StorefrontEnrollmentAttachController {
@@ -24,6 +25,6 @@ export default class StorefrontEnrollmentAttachController {
     const payload = await context.request.validateUsing(StorefrontEnrollmentAttachmentValidator)
     const result = await this.useCase.execute({ protocol, ...payload })
     if (result.isLeft()) throw result.value
-    return context.response.ok(result.value)
+    return context.response.ok(publicEnrollmentView(result.value))
   }
 }

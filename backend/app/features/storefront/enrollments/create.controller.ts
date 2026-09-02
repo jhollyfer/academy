@@ -3,6 +3,7 @@ import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import StorefrontEnrollmentCreateUseCase from './create.use-case.ts'
 import { StorefrontEnrollmentCreateValidator } from '#core/validator'
+import { publicEnrollmentView } from '#features/_shared.storefront'
 
 @inject()
 export default class StorefrontEnrollmentCreateController {
@@ -23,6 +24,10 @@ export default class StorefrontEnrollmentCreateController {
     const payload = await context.request.validateUsing(StorefrontEnrollmentCreateValidator)
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
-    return context.response.created(result.value)
+    // A mesma projeção da leitura por protocolo: o 201 é resposta de rota sem
+    // sessão como as outras, e devolver o cadastro inteiro de volta só porque
+    // ele acabou de subir é gravá-lo num corpo de resposta que ninguém precisa
+    // ler. O que a tela usa daqui é o `protocol`.
+    return context.response.created(publicEnrollmentView(result.value))
   }
 }

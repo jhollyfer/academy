@@ -61,6 +61,14 @@ export default class StorefrontEnrollmentAttachUseCase {
         files.preload('storage')
       })
 
+      // A turma junto, pelo mesmo motivo que o `show` a carrega: as duas rotas
+      // respondem com a projeção pública, e sem isto o anexo devolveria
+      // `class: null` para uma matrícula que tem turma - a mesma resposta que
+      // significaria "não há turma" na outra rota.
+      await enrollment.load('class', function (turma) {
+        turma.preload('course')
+      })
+
       // Anexar **não** confirma a matrícula: quem confirma é a secretaria, no
       // painel, depois de olhar o comprovante. Carimbar `CONFIRMED` aqui
       // entregaria a vaga a quem anexasse qualquer imagem.

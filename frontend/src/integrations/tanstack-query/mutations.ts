@@ -6,6 +6,7 @@ import type {
   ClassResponse,
   CourseResponse,
   EnrollmentResponse,
+  StorefrontEnrollmentResponse,
 } from '../response'
 import type {
   AdministratorClassCreatePayload,
@@ -290,18 +291,18 @@ export function useEnrollmentDelete(options?: MutationProps<void, string>) {
  */
 export function useEnrollmentCreate(
   options?: MutationProps<
-    EnrollmentResponse,
+    StorefrontEnrollmentResponse,
     StorefrontEnrollmentCreatePayload
   >,
 ) {
   return useMutation<
-    EnrollmentResponse,
+    StorefrontEnrollmentResponse,
     HTTPError,
     StorefrontEnrollmentCreatePayload
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<EnrollmentResponse>('/storefront/enrollments', {
+      return request<StorefrontEnrollmentResponse>('/storefront/enrollments', {
         method: 'POST',
         body: JSON.stringify(payload),
       })
@@ -316,18 +317,18 @@ export function useEnrollmentCreate(
 export function useEnrollmentAttach(
   protocol: string,
   options?: MutationProps<
-    EnrollmentResponse,
+    StorefrontEnrollmentResponse,
     StorefrontEnrollmentAttachmentPayload
   >,
 ) {
   return useMutation<
-    EnrollmentResponse,
+    StorefrontEnrollmentResponse,
     HTTPError,
     StorefrontEnrollmentAttachmentPayload
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<EnrollmentResponse>(
+      return request<StorefrontEnrollmentResponse>(
         `/storefront/enrollments/${protocol}/attachments`,
         {
           method: 'POST',

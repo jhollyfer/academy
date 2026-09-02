@@ -7,6 +7,7 @@ import type {
   CourseFaqResponse,
   CourseResponse,
   EnrollmentResponse,
+  StorefrontEnrollmentResponse,
   Paginated,
 } from '../response'
 import type { ListSearch } from '#/lib/list-search'
@@ -193,9 +194,12 @@ export function storefrontEnrollmentQueryOptions(protocol: string) {
   return queryOptions({
     queryKey: queryKeys.storefront.enrollment(protocol),
     queryFn: ({ signal }) =>
-      request<EnrollmentResponse>(`/storefront/enrollments/${protocol}`, {
-        signal,
-      }),
+      request<StorefrontEnrollmentResponse>(
+        `/storefront/enrollments/${protocol}`,
+        {
+          signal,
+        },
+      ),
     retry: false,
   })
 }

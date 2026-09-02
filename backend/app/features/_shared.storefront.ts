@@ -1,5 +1,6 @@
 import Class from '#models/class'
 import type Course from '#models/course'
+import type Enrollment from '#models/enrollment'
 import { withSeatsTaken } from '#features/_shared.seats'
 import { ActiveStatuses, ClassStatuses } from '#core/entity'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
@@ -81,4 +82,76 @@ export async function attachAnnounceableClasses(courses: ReadonlyArray<Course>):
     course.$extras.announcedClasses = announced
     course.$extras.nextClass = announced.at(0) ?? null
   }
+}
+
+/**
+ * O que a leitura por protocolo pode devolver, e nada além.
+ *
+ * O `GET /storefront/enrollments/:protocol` não tem sessão: a credencial é o
+ * próprio protocolo, um uuid v4 que só quem se inscreveu recebeu. Isso torna a
+ * URL impraticável de adivinhar, mas não muda o que ela entrega a quem a tem -
+ * e ela entregava o model inteiro, serializado por padrão: CPF do candidato,
+ * e-mail, telefone, data de nascimento, e nome, CPF e telefone do responsável
+ * legal. De uma criança, nos casos em que há responsável.
+ *
+ * O link viaja por WhatsApp. Ele é encaminhado, fica no histórico da conversa e
+ * sobrevive à troca de aparelho - e cada uma dessas cópias carregava o cadastro
+ * completo de um menor de idade.
+ *
+ * A projeção é uma lista de permissão, e não um `omit` dos campos sensíveis de
+ * hoje: com `omit`, toda coluna nova nasce pública e só deixa de ser quando
+ * alguém lembra de escondê-la. Aqui o padrão é o inverso, que é o padrão certo
+ * para um endpoint sem autenticação.
+ *
+ * `studentFirstName` e não `studentName`: o primeiro nome basta para a pessoa
+ * reconhecer que a tela é a dela, e é o nome completo que identifica alguém.
+ *
+ * Os arquivos saem sem `storage`: a tela só precisa saber **se** há comprovante
+ * anexado, e o objeto de storage carrega o caminho do arquivo no bucket - o
+ * comprovante bancário em si, que é o dado mais sensível do pedido inteiro.
+ */
+export function publicEnrollmentView(enrollment: Enrollment) {
+  return {
+    id: enrollment.id,
+    protocol: enrollment.protocol,
+    status: enrollment.status,
+    studentFirstName: firstName(enrollment.studentName),
+    class: publicClassView(enrollment.class),
+    files: (enrollment.files ?? []).map((file) => ({
+      id: file.id,
+      kind: file.kind,
+      createdAt: file.createdAt.toISO(),
+    })),
+  }
+}
+
+/**
+ * A turma e o curso como a tela de acompanhamento os mostram. Nada aqui é do
+ * candidato: é a oferta, que a vitrine já publica para quem nem se inscreveu.
+ */
+function publicClassView(entity: Class | null | undefined) {
+  if (!entity) return null
+
+  return {
+    id: entity.id,
+    name: entity.name,
+    startsAt: entity.startsAt.toISODate(),
+    location: entity.location,
+    course: {
+      id: entity.course.id,
+      name: entity.course.name,
+      slug: entity.course.slug,
+      enrollmentFeeInCents: entity.course.enrollmentFeeInCents,
+      monthlyFeeInCents: entity.course.monthlyFeeInCents,
+    },
+  }
+}
+
+/**
+ * O primeiro nome. `split` no espaço e não `slice` de tamanho fixo: "Ana" e
+ * "Anna Beatriz" têm primeiros nomes de tamanhos diferentes, e cortar por
+ * caractere devolveria pedaço de palavra.
+ */
+function firstName(name: string): string {
+  return name.trim().split(/\s+/)[0] ?? ''
 }
