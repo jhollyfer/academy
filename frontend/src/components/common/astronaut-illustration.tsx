@@ -117,7 +117,7 @@ export function AstronautIllustration({
       />
       <path
         d="M102 64 q 8 -6 16 0"
-        stroke="white"
+        stroke="currentColor"
         strokeWidth="1.4"
         strokeLinecap="round"
         opacity="0.8"
