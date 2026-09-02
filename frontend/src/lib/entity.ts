@@ -325,7 +325,6 @@ export const STORAGE_MIMETYPES = [
   'image/png',
   'image/webp',
   'image/gif',
-  'image/svg+xml',
   'application/pdf',
 ] as const
 
@@ -336,7 +335,6 @@ export const STORAGE_EXTENSIONS: Record<StorageMimetype, string> = {
   'image/png': 'png',
   'image/webp': 'webp',
   'image/gif': 'gif',
-  'image/svg+xml': 'svg',
   'application/pdf': 'pdf',
 }
 
