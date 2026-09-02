@@ -363,6 +363,13 @@ function RouteComponent(): React.JSX.Element {
                           data-accent={course.accent}
                           className="rounded-card flex cursor-pointer items-start gap-4 border border-border bg-card p-5 transition-colors has-checked:border-primary has-checked:bg-background"
                         >
+                          {/*
+                            Em cada rádio e não no `div` que os embrulha: pôr
+                            `role="radiogroup"` ali exigiria dar um nome
+                            acessível ao grupo, e o `fieldset` acima já tem a
+                            `legend` que o nomeia - seriam dois grupos aninhados
+                            anunciando a mesma pergunta duas vezes.
+                          */}
                           <input
                             type="radio"
                             name={field.name}
@@ -370,6 +377,12 @@ function RouteComponent(): React.JSX.Element {
                             checked={field.value === entity.id}
                             onChange={() => field.onChange(entity.id)}
                             onBlur={field.onBlur}
+                            required
+                            aria-invalid={fieldState.invalid}
+                            aria-describedby={errorDescribedBy(
+                              fieldState.invalid,
+                              'classId',
+                            )}
                             className="mt-1 size-4 accent-foreground"
                           />
                           <span className="grid gap-1">
@@ -390,7 +403,9 @@ function RouteComponent(): React.JSX.Element {
                         </label>
                       ))}
                       {fieldState.error && (
-                        <FieldError>{fieldState.error.message}</FieldError>
+                        <FieldError id={errorId('classId')}>
+                          {fieldState.error.message}
+                        </FieldError>
                       )}
                     </div>
                   )}
@@ -699,6 +714,10 @@ function RouteComponent(): React.JSX.Element {
                             field.onChange(checked === true)
                           }
                           aria-invalid={fieldState.invalid}
+                          aria-describedby={errorDescribedBy(
+                            fieldState.invalid,
+                            'termsAccepted',
+                          )}
                         />
                         <span className="text-muted-foreground">
                           Li e aceito os{' '}
@@ -713,7 +732,9 @@ function RouteComponent(): React.JSX.Element {
                         </span>
                       </label>
                       {fieldState.error && (
-                        <FieldError>{fieldState.error.message}</FieldError>
+                        <FieldError id={errorId(field.name)}>
+                          {fieldState.error.message}
+                        </FieldError>
                       )}
                     </Field>
                   )}
@@ -731,6 +752,10 @@ function RouteComponent(): React.JSX.Element {
                             field.onChange(checked === true)
                           }
                           aria-invalid={fieldState.invalid}
+                          aria-describedby={errorDescribedBy(
+                            fieldState.invalid,
+                            'lgpdConsent',
+                          )}
                         />
                         <span className="text-muted-foreground">
                           Autorizo o uso dos meus dados para processar esta
@@ -746,7 +771,9 @@ function RouteComponent(): React.JSX.Element {
                         </span>
                       </label>
                       {fieldState.error && (
-                        <FieldError>{fieldState.error.message}</FieldError>
+                        <FieldError id={errorId(field.name)}>
+                          {fieldState.error.message}
+                        </FieldError>
                       )}
                     </Field>
                   )}
