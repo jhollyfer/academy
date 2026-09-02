@@ -109,4 +109,20 @@ export default await Env.create(new URL('../', import.meta.url), {
   SMTP_PASSWORD: Env.schema.string.optional(),
   MAIL_FROM: Env.schema.string.optional(),
   MAIL_TO: Env.schema.string.optional(),
+
+  /*
+  |----------------------------------------------------------------------------
+  | Semeadura do dono
+  |----------------------------------------------------------------------------
+  |
+  | A senha do `OWNER` que o seeder cria. Opcionais porque a aplicação sobe sem
+  | elas: quem as exige é o `user_seeder`, que roda à mão, e ele recusa rodar
+  | sem a senha em vez de inventar uma.
+  |
+  | Antes a senha era literal no seeder, e o repositório é o lugar errado para
+  | ela: qualquer pessoa que lesse `database/seeders/user_seeder.ts` tinha a
+  | credencial de dono de todo ambiente já semeado.
+  */
+  SEED_OWNER_EMAIL: Env.schema.string.optional(),
+  SEED_OWNER_PASSWORD: Env.schema.string.optional(),
 })
