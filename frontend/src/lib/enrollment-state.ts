@@ -182,12 +182,13 @@ function formatTime(value: string | null): string {
 }
 
 /**
- * Os turnos em que a escola tem aula, na ordem do dia.
+ * O nome de cada turno, como a página o escreve.
  *
- * Um `Set` e não `filter` de igualdade: são três turnos possíveis e cinco
- * turmas, e o que a frase precisa é da lista sem repetição.
+ * Minúsculo porque nasceu no meio de frase - "aos sábados de manhã, tarde e
+ * noite". Quem precisar dele como rótulo solto capitaliza na hora de exibir; o
+ * dado aqui é a palavra, não a forma.
  */
-const SHIFT_LABELS: Record<string, string> = {
+export const SHIFT_LABELS: Record<string, string> = {
   [Shifts.MORNING]: 'manhã',
   [Shifts.AFTERNOON]: 'tarde',
   [Shifts.NIGHT]: 'noite',
@@ -238,6 +239,12 @@ export function scheduleSummary(
   }
 }
 
+/**
+ * Os turnos em que a escola tem aula, na ordem do dia.
+ *
+ * Um `Set` e não `filter` de igualdade: são três turnos possíveis e cinco
+ * turmas, e o que a frase precisa é da lista sem repetição.
+ */
 function shiftLabels(classes: ReadonlyArray<ClassResponse>): Array<string> {
   const shifts = new Set(classes.map((entity) => entity.shift))
 

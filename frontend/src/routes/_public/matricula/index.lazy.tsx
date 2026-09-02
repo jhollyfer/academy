@@ -14,10 +14,12 @@ import { LEGAL_AGE } from '#/lib/entity'
 import { applyMutationError } from '#/lib/form-errors'
 import { errorId, invalidProps } from '#/lib/form-a11y'
 import {
+  SHIFT_LABELS,
   WAITING_LIST_MESSAGE,
   courseClasses,
   formatTimeRange,
 } from '#/lib/enrollment-state'
+import { courseIllustration } from '#/lib/course-illustration'
 import { whatsappUrl } from '#/lib/site'
 import { Highlight } from '#/components/common/highlight'
 import { Button } from '#/components/ui/button'
@@ -169,6 +171,28 @@ function classTime(entity: ClassResponse): string {
   return formatTimeRange(entity.startsAtTime, entity.endsAtTime)
 }
 
+/**
+ * O turno no começo da frase.
+ *
+ * `SHIFT_LABELS` guarda a palavra em minúscula porque nasceu no meio de frase -
+ * "aos sábados de manhã, tarde e noite". Aqui ela abre a linha de baixo do
+ * horário, e abrir frase em minúscula é erro de escrita, não estilo.
+ */
+function shiftLabel(shift: string): string {
+  const label = SHIFT_LABELS[shift]
+
+  if (!label) return ''
+
+  return `${label.charAt(0).toUpperCase()}${label.slice(1)}`
+}
+
+/** `"3 turmas"`, e `"1 turma"` quando é uma só. */
+function classCountLabel(count: number): string {
+  if (count === 1) return '1 turma'
+
+  return `${count} turmas`
+}
+
 function seatsLabel(remaining: number | undefined): string {
   if (remaining === undefined) return ''
   if (remaining === 0) return 'Turma cheia: você entra na fila de espera.'
@@ -184,31 +208,56 @@ function RouteComponent(): React.JSX.Element {
   const courses = data.data
 
   /*
-   * Uma opção por **turma**, e não por curso.
+   * Os cursos que dá para escolher: os que têm turma anunciada.
    *
-   * A escola abre cinco: duas de programação pela manhã e três de robótica à
-   * tarde e à noite. Enquanto era uma por curso, escolher o curso escolhia a
-   * turma junto; agora são coisas diferentes, e quem decide qual das três de
-   * robótica cabe na semana dele é o candidato, não o servidor.
-   *
-   * Curso sem turma anunciada não entra: pedir treze campos para responder que
-   * não há vaga é gastar o tempo de alguém para não entregar nada.
+   * Curso sem turma não entra: pedir treze campos para responder que não há
+   * vaga é gastar o tempo de alguém para não entregar nada.
    */
-  const options = courses.flatMap(function (course) {
+  const selectableCourses = courses.filter(
+    (course) => courseClasses(course).length > 0,
+  )
+
+  /*
+   * Toda turma anunciada, com o curso de cada uma pendurado.
+   *
+   * Não é mais o que a tela desenha - o passo pergunta o curso primeiro e só
+   * então os horários dele. Sobrou para as duas perguntas que a escolha não
+   * responde: se existe alguma turma aberta, lá embaixo, e de que curso é o
+   * `classId` que a revisão imprime no fim.
+   */
+  const options = selectableCourses.flatMap(function (course) {
     const classes = courseClasses(course)
 
     return classes.map((entity) => ({ course, entity }))
   })
 
-  const preselected = options.find(
-    (option) => option.course.slug === search.curso,
+  const preselectedCourse = selectableCourses.find(
+    (course) => course.slug === search.curso,
   )
+
+  /*
+   * O curso escolhido, que não é campo do formulário.
+   *
+   * A matrícula manda um `classId` e mais nada: a turma já diz de que curso
+   * ela é, e um `courseId` no payload seria um segundo lugar para a mesma
+   * verdade discordar do primeiro. Aqui ele existe para decidir uma coisa só -
+   * quais horários a barra mostra.
+   */
+  const [courseId, setCourseId] = React.useState(preselectedCourse?.id ?? '')
 
   const form = useForm<FormValues, unknown, StorefrontEnrollmentCreatePayload>({
     resolver: vineResolver(StorefrontEnrollmentCreateValidator),
     mode: 'onTouched',
     defaultValues: {
-      classId: preselected?.entity.id ?? options.at(0)?.entity.id ?? '',
+      /*
+       * Vazio, e não a primeira turma da lista.
+       *
+       * Ele vinha pré-marcado, e o que chegava ao servidor quando alguém
+       * atravessava o passo sem olhar era a turma que o formulário escolheu -
+       * gravada como se fosse decisão de quem se matriculou. O passo agora
+       * pergunta o curso e depois o horário; a resposta é de quem responde.
+       */
+      classId: '',
       studentName: '',
       studentBirthDate: '',
       studentDocument: null,
@@ -298,6 +347,27 @@ function RouteComponent(): React.JSX.Element {
   const index = steps.indexOf(step)
 
   const selected = options.find((option) => option.entity.id === classId)
+
+  const selectedCourse = selectableCourses.find(
+    (course) => course.id === courseId,
+  )
+
+  // Os horários que a barra desenha. Vazio enquanto não há curso escolhido, e
+  // aí a barra não aparece.
+  let scheduleOptions: Array<ClassResponse> = []
+  if (selectedCourse) scheduleOptions = courseClasses(selectedCourse)
+
+  /*
+   * Trocar de curso apaga o horário escolhido.
+   *
+   * Os horários pertencem a um curso só. Mantido, o `classId` das 13h da
+   * robótica seguiria marcado com a programação na tela, e o passo terminaria
+   * enviando a turma que a pessoa acabou de abandonar.
+   */
+  function changeCourse(value: string): void {
+    setCourseId(value)
+    form.setValue('classId', '')
+  }
 
   /*
    * Os dois aceites, observados: o botão de enviar depende deles.
@@ -434,74 +504,150 @@ function RouteComponent(): React.JSX.Element {
                   tabIndex={-1}
                   className="text-heading-md font-bold outline-none"
                 >
-                  Qual turma você quer?
+                  Qual curso você quer?
                 </legend>
 
-                <Controller
-                  control={form.control}
-                  name="classId"
-                  render={({ field, fieldState }) => (
-                    <RadioGroup
-                      required
-                      name={field.name}
-                      value={field.value}
-                      onValueChange={(value) => field.onChange(value)}
-                      aria-invalid={fieldState.invalid}
-                      className="mt-5 grid gap-3"
-                    >
-                      {options.map(({ course, entity }) => (
-                        <label
-                          key={entity.id}
-                          data-accent={course.accent}
-                          className="rounded-card flex cursor-pointer items-start gap-4 border border-border bg-card p-5 transition-colors has-data-[checked]:border-primary has-data-[checked]:bg-background"
-                        >
-                          {/*
-                            O radio do registry no lugar do nativo: o nativo
-                            pintava com `accent-color`, que o navegador resolve
-                            sozinho e não olha para o tema - o marcador ficava
-                            fora da paleta no escuro.
+                {/*
+                  O curso primeiro, o horário depois, e não os dois na mesma
+                  lista. Eram cinco linhas - duas de programação e três de
+                  robótica -, e quem chegava decidido pelo curso varria as cinco
+                  para achar as suas. São duas decisões, e agora são dois
+                  controles.
 
-                            O estado inválido vai nos dois lugares, e por
-                            motivos diferentes: no item porque é ele que traz
-                            as variantes `aria-invalid:` na classe do registry,
-                            e sem ele o erro seria lido mas não pintado; no
-                            `RadioGroup` que os embrulha porque é ele que tem
-                            `role="radiogroup"`, e é o grupo - não o rádio
-                            solto - que o leitor de tela anuncia ao entrar.
-                            A descrição do erro fica só no item, para a
-                            mensagem não ser lida duas vezes.
-                          */}
-                          <RadioGroupItem
-                            value={entity.id}
-                            onBlur={field.onBlur}
-                            {...invalidProps(fieldState.invalid, 'classId')}
-                            className="mt-1"
-                          />
-                          <span className="grid gap-1">
-                            <span className="font-bold tracking-tight">
-                              {course.name}
-                              {classTime(entity) && (
-                                <span className="ml-2 font-normal text-foreground">
-                                  {classTime(entity)}
-                                </span>
-                              )}
-                            </span>
-                            <span className="text-sm text-muted-foreground">
-                              {entity.name}, começa em{' '}
-                              {formatDate(entity.startsAt)}. {entity.location}.{' '}
-                              {seatsLabel(entity.seatsRemaining)}
-                            </span>
+                  Este `RadioGroup` não é campo do formulário: ele escolhe o que
+                  a barra de baixo mostra. Quem viaja no payload é o `classId`.
+                */}
+                <RadioGroup
+                  required
+                  name="courseId"
+                  value={courseId}
+                  onValueChange={changeCourse}
+                  className="mt-5 grid gap-3 sm:grid-cols-2"
+                >
+                  {selectableCourses.map((course) => (
+                    <label
+                      key={course.id}
+                      data-accent={course.accent}
+                      className="rounded-card flex cursor-pointer flex-col gap-4 border border-border bg-card p-5 transition-colors has-data-[checked]:border-primary has-data-[checked]:bg-background"
+                    >
+                      {/* `alt` vazio: a ilustração repete o nome que vem logo
+                          abaixo, e um leitor de tela que a anunciasse leria o
+                          curso duas vezes. */}
+                      <img
+                        src={courseIllustration(course.slug)}
+                        alt=""
+                        width={400}
+                        height={300}
+                        loading="lazy"
+                        className="h-28 w-full object-contain"
+                      />
+
+                      <span className="flex items-start gap-4">
+                        <RadioGroupItem value={course.id} className="mt-1" />
+                        <span className="grid gap-1">
+                          <span className="font-bold tracking-tight">
+                            {course.name}
                           </span>
-                        </label>
-                      ))}
-                      {fieldState.error && (
-                        <FieldError id={errorId('classId')}>
-                          {fieldState.error.message}
-                        </FieldError>
-                      )}
-                    </RadioGroup>
-                  )}
-                />
+                          <span className="text-sm text-muted-foreground">
+                            {course.workloadHours}h em {course.durationMonths}{' '}
+                            meses.{' '}
+                            {classCountLabel(courseClasses(course).length)} para
+                            escolher.
+                          </span>
+                        </span>
+                      </span>
+                    </label>
+                  ))}
+                </RadioGroup>
+              </fieldset>
+
+              {/* `mt-2` sobre o `gap-4` do `FieldGroup`: são duas perguntas com
+                  título próprio, e 16px entre elas encostava o segundo título
+                  nos cards do primeiro. */}
+              <fieldset className="mt-2">
+                <legend className="text-heading-md font-bold">
+                  Qual horário cabe na sua semana?
+                </legend>
+
+                {/*
+                  Sem curso escolhido não há horário para mostrar, e um espaço
+                  em branco no lugar da barra pareceria falta de turma. A linha
+                  diz o que fazer para a barra aparecer.
+                */}
+                {!selectedCourse && (
+                  <p className="mt-5 text-sm text-muted-foreground">
+                    Escolha um curso acima para ver os horários disponíveis.
+                  </p>
+                )}
+
+                {selectedCourse && (
+                  <Controller
+                    control={form.control}
+                    name="classId"
+                    render={({ field, fieldState }) => (
+                      <RadioGroup
+                        required
+                        name={field.name}
+                        value={field.value}
+                        onValueChange={(value) => field.onChange(value)}
+                        aria-invalid={fieldState.invalid}
+                        className="mt-5 grid gap-3 sm:grid-cols-2"
+                      >
+                        {scheduleOptions.map((entity) => (
+                          <label
+                            key={entity.id}
+                            data-accent={selectedCourse.accent}
+                            className="rounded-card flex cursor-pointer items-start gap-4 border border-border bg-card p-5 transition-colors has-data-[checked]:border-primary has-data-[checked]:bg-background"
+                          >
+                            {/*
+                              O radio do registry no lugar do nativo: o nativo
+                              pintava com `accent-color`, que o navegador
+                              resolve sozinho e não olha para o tema - o
+                              marcador ficava fora da paleta no escuro.
+
+                              O estado inválido vai nos dois lugares, e por
+                              motivos diferentes: no item porque é ele que traz
+                              as variantes `aria-invalid:` na classe do
+                              registry, e sem ele o erro seria lido mas não
+                              pintado; no `RadioGroup` que os embrulha porque é
+                              ele que tem `role="radiogroup"`, e é o grupo - não
+                              o rádio solto - que o leitor de tela anuncia ao
+                              entrar. A descrição do erro fica só no item, para
+                              a mensagem não ser lida duas vezes.
+                            */}
+                            <RadioGroupItem
+                              value={entity.id}
+                              onBlur={field.onBlur}
+                              {...invalidProps(fieldState.invalid, 'classId')}
+                              className="mt-1"
+                            />
+                            <span className="grid gap-1">
+                              {/* Turma sem horário fechado cai no nome dela: é
+                                  o que `classTime` devolve vazio para não
+                                  anunciar uma hora que ninguém decidiu. */}
+                              <span className="font-bold tracking-tight">
+                                {classTime(entity) || entity.name}
+                              </span>
+                              <span className="text-sm text-muted-foreground">
+                                {shiftLabel(entity.shift)}, começa em{' '}
+                                {formatDate(entity.startsAt)}. {entity.location}
+                                . {seatsLabel(entity.seatsRemaining)}
+                              </span>
+                            </span>
+                          </label>
+                        ))}
+                        {fieldState.error && (
+                          <FieldError
+                            id={errorId('classId')}
+                            className="sm:col-span-2"
+                          >
+                            {fieldState.error.message}
+                          </FieldError>
+                        )}
+                      </RadioGroup>
+                    )}
+                  />
+                )}
               </fieldset>
             </FieldGroup>
           )}
