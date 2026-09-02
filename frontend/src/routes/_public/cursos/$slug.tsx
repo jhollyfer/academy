@@ -1,5 +1,8 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
-import { storefrontCourseQueryOptions } from '#/integrations/tanstack-query/queries'
+import {
+  storefrontCourseQueryOptions,
+  storefrontCoursesQueryOptions,
+} from '#/integrations/tanstack-query/queries'
 import { SITE_IMAGE, SITE_TITLE, SITE_URL, absoluteUrl } from '#/lib/site'
 import type { CourseResponse } from '#/integrations/response'
 
@@ -107,10 +110,33 @@ function courseJsonLd(course: CourseResponse) {
 
 export const Route = createFileRoute('/_public/cursos/$slug')({
   loader: async ({ context, params }) => {
+    /*
+     * A lista da vitrine junto com o curso, e por `prefetchQuery`.
+     *
+     * O `EnrollmentCta` decide o rótulo lendo `storefrontCoursesQueryOptions`,
+     * e sem esta linha essa consulta não existia no SSR: o botão caía no estado
+     * `NONE` e o HTML do servidor anunciava "Avise quando abrir a turma" - com
+     * turma aberta e 39 vagas. A hidratação corrigia depois, mas o buscador e
+     * quem está sem JavaScript leem o HTML, e nele não havia link nenhum para
+     * `/matricula`. A home já fazia isto; a página do curso é que ficou de fora.
+     *
+     * `prefetchQuery` e não `ensureQueryData` pelo mesmo motivo da home: a
+     * lista é enfeite do botão, e uma consulta fora do ar não pode derrubar a
+     * página do curso, que se sustenta sozinha.
+     */
+    const courses = context.queryClient.prefetchQuery(
+      storefrontCoursesQueryOptions(),
+    )
+
     try {
-      return await context.queryClient.ensureQueryData(
-        storefrontCourseQueryOptions(params.slug),
-      )
+      const [course] = await Promise.all([
+        context.queryClient.ensureQueryData(
+          storefrontCourseQueryOptions(params.slug),
+        ),
+        courses,
+      ])
+
+      return course
     } catch {
       // 404 de negócio lançado no loader: sem isto o componente renderizaria e
       // só então descobriria que não há curso, e a rota responderia 200 com uma
