@@ -8,6 +8,14 @@ import { useEnrollmentUpdate } from '#/integrations/tanstack-query/mutations'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { Badge } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '#/components/ui/card'
+import { Empty, EmptyDescription, EmptyTitle } from '#/components/ui/empty'
 import { Textarea } from '#/components/ui/textarea'
 import {
   ConfirmDialog,
@@ -123,178 +131,206 @@ function RouteComponent(): React.JSX.Element {
 
       <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
         <div className="grid gap-8">
-          <section className="rounded-lg border bg-card p-6">
-            <h2 className="font-semibold">Dados enviados</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Como o candidato preencheu. O painel não edita: os dados são dele.
-            </p>
+          <Card className="[--card-spacing:--spacing(6)]">
+            <CardHeader>
+              <CardTitle render={<h2 />} className="text-base font-semibold">
+                Dados enviados
+              </CardTitle>
+              <CardDescription className="text-sm">
+                Como o candidato preencheu. O painel não edita: os dados são
+                dele.
+              </CardDescription>
+            </CardHeader>
 
-            <dl className="mt-6 grid gap-4 sm:grid-cols-2">
-              <Row label="Curso">{enrollment.class?.course?.name ?? '-'}</Row>
-              <Row label="Turma">{enrollment.class?.name ?? '-'}</Row>
-              <Row label="Nascimento">
-                {formatDate(enrollment.studentBirthDate)} (
-                {enrollment.ageAtEnrollment} anos na inscrição)
-              </Row>
-              <Row label="CPF">{formatCpf(enrollment.studentDocument)}</Row>
-              <Row label="E-mail">{enrollment.email}</Row>
-              <Row label="Telefone">{formatPhone(enrollment.phone)}</Row>
-            </dl>
+            <CardContent>
+              <dl className="grid gap-4 sm:grid-cols-2">
+                <Row label="Curso">{enrollment.class?.course?.name ?? '-'}</Row>
+                <Row label="Turma">{enrollment.class?.name ?? '-'}</Row>
+                <Row label="Nascimento">
+                  {formatDate(enrollment.studentBirthDate)} (
+                  {enrollment.ageAtEnrollment} anos na inscrição)
+                </Row>
+                <Row label="CPF">{formatCpf(enrollment.studentDocument)}</Row>
+                <Row label="E-mail">{enrollment.email}</Row>
+                <Row label="Telefone">{formatPhone(enrollment.phone)}</Row>
+              </dl>
 
-            {enrollment.requiresGuardian && (
-              <>
-                <h3 className="mt-8 font-medium">Responsável legal</h3>
-                <dl className="mt-4 grid gap-4 sm:grid-cols-2">
-                  <Row label="Nome">{enrollment.guardianName ?? '-'}</Row>
-                  <Row label="CPF">
-                    {formatCpf(enrollment.guardianDocument)}
-                  </Row>
-                  <Row label="Telefone">
-                    {formatPhone(enrollment.guardianPhone)}
-                  </Row>
-                </dl>
-              </>
-            )}
+              {enrollment.requiresGuardian && (
+                <>
+                  <h3 className="mt-8 font-medium">Responsável legal</h3>
+                  <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+                    <Row label="Nome">{enrollment.guardianName ?? '-'}</Row>
+                    <Row label="CPF">
+                      {formatCpf(enrollment.guardianDocument)}
+                    </Row>
+                    <Row label="Telefone">
+                      {formatPhone(enrollment.guardianPhone)}
+                    </Row>
+                  </dl>
+                </>
+              )}
 
-            <dl className="mt-8 grid gap-4 border-t pt-6 sm:grid-cols-2">
-              <Row label="Protocolo">
-                <span className="font-mono text-xs break-all">
-                  {enrollment.protocol}
-                </span>
-              </Row>
-              <Row label="Consentimento LGPD">
-                {formatDate(enrollment.lgpdConsentAt)}
-              </Row>
-            </dl>
-          </section>
+              <dl className="mt-8 grid gap-4 border-t pt-6 sm:grid-cols-2">
+                <Row label="Protocolo">
+                  <span className="font-mono text-xs break-all">
+                    {enrollment.protocol}
+                  </span>
+                </Row>
+                <Row label="Consentimento LGPD">
+                  {formatDate(enrollment.lgpdConsentAt)}
+                </Row>
+              </dl>
+            </CardContent>
+          </Card>
 
-          <section className="rounded-lg border bg-card p-6">
-            <h2 className="font-semibold">Comprovante do Pix</h2>
+          <Card className="[--card-spacing:--spacing(6)]">
+            <CardHeader>
+              <CardTitle render={<h2 />} className="text-base font-semibold">
+                Comprovante do Pix
+              </CardTitle>
+            </CardHeader>
 
-            {!receipt && (
-              <p className="mt-3 text-sm text-muted-foreground">
-                Ainda não enviado. Sem ele, a confirmação é recusada.
-              </p>
-            )}
+            <CardContent>
+              {!receipt && (
+                <Empty className="border">
+                  <EmptyTitle>Ainda não enviado</EmptyTitle>
+                  <EmptyDescription>
+                    Sem ele, a confirmação é recusada.
+                  </EmptyDescription>
+                </Empty>
+              )}
 
-            {receipt?.storage && (
-              <div className="mt-4 grid gap-4">
-                <p className="text-sm text-muted-foreground">
-                  Enviado em {formatDate(receipt.createdAt)}.{' '}
-                  {receipt.storage.originalName}
-                </p>
+              {receipt?.storage && (
+                <div className="mt-4 grid gap-4">
+                  <p className="text-sm text-muted-foreground">
+                    Enviado em {formatDate(receipt.createdAt)}.{' '}
+                    {receipt.storage.originalName}
+                  </p>
 
-                {/*
+                  {/*
                   Imagem aparece inline; PDF vira link. É a diferença entre a
                   secretaria conferir num olhar e ter que baixar um arquivo para
                   cada matrícula da fila.
                 */}
-                {receipt.storage.mimetype.startsWith('image/') && (
-                  <img
-                    src={receipt.storage.url}
-                    alt={`Comprovante enviado por ${enrollment.studentName}`}
-                    className="max-h-[420px] w-fit rounded-md border object-contain"
-                  />
-                )}
+                  {receipt.storage.mimetype.startsWith('image/') && (
+                    <img
+                      src={receipt.storage.url}
+                      alt={`Comprovante enviado por ${enrollment.studentName}`}
+                      className="max-h-[420px] w-fit rounded-md border object-contain"
+                    />
+                  )}
 
-                <Button
-                  nativeButton={false}
-                  variant="outline"
-                  size="sm"
-                  className="w-fit"
-                  render={
-                    <a
-                      href={receipt.storage.url}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <FileArrowDown />
-                      Abrir arquivo
-                    </a>
-                  }
-                />
-              </div>
-            )}
-          </section>
+                  <Button
+                    nativeButton={false}
+                    variant="outline"
+                    size="sm"
+                    className="w-fit"
+                    render={
+                      <a
+                        href={receipt.storage.url}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <FileArrowDown />
+                        Abrir arquivo
+                      </a>
+                    }
+                  />
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         <div className="grid gap-8 self-start">
-          <section className="rounded-lg border bg-card p-6">
-            <h2 className="font-semibold">Situação</h2>
+          <Card className="[--card-spacing:--spacing(6)]">
+            <CardHeader>
+              <CardTitle render={<h2 />} className="text-base font-semibold">
+                Situação
+              </CardTitle>
+            </CardHeader>
 
-            {allowed.length === 0 && (
-              <p className="mt-3 text-sm text-muted-foreground">
-                Estado final. Não há para onde mover.
-              </p>
-            )}
+            <CardContent>
+              {allowed.length === 0 && (
+                <Empty className="border">
+                  <EmptyTitle>Estado final</EmptyTitle>
+                  <EmptyDescription>Não há para onde mover.</EmptyDescription>
+                </Empty>
+              )}
 
-            <div className="mt-4 grid gap-2">
-              {allowed.map((status) => (
-                <ConfirmDialog
-                  key={status}
-                  trigger={
-                    <Button
-                      variant={triggerVariant(status)}
-                      disabled={mutation.isPending}
-                      className="w-full justify-start"
-                    >
-                      {STATUS[status].action}
-                    </Button>
-                  }
-                  onConfirm={() => mutation.mutate({ status })}
-                  destructive={status === EnrollmentStatuses.CANCELLED}
-                >
-                  <ConfirmDialogHeader>
-                    <ConfirmDialogTitle>
-                      {STATUS[status].action}: {enrollment.studentName}?
-                    </ConfirmDialogTitle>
-                    <ConfirmDialogDescription>
-                      {status === EnrollmentStatuses.CONFIRMED &&
-                        'Confirme só depois de ver o comprovante. A vaga passa a ser dela.'}
-                      {status === EnrollmentStatuses.CANCELLED &&
-                        'A vaga volta para a turma e o candidato deixa de ocupá-la.'}
-                      {status === EnrollmentStatuses.PENDING &&
-                        'A matrícula volta a ocupar vaga e aguarda conferência.'}
-                      {status === EnrollmentStatuses.WAITLIST &&
-                        'A matrícula deixa de ocupar vaga e entra na fila.'}
-                    </ConfirmDialogDescription>
-                  </ConfirmDialogHeader>
-                  <ConfirmDialogFooter>
-                    <ConfirmDialogCancel />
-                    <ConfirmDialogConfirm>
-                      {STATUS[status].action}
-                    </ConfirmDialogConfirm>
-                  </ConfirmDialogFooter>
-                </ConfirmDialog>
-              ))}
-            </div>
-          </section>
+              <div className="mt-4 grid gap-2">
+                {allowed.map((status) => (
+                  <ConfirmDialog
+                    key={status}
+                    trigger={
+                      <Button
+                        variant={triggerVariant(status)}
+                        disabled={mutation.isPending}
+                        className="w-full justify-start"
+                      >
+                        {STATUS[status].action}
+                      </Button>
+                    }
+                    onConfirm={() => mutation.mutate({ status })}
+                    destructive={status === EnrollmentStatuses.CANCELLED}
+                  >
+                    <ConfirmDialogHeader>
+                      <ConfirmDialogTitle>
+                        {STATUS[status].action}: {enrollment.studentName}?
+                      </ConfirmDialogTitle>
+                      <ConfirmDialogDescription>
+                        {status === EnrollmentStatuses.CONFIRMED &&
+                          'Confirme só depois de ver o comprovante. A vaga passa a ser dela.'}
+                        {status === EnrollmentStatuses.CANCELLED &&
+                          'A vaga volta para a turma e o candidato deixa de ocupá-la.'}
+                        {status === EnrollmentStatuses.PENDING &&
+                          'A matrícula volta a ocupar vaga e aguarda conferência.'}
+                        {status === EnrollmentStatuses.WAITLIST &&
+                          'A matrícula deixa de ocupar vaga e entra na fila.'}
+                      </ConfirmDialogDescription>
+                    </ConfirmDialogHeader>
+                    <ConfirmDialogFooter>
+                      <ConfirmDialogCancel />
+                      <ConfirmDialogConfirm>
+                        {STATUS[status].action}
+                      </ConfirmDialogConfirm>
+                    </ConfirmDialogFooter>
+                  </ConfirmDialog>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-          <section className="rounded-lg border bg-card p-6">
-            <h2 className="font-semibold">Anotação interna</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Só a secretaria vê. Não aparece para o candidato.
-            </p>
+          <Card className="[--card-spacing:--spacing(6)]">
+            <CardHeader>
+              <CardTitle render={<h2 />} className="text-base font-semibold">
+                Anotação interna
+              </CardTitle>
+              <CardDescription className="text-sm">
+                Só a secretaria vê. Não aparece para o candidato.
+              </CardDescription>
+            </CardHeader>
 
-            <Textarea
-              value={notes}
-              onChange={(event) => setNotes(event.target.value)}
-              rows={4}
-              className="mt-4"
-              aria-label="Anotação interna"
-            />
+            <CardContent>
+              <Textarea
+                value={notes}
+                onChange={(event) => setNotes(event.target.value)}
+                rows={4}
+                aria-label="Anotação interna"
+              />
 
-            <Button
-              size="sm"
-              className="mt-3"
-              disabled={
-                mutation.isPending || notes === (enrollment.notes ?? '')
-              }
-              onClick={() => mutation.mutate({ notes: notes || null })}
-            >
-              Salvar anotação
-            </Button>
-          </section>
+              <Button
+                size="sm"
+                className="mt-3"
+                disabled={
+                  mutation.isPending || notes === (enrollment.notes ?? '')
+                }
+                onClick={() => mutation.mutate({ notes: notes || null })}
+              >
+                Salvar anotação
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

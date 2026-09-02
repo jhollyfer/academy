@@ -6,6 +6,8 @@ import { CheckCircle, Copy, Hourglass, Warning } from '@phosphor-icons/react'
 import { storefrontEnrollmentQueryOptions } from '#/integrations/tanstack-query/queries'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { Button } from '#/components/ui/button'
+import { Alert, AlertTitle } from '#/components/ui/alert'
+import { Card, CardContent } from '#/components/ui/card'
 import { formatDate, formatMoney } from '#/lib/format'
 import { EnrollmentStatuses } from '#/lib/entity'
 import { Route as ProtocolRoute } from './$protocol'
@@ -105,15 +107,17 @@ function RouteComponent(): React.JSX.Element {
           vai ditar no WhatsApp, e dígito de largura variável se lê pior em voz
           alta.
         */}
-        <div className="rounded-card mt-10 border border-border bg-card p-6">
-          <p className="text-sm text-muted-foreground">Seu protocolo</p>
-          <p className="mt-2 font-mono text-sm break-all tabular-nums">
-            {enrollment.protocol}
-          </p>
-          <p className="mt-4 text-sm text-muted-foreground">
-            Guarde este endereço. É por ele que você acompanha a matrícula.
-          </p>
-        </div>
+        <Card className="rounded-card mt-10 [--card-spacing:--spacing(6)]">
+          <CardContent>
+            <p className="text-sm text-muted-foreground">Seu protocolo</p>
+            <p className="mt-2 font-mono text-sm break-all tabular-nums">
+              {enrollment.protocol}
+            </p>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Guarde este endereço. É por ele que você acompanha a matrícula.
+            </p>
+          </CardContent>
+        </Card>
 
         {course && (
           <dl className="mt-8 grid gap-3 text-sm">
@@ -157,23 +161,27 @@ function RouteComponent(): React.JSX.Element {
                   Pague por Pix e anexe o comprovante aqui embaixo.
                 </p>
 
-                <div className="rounded-card mt-6 flex flex-wrap items-center justify-between gap-4 border border-border bg-card p-5">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Chave Pix</p>
-                    <p className="mt-1 font-mono text-sm">{PIX_KEY}</p>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={copyPix}>
-                    <Copy />
-                    Copiar
-                  </Button>
-                </div>
+                <Card className="rounded-card mt-6 [--card-spacing:--spacing(5)]">
+                  <CardContent className="flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Chave Pix</p>
+                      <p className="mt-1 font-mono text-sm">{PIX_KEY}</p>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={copyPix}>
+                      <Copy />
+                      Copiar
+                    </Button>
+                  </CardContent>
+                </Card>
 
                 <div className="mt-8">
                   {hasReceipt && (
-                    <p className="mb-4 inline-flex items-center gap-2 text-sm text-foreground">
-                      <CheckCircle weight="fill" className="size-4" />
-                      Comprovante enviado. A secretaria vai conferir.
-                    </p>
+                    <Alert className="mb-4">
+                      <CheckCircle weight="fill" />
+                      <AlertTitle>
+                        Comprovante enviado. A secretaria vai conferir.
+                      </AlertTitle>
+                    </Alert>
                   )}
 
                   <ReceiptUpload

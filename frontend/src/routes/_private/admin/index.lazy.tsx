@@ -6,6 +6,9 @@ import {
   enrollmentsListQueryOptions,
 } from '#/integrations/tanstack-query/queries'
 import { Badge } from '#/components/ui/badge'
+import { Card, CardContent } from '#/components/ui/card'
+import { Empty, EmptyDescription, EmptyTitle } from '#/components/ui/empty'
+import { Progress } from '#/components/ui/progress'
 import { formatDate } from '#/lib/format'
 import { ClassStatuses, EnrollmentStatuses } from '#/lib/entity'
 import type { EnrollmentStatus } from '#/lib/entity'
@@ -74,10 +77,12 @@ function RouteComponent(): React.JSX.Element {
         <h2 className="font-semibold">Ocupação das turmas</h2>
 
         {open.length === 0 && (
-          <p className="mt-3 text-sm text-muted-foreground">
-            Nenhuma turma aberta. Sem turma, o site não tem o que oferecer na
-            matrícula.
-          </p>
+          <Empty className="mt-3 border">
+            <EmptyTitle>Nenhuma turma aberta</EmptyTitle>
+            <EmptyDescription>
+              Sem turma, o site não tem o que oferecer na matrícula.
+            </EmptyDescription>
+          </Empty>
         )}
 
         <ul className="mt-4 grid gap-3">
@@ -86,48 +91,46 @@ function RouteComponent(): React.JSX.Element {
             const percent = Math.round((taken / entity.capacity) * 100)
 
             return (
-              <li key={entity.id} className="rounded-lg border bg-card p-5">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <Link
-                      to="/admin/turmas/$id"
-                      params={{ id: entity.id }}
-                      className="font-medium hover:underline"
-                    >
-                      {entity.name}
-                    </Link>
-                    <p className="text-sm text-muted-foreground">
-                      {entity.course?.name} · começa em{' '}
-                      {formatDate(entity.startsAt)}
-                    </p>
-                  </div>
+              <li key={entity.id}>
+                <Card>
+                  <CardContent className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <Link
+                        to="/admin/turmas/$id"
+                        params={{ id: entity.id }}
+                        className="font-medium hover:underline"
+                      >
+                        {entity.name}
+                      </Link>
+                      <p className="text-sm text-muted-foreground">
+                        {entity.course?.name} · começa em{' '}
+                        {formatDate(entity.startsAt)}
+                      </p>
+                    </div>
 
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm tabular-nums">
-                      {taken} de {entity.capacity}
-                    </span>
-                    {entity.status === ClassStatuses.FULL && (
-                      <Badge variant="secondary">Lotada</Badge>
-                    )}
-                  </div>
-                </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm tabular-nums">
+                        {taken} de {entity.capacity}
+                      </span>
+                      {entity.status === ClassStatuses.FULL && (
+                        <Badge variant="secondary">Lotada</Badge>
+                      )}
+                    </div>
+                  </CardContent>
 
-                {/*
-                  Barra sem trilho de fundo: o que interessa é quanto encheu, e
-                  um trilho cinza atrás transforma o número numa peça de painel.
-                  `role="img"` com rótulo porque a barra é a informação, e sem
-                  isso ela não existe para quem usa leitor de tela.
+                  {/*
+                  `Progress` do registry, e não a barra montada à mão que estava
+                  aqui: ela já traz o trilho, o indicador e o `aria-valuenow`
+                  que a barra manual não tinha - o rótulo `role="img"` era o
+                  remendo para isso.
                 */}
-                <div
-                  role="img"
-                  aria-label={`${percent}% das vagas ocupadas`}
-                  className="mt-4 h-1 w-full bg-border"
-                >
-                  <div
-                    className="h-full bg-primary transition-[width]"
-                    style={{ width: `${percent}%` }}
-                  />
-                </div>
+                  <CardContent>
+                    <Progress
+                      value={percent}
+                      aria-label={`${percent}% das vagas ocupadas`}
+                    />
+                  </CardContent>
+                </Card>
               </li>
             )
           })}
@@ -149,17 +152,19 @@ function Stat({
   to: { status: EnrollmentStatus }
 }): React.JSX.Element {
   return (
-    <div className="rounded-lg border bg-card p-5">
+    <Card>
       {/*
         O número é um link para a listagem já filtrada: ver "3 aguardando" e ter
         que ir até Matrículas e filtrar à mão é o atrito que faz ninguém usar o
         painel.
       */}
-      <Link to="/admin/matriculas" search={to} className="block">
-        <dt className="text-sm text-muted-foreground">{label}</dt>
-        <dd className="mt-1 text-3xl font-semibold tabular-nums">{value}</dd>
-        <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
-      </Link>
-    </div>
+      <CardContent>
+        <Link to="/admin/matriculas" search={to} className="block">
+          <dt className="text-sm text-muted-foreground">{label}</dt>
+          <dd className="mt-1 text-3xl font-semibold tabular-nums">{value}</dd>
+          <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
+        </Link>
+      </CardContent>
+    </Card>
   )
 }
