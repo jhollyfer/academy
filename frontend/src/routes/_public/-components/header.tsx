@@ -16,6 +16,7 @@ import {
   SheetTrigger,
 } from '#/components/ui/sheet'
 import { EnrollmentCta } from '#/components/common/enrollment-cta'
+import { navLinkVariants } from './nav-link'
 import { whatsappUrl } from '#/lib/site'
 
 /**
@@ -147,7 +148,7 @@ export function Header(): React.JSX.Element {
                       <Link
                         to={link.to}
                         params={link.params}
-                        className="rounded-md px-3 py-2.5 text-base text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
+                        className={navLinkVariants({ tone: 'sheet' })}
                       >
                         {link.label}
                       </Link>
@@ -161,7 +162,7 @@ export function Header(): React.JSX.Element {
                       href={whatsappUrl(HEADER_MESSAGE)}
                       target="_blank"
                       rel="noreferrer"
-                      className="rounded-md px-3 py-2.5 text-base text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
+                      className={navLinkVariants({ tone: 'sheet' })}
                     >
                       WhatsApp
                     </a>
@@ -175,7 +176,14 @@ export function Header(): React.JSX.Element {
                 Sheet aberto, com o scroll da página preso.
               */}
               <SheetFooter>
-                <SheetClose render={<EnrollmentCta className="w-full" />} />
+                {/*
+                  `scale="lg"` e não o `md` padrão: o `md` tem 40px de altura,
+                  e este é um botão de dedo no rodapé de um painel de celular -
+                  os 48px do `lg` passam com folga dos 44px da WCAG 2.5.5.
+                */}
+                <SheetClose
+                  render={<EnrollmentCta scale="lg" className="w-full" />}
+                />
               </SheetFooter>
             </SheetContent>
           </Sheet>

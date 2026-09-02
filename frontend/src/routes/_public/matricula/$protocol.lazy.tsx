@@ -2,7 +2,13 @@ import * as React from 'react'
 import { Link, createLazyFileRoute } from '@tanstack/react-router'
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { CheckCircle, Copy, Hourglass, Warning } from '@phosphor-icons/react'
+import {
+  Check,
+  CheckCircle,
+  Copy,
+  Hourglass,
+  Warning,
+} from '@phosphor-icons/react'
 import { storefrontEnrollmentQueryOptions } from '#/integrations/tanstack-query/queries'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { Button } from '#/components/ui/button'
@@ -136,6 +142,14 @@ const STATUS_VIEW: Record<
  */
 const PIX_KEY = '00.000.000/0001-00'
 
+/**
+ * Quanto tempo o botão fica em "Copiado!" antes de voltar a "Copiar".
+ *
+ * Dois segundos: tempo de a confirmação ser lida sem que o botão fique
+ * mentindo depois, quando a área de transferência já pode ter outro conteúdo.
+ */
+const COPIED_RESET_MS = 2_000
+
 function RouteComponent(): React.JSX.Element {
   const { protocol } = ProtocolRoute.useParams()
   const { data: enrollment } = useSuspenseQuery(
@@ -150,10 +164,30 @@ function RouteComponent(): React.JSX.Element {
   // resposta do painel e não esta.
   const hasReceipt = enrollment.files.length > 0
 
+  const [copied, setCopied] = React.useState(false)
+
+  /**
+   * O timer do "Copiado!" vive num `ref` para poder ser cancelado: sem isso,
+   * sair da tela dentro dos dois segundos deixa um `setState` mirando um
+   * componente que não existe mais, e clicar duas vezes seguidas encurta a
+   * segunda confirmação para o que sobrou da primeira.
+   */
+  const copiedTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  React.useEffect(() => {
+    return () => {
+      if (copiedTimer.current) clearTimeout(copiedTimer.current)
+    }
+  }, [])
+
   async function copyPix() {
     try {
       await navigator.clipboard.writeText(PIX_KEY)
       toast.success('Chave Pix copiada')
+
+      setCopied(true)
+      if (copiedTimer.current) clearTimeout(copiedTimer.current)
+      copiedTimer.current = setTimeout(() => setCopied(false), COPIED_RESET_MS)
     } catch {
       // `clipboard` falha sem HTTPS e em alguns navegadores embutidos. A chave
       // está visível na tela de qualquer forma, então o aviso diz o que fazer em
@@ -163,6 +197,9 @@ function RouteComponent(): React.JSX.Element {
       )
     }
   }
+
+  let copyLabel = 'Copiar'
+  if (copied) copyLabel = 'Copiado!'
 
   return (
     <div className="relative">
@@ -242,8 +279,15 @@ function RouteComponent(): React.JSX.Element {
                       <p className="mt-1 font-mono text-sm">{PIX_KEY}</p>
                     </div>
                     <Button variant="outline" size="sm" onClick={copyPix}>
-                      <Copy />
-                      Copiar
+                      {copied && <Check />}
+                      {!copied && <Copy />}
+                      {/*
+                        O rótulo é a região viva, e não o botão inteiro: o
+                        leitor de tela anuncia a troca do texto sem reler o
+                        ícone a cada render. O toast do sonner sozinho não
+                        cobre isso em todo navegador.
+                      */}
+                      <span aria-live="polite">{copyLabel}</span>
                     </Button>
                   </CardContent>
                 </Card>

@@ -5,6 +5,7 @@ import { InstagramLogo, WhatsappLogo } from '@phosphor-icons/react'
 import { Separator } from '#/components/ui/separator'
 import { ADDRESS, WHATSAPP_NUMBER, whatsappUrl } from '#/lib/site'
 import { formatPhone } from '#/lib/format'
+import { navLinkVariants } from './nav-link'
 
 const FOOTER_MESSAGE = 'Olá! Quero saber mais sobre os cursos da Maiyu Academy.'
 
@@ -37,36 +38,30 @@ export function Footer(): React.JSX.Element {
             </p>
           </div>
 
-          <nav
-            aria-label="Cursos"
-            className="grid content-start gap-2.5 text-sm"
-          >
+          <nav aria-label="Cursos" className="grid content-start gap-1 text-sm">
             <p className="font-medium text-background dark:text-card-foreground">
               Cursos
             </p>
             <Link
               to="/cursos/$slug"
               params={{ slug: 'robotica' }}
-              className="text-background/70 dark:text-muted-foreground transition-colors hover:text-background dark:hover:text-card-foreground"
+              className={navLinkVariants()}
             >
               Robótica
             </Link>
             <Link
               to="/cursos/$slug"
               params={{ slug: 'web-development' }}
-              className="text-background/70 dark:text-muted-foreground transition-colors hover:text-background dark:hover:text-card-foreground"
+              className={navLinkVariants()}
             >
               Desenvolvimento web
             </Link>
-            <Link
-              to="/sobre"
-              className="text-background/70 dark:text-muted-foreground transition-colors hover:text-background dark:hover:text-card-foreground"
-            >
+            <Link to="/sobre" className={navLinkVariants()}>
               A escola
             </Link>
           </nav>
 
-          <div className="grid content-start gap-2.5 text-sm">
+          <div className="grid content-start gap-1 text-sm">
             <p className="font-medium text-background dark:text-card-foreground">
               Contato
             </p>
@@ -74,7 +69,7 @@ export function Footer(): React.JSX.Element {
               href={whatsappUrl(FOOTER_MESSAGE)}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 text-background/70 dark:text-muted-foreground transition-colors hover:text-background dark:hover:text-card-foreground"
+              className={navLinkVariants()}
             >
               <WhatsappLogo className="size-4" />
               {formatPhone(WHATSAPP_NUMBER.slice(2))}
@@ -83,30 +78,21 @@ export function Footer(): React.JSX.Element {
               href="https://instagram.com/maiyu.academy"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 text-background/70 dark:text-muted-foreground transition-colors hover:text-background dark:hover:text-card-foreground"
+              className={navLinkVariants()}
             >
               <InstagramLogo className="size-4" />
               maiyu.academy
             </a>
           </div>
 
-          <nav
-            aria-label="Legal"
-            className="grid content-start gap-2.5 text-sm"
-          >
+          <nav aria-label="Legal" className="grid content-start gap-1 text-sm">
             <p className="font-medium text-background dark:text-card-foreground">
               Legal
             </p>
-            <Link
-              to="/privacidade"
-              className="text-background/70 dark:text-muted-foreground transition-colors hover:text-background dark:hover:text-card-foreground"
-            >
+            <Link to="/privacidade" className={navLinkVariants()}>
               Privacidade
             </Link>
-            <Link
-              to="/termos"
-              className="text-background/70 dark:text-muted-foreground transition-colors hover:text-background dark:hover:text-card-foreground"
-            >
+            <Link to="/termos" className={navLinkVariants()}>
               Termos de uso
             </Link>
           </nav>

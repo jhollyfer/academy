@@ -61,10 +61,14 @@ function SheetContent({
           <SheetPrimitive.Close
             data-slot="sheet-close"
             render={
+              // `size-11` sobre o `icon-lg`, no mesmo espírito do gatilho que
+              // abre o painel: fechar é a única saída por toque, e os 28px do
+              // `icon-sm` erram debaixo do polegar. 44px é o mínimo da WCAG
+              // 2.5.5.
               <Button
                 variant="ghost"
-                className="absolute top-4 right-4"
-                size="icon-sm"
+                className="absolute top-4 right-4 size-11"
+                size="icon-lg"
               />
             }
           >
