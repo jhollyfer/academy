@@ -123,6 +123,41 @@ function errorDescribedBy(
   return errorId(name)
 }
 
+/**
+ * O par de atributos que descreve um campo inválido, escrito uma vez só.
+ *
+ * Antes cada campo repetia `aria-invalid` e `aria-describedby` à mão, e as duas
+ * escritas que conviviam (`fieldState.invalid` nos controlados,
+ * `Boolean(errors.x)` nos mascarados) deixavam controle sem atributo nenhum
+ * quando alguém esquecia um dos dois. Um objeto espalhado no JSX torna
+ * impossível ligar o estado inválido sem ligar junto a mensagem que o explica.
+ */
+function invalidProps(
+  invalid: boolean,
+  name: keyof FormValues,
+): {
+  'aria-invalid': boolean
+  'aria-describedby': string | undefined
+} {
+  return {
+    'aria-invalid': invalid,
+    'aria-describedby': errorDescribedBy(invalid, name),
+  }
+}
+
+/*
+ * O formato que os campos mascarados aceitam, para o navegador conhecer a
+ * regra além do JavaScript.
+ *
+ * Tolerantes à pontuação porque a máscara é do `use-mask-input` e o valor que
+ * o React Hook Form guarda vem sem ela (`autoUnmask`): o mesmo campo pode ser
+ * lido nas duas formas, e um `pattern` que só entendesse uma delas seria uma
+ * regra falsa. Quem valida de verdade continua sendo o VineJS - inclusive os
+ * dígitos verificadores do CPF, que nenhum `pattern` alcança.
+ */
+const CPF_PATTERN = '\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}'
+const PHONE_PATTERN = '\\(?\\d{2}\\)? ?\\d{4,5}-?\\d{4}'
+
 /** Os campos que cada passo valida antes de deixar avançar. */
 const STEP_FIELDS = {
   curso: ['classId'],
@@ -257,6 +292,49 @@ function RouteComponent(): React.JSX.Element {
   const { errors } = form.formState
   const [step, setStep] = React.useState<Step>('curso')
 
+  /*
+   * O título do passo, focado a cada troca.
+   *
+   * Trocar de passo repinta a tela inteira sem mexer no foco: quem navega por
+   * teclado continua no botão "Continuar" que acabou de sumir, e o leitor de
+   * tela só ouve o "Passo 2 de 4" do `aria-live` - o número, nunca o que
+   * apareceu. Focar o `legend` faz o passo se apresentar.
+   */
+  const headingRef = React.useRef<HTMLLegendElement>(null)
+
+  /*
+   * O campo que o servidor marcou e que só existe depois de o passo alvo
+   * montar. `null` quando não há nada pendente.
+   *
+   * Um `ref` e não estado: limpá-lo não pode disparar uma segunda passagem do
+   * efeito abaixo, que encontraria o campo já consumido e mandaria o foco de
+   * volta para o título - tirando-o justamente do campo que o servidor pediu
+   * para corrigir.
+   */
+  const pendingFocus = React.useRef<keyof FormValues | null>(null)
+
+  // A primeira renderização não conta: mover o foco na abertura da página
+  // rouba o começo do documento de quem usa leitor de tela e pula o link de
+  // "pular para o conteúdo".
+  const mounted = React.useRef(false)
+
+  React.useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true
+      return
+    }
+
+    const field = pendingFocus.current
+
+    if (field) {
+      pendingFocus.current = null
+      form.setFocus(field)
+      return
+    }
+
+    headingRef.current?.focus()
+  }, [step, form])
+
   const birthDate = form.watch('studentBirthDate')
   const classId = form.watch('classId')
 
@@ -309,12 +387,26 @@ function RouteComponent(): React.JSX.Element {
         STEP_FIELDS[name].some((field) => marked.includes(field)),
       )
 
-      if (target) setStep(target)
+      // O passo que já está na tela não precisa de nada disto: os campos dele
+      // estavam montados no envio, e o `shouldFocusError` do `handleSubmit` já
+      // levou o foco ao primeiro marcado.
+      if (!target || target === step) return
+
+      // O foco não pode ir daqui: o campo marcado estava desmontado no momento
+      // do envio, e é isso que faz o `shouldFocusError` não alcançá-lo.
+      // Guardamos o alvo e cobramos quando o passo montar.
+      const field = STEP_FIELDS[target].find((name) => marked.includes(name))
+      if (field) pendingFocus.current = field
+
+      setStep(target)
     },
   })
 
   async function next() {
-    const valid = await form.trigger(STEP_FIELDS[step])
+    // `shouldFocus` porque reprovar sem mover o foco deixa a pessoa parada no
+    // botão "Continuar", com a mensagem de erro numa parte da tela que ela não
+    // está lendo - e, no leitor de tela, sem anúncio nenhum de que algo mudou.
+    const valid = await form.trigger(STEP_FIELDS[step], { shouldFocus: true })
 
     if (!valid) return
 
@@ -387,7 +479,11 @@ function RouteComponent(): React.JSX.Element {
           {step === 'curso' && (
             <FieldGroup>
               <fieldset>
-                <legend className="text-heading-md font-bold">
+                <legend
+                  ref={headingRef}
+                  tabIndex={-1}
+                  className="text-heading-md font-bold outline-none"
+                >
                   Qual turma você quer?
                 </legend>
 
@@ -400,6 +496,7 @@ function RouteComponent(): React.JSX.Element {
                       name={field.name}
                       value={field.value}
                       onValueChange={(value) => field.onChange(value)}
+                      aria-invalid={fieldState.invalid}
                       className="mt-5 grid gap-3"
                     >
                       {options.map(({ course, entity }) => (
@@ -414,20 +511,20 @@ function RouteComponent(): React.JSX.Element {
                             sozinho e não olha para o tema - o marcador ficava
                             fora da paleta no escuro.
 
-                            O estado inválido vai em cada rádio, e não no
-                            `RadioGroup` que os embrulha, porque é o item que
-                            traz as variantes `aria-invalid:` na classe do
-                            registry - anunciado no `div` de fora, o erro seria
-                            lido mas não pintado.
+                            O estado inválido vai nos dois lugares, e por
+                            motivos diferentes: no item porque é ele que traz
+                            as variantes `aria-invalid:` na classe do registry,
+                            e sem ele o erro seria lido mas não pintado; no
+                            `RadioGroup` que os embrulha porque é ele que tem
+                            `role="radiogroup"`, e é o grupo - não o rádio
+                            solto - que o leitor de tela anuncia ao entrar.
+                            A descrição do erro fica só no item, para a
+                            mensagem não ser lida duas vezes.
                           */}
                           <RadioGroupItem
                             value={entity.id}
                             onBlur={field.onBlur}
-                            aria-invalid={fieldState.invalid}
-                            aria-describedby={errorDescribedBy(
-                              fieldState.invalid,
-                              'classId',
-                            )}
+                            {...invalidProps(fieldState.invalid, 'classId')}
                             className="mt-1"
                           />
                           <span className="grid gap-1">
@@ -462,7 +559,11 @@ function RouteComponent(): React.JSX.Element {
           {step === 'aluno' && (
             <FieldGroup>
               <fieldset className="grid gap-6">
-                <legend className="text-heading-md font-bold">
+                <legend
+                  ref={headingRef}
+                  tabIndex={-1}
+                  className="text-heading-md font-bold outline-none"
+                >
                   Dados de quem vai estudar
                 </legend>
 
@@ -480,11 +581,7 @@ function RouteComponent(): React.JSX.Element {
                         required
                         maxLength={160}
                         autoComplete="name"
-                        aria-invalid={fieldState.invalid}
-                        aria-describedby={errorDescribedBy(
-                          fieldState.invalid,
-                          'studentName',
-                        )}
+                        {...invalidProps(fieldState.invalid, 'studentName')}
                       />
                       {fieldState.error && (
                         <FieldError id={errorId('studentName')}>
@@ -515,8 +612,7 @@ function RouteComponent(): React.JSX.Element {
                         type="date"
                         required
                         autoComplete="bday"
-                        aria-invalid={fieldState.invalid}
-                        aria-describedby={errorDescribedBy(
+                        {...invalidProps(
                           fieldState.invalid,
                           'studentBirthDate',
                         )}
@@ -540,14 +636,14 @@ function RouteComponent(): React.JSX.Element {
                     })}
                     id="studentDocument"
                     inputMode="numeric"
+                    pattern={CPF_PATTERN}
                     // Sem token de preenchimento automático: não existe um para
                     // CPF, e `off` impede o navegador de oferecer o campo
                     // errado - foi o que ele fez com "documento" e o número do
                     // cartão salvo.
                     autoComplete="off"
                     placeholder="000.000.000-00"
-                    aria-invalid={Boolean(errors.studentDocument)}
-                    aria-describedby={errorDescribedBy(
+                    {...invalidProps(
                       Boolean(errors.studentDocument),
                       'studentDocument',
                     )}
@@ -571,11 +667,7 @@ function RouteComponent(): React.JSX.Element {
                         type="email"
                         required
                         autoComplete="email"
-                        aria-invalid={fieldState.invalid}
-                        aria-describedby={errorDescribedBy(
-                          fieldState.invalid,
-                          'email',
-                        )}
+                        {...invalidProps(fieldState.invalid, 'email')}
                       />
                       {fieldState.error && (
                         <FieldError id={errorId('email')}>
@@ -598,14 +690,11 @@ function RouteComponent(): React.JSX.Element {
                     )}
                     id="phone"
                     inputMode="tel"
+                    pattern={PHONE_PATTERN}
                     required
                     autoComplete="tel"
                     placeholder="(97) 98460-0872"
-                    aria-invalid={Boolean(errors.phone)}
-                    aria-describedby={errorDescribedBy(
-                      Boolean(errors.phone),
-                      'phone',
-                    )}
+                    {...invalidProps(Boolean(errors.phone), 'phone')}
                   />
                   {errors.phone && (
                     <FieldError id={errorId('phone')}>
@@ -620,7 +709,11 @@ function RouteComponent(): React.JSX.Element {
           {step === 'responsavel' && (
             <FieldGroup>
               <fieldset className="grid gap-6">
-                <legend className="text-heading-md font-bold">
+                <legend
+                  ref={headingRef}
+                  tabIndex={-1}
+                  className="text-heading-md font-bold outline-none"
+                >
                   Dados do responsável legal
                 </legend>
                 <p className="text-sm text-muted-foreground">
@@ -651,11 +744,7 @@ function RouteComponent(): React.JSX.Element {
                           pessoas diferentes.
                         */
                         autoComplete="section-responsavel name"
-                        aria-invalid={fieldState.invalid}
-                        aria-describedby={errorDescribedBy(
-                          fieldState.invalid,
-                          'guardianName',
-                        )}
+                        {...invalidProps(fieldState.invalid, 'guardianName')}
                       />
                       {fieldState.error && (
                         <FieldError id={errorId('guardianName')}>
@@ -674,11 +763,11 @@ function RouteComponent(): React.JSX.Element {
                     })}
                     id="guardianDocument"
                     inputMode="numeric"
+                    pattern={CPF_PATTERN}
                     required
                     autoComplete="off"
                     placeholder="000.000.000-00"
-                    aria-invalid={Boolean(errors.guardianDocument)}
-                    aria-describedby={errorDescribedBy(
+                    {...invalidProps(
                       Boolean(errors.guardianDocument),
                       'guardianDocument',
                     )}
@@ -704,11 +793,11 @@ function RouteComponent(): React.JSX.Element {
                     )}
                     id="guardianPhone"
                     inputMode="tel"
+                    pattern={PHONE_PATTERN}
                     required
                     autoComplete="section-responsavel tel"
                     placeholder="(97) 98460-0872"
-                    aria-invalid={Boolean(errors.guardianPhone)}
-                    aria-describedby={errorDescribedBy(
+                    {...invalidProps(
                       Boolean(errors.guardianPhone),
                       'guardianPhone',
                     )}
@@ -726,7 +815,11 @@ function RouteComponent(): React.JSX.Element {
           {step === 'revisao' && (
             <FieldGroup>
               <fieldset className="grid gap-6">
-                <legend className="text-heading-md font-bold">
+                <legend
+                  ref={headingRef}
+                  tabIndex={-1}
+                  className="text-heading-md font-bold outline-none"
+                >
                   Confira e envie
                 </legend>
 
@@ -756,15 +849,12 @@ function RouteComponent(): React.JSX.Element {
                     <Field data-invalid={fieldState.invalid}>
                       <label className="flex items-start gap-3 text-sm">
                         <Checkbox
+                          required
                           checked={field.value === true}
                           onCheckedChange={(checked) =>
                             field.onChange(checked === true)
                           }
-                          aria-invalid={fieldState.invalid}
-                          aria-describedby={errorDescribedBy(
-                            fieldState.invalid,
-                            'termsAccepted',
-                          )}
+                          {...invalidProps(fieldState.invalid, 'termsAccepted')}
                         />
                         <span className="text-muted-foreground">
                           Li e aceito os{' '}
@@ -794,15 +884,12 @@ function RouteComponent(): React.JSX.Element {
                     <Field data-invalid={fieldState.invalid}>
                       <label className="flex items-start gap-3 text-sm">
                         <Checkbox
+                          required
                           checked={field.value === true}
                           onCheckedChange={(checked) =>
                             field.onChange(checked === true)
                           }
-                          aria-invalid={fieldState.invalid}
-                          aria-describedby={errorDescribedBy(
-                            fieldState.invalid,
-                            'lgpdConsent',
-                          )}
+                          {...invalidProps(fieldState.invalid, 'lgpdConsent')}
                         />
                         <span className="text-muted-foreground">
                           Autorizo o uso dos meus dados para processar esta

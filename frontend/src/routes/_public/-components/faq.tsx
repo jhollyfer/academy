@@ -21,6 +21,17 @@ import type { CourseFaqResponse } from '#/integrations/response'
  *
  * Sem pergunta a seção some inteira, em vez de deixar um título sobre um vazio.
  */
+/**
+ * O `id` do painel de uma pergunta, escrito nos dois lados da relação: no
+ * `id` do próprio painel e no `aria-controls` do botão que o abre.
+ *
+ * Prefixado porque `faq.id` é um uuid do banco, e um `id` de HTML que começa
+ * com dígito é válido mas trava seletor de CSS.
+ */
+function panelId(faqId: string): string {
+  return `faq-resposta-${faqId}`
+}
+
 export function Faq({
   faqs,
   title = 'Perguntas',
@@ -45,7 +56,16 @@ export function Faq({
             {title} <Highlight variant="outline">{highlight}</Highlight>
           </h2>
 
+          {/*
+            `keepMounted` porque o `aria-controls` abaixo é escrito à mão. Por
+            padrão o Base UI mantém o painel fora do DOM enquanto fechado, e
+            justamente por isso o trigger dele só emite `aria-controls` quando
+            aberto - apontar para um `id` inexistente seria pior que a
+            ausência. Com o painel persistido (e `hidden` enquanto fechado), a
+            referência vale nos dois estados.
+          */}
           <Accordion
+            keepMounted
             className={cn(
               REVEAL,
               'delay-100 rounded-card border-border bg-card',
@@ -53,10 +73,16 @@ export function Faq({
           >
             {faqs.map((faq) => (
               <AccordionItem key={faq.id} value={faq.id} className="px-2">
-                <AccordionTrigger className="py-5 text-left text-base font-medium text-foreground">
+                <AccordionTrigger
+                  aria-controls={panelId(faq.id)}
+                  className="py-5 text-left text-base font-medium text-foreground"
+                >
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="pb-5 text-body-md text-muted-foreground">
+                <AccordionContent
+                  id={panelId(faq.id)}
+                  className="pb-5 text-body-md text-muted-foreground"
+                >
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
