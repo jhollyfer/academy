@@ -82,6 +82,15 @@ type FormValues = Merge<
  */
 const STEPS = ['curso', 'aluno', 'responsavel', 'revisao'] as const
 
+/**
+ * O id da linha que diz por que o botão de enviar não responde.
+ *
+ * Constante e não literal repetido: ela aparece no `id` do parágrafo e no
+ * `aria-describedby` do botão, e os dois errarem juntos é o único jeito de o
+ * vínculo continuar valendo.
+ */
+const CONSENT_HINT_ID = 'consentimento-pendente'
+
 type Step = (typeof STEPS)[number]
 
 /** Os campos que cada passo valida antes de deixar avançar. */
@@ -193,11 +202,20 @@ function RouteComponent(): React.JSX.Element {
       guardianName: null,
       guardianDocument: null,
       guardianPhone: null,
-      // Marcados por padrão: são obrigatórios, a tela os explica, e começar
-      // desmarcado só acrescenta dois cliques ao caminho de quem já decidiu. O
-      // texto ao lado da caixa continua sendo o consentimento informado.
-      termsAccepted: true,
-      lgpdConsent: true,
+      /*
+       * Desmarcados, e isto não é preferência de UX.
+       *
+       * Vinham marcados, com o argumento de que poupavam dois cliques a quem já
+       * tinha decidido. Só que consentimento pré-marcado não é consentimento: o
+       * art. 8º da LGPD pede manifestação **livre e inequívoca** do titular, e
+       * uma caixa que o formulário marcou sozinho não manifesta nada - ela
+       * registra a vontade de quem escreveu o formulário. O que ficaria gravado
+       * em `lgpdConsentAt` seria a hora em que a página carregou.
+       *
+       * Os dois cliques economizados eram o consentimento inteiro.
+       */
+      termsAccepted: false,
+      lgpdConsent: false,
     },
   })
 
@@ -217,6 +235,26 @@ function RouteComponent(): React.JSX.Element {
   const index = steps.indexOf(step)
 
   const selected = options.find((option) => option.entity.id === classId)
+
+  /*
+   * Os dois aceites, observados: o botão de enviar depende deles.
+   *
+   * `watch` e não `getValues`: `getValues` lê sem inscrever, e marcar a caixa
+   * não re-renderizaria - o botão continuaria desabilitado com os dois aceites
+   * dados, que é o defeito oposto e pior.
+   */
+  const [termsAccepted, lgpdConsent] = form.watch([
+    'termsAccepted',
+    'lgpdConsent',
+  ])
+
+  const consented = termsAccepted === true && lgpdConsent === true
+
+  // O botão só aponta para o motivo enquanto o motivo existe: um
+  // `aria-describedby` para um `id` que saiu do DOM é uma referência morta, e o
+  // leitor de tela anuncia o botão sem descrição nenhuma.
+  let consentHintId: string | undefined
+  if (!consented) consentHintId = CONSENT_HINT_ID
 
   const mutation = useEnrollmentCreate({
     onSuccess: async function (enrollment) {
@@ -648,6 +686,24 @@ function RouteComponent(): React.JSX.Element {
                     </Field>
                   )}
                 />
+
+                {/*
+                  O que falta, dito onde a pessoa está olhando.
+
+                  `aria-live="polite"` porque o texto **some** quando a segunda
+                  caixa é marcada: sem isto, quem usa leitor de tela marcaria as
+                  duas e não teria como saber que o botão destravou, já que nada
+                  move o foco.
+                */}
+                {!consented && (
+                  <p
+                    id={CONSENT_HINT_ID}
+                    aria-live="polite"
+                    className="text-sm text-muted-foreground"
+                  >
+                    Marque os dois aceites acima para enviar a matrícula.
+                  </p>
+                )}
               </fieldset>
             </FieldGroup>
           )}
@@ -677,7 +733,25 @@ function RouteComponent(): React.JSX.Element {
             )}
 
             {index === steps.length - 1 && (
-              <Button type="submit" disabled={mutation.isPending}>
+              /*
+               * Desabilitado enquanto faltar um aceite.
+               *
+               * Com as caixas desmarcadas por padrão, um botão vivo mandaria o
+               * formulário para o 422 do `literal(true)` e a pessoa levaria um
+               * erro de servidor no lugar de uma instrução. O botão morto é a
+               * mesma regra dita antes, e não depois.
+               *
+               * `aria-describedby` e não só o `disabled`: botão desabilitado é
+               * mudo - não recebe foco e não explica por que não responde -, e
+               * quem navega por teclado ou leitor de tela ficaria sem saber o
+               * que falta. A linha abaixo é o motivo, e ela existe no DOM antes
+               * de alguém tentar clicar.
+               */
+              <Button
+                type="submit"
+                disabled={mutation.isPending || !consented}
+                aria-describedby={consentHintId}
+              >
                 {mutation.isPending && 'Enviando...'}
                 {!mutation.isPending && 'Enviar matrícula'}
                 <CheckCircle />
