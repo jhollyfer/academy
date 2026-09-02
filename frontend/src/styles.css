@@ -1,6 +1,22 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+
+/*
+ * As duas famílias, servidas do próprio bundle.
+ *
+ * `archivo/wdth.css` e não `archivo/index.css`: é o único arquivo do pacote que
+ * declara `font-stretch: 62% 125%`, e a largura condensada é justamente a
+ * identidade que os títulos pedem. Custa 90 kB de latin contra 35 kB da versão
+ * só-peso, e o custo é consciente - o display é uma linha por seção, não o
+ * corpo da página.
+ *
+ * Antes daqui `--font-display` pedia `Archivo Narrow` sem carregar arquivo
+ * nenhum: quem não tivesse a fonte instalada - ou seja, praticamente todo mundo
+ * - lia os títulos em Outfit. O condensado do projeto nunca existiu de fato.
+ * Agora existe.
+ */
+@import '@fontsource-variable/archivo/wdth.css';
 @import '@fontsource-variable/outfit';
 /*
  * Só o itálico da serifa.
@@ -26,28 +42,35 @@
 
 /*
  * ============================================================================
- * PALETA MAIYU
+ * PALETA MAIYU - DUAS CAMADAS
  * ============================================================================
  *
- * Nenhum token de marca. A página inteira - vitrine e painel - pinta com os
- * nomes que o shadcn já define, e a paleta oficial entra como **valor** deles.
- * Um `--cream` que era `background`, um `--ink` que era `foreground`, um
- * `--line` que era `border` e um `--green` que era `primary` moravam aqui e
- * eram apelido: morreram, e a vitrine passou a ler os nomes semânticos como o
- * painel sempre leu.
+ * CAMADA 1, primitivas. A paleta da marca em escala: uma rampa neutra de 50 a
+ * 950 e quatro famílias de acento em 100/300/500/700/900. Nome de cor, não nome
+ * de papel. Nenhum componente lê daqui.
  *
- * O verde da marca é `--primary`, e ele troca de valor com o tema: #178528 no
- * claro, #88FF9A no escuro, matiz 129° nos dois. É o mesmo desenho do
- * simple-hub, e a razão é a mesma - o verde puro dá **1,20:1** sobre o #FAFAFA
- * e reprova até como elemento gráfico, que pede 3:1. Um botão pintado com ele
- * no claro não teria contorno, e o painel inteiro é botão cheio.
+ * CAMADA 2, semânticas. Os nomes que o shadcn define - `--primary`, `--card`,
+ * `--border` -, cada um apontando para uma primitiva. É o que a página inteira
+ * lê, vitrine e painel, e é o que troca de valor entre claro e escuro.
  *
- * O preço aparece no bloco do hero, que é `bg-primary`: ele é verde-escuro no
- * tema claro e verde-vivo no escuro. `--primary-foreground` acompanha - branco
- * no claro, #272221 no escuro - e o par dá 4,75:1 e 12,58:1.
+ * Por que voltou a existir uma camada de cor com nome de cor, se `--cream`,
+ * `--ink`, `--line` e `--green` foram apagados daqui: aqueles eram apelido, um
+ * nome novo para um valor só, e um apelido é um degrau a mais para descobrir a
+ * cor de qualquer coisa. Estes são **escala** - 11 degraus de neutro e 20 de
+ * acento, gerados por interpolação em OKLCH. A escala se paga: dá para pedir o
+ * roxo um passo mais escuro sem chutar um hex, e é o que permite montar um
+ * gráfico ou um estado de destaque sem inventar cor no componente.
  *
- * `--ring`, `--accent-foreground` e `--chart-1` seguem os mesmos dois valores:
- * são os papéis em que o verde é traço, e traço é onde o puro reprova.
+ * A regra que sobrou intacta: **nenhum hex fora deste bloco**. Componente
+ * consome utilitário do Tailwind, que lê a camada 2, que lê a camada 1.
+ *
+ * A rampa neutra não é cinza. Ela é derivada do #272221 da marca e mantém o
+ * matiz quente (H≈33 em OKLCH) do 50 ao 950 - um cinza puro ao lado do preto da
+ * marca fica azulado por contraste simultâneo.
+ *
+ * Contraste: todo par foreground/background aqui foi calculado e passa o AA -
+ * 4,5:1 para texto, 3:1 para componente de interface (WCAG 1.4.11). Os números
+ * de cada par estão no comentário do token correspondente.
  * ============================================================================
  */
 
@@ -55,7 +78,95 @@
   color-scheme: light;
 
   /* --------------------------------------------------------------------
+   * CAMADA 1 - primitivas
+   *
+   * Estas não trocam com o tema. São a paleta; quem troca é a camada 2.
+   * -------------------------------------------------------------------- */
+
+  /*
+   * A rampa neutra.
+   *
+   * Âncoras do guia de estilo: 950 é o `black` #272221, 900 é o `dark` #403937 e
+   * 50 é o `background` #FAFAFA. Os degraus entre eles saíram de interpolação em
+   * OKLCH com o matiz preso em ~33° e a croma subindo até o meio da rampa - é o
+   * que segura o tom quente no cinza médio, onde ele mais tende a fugir.
+   */
+  --neutral-0: #ffffff;
+  --neutral-50: #fafafa; /* oklch(0.9851 0      33) - guia: background */
+  --neutral-100: #f6f2f2; /* oklch(0.9650 0.0040 33) */
+  --neutral-200: #e9e3e1; /* oklch(0.9200 0.0070 33) */
+  --neutral-300: #d7cfcd; /* oklch(0.8600 0.0095 33) */
+  --neutral-400: #bfb5b3; /* oklch(0.7800 0.0115 33) */
+  --neutral-500: #a39996; /* oklch(0.6900 0.0130 33) */
+  --neutral-600: #877c7a; /* oklch(0.5950 0.0135 33) */
+  --neutral-700: #6a615e; /* oklch(0.5000 0.0130 33) */
+  --neutral-800: #534b49; /* oklch(0.4200 0.0118 34) */
+  --neutral-900: #403937; /* oklch(0.3511 0.0105 36.5) - guia: dark */
+  --neutral-950: #272221; /* oklch(0.2572 0.0079 31.1) - guia: black */
+
+  /*
+   * O verde. Primary, sucesso, estado "aberto/disponível".
+   *
+   * O 500 é o #88FF9A do guia. Os outros quatro saíram dele em OKLCH, matiz
+   * 147,3° preso, mexendo em L e croma.
+   *
+   * O 900 é o que substitui o #178528 que morava em `--primary` no claro. O
+   * antigo passava (4,55:1 sobre o #FAFAFA, 4,75:1 de branco por dentro), mas
+   * estava em outro matiz - 144,8° contra os 147,3° do verde puro -, então claro
+   * e escuro pintavam dois verdes diferentes. Este dá 4,94:1 e 5,16:1, no matiz
+   * da família. E é o que faz o par `--accent-foreground` sobre `--accent`
+   * passar: com o #178528 sobre o cinza antigo o par dava 4,13:1 e reprovava.
+   */
+  --brand-green-100: #daffdd; /* oklch(0.9650 0.0590 147.3) */
+  --brand-green-300: #b5ffbd; /* oklch(0.9350 0.1150 147.3) */
+  --brand-green-500: #88ff9a; /* oklch(0.9061 0.1747 147.3) - guia: green */
+  --brand-green-700: #3abf58; /* oklch(0.7100 0.1834 147.3) */
+  --brand-green-900: #007f2d; /* oklch(0.5200 0.1600 147.3) */
+
+  /* O roxo. Categoria e trilha secundária. Cor de classificação, nunca de ação. */
+  --brand-purple-100: #f0ebff; /* oklch(0.9500 0.0268 295.8) */
+  --brand-purple-300: #ccbbff; /* oklch(0.8300 0.0956 295.8) */
+  --brand-purple-500: #a480f5; /* oklch(0.6846 0.1690 295.8) - guia: purple */
+  --brand-purple-700: #7d54cb; /* oklch(0.5500 0.1775 295.8) */
+  --brand-purple-900: #543092; /* oklch(0.4100 0.1521 295.8) */
+
+  /* O rosa. Destaque e selo de novidade. */
+  --brand-pink-100: #ffe7f2; /* oklch(0.9500 0.0299 348.9) */
+  --brand-pink-300: #ffb9db; /* oklch(0.8600 0.0910 348.9) */
+  --brand-pink-500: #fb80c1; /* oklch(0.7572 0.1658 348.9) - guia: pink */
+  --brand-pink-700: #c84590; /* oklch(0.5950 0.1824 348.9) */
+  --brand-pink-900: #8c1e60; /* oklch(0.4400 0.1575 348.9) */
+
+  /*
+   * O azul do guia, que é um ciano/água. Informação e link de apoio.
+   * O nome é o do guia de propósito, mesmo com a cor puxando para o verde-água.
+   */
+  --brand-blue-100: #d6fbf2; /* oklch(0.9600 0.0397 179.2) */
+  --brand-blue-300: #a9f7e6; /* oklch(0.9200 0.0794 179.2) */
+  --brand-blue-500: #77eed7; /* oklch(0.8735 0.1134 179.2) - guia: blue */
+  --brand-blue-700: #00aa94; /* oklch(0.6600 0.1206 179.2) */
+  --brand-blue-900: #007162; /* oklch(0.4900 0.0898 179.2) */
+
+  /*
+   * As duas pontas do gradiente azul. Não pertencem a nenhuma escala - são um
+   * par, e só existem para montar `--gradient-blue`.
+   */
+  --brand-gradient-blue-from: #31e1f7;
+  --brand-gradient-blue-to: #3168f7;
+
+  /*
+   * O vermelho de erro. Não está no guia de estilo, mas `--destructive` precisa
+   * de uma primitiva por trás como todo o resto - senão ele seria o único hex
+   * solto da camada semântica. São os dois valores que o projeto já usava.
+   */
+  --brand-red-500: #e65c54;
+  --brand-red-700: #c2251c;
+
+  /* --------------------------------------------------------------------
    * Raio
+   *
+   * Inalterados. Ficam documentados: `--radius-card-lg` e `--radius-block-lg`
+   * são os cantos da vitrine, expostos como `rounded-card` e `rounded-block`.
    * -------------------------------------------------------------------- */
 
   --radius-card-lg: 24px;
@@ -66,65 +177,134 @@
   --radius: 0.5rem;
 
   /* --------------------------------------------------------------------
-   * A camada semântica
+   * CAMADA 2 - as semânticas do shadcn, tema claro
    *
-   * Quem pinta a página inteira. Os valores estão aqui em vez de atrás de um
-   * `var(--cream)`: um alias de uma linha só para um nome que ninguém mais lê é
-   * um degrau a mais para descobrir a cor de qualquer coisa.
+   * Só `var()` para a camada 1. Um hex aqui seria uma cor que a escala não
+   * conhece, e a próxima variação dela viraria chute.
    * -------------------------------------------------------------------- */
 
-  --background: #fafafa;
-  --foreground: #272221;
-  --card: #ffffff;
-  --card-foreground: #272221;
-  --popover: #ffffff;
-  --popover-foreground: #272221;
-  /* O verde da marca escurecido no mesmo matiz (129°) até aguentar ser botão
-     sobre a base clara: 4,55:1 de borda contra o #FAFAFA e 4,75:1 de texto
-     branco por dentro. O puro daria 1,20:1 e o botão não teria contorno. */
-  --primary: #178528;
-  --primary-foreground: #ffffff;
-  --secondary: #efefef;
-  --secondary-foreground: #272221;
-  --muted: #efefef;
-  /* O #403937 da marca, o mesmo que no escuro vira superfície elevada: 10,83:1. */
-  --muted-foreground: #403937;
-  --accent-color: #efefef;
-  --accent-foreground: #178528;
-  --destructive: #c2251c;
-  --destructive-foreground: #ffffff;
-  /* A borda é o que separa bloco de bloco, porque a sombra é quase nula. */
-  --border: rgba(39, 34, 33, 0.1);
+  --background: var(--neutral-50);
+  --foreground: var(--neutral-950); /* 15,05:1 sobre o background */
+  --card: var(--neutral-0);
+  --card-foreground: var(--neutral-950); /* 15,71:1 */
+  --popover: var(--neutral-0);
+  --popover-foreground: var(--neutral-950);
+
+  /*
+   * O verde da marca escurecido no matiz da família até aguentar ser botão
+   * sobre a base clara: 4,94:1 de borda contra o #FAFAFA e 5,16:1 de texto
+   * branco por dentro. O #88FF9A puro daria 1,20:1 e reprovaria até como
+   * elemento gráfico, que pede 3:1 - um botão pintado com ele no claro não teria
+   * contorno, e o painel inteiro é botão cheio.
+   */
+  --primary: var(--brand-green-900);
+  --primary-foreground: var(--neutral-0);
+
+  --secondary: var(--neutral-200);
+  --secondary-foreground: var(--neutral-950); /* 12,37:1 */
+  --muted: var(--neutral-200);
+  /* 8,14:1 sobre o background, 8,50:1 sobre o card. */
+  --muted-foreground: var(--neutral-800);
+
+  /*
+   * Aqui o neon entra, e é a mudança visível desta refatoração: `--accent` era
+   * o mesmo cinza de `--secondary` e passa a ser o verde mais claro da escala.
+   * É o que o guia pede - no claro o #88FF9A é destaque, não ação -, e alcança
+   * todo hover de item de menu do painel. O par com `--accent-foreground` dá
+   * 4,74:1.
+   */
+  --accent-color: var(--brand-green-100);
+  --accent-foreground: var(--brand-green-900);
+
+  --destructive: var(--brand-red-700); /* 5,63:1 sobre o background */
+  --destructive-foreground: var(--neutral-0); /* 5,87:1 por dentro */
+
+  /*
+   * A borda é o que separa bloco de bloco, porque a sombra é quase nula.
+   *
+   * `color-mix` e não um rgba literal: assim ela é de fato o foreground com
+   * opacidade, e segue o foreground se ele mudar - era o que o valor fixo
+   * prometia no nome e não cumpria.
+   */
+  --border: color-mix(in srgb, var(--foreground) 10%, transparent);
   /*
    * A borda do campo tem valor próprio, e é mais forte que a de bloco.
    *
    * A regra 1.4.11 do WCAG pede 3:1 de **componente de interface**, e a borda de
    * um input é isso - é ela que diz onde clicar. A borda de bloco dá 1,26:1 sobre
-   * o #FAFAFA: serve de divisor, não serve de campo. Isto dá 3,03:1. A diferença
-   * aparece inteira no formulário de `/matricula`, que é o funil.
+   * o #FAFAFA: serve de divisor, não serve de campo. Isto dá 3,03:1 sobre o
+   * background e 3,17:1 sobre o card. A diferença aparece inteira no formulário
+   * de `/matricula`, que é o funil.
    */
-  --input: rgba(39, 34, 33, 0.49);
-  --ring: #178528;
+  --input: color-mix(in srgb, var(--foreground) 49%, transparent);
+  --ring: var(--primary); /* 4,94:1 - traço, então o piso é 3:1 */
 
   /*
-   * A escala de gráfico é a paleta secundária da marca, escurecida até 3:1 sobre
-   * a base clara - o piso de elemento gráfico. O roxo e o rosa entram aqui e só
-   * aqui: são cor de dado, nunca de ação.
+   * Os hovers, que antes eram a mesma expressão `color-mix` copiada dentro de
+   * `ui/button.tsx` e `ui/bubble.tsx`. Duas cópias de um número mágico em classe
+   * é o começo de três.
    */
-  --chart-1: #178528;
-  --chart-2: #07a0b4;
-  --chart-3: #a07bf5;
-  --chart-4: #f94ea9;
-  --chart-5: #3168f7;
+  --secondary-hover: color-mix(in oklch, var(--secondary), var(--foreground) 5%);
+  --muted-hover: color-mix(in oklch, var(--muted), var(--foreground) 5%);
 
-  --sidebar: #ffffff;
-  --sidebar-foreground: #272221;
-  --sidebar-primary: #178528;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #efefef;
-  --sidebar-accent-foreground: #178528;
-  --sidebar-border: rgba(39, 34, 33, 0.1);
-  --sidebar-ring: #178528;
+  /* O verde rebaixado a superfície, para o balão de conversa. Sai do `--primary`
+     em vez de ser um hex novo, então acompanha o tema sozinho. */
+  --primary-tint: oklch(from var(--primary) 0.93 calc(c * 0.4) h);
+  --primary-tint-hover: oklch(from var(--primary) 0.88 calc(c * 0.5) h);
+
+  /* A cortina de diálogo, gaveta e painel lateral. Era `bg-black/80` repetido
+     em quatro arquivos; é o preto da marca, não o preto puro. */
+  --overlay: color-mix(in srgb, var(--neutral-950) 80%, transparent);
+
+  /*
+   * A escala de gráfico é a paleta secundária da marca, no degrau que passa de
+   * 3:1 sobre a base clara - o piso de elemento gráfico. O roxo e o rosa entram
+   * aqui e só aqui: são cor de dado, nunca de ação.
+   * 4,94 / 5,69 / 5,03 / 4,27 / 4,52.
+   */
+  --chart-1: var(--brand-green-900);
+  --chart-2: var(--brand-blue-900);
+  --chart-3: var(--brand-purple-700);
+  --chart-4: var(--brand-pink-700);
+  --chart-5: var(--brand-gradient-blue-to);
+
+  --sidebar: var(--neutral-0);
+  --sidebar-foreground: var(--neutral-950);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--accent-color);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+
+  /* --------------------------------------------------------------------
+   * Os gradientes
+   *
+   * Token, e não classe montada no componente: um gradiente escrito à mão em
+   * duas telas vira dois gradientes diferentes na terceira.
+   *
+   * Uso: só superfície grande - hero, card em destaque, CTA principal. Nunca
+   * texto corrido, nunca borda fina.
+   *
+   * `--gradient-blue` **não carrega texto**. O cálculo é direto: tinta branca dá
+   * 1,59:1 na ponta ciano, e tinta escura dá 3,33:1 na ponta azul - nenhuma das
+   * duas atravessa o gradiente inteiro passando o AA. Ou ele fica sem texto por
+   * cima, ou o texto ganha uma faixa sólida atrás.
+   *
+   * `--gradient-green` é seguro com tinta escura: 11,22:1 na ponta água e
+   * 12,58:1 na ponta verde.
+   * -------------------------------------------------------------------- */
+
+  --gradient-blue: linear-gradient(
+    135deg,
+    var(--brand-gradient-blue-from),
+    var(--brand-gradient-blue-to)
+  );
+  --gradient-green: linear-gradient(
+    135deg,
+    var(--brand-blue-500),
+    var(--brand-green-500)
+  );
 }
 
 /*
@@ -132,95 +312,247 @@
  * O TEMA ESCURO
  * ============================================================================
  *
- * A base é o #272221 da marca, e a superfície elevada - card, popover, sidebar,
- * sheet - é o #403937. Um degrau só, e ele vem da cor, não de sombra: sombra
- * preta sobre fundo quase preto não separa nada. Quem fecha o card no escuro é
- * a borda.
+ * Mesma camada 1, outro recorte dela. A base é o #272221 (neutral-950) e a
+ * superfície elevada - card, popover, sidebar, sheet - é o #403937
+ * (neutral-900). Um degrau só, e ele vem da cor, não de sombra: sombra preta
+ * sobre fundo quase preto não separa nada. Quem fecha o card no escuro é a
+ * borda.
  *
- * `--primary` não aparece invertido aqui porque não inverte: o verde é
- * preenchimento, e o mesmo #88FF9A serve os dois temas. Quem troca são os três
- * papéis em que o verde é traço - `--ring`, `--accent-foreground` e
- * `--chart-1` -, que no claro precisam do matiz escurecido e aqui voltam ao puro.
+ * Aqui o verde é o puro do guia: sobre o #272221 ele dá 12,58:1 e não precisa
+ * de escurecimento nenhum. É o mesmo papel do claro, com o pé trocado - lá o
+ * verde é preenchimento com tinta branca, aqui é preenchimento com tinta
+ * escura.
  * ============================================================================
  */
 .dark {
   color-scheme: dark;
 
-  --background: #272221;
-  --foreground: #fafafa;
+  --background: var(--neutral-950);
+  --foreground: var(--neutral-50); /* 15,05:1 */
 
-  /* O degrau de elevação. 15,05:1 de texto sobre a base, 12,4:1 sobre o card. */
-  --card: #403937;
-  --card-foreground: #fafafa;
-  --popover: #403937;
-  --popover-foreground: #fafafa;
+  /* O degrau de elevação. 10,83:1 de texto sobre o card. */
+  --card: var(--neutral-900);
+  --card-foreground: var(--neutral-50);
+  --popover: var(--neutral-900);
+  --popover-foreground: var(--neutral-50);
 
-  /* Aqui o verde entra puro: 12,58:1 sobre a base, e a tinta por cima dele
-     volta a ser a escura. É o mesmo papel do claro, com o pé trocado. */
-  --primary: #88ff9a;
-  --primary-foreground: #272221;
+  --primary: var(--brand-green-500); /* 12,58:1 nos dois sentidos */
+  --primary-foreground: var(--neutral-950);
 
   /* Um degrau acima do card, para o que precisa se destacar de dentro dele:
      hover de item de menu, linha de tabela marcada, chip. */
-  --secondary: #4a4341;
-  --secondary-foreground: #fafafa;
-  --muted: #4a4341;
+  --secondary: var(--neutral-800);
+  --secondary-foreground: var(--neutral-50); /* 8,14:1 */
+  --muted: var(--neutral-800);
+  /*
+   * Um degrau da rampa, e não o branco com opacidade: como opacidade ele mudaria
+   * de valor conforme a superfície embaixo, e a legenda de um card ficaria
+   * diferente da de uma tabela. 7,84:1 sobre a base, 5,64:1 sobre o card.
+   */
+  --muted-foreground: var(--neutral-400);
 
-  /* O #FAFAFA a 70%, resolvido em cor cheia em vez de opacidade: como opacidade
-     ele mudaria de valor conforme a superfície embaixo, e a legenda de um card
-     ficaria diferente da de uma tabela. 8,04:1 sobre a base, 5,79:1 sobre o
-     card. */
-  --muted-foreground: #bbb9b9;
-
-  --accent-color: #4a4341;
-  --accent-foreground: #88ff9a;
+  /*
+   * No escuro o neon volta a ser traço, não superfície: o fundo de destaque é o
+   * degrau de cinza e quem pinta por cima é o verde. Inverter isto aqui - verde
+   * de fundo em todo hover de menu - deixaria o painel piscando.
+   */
+  --accent-color: var(--neutral-800);
+  --accent-foreground: var(--brand-green-500); /* 6,81:1 */
 
   /* O vermelho do claro tem 1,9:1 aqui e sumiria. Este é o mesmo matiz clareado
-     até 4,51:1 sobre a base - e o texto por cima dele volta a ser o #272221. */
-  --destructive: #e65c54;
-  --destructive-foreground: #272221;
+     até 4,51:1 sobre a base - e o texto por cima dele volta a ser o escuro. */
+  --destructive: var(--brand-red-500);
+  --destructive-foreground: var(--neutral-950);
 
-  /* Branco a 12% desenha o card sem virar traço. O campo precisa dos 3:1 de
-     componente de interface, e branco a 38% é onde isso acontece: 3,06:1 sobre
-     o card, que é onde os campos de `/matricula` moram. */
-  --border: rgba(255, 255, 255, 0.12);
-  --input: rgba(255, 255, 255, 0.38);
-  --ring: #88ff9a;
+  /* Foreground a 12% desenha o card sem virar traço. O campo precisa dos 3:1 de
+     componente de interface, e 38% é onde isso acontece: 3,54:1 sobre o card,
+     que é onde os campos de `/matricula` moram. */
+  --border: color-mix(in srgb, var(--foreground) 12%, transparent);
+  --input: color-mix(in srgb, var(--foreground) 38%, transparent);
+  --ring: var(--primary);
+
+  --secondary-hover: color-mix(in oklch, var(--secondary), var(--foreground) 5%);
+  --muted-hover: color-mix(in oklch, var(--muted), var(--foreground) 5%);
+  --primary-tint: oklch(from var(--primary) 0.3 calc(c * 0.4) h);
+  --primary-tint-hover: oklch(from var(--primary) 0.35 calc(c * 0.5) h);
+  --overlay: color-mix(in srgb, var(--neutral-950) 80%, transparent);
 
   /* Aqui a paleta secundária entra pura: sobre o #272221 ela já passa de 3:1
-     sozinha, e escurecer como no claro só apagaria a marca. */
-  --chart-1: #88ff9a;
-  --chart-2: #31e1f7;
-  --chart-3: #a480f5;
-  --chart-4: #fb80c1;
-  --chart-5: #77eed7;
+     sozinha, e escurecer como no claro só apagaria a marca.
+     12,58 / 11,22 / 5,22 / 6,70 / 9,91. */
+  --chart-1: var(--brand-green-500);
+  --chart-2: var(--brand-blue-500);
+  --chart-3: var(--brand-purple-500);
+  --chart-4: var(--brand-pink-500);
+  --chart-5: var(--brand-gradient-blue-from);
 
-  --sidebar: #403937;
-  --sidebar-foreground: #fafafa;
-  --sidebar-primary: #178528;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #4a4341;
-  --sidebar-accent-foreground: #88ff9a;
-  --sidebar-border: rgba(255, 255, 255, 0.12);
-  --sidebar-ring: #88ff9a;
+  --sidebar: var(--neutral-900);
+  --sidebar-foreground: var(--neutral-50);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--accent-color);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
 }
 
 @theme inline {
+  /* --------------------------------------------------------------------
+   * As famílias
+   * -------------------------------------------------------------------- */
+
   /*
-   * Sans geométrica de terminação arredondada, variável e servida do próprio
-   * bundle.
+   * O par. `--font-display` deixou de ser um apelido do `--font-sans`: agora são
+   * duas vozes, e é isso que cria a hierarquia que faltava. Antes título e corpo
+   * eram a mesma família e só o tamanho os separava.
    *
-   * Antes daqui `--font-display` pedia `Archivo Narrow` sem carregar arquivo
-   * nenhum: quem não tivesse a fonte instalada - ou seja, praticamente todo
-   * mundo - lia os títulos em Inter itálica esticada. O itálico condensado do
-   * projeto nunca existiu de fato.
-   *
-   * Título e corpo na mesma família de propósito: a hierarquia vem do peso e do
-   * tamanho, e a única quebra de família na página é a palavra da pílula.
+   * Archivo tem eixo de largura (62% a 125%), e é dele que sai o título
+   * condensado - a `@utility display-title` lá embaixo é quem aciona.
    */
+  --font-display: 'Archivo Variable', Archivo, system-ui, sans-serif;
   --font-sans: 'Outfit Variable', system-ui, sans-serif;
-  --font-display: 'Outfit Variable', system-ui, sans-serif;
   --font-serif: 'Playfair Display Variable', Georgia, serif;
+  /*
+   * Stack de sistema, sem arquivo. `font-mono` aparece em cinco lugares - o
+   * protocolo da matrícula, um eixo de gráfico, um campo de questionário -, tudo
+   * número curto e identificador. Uma quarta fonte baixada para isso seria byte
+   * que não pinta pixel.
+   */
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;
+
+  /* --------------------------------------------------------------------
+   * A escala tipográfica
+   *
+   * Nomes novos de propósito. O registry deste projeto é o `base-mira`, que é
+   * miúdo - botão de 28px de altura, selo em 10px, `text-xs/relaxed` por toda
+   * parte -, e redefinir `--text-xs`, `--text-sm` ou `--text-base` mudaria o
+   * tamanho do painel inteiro. Os degraus do Tailwind ficam intactos; estes
+   * convivem com eles.
+   *
+   * A regra da escala: quanto maior o texto, mais negativo o tracking e mais
+   * apertada a entrelinha. Display de 1,05 a 1,12; corpo em 1,6.
+   *
+   * `body-md` é o corpo, e são 16px - o piso do mobile. `body-sm` existe para
+   * metadado e legenda, não para texto de leitura.
+   * -------------------------------------------------------------------- */
+
+  --text-display-xl: 3.75rem; /* 60px */
+  --text-display-xl--line-height: 1.05;
+  --text-display-xl--letter-spacing: -0.035em;
+  --text-display-xl--font-weight: 700;
+
+  --text-display-lg: 3rem; /* 48px */
+  --text-display-lg--line-height: 1.08;
+  --text-display-lg--letter-spacing: -0.03em;
+  --text-display-lg--font-weight: 700;
+
+  --text-display-md: 2.25rem; /* 36px */
+  --text-display-md--line-height: 1.12;
+  --text-display-md--letter-spacing: -0.025em;
+  --text-display-md--font-weight: 600;
+
+  --text-heading-lg: 1.75rem; /* 28px */
+  --text-heading-lg--line-height: 1.2;
+  --text-heading-lg--letter-spacing: -0.02em;
+  --text-heading-lg--font-weight: 600;
+
+  --text-heading-md: 1.25rem; /* 20px */
+  --text-heading-md--line-height: 1.35;
+  --text-heading-md--letter-spacing: -0.015em;
+  --text-heading-md--font-weight: 600;
+
+  --text-heading-sm: 1.125rem; /* 18px */
+  --text-heading-sm--line-height: 1.4;
+  --text-heading-sm--letter-spacing: -0.01em;
+  --text-heading-sm--font-weight: 600;
+
+  --text-body-lg: 1.125rem; /* 18px */
+  --text-body-lg--line-height: 1.6;
+  --text-body-lg--letter-spacing: 0em;
+  --text-body-lg--font-weight: 400;
+
+  --text-body-md: 1rem; /* 16px - o corpo */
+  --text-body-md--line-height: 1.6;
+  --text-body-md--letter-spacing: 0em;
+  --text-body-md--font-weight: 400;
+
+  --text-body-sm: 0.875rem; /* 14px - metadado e legenda */
+  --text-body-sm--line-height: 1.55;
+  --text-body-sm--letter-spacing: 0.005em;
+  --text-body-sm--font-weight: 400;
+
+  --text-label: 0.8125rem; /* 13px */
+  --text-label--line-height: 1.4;
+  --text-label--letter-spacing: 0.01em;
+  --text-label--font-weight: 500;
+
+  --text-overline: 0.75rem; /* 12px */
+  --text-overline--line-height: 1.3;
+  --text-overline--letter-spacing: 0.08em;
+  --text-overline--font-weight: 600;
+
+  /*
+   * Os dois miúdos do registry, que hoje moram como `text-[0.625rem]` em treze
+   * arquivos de `components/ui/`. Deliberadamente **sem** `--line-height`: os
+   * arbitrários de hoje herdam a entrelinha do contexto, e cravar uma aqui
+   * mudaria a altura desses treze componentes. A troca precisa ser pixel a
+   * pixel a mesma.
+   */
+  --text-2xs: 0.625rem;
+  --text-3xs: 0.5625rem;
+
+  /* --------------------------------------------------------------------
+   * A camada 1 como utilitário
+   *
+   * Para o highlight decorativo que precisa de um degrau nomeado da escala -
+   * `bg-brand-green-100`, `text-brand-purple-700`. Não é para pintar UI: quem
+   * pinta UI são os nomes semânticos abaixo.
+   *
+   * `--color-neutral-*` sobrescreve de propósito o neutro padrão do Tailwind,
+   * que é frio. Quem escrever `bg-neutral-200` neste projeto recebe o neutro
+   * quente da marca, e não um cinza azulado ao lado do #272221.
+   * -------------------------------------------------------------------- */
+
+  --color-neutral-0: var(--neutral-0);
+  --color-neutral-50: var(--neutral-50);
+  --color-neutral-100: var(--neutral-100);
+  --color-neutral-200: var(--neutral-200);
+  --color-neutral-300: var(--neutral-300);
+  --color-neutral-400: var(--neutral-400);
+  --color-neutral-500: var(--neutral-500);
+  --color-neutral-600: var(--neutral-600);
+  --color-neutral-700: var(--neutral-700);
+  --color-neutral-800: var(--neutral-800);
+  --color-neutral-900: var(--neutral-900);
+  --color-neutral-950: var(--neutral-950);
+
+  --color-brand-green-100: var(--brand-green-100);
+  --color-brand-green-300: var(--brand-green-300);
+  --color-brand-green-500: var(--brand-green-500);
+  --color-brand-green-700: var(--brand-green-700);
+  --color-brand-green-900: var(--brand-green-900);
+
+  --color-brand-purple-100: var(--brand-purple-100);
+  --color-brand-purple-300: var(--brand-purple-300);
+  --color-brand-purple-500: var(--brand-purple-500);
+  --color-brand-purple-700: var(--brand-purple-700);
+  --color-brand-purple-900: var(--brand-purple-900);
+
+  --color-brand-pink-100: var(--brand-pink-100);
+  --color-brand-pink-300: var(--brand-pink-300);
+  --color-brand-pink-500: var(--brand-pink-500);
+  --color-brand-pink-700: var(--brand-pink-700);
+  --color-brand-pink-900: var(--brand-pink-900);
+
+  --color-brand-blue-100: var(--brand-blue-100);
+  --color-brand-blue-300: var(--brand-blue-300);
+  --color-brand-blue-500: var(--brand-blue-500);
+  --color-brand-blue-700: var(--brand-blue-700);
+  --color-brand-blue-900: var(--brand-blue-900);
+
+  /* --------------------------------------------------------------------
+   * A camada 2 como utilitário
+   * -------------------------------------------------------------------- */
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -241,6 +573,11 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-muted-hover: var(--muted-hover);
+  --color-primary-tint: var(--primary-tint);
+  --color-primary-tint-hover: var(--primary-tint-hover);
+  --color-overlay: var(--overlay);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -255,6 +592,10 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  /* Os gradientes como `bg-gradient-blue` e `bg-gradient-green`. */
+  --background-image-gradient-blue: var(--gradient-blue);
+  --background-image-gradient-green: var(--gradient-green);
+
   /* Os raios da landing, como utilitário: `rounded-card` e `rounded-block`. */
   --radius-card: var(--radius-card-lg);
   --radius-block: var(--radius-block-lg);
@@ -263,6 +604,23 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+}
+
+/*
+ * A voz de display, num utilitário só.
+ *
+ * `font-stretch` não cabe nos sub-tokens de `--text-*` do Tailwind, então a
+ * largura condensada precisa de um lugar próprio - e o lugar já tinha nome: a
+ * classe `display-title` é usada em `common/not-found-page.tsx` desde sempre e
+ * **nunca existiu**, nem aqui nem no registry do shadcn. Os títulos que a
+ * pediam vinham renderizando em Outfit normal.
+ *
+ * Sem `font-weight`: quem chama já decide o peso pelo degrau da escala, e
+ * cravar um aqui brigaria com o `font-bold` que esses mesmos títulos usam.
+ */
+@utility display-title {
+  font-family: var(--font-display);
+  font-stretch: 87.5%;
 }
 
 @layer base {
