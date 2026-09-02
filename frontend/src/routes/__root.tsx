@@ -22,6 +22,20 @@ import {
 
 import appCss from '../styles.css?url'
 
+/**
+ * O woff2 do corpo do texto, importado para render o endereço com hash.
+ *
+ * `?url` e não um caminho escrito à mão: o arquivo entra no build com hash de
+ * conteúdo, e um literal `/assets/outfit-....woff2` quebraria no próximo build
+ * que mudasse o hash - e quebraria em silêncio, porque um `preload` que aponta
+ * para 404 não estraga a página, só deixa de adiantar o download.
+ *
+ * Só o subconjunto latino. Os outros que o `@fontsource` declara têm
+ * `unicode-range` e o navegador nunca os baixa num site em português; pré-
+ * carregá-los seria puxar bytes que nada usa.
+ */
+import outfitLatin from '@fontsource-variable/outfit/files/outfit-latin-wght-normal.woff2?url'
+
 import type { QueryClient } from '@tanstack/react-query'
 
 /**
@@ -116,6 +130,66 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         href: '/favicon.svg',
         type: 'image/svg+xml',
       },
+      /*
+       * O `.ico` de volta, e desta vez com arquivo.
+       *
+       * O comentário acima conta que a linha anterior apontava para um `.ico`
+       * que nunca existiu, e a saída foi apagar a linha. Só que o navegador que
+       * não lê SVG **não** desiste: ele pede `/favicon.ico` na raiz por
+       * convenção, declarado ou não, e continuava tomando 404 a cada visita.
+       *
+       * Agora o arquivo existe (`scripts/generate-icons.mjs` o gera do mesmo
+       * SVG), e declará-lo evita a segunda requisição às cegas. Quem lê SVG
+       * ignora esta linha: o `image/svg+xml` acima tem precedência.
+       */
+      {
+        rel: 'icon',
+        href: '/favicon.ico',
+        sizes: '32x32',
+        type: 'image/x-icon',
+      },
+      // O iOS ignora o manifesto ao adicionar à tela de início e lê só isto.
+      // Sem a linha, ele recorta um print da página como ícone.
+      {
+        rel: 'apple-touch-icon',
+        href: '/apple-touch-icon.png',
+        sizes: '180x180',
+      },
+      /*
+       * O manifesto, que é o que torna "adicionar à tela de início" uma
+       * instalação com nome e ícone em vez de um atalho genérico.
+       *
+       * A página já promete que "a matrícula cabe no celular", e o celular é o
+       * aparelho de quase todo mundo que se inscreve aqui.
+       */
+      {
+        rel: 'manifest',
+        href: '/site.webmanifest',
+      },
+      /*
+       * A fonte do corpo, pedida junto com o CSS em vez de depois dele.
+       *
+       * Sem isto o navegador só descobre o `@font-face` depois de baixar e
+       * analisar a folha de estilo, e só então começa a buscar o woff2 - duas
+       * viagens em série. A escola está numa cidade onde a conexão é ruim, e é
+       * exatamente ali que uma viagem a menos aparece.
+       *
+       * `crossOrigin` é obrigatório mesmo sendo mesma origem: fonte é sempre
+       * buscada em modo CORS, e um `preload` sem ele vira um **segundo**
+       * download em vez de um adiantamento - o pior dos dois mundos.
+       *
+       * Só o Outfit fica aqui: ele é o corpo de todo texto do site. A serifa
+       * (Playfair) é pré-carregada no `head` da home, que é onde ela cai no
+       * elemento de LCP - declará-la aqui faria `/termos` e `/privacidade`
+       * baixarem uma fonte que aquelas páginas não usam.
+       */
+      {
+        rel: 'preload',
+        as: 'font',
+        type: 'font/woff2',
+        href: outfitLatin,
+        crossOrigin: 'anonymous',
+      },
       {
         rel: 'stylesheet',
         href: appCss,
@@ -137,6 +211,35 @@ function RootDocument({
     // cliente divergem neste elemento por construção.
     <html lang={LOCALE} suppressHydrationWarning>
       <head>
+        {/*
+          A cor da barra do sistema no celular, uma por tema.
+
+          Escritas aqui e **não** no `head` da rota raiz, e isso não é
+          preferência: a fusão de `meta` do roteador desduplica por `name`, e o
+          par claro/escuro tem o mesmo `name` - declarado lá, o segundo apagava
+          o primeiro e só a variante escura chegava ao HTML. Aqui elas
+          atravessam inteiras, e não perdem nada por isso: são estáticas, iguais
+          em toda rota, que é justamente o que a casca do documento carrega.
+
+          Uma cor só deixaria a barra do sistema brigando com a página em
+          metade dos aparelhos - faixa clara colada num fundo #272221, que é o
+          tipo de emenda que faz o site parecer quebrado antes de alguém ler
+          qualquer coisa.
+
+          Os valores são os mesmos `--background` de `styles.css`. Se um mudar
+          lá, este muda junto: não há como um literal aqui ler um custom
+          property de lá.
+        */}
+        <meta
+          name="theme-color"
+          media="(prefers-color-scheme: light)"
+          content="#fafafa"
+        />
+        <meta
+          name="theme-color"
+          media="(prefers-color-scheme: dark)"
+          content="#272221"
+        />
         <HeadContent />
       </head>
       <body>
