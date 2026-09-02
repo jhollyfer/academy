@@ -244,7 +244,11 @@
    * `ui/button.tsx` e `ui/bubble.tsx`. Duas cópias de um número mágico em classe
    * é o começo de três.
    */
-  --secondary-hover: color-mix(in oklch, var(--secondary), var(--foreground) 5%);
+  --secondary-hover: color-mix(
+    in oklch,
+    var(--secondary),
+    var(--foreground) 5%
+  );
   --muted-hover: color-mix(in oklch, var(--muted), var(--foreground) 5%);
 
   /* O verde rebaixado a superfície, para o balão de conversa. Sai do `--primary`
@@ -371,7 +375,11 @@
   --input: color-mix(in srgb, var(--foreground) 38%, transparent);
   --ring: var(--primary);
 
-  --secondary-hover: color-mix(in oklch, var(--secondary), var(--foreground) 5%);
+  --secondary-hover: color-mix(
+    in oklch,
+    var(--secondary),
+    var(--foreground) 5%
+  );
   --muted-hover: color-mix(in oklch, var(--muted), var(--foreground) 5%);
   --primary-tint: oklch(from var(--primary) 0.3 calc(c * 0.4) h);
   --primary-tint-hover: oklch(from var(--primary) 0.35 calc(c * 0.5) h);

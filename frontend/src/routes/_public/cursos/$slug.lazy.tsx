@@ -274,9 +274,7 @@ function Fact({
         {icon}
         {label}
       </dt>
-      <dd className="text-heading-sm text-primary-foreground">
-        {children}
-      </dd>
+      <dd className="text-heading-sm text-primary-foreground">{children}</dd>
     </div>
   )
 }

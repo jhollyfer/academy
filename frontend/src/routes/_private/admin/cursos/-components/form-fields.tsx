@@ -186,9 +186,7 @@ export function CourseFormFields({
       </fieldset>
 
       <fieldset className="grid gap-6">
-        <legend className="text-heading-sm">
-          Formato e investimento
-        </legend>
+        <legend className="text-heading-sm">Formato e investimento</legend>
 
         <div className="grid gap-6 sm:grid-cols-2">
           <NumberField
