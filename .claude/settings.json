@@ -1,0 +1,5 @@
+{
+  "enabledPlugins": {
+    "scandit-sdk@claude-plugins-official": true
+  }
+}
