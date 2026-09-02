@@ -8,6 +8,7 @@ import type { AuthenticationSignInPayload } from '#/lib/validator'
 import { useSignIn } from '#/integrations/tanstack-query/mutations'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { applyMutationError } from '#/lib/form-errors'
+import { errorId, invalidProps } from '#/lib/form-a11y'
 import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
 import {
@@ -85,11 +86,14 @@ function RouteComponent(): React.JSX.Element {
                     {...field}
                     id="email"
                     type="email"
+                    required
                     autoComplete="username"
-                    aria-invalid={fieldState.invalid}
+                    {...invalidProps(fieldState.invalid, 'email')}
                   />
                   {fieldState.error && (
-                    <FieldError>{fieldState.error.message}</FieldError>
+                    <FieldError id={errorId('email')}>
+                      {fieldState.error.message}
+                    </FieldError>
                   )}
                 </Field>
               )}
@@ -105,11 +109,14 @@ function RouteComponent(): React.JSX.Element {
                     {...field}
                     id="password"
                     type="password"
+                    required
                     autoComplete="current-password"
-                    aria-invalid={fieldState.invalid}
+                    {...invalidProps(fieldState.invalid, 'password')}
                   />
                   {fieldState.error && (
-                    <FieldError>{fieldState.error.message}</FieldError>
+                    <FieldError id={errorId('password')}>
+                      {fieldState.error.message}
+                    </FieldError>
                   )}
                 </Field>
               )}
