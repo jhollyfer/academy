@@ -23,6 +23,7 @@ import { Button } from '#/components/ui/button'
 import { PillButton } from '#/components/common/pill-button'
 import { Input } from '#/components/ui/input'
 import { Checkbox } from '#/components/ui/checkbox'
+import { RadioGroup, RadioGroupItem } from '#/components/ui/radio-group'
 import {
   Field,
   FieldError,
@@ -360,21 +361,28 @@ function RouteComponent(): React.JSX.Element {
                   control={form.control}
                   name="classId"
                   render={({ field, fieldState }) => (
-                    <div className="mt-5 grid gap-3">
+                    <RadioGroup
+                      name={field.name}
+                      value={field.value}
+                      onValueChange={(value) => field.onChange(value)}
+                      className="mt-5 grid gap-3"
+                    >
                       {options.map(({ course, entity }) => (
                         <label
                           key={entity.id}
                           data-accent={course.accent}
-                          className="rounded-card flex cursor-pointer items-start gap-4 border border-border bg-card p-5 transition-colors has-checked:border-primary has-checked:bg-background"
+                          className="rounded-card flex cursor-pointer items-start gap-4 border border-border bg-card p-5 transition-colors has-data-[checked]:border-primary has-data-[checked]:bg-background"
                         >
-                          <input
-                            type="radio"
-                            name={field.name}
+                          {/*
+                            O radio do registry no lugar do nativo: o nativo
+                            pintava com `accent-color`, que o navegador resolve
+                            sozinho e não olha para o tema - o marcador ficava
+                            fora da paleta no escuro.
+                          */}
+                          <RadioGroupItem
                             value={entity.id}
-                            checked={field.value === entity.id}
-                            onChange={() => field.onChange(entity.id)}
                             onBlur={field.onBlur}
-                            className="mt-1 size-4 accent-foreground"
+                            className="mt-1"
                           />
                           <span className="grid gap-1">
                             <span className="font-bold tracking-tight">
@@ -396,7 +404,7 @@ function RouteComponent(): React.JSX.Element {
                       {fieldState.error && (
                         <FieldError>{fieldState.error.message}</FieldError>
                       )}
-                    </div>
+                    </RadioGroup>
                   )}
                 />
               </fieldset>
