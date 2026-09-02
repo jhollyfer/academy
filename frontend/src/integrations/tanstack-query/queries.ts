@@ -194,9 +194,12 @@ export function storefrontEnrollmentQueryOptions(protocol: string) {
   return queryOptions({
     queryKey: queryKeys.storefront.enrollment(protocol),
     queryFn: ({ signal }) =>
-      request<StorefrontEnrollmentResponse>(`/storefront/enrollments/${protocol}`, {
-        signal,
-      }),
+      request<StorefrontEnrollmentResponse>(
+        `/storefront/enrollments/${protocol}`,
+        {
+          signal,
+        },
+      ),
     retry: false,
   })
 }
