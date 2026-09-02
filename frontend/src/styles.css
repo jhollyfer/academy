@@ -375,15 +375,19 @@
   --input: color-mix(in srgb, var(--foreground) 38%, transparent);
   --ring: var(--primary);
 
-  --secondary-hover: color-mix(
-    in oklch,
-    var(--secondary),
-    var(--foreground) 5%
-  );
-  --muted-hover: color-mix(in oklch, var(--muted), var(--foreground) 5%);
+  /*
+   * Só o tint aparece aqui.
+   *
+   * `--secondary-hover`, `--muted-hover` e `--overlay` não se repetem no escuro
+   * porque não precisam: a substituição de `var()` dentro de uma custom property
+   * acontece por elemento, então a fórmula declarada no `:root` já lê o
+   * `--secondary` e o `--foreground` deste tema. Repeti-las seria linha morta.
+   *
+   * O tint é a exceção real: a claridade de destino muda de 0,93 para 0,3, e
+   * isso é valor, não fórmula.
+   */
   --primary-tint: oklch(from var(--primary) 0.3 calc(c * 0.4) h);
   --primary-tint-hover: oklch(from var(--primary) 0.35 calc(c * 0.5) h);
-  --overlay: color-mix(in srgb, var(--neutral-950) 80%, transparent);
 
   /* Aqui a paleta secundária entra pura: sobre o #272221 ela já passa de 3:1
      sozinha, e escurecer como no claro só apagaria a marca.
