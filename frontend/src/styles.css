@@ -368,11 +368,17 @@
   --destructive: var(--brand-red-500);
   --destructive-foreground: var(--neutral-950);
 
-  /* Foreground a 12% desenha o card sem virar traço. O campo precisa dos 3:1 de
-     componente de interface, e 38% é onde isso acontece: 3,54:1 sobre o card,
-     que é onde os campos de `/matricula` moram. */
+  /*
+   * Foreground a 12% desenha o card sem virar traço.
+   *
+   * O campo precisa dos 3:1 de componente de interface, e aqui são **40%**, não
+   * os 38% de antes. A conta mudou junto com a fórmula: 38% era de branco puro
+   * e dava 3,06:1 sobre o card, mas o foreground deste tema é o #FAFAFA, e os
+   * mesmos 38% dele caem para 2,98:1 - reprovam por dois centésimos. 40% devolve
+   * 3,14:1. É onde os campos de `/matricula` moram, no funil.
+   */
   --border: color-mix(in srgb, var(--foreground) 12%, transparent);
-  --input: color-mix(in srgb, var(--foreground) 38%, transparent);
+  --input: color-mix(in srgb, var(--foreground) 40%, transparent);
   --ring: var(--primary);
 
   /*
