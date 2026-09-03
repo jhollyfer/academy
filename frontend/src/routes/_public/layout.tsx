@@ -27,7 +27,7 @@ function RouteComponent(): React.JSX.Element {
       */}
       <a
         href={'#'.concat(MAIN_ID)}
-        className="sr-only bg-primary px-4 py-2 font-medium text-primary-foreground focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50"
+        className="focus-ring sr-only bg-primary px-4 py-2 font-medium text-primary-foreground focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50"
       >
         Pular para o conteúdo
       </a>

@@ -10,6 +10,7 @@ import {
 import { Sidebar } from './-components/sidebar'
 import { ThemeToggle } from '#/components/common/theme-toggle'
 import { UploadingProvider } from '#/components/common/uploading-context'
+import { HTTPError, HTTPStatus } from '#/integrations/tanstack-query/http'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -42,9 +43,22 @@ export const Route = createFileRoute('/_private')({
       )
 
       return { account }
-    } catch {
-      // Qualquer falha aqui é ausência de sessão utilizável: o `request` já
-      // tentou renovar com o refresh token antes de deixar o erro subir.
+    } catch (error) {
+      // Só 401 e 403 significam ausência de sessão utilizável - e para chegar
+      // ao 401 o `request` já tentou renovar com o refresh token antes de
+      // deixar o erro subir.
+      //
+      // Um `catch` cego mandava para o login também o 500, o timeout de 15s e a
+      // queda de rede: a API fora do ar virava "você foi deslogado", e a pessoa
+      // reentrava para cair no mesmo lugar. Erro de infraestrutura sobe para o
+      // `defaultErrorComponent`, que sabe desenhá-lo.
+      const semSessao =
+        error instanceof HTTPError &&
+        (error.status === HTTPStatus.UNAUTHORIZED ||
+          error.status === HTTPStatus.FORBIDDEN)
+
+      if (!semSessao) throw error
+
       throw redirect({
         to: '/authentication',
         search: { redirect: location.href },
@@ -71,7 +85,7 @@ function RouteComponent(): React.JSX.Element {
       */}
       <a
         href={'#'.concat(MAIN_ID)}
-        className="sr-only rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50"
+        className="focus-ring sr-only rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50"
       >
         Pular para o conteúdo
       </a>
