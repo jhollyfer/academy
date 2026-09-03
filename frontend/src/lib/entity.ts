@@ -78,6 +78,27 @@ export function homeForRole(role: UserRole): '/administrator' | '/portal' {
  * Os papéis que um endpoint pode atribuir. `OWNER` fica de fora pelo motivo
  * acima.
  */
+/**
+ * O papel que um endpoint pode atribuir. `OWNER` fora do tipo, e não só da
+ * lista: o formulário de edição recebe o papel do registro, e sem esta exclusão
+ * o compilador aceitaria montar um payload que promove alguém a dono - que o
+ * backend recusa com 422, mas tarde.
+ */
+export type ManageableUserRole = Exclude<UserRole, typeof UserRoles.OWNER>
+
+/**
+ * O papel do registro, quando ele é atribuível.
+ *
+ * `undefined` para o dono, que nenhum formulário edita - a `UserPolicy` responde
+ * 404 antes da tela abrir. Existe para o `values` do formulário poder receber o
+ * papel sem afirmar ao compilador algo que o tipo não garante.
+ */
+export function manageableRoleOf(role: UserRole): ManageableUserRole | undefined {
+  if (role === UserRoles.OWNER) return undefined
+
+  return role
+}
+
 export const MANAGEABLE_USER_ROLES = USER_ROLES.filter(function (role) {
   return role !== UserRoles.OWNER
 })

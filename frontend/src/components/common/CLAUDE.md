@@ -26,8 +26,11 @@ A regra corta nos dois sentidos, e cortou nas duas direções no mesmo dia.
 usava, cada um com **uma** rota. Dias depois o `date-picker` voltou: a data de
 nascimento do formulário público de matrícula virou o segundo consumidor, e
 deixá-lo em `administrator/classes/-components/` faria a vitrine importar de
-dentro da pasta de uma rota do painel. `input-password.tsx` continua embaixo,
-com o sign-in como único consumidor. Pelo mesmo motivo `rating-stars.tsx`,
+dentro da pasta de uma rota do painel. O `input-password.tsx` fez o mesmo caminho
+depois: ficou embaixo enquanto o sign-in era o único consumidor, e subiu quando
+o formulário do painel de usuários virou o segundo - deixá-lo em
+`routes/authentication/-components/` faria o painel importar de dentro da pasta
+de outra área. Pelo mesmo motivo `rating-stars.tsx`,
 `text-list-field.tsx`, `rich-text.tsx`, `rich-editor/` e `multi-file-upload/`
 não foram trazidos dos projetos irmãos: nota, lista de texto, markdown e anexo
 múltiplo não existem neste contrato, e importar peça sem consumidor é o começo
@@ -123,5 +126,4 @@ mesma tabela, e o segundo envelheceria.
 
 Se um componente daqui vier a ter rota única, desce para
 `routes/<área>/-components/`, e sobe de volta quando o segundo aparecer. Foi o
-caminho do `input-password` (desceu e ficou) e do `date-picker` (desceu e
-voltou).
+caminho do `date-picker` e do `input-password`, os dois desceram e voltaram.

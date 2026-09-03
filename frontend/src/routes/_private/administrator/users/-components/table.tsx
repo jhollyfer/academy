@@ -1,6 +1,7 @@
 import { getRouteApi } from '@tanstack/react-router'
 import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { UserBulkActions } from './bulk-actions'
 import { userColumns } from './columns'
 import { UserFilters } from './filters'
 import { UserRowActions } from './row-actions'
@@ -9,13 +10,16 @@ import {
   TableActions,
   TableColumnToggle,
   TableContent,
+  TableCreateButton,
   TableEmpty,
+  TableEmptyActions,
   TableEmptyDescription,
   TableEmptyTitle,
   TableGrid,
   TableHeader,
   TablePagination,
   TableSearch,
+  TableSelectionBar,
   TableTitle,
   TableToolbar,
   TableTrashToggle,
@@ -44,9 +48,12 @@ export function UsersTable(): React.JSX.Element {
     columns: userColumns,
     getRowId: (row) => row.id,
     persistKey: 'administrator:users',
-    // Sem seleção: as ações em massa deste recurso seriam arquivar gente, e um
-    // clique errado tira o acesso de uma turma inteira de famílias.
-    selectable: false,
+    // Predicado, e não `true`: a própria conta e a do dono nascem com a caixa
+    // desabilitada. É o que torna a ação em massa aceitável aqui - arquivar em
+    // lote tira acesso de várias pessoas, e as duas linhas que quem clicou não
+    // conseguiria desfazer ficam fora da seleção. O backend recusa as duas de
+    // todo modo, com 403.
+    selectable: (row) => row.id !== account.id && row.role !== UserRoles.OWNER,
     actions: (user) => (
       <UserRowActions
         user={user}
@@ -66,7 +73,11 @@ export function UsersTable(): React.JSX.Element {
     >
       <TableHeader>
         <TableTitle>Usuários</TableTitle>
-        <TableActions />
+        <TableActions>
+          <TableCreateButton to="/administrator/users/new">
+            Adicionar usuário
+          </TableCreateButton>
+        </TableActions>
       </TableHeader>
 
       <TableToolbar>
@@ -83,9 +94,18 @@ export function UsersTable(): React.JSX.Element {
             A equipe da escola nasce com senha; responsável e aluno nascem por
             convite, na confirmação da matrícula.
           </TableEmptyDescription>
+          <TableEmptyActions>
+            <TableCreateButton to="/administrator/users/new">
+              Adicionar usuário
+            </TableCreateButton>
+          </TableEmptyActions>
         </TableEmpty>
 
         <TableGrid table={table} />
+
+        <TableSelectionBar table={table} noun={['conta', 'contas']}>
+          {(users) => <UserBulkActions users={users} />}
+        </TableSelectionBar>
       </TableContent>
 
       <TablePagination meta={data?.meta} />

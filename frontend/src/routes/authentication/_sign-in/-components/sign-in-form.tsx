@@ -16,7 +16,7 @@ import {
   AuthShellDescription,
 } from '../../-components/auth-shell'
 import { Input } from '#/components/ui/input'
-import { InputPassword } from '../../-components/input-password'
+import { InputPassword } from '#/components/common/input-password'
 import {
   Field,
   FieldError,

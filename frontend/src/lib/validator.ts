@@ -10,6 +10,7 @@ import {
   COURSE_ACCENTS,
   ENROLLMENT_FILE_KINDS,
   ENROLLMENT_STATUSES,
+  MANAGEABLE_USER_ROLES,
   SHIFTS,
   SORT_DIRECTIONS,
   STORAGE_MIMETYPES,
@@ -701,3 +702,50 @@ export const StorageCompleteValidator = vine.create({
 })
 
 export type StorageCompletePayload = Infer<typeof StorageCompleteValidator>
+
+// ---------------------------------------------------------------------------
+// administrator/users
+// ---------------------------------------------------------------------------
+
+/**
+ * A senha é **opcional** na criação, e é ela que decide o caminho: com senha a
+ * conta nasce pronta e a secretaria informa a credencial; sem senha sai um
+ * convite por e-mail e quem define é o titular.
+ *
+ * O segundo é o único aceitável para responsável e aluno - a secretaria não deve
+ * escolher, conhecer nem digitar a senha de uma família. Cópia linha a linha do
+ * `#core/validator` do servidor, que é o que segura o dado.
+ *
+ * `role` usa `MANAGEABLE_USER_ROLES` e não `USER_ROLES`: `OWNER` fora da lista é
+ * o que impede alguém de se promover a dono por um POST.
+ */
+export const AdministratorUserCreateValidator = vine.create({
+  name: vine.string().trim().minLength(2).maxLength(120),
+  email: email(),
+  password: password().optional(),
+  phone: phone().nullable().optional(),
+  role: vine.enum(MANAGEABLE_USER_ROLES),
+  status: activeStatus().optional(),
+  avatarId: vine.string().uuid().nullable().optional(),
+})
+
+/**
+ * A edição não aceita senha: trocar a própria é `/account`, e redefinir a de
+ * outra pessoa é emitir convite. Um `PUT` com `password` deixaria a secretaria
+ * assumir a conta de uma família sem deixar rastro.
+ */
+export const AdministratorUserUpdateValidator = vine.create({
+  name: vine.string().trim().minLength(2).maxLength(120).optional(),
+  email: email().optional(),
+  phone: phone().nullable().optional(),
+  role: vine.enum(MANAGEABLE_USER_ROLES).optional(),
+  status: activeStatus().optional(),
+  avatarId: vine.string().uuid().nullable().optional(),
+})
+
+export type AdministratorUserCreatePayload = Infer<
+  typeof AdministratorUserCreateValidator
+>
+export type AdministratorUserUpdatePayload = Infer<
+  typeof AdministratorUserUpdateValidator
+>

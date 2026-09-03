@@ -8,6 +8,7 @@ import type {
   ClassResponse,
   CourseResponse,
   EnrollmentResponse,
+  ManagedUserResponse,
   StorageResponse,
   StorefrontEnrollmentResponse,
 } from '../response'
@@ -17,6 +18,8 @@ import type {
   AdministratorCourseCreatePayload,
   AdministratorCourseUpdatePayload,
   AdministratorEnrollmentUpdatePayload,
+  AdministratorUserCreatePayload,
+  AdministratorUserUpdatePayload,
   AuthenticationInviteAcceptPayload,
   AuthenticationSignInPayload,
   StorefrontEnrollmentAttachmentPayload,
@@ -219,6 +222,43 @@ export function useCourseUpdate(
 // ---------------------------------------------------------------------------
 // administrator/users
 // ---------------------------------------------------------------------------
+
+export function useUserCreate(
+  options?: MutationProps<ManagedUserResponse, AdministratorUserCreatePayload>,
+) {
+  return useMutation<
+    ManagedUserResponse,
+    HTTPError,
+    AdministratorUserCreatePayload
+  >({
+    ...options,
+    mutationFn: function (payload) {
+      return request<ManagedUserResponse>('/administrator/users', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      })
+    },
+  })
+}
+
+export function useUserUpdate(
+  id: string,
+  options?: MutationProps<ManagedUserResponse, AdministratorUserUpdatePayload>,
+) {
+  return useMutation<
+    ManagedUserResponse,
+    HTTPError,
+    AdministratorUserUpdatePayload
+  >({
+    ...options,
+    mutationFn: function (payload) {
+      return request<ManagedUserResponse>(
+        '/administrator/users/'.concat(id),
+        { method: 'PUT', body: JSON.stringify(payload) },
+      )
+    },
+  })
+}
 
 export function useUserArchive(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({

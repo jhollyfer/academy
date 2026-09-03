@@ -1,5 +1,7 @@
 import type * as React from 'react'
+import { Link } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
+import { EyeIcon, PencilSimpleIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
 import {
@@ -7,6 +9,10 @@ import {
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
 import { CopyIdMenuItem } from '#/components/common/copy-id-menu-item'
+import {
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '#/components/ui/dropdown-menu'
 import {
   RowActions,
   RowActionsArchive,
@@ -61,7 +67,28 @@ export function UserRowActions({
 
   return (
     <RowActions>
+      <DropdownMenuItem
+        render={
+          <Link to="/administrator/users/$id" params={{ id: user.id }}>
+            <EyeIcon />
+            Ver detalhes
+          </Link>
+        }
+      />
+      {/* O dono não é editável: a `UserPolicy` recusa, e `isSelf` cobre o caso
+          de ele abrir a própria linha. */}
+      {!isSelf && (
+        <DropdownMenuItem
+          render={
+            <Link to="/administrator/users/$id/edit" params={{ id: user.id }}>
+              <PencilSimpleIcon />
+              Editar
+            </Link>
+          }
+        />
+      )}
       <CopyIdMenuItem id={user.id} />
+      <DropdownMenuSeparator />
 
       {!isSelf && !user.deletedAt && (
         <RowActionsArchive onConfirm={() => archive.mutate(user.id)}>

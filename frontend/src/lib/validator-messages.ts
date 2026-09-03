@@ -89,6 +89,8 @@ export const FIELD_LABELS = {
   passwordConfirmation: 'a confirmação da senha',
   phone: 'o telefone',
   status: 'a situação',
+  role: 'o papel',
+  avatarId: 'a foto',
   notes: 'as observações',
 
   // ── Curso ──────────────────────────────────────────────────────────
