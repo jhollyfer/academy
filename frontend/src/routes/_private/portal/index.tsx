@@ -9,5 +9,6 @@ import { portalEnrollmentsQueryOptions } from '#/integrations/tanstack-query/que
  * administrador que chegasse aqui receberia 403 do middleware de papel.
  */
 export const Route = createFileRoute('/_private/portal/')({
-  loader: ({ context }) => context.queryClient.ensureQueryData(portalEnrollmentsQueryOptions()),
+  loader: ({ context }) =>
+    context.queryClient.ensureQueryData(portalEnrollmentsQueryOptions()),
 })

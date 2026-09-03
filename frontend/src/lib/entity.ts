@@ -56,9 +56,15 @@ export const USER_ROLES = Object.values(UserRoles)
  * `#core/entity` do servidor - o schema não atravessa a fronteira, mas a
  * expressão é a mesma.
  */
-export const STAFF_USER_ROLES: Array<UserRole> = [UserRoles.OWNER, UserRoles.ADMINISTRATOR]
+export const STAFF_USER_ROLES: Array<UserRole> = [
+  UserRoles.OWNER,
+  UserRoles.ADMINISTRATOR,
+]
 
-export const PORTAL_USER_ROLES: Array<UserRole> = [UserRoles.RESPONSIBLE, UserRoles.STUDENT]
+export const PORTAL_USER_ROLES: Array<UserRole> = [
+  UserRoles.RESPONSIBLE,
+  UserRoles.STUDENT,
+]
 
 /**
  * Onde cada papel entra depois do login.
@@ -93,7 +99,9 @@ export type ManageableUserRole = Exclude<UserRole, typeof UserRoles.OWNER>
  * 404 antes da tela abrir. Existe para o `values` do formulário poder receber o
  * papel sem afirmar ao compilador algo que o tipo não garante.
  */
-export function manageableRoleOf(role: UserRole): ManageableUserRole | undefined {
+export function manageableRoleOf(
+  role: UserRole,
+): ManageableUserRole | undefined {
   if (role === UserRoles.OWNER) return undefined
 
   return role

@@ -76,9 +76,7 @@ export function UserDetail(): React.JSX.Element {
         {editable && (
           <Button
             nativeButton={false}
-            render={
-              <Link to="/administrator/users/$id/edit" params={{ id }} />
-            }
+            render={<Link to="/administrator/users/$id/edit" params={{ id }} />}
           >
             <PencilSimpleIcon />
             Editar
