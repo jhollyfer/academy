@@ -34,15 +34,31 @@
  * é gerenciável por endpoint nenhum, nasce só pelo seeder, e é quem cadastra os
  * `ADMINISTRATOR` da secretaria. Quem valida payload usa `manageableRole()`,
  * que exclui o valor - assim ninguém se promove a dono por um POST.
+ *
+ * São quatro, em dois grupos que não se misturam: quem **opera** a escola
+ * (`OWNER`, `ADMINISTRATOR`) e quem é **atendido** por ela (`RESPONSIBLE`,
+ * `STUDENT`). Os dois grupos entram em áreas diferentes do app, e é por isso que
+ * o destino pós-login não pode ser fixo.
  */
 export const UserRoles = {
   OWNER: 'OWNER',
   ADMINISTRATOR: 'ADMINISTRATOR',
+  RESPONSIBLE: 'RESPONSIBLE',
+  STUDENT: 'STUDENT',
 } as const
 
 export type UserRole = (typeof UserRoles)[keyof typeof UserRoles]
 
 export const USER_ROLES = Object.values(UserRoles)
+
+/**
+ * Quem opera o painel, e quem é atendido por ele. Cópia linha a linha do
+ * `#core/entity` do servidor - o schema não atravessa a fronteira, mas a
+ * expressão é a mesma.
+ */
+export const STAFF_USER_ROLES: Array<UserRole> = [UserRoles.OWNER, UserRoles.ADMINISTRATOR]
+
+export const PORTAL_USER_ROLES: Array<UserRole> = [UserRoles.RESPONSIBLE, UserRoles.STUDENT]
 
 /**
  * Os papéis que um endpoint pode atribuir. `OWNER` fica de fora pelo motivo

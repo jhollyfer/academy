@@ -14,7 +14,7 @@ import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
 import { scalarPage } from '#core/openapi/scalar'
 import openapi from '#config/openapi'
-import { STAFF_USER_ROLES } from '#core/entity'
+import { PORTAL_USER_ROLES, STAFF_USER_ROLES } from '#core/entity'
 
 router.get('/', function (context) {
   return context.response.redirect('/documentation')
@@ -204,6 +204,32 @@ router
  * A ordem `auth` → `role` é o que faz uma requisição sem sessão receber `401` e
  * não `403`: sem sessão o papel do requisitante ainda é desconhecido.
  */
+/**
+ * O portal de quem é atendido pela escola.
+ *
+ * Existe separado de `/administrator` porque o recorte é outro: lá o papel
+ * decide **o que se pode fazer**, e aqui decide **o que é seu**. Um responsável
+ * não é um administrador com menos botões - ele enxerga um conjunto de linhas
+ * que ninguém mais enxerga, e é `_shared.portal.ts` que o define.
+ *
+ * Fora do escopo, a resposta é 404 e não 403 (RN-17): 403 confirmaria que o
+ * registro existe, que é justamente o que o recorte esconde.
+ */
+router
+  .group(() => {
+    router
+      .group(() => {
+        router.get('/', [controllers.portal.enrollments.Paginate])
+        router.get(':id', [controllers.portal.enrollments.Show])
+      })
+      .prefix('enrollments')
+      .as('enrollments')
+  })
+  .prefix('portal')
+  .as('portal')
+  .use(middleware.auth())
+  .use(middleware.role(PORTAL_USER_ROLES))
+
 router
   .group(() => {
     router

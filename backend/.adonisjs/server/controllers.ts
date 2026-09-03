@@ -53,6 +53,12 @@ export const controllers = {
     SignIn: () => import('#features/authentication/sign-in.controller'),
     SignOut: () => import('#features/authentication/sign-out.controller'),
   },
+  portal: {
+    enrollments: {
+      Paginate: () => import('#features/portal/enrollments/paginate.controller'),
+      Show: () => import('#features/portal/enrollments/show.controller'),
+    },
+  },
   storages: {
     Complete: () => import('#features/storages/complete.controller'),
     Create: () => import('#features/storages/create.controller'),

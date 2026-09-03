@@ -76,11 +76,15 @@ export const ACCOUNT_STATUS_LABELS: Record<string, string | undefined> = {
 export const USER_ROLE_LABELS: Record<string, string | undefined> = {
   OWNER: 'Dono',
   ADMINISTRATOR: 'Administrador',
+  RESPONSIBLE: 'Responsável',
+  STUDENT: 'Aluno',
 } satisfies Record<UserRole, string>
 
 export const USER_ROLE_VARIANTS: Record<string, BadgeVariant> = {
   OWNER: 'info',
   ADMINISTRATOR: 'neutral',
+  RESPONSIBLE: 'neutral',
+  STUDENT: 'neutral',
 } satisfies Record<UserRole, BadgeVariant>
 
 // ---------------------------------------------------------------------------

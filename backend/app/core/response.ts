@@ -251,6 +251,11 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'administrator/enrollments': ENROLLMENT,
   'administrator/users': MANAGED_USER,
 
+  // O mesmo recurso do painel: quem restringe o que a pessoa alcança é o escopo
+  // da consulta, não uma projeção. Diferente do `storefront`, que é anônimo e
+  // por isso devolve menos - aqui há sessão, e a matrícula é da própria pessoa.
+  'portal/enrollments': ENROLLMENT,
+
   'storefront/courses': COURSE,
   // Projeção declarada, e não o `ENROLLMENT` do painel: estas rotas não têm
   // sessão, e devolvem só o que a tela de acompanhamento mostra.
