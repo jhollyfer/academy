@@ -1,0 +1,4 @@
+
+# IDE da JetBrains. O `backend/.gitignore` já a ignorava; a raiz não, e dois
+# arquivos de módulo chegaram a ser rastreados por isso.
+.idea/
