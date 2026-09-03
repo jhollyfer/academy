@@ -808,6 +808,37 @@
 }
 
 /*
+ * Campo inválido em foco fica vermelho, e não verde.
+ *
+ * `--ring` é `--primary`, que é o verde da marca, e todo campo de
+ * `components/ui` carrega os dois conjuntos ao mesmo tempo:
+ * `focus-visible:border-ring ring-ring/30` e `aria-invalid:border-destructive
+ * ring-destructive/20`. No envio de um formulário vazio o react-hook-form foca
+ * o primeiro campo com erro (`shouldFocusError`), os dois estados valem juntos
+ * e o verde ganhava - o campo aparecia com anel verde e mensagem vermelha
+ * embaixo, dizendo duas coisas opostas sobre o mesmo dado.
+ *
+ * Aqui e não em `components/ui`: são dez arquivos com esse par de classes, e o
+ * próximo `shadcn add` desfaz a edição de qualquer um deles.
+ *
+ * Fora de `@layer`, pelo mesmo motivo escrito no `.prose` acima: as utilities
+ * do Tailwind vivem em `@layer utilities`, CSS sem camada vence CSS em camada,
+ * e é isto que torna a regra imune à ordem em que as classes forem geradas.
+ *
+ * `--tw-ring-color` e não `box-shadow`: no Tailwind v4 o `ring-2` gera uma
+ * sombra que **referencia** essa variável, então trocar a variável recompõe a
+ * sombra sem precisar reescrevê-la - e sem saber a espessura que cada campo
+ * pediu.
+ *
+ * Uma regra serve aos dois temas porque `--destructive` é redefinido no escuro,
+ * e o `color-mix` resolve por elemento.
+ */
+[aria-invalid='true']:focus-visible {
+  border-color: var(--destructive);
+  --tw-ring-color: color-mix(in oklch, var(--destructive) 40%, transparent);
+}
+
+/*
  * O título das artes de divulgação: condensado, bold, itálico, caixa alta.
  *
  * `font-stretch: 75%` e não os 87,5% do `display-title`: aquele é o título de
