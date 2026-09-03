@@ -180,9 +180,9 @@ export default class extends BaseSeeder {
 
   async run() {
     const robotics = await Course.updateOrCreate(
-      { slug: 'robotica' },
+      { slug: 'robotics' },
       {
-        slug: 'robotica',
+        slug: 'robotics',
         name: 'Robotics Fundamentals',
         tagline: 'Do primeiro LED ao robô que anda sozinho, em dezesseis sábados.',
         description:
@@ -197,7 +197,7 @@ export default class extends BaseSeeder {
           'Não é preciso saber nada de eletrônica nem de programação. O laboratório fornece o kit.',
         projectOutcome:
           'Um robô autônomo que segue linha e desvia de obstáculo, montado e programado por você.',
-        enrollmentFeeInCents: 15_000,
+        enrollmentFeeInCents: 5_000,
         monthlyFeeInCents: 15_000,
         position: 0,
         status: ActiveStatuses.ACTIVE,
@@ -220,7 +220,7 @@ export default class extends BaseSeeder {
         requirements:
           'Não é preciso saber programar. Saber usar computador com alguma desenvoltura ajuda.',
         projectOutcome: 'Um site seu, publicado, feito de HTML e CSS do zero.',
-        enrollmentFeeInCents: 15_000,
+        enrollmentFeeInCents: 5_000,
         monthlyFeeInCents: 15_000,
         position: 1,
         status: ActiveStatuses.ACTIVE,
