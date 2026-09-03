@@ -212,7 +212,17 @@ export function CourseFormFields({
                 <FieldLabel htmlFor={`${idPrefix}-accent`}>
                   Tema do curso
                 </FieldLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
+                {/*
+                  `items` é o que faz o GATILHO mostrar "Robótica" e não
+                  "ROBOTICS": o `SelectValue` do Base UI renderiza o valor cru
+                  enquanto não souber traduzi-lo. É o mesmo mapa que rotula a
+                  lista abaixo, a coluna da listagem e o badge da ficha.
+                */}
+                <Select
+                  items={COURSE_ACCENT_LABELS}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                >
                   <SelectTrigger
                     id={`${idPrefix}-accent`}
                     aria-invalid={fieldState.invalid}
@@ -241,6 +251,7 @@ export function CourseFormFields({
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor={`${idPrefix}-status`}>Situação</FieldLabel>
                 <Select
+                  items={ACTIVE_STATUS_LABELS}
                   value={field.value ?? 'ACTIVE'}
                   onValueChange={field.onChange}
                 >

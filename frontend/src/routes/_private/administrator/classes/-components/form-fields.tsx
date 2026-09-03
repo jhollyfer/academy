@@ -47,7 +47,19 @@ export function ClassFormFields({
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel htmlFor={`${idPrefix}-courseId`}>Curso</FieldLabel>
-            <Select value={field.value} onValueChange={field.onChange}>
+            {/*
+              Aqui os rótulos não vêm de um mapa de enum: são os cursos que a
+              API devolveu. Sem `items` o gatilho mostrava o uuid do curso
+              escolhido, que não diz nada a ninguém.
+            */}
+            <Select
+              items={courses.map((course) => ({
+                value: course.id,
+                label: course.name,
+              }))}
+              value={field.value}
+              onValueChange={field.onChange}
+            >
               <SelectTrigger
                 id={`${idPrefix}-courseId`}
                 aria-invalid={fieldState.invalid}
@@ -151,7 +163,19 @@ export function ClassFormFields({
               <FieldLabel htmlFor={`${idPrefix}-weekday`}>
                 Dia da semana
               </FieldLabel>
-              <Select value={field.value} onValueChange={field.onChange}>
+              {/*
+                `items` é o que faz o GATILHO mostrar "Sábado" e não "SATURDAY".
+                O `SelectValue` do Base UI renderiza o valor cru enquanto não
+                souber traduzi-lo, e é por este mapa que ele descobre - o mesmo
+                que rotula a lista abaixo, a coluna da listagem e o badge da
+                ficha. Sem ele, a lista aberta ficava em português e o campo
+                fechado voltava para o inglês do enum.
+              */}
+              <Select
+                items={WEEKDAY_LABELS}
+                value={field.value}
+                onValueChange={field.onChange}
+              >
                 <SelectTrigger id={`${idPrefix}-weekday`}>
                   <SelectValue />
                 </SelectTrigger>
@@ -176,7 +200,11 @@ export function ClassFormFields({
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor={`${idPrefix}-shift`}>Turno</FieldLabel>
-              <Select value={field.value} onValueChange={field.onChange}>
+              <Select
+                items={SHIFT_LABELS}
+                value={field.value}
+                onValueChange={field.onChange}
+              >
                 <SelectTrigger id={`${idPrefix}-shift`}>
                   <SelectValue />
                 </SelectTrigger>
