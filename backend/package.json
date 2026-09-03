@@ -76,7 +76,7 @@
     "@adonisjs/redis": "10.0.2",
     "@adonisjs/session": "^8.1.0",
     "@adonisjs/shield": "^9.0.0",
-    "@aws-sdk/client-s3": "^3.1099.0",
+    "@aws-sdk/client-s3": "^3.1123.0",
     "@aws-sdk/s3-request-presigner": "^3.1099.0",
     "@japa/api-client": "^3.2.1",
     "@tuyau/core": "^1.2.2",
