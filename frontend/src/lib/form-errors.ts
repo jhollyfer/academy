@@ -23,7 +23,7 @@ import type { HTTPError } from '#/integrations/tanstack-query/http'
  * campo atribuível (5xx, rede), e aí a decisão é de quem chamou: normalmente um
  * toast com ação de tentar de novo.
  *
- * O sign-in e o wizard de sign-up - de onde esta lógica saiu - foram os últimos
+ * O sign-in e o formulário público de matrícula - de onde esta lógica saiu - foram os últimos
  * a migrar. O wizard ainda lê `error.errors` por conta própria, mas só para
  * descobrir a qual passo voltar; quem marca a tela é este helper.
  */
@@ -77,7 +77,7 @@ export function applyHTTPErrorToForm<
 /**
  * O `onError` de um formulário, inteiro.
  *
- * É o que os trinta e nove `form-create.tsx` e `form-edit.tsx` do painel
+ * É o que os quatro `form-create.tsx` e `form-edit.tsx` do painel
  * escreviam à mão, sempre na mesma ordem: tenta marcar os campos, e o que não
  * couber em campo nenhum vira mensagem de rodapé.
  *
@@ -92,13 +92,14 @@ export function applyHTTPErrorToForm<
  *   reenviar não cria nada.
  * - **Criação só quando o use-case recusa a duplicata com 409.** O 5xx pode
  *   ter vindo *depois* da escrita, e aí o reenvio grava o registro de novo. Os
- *   que checam antes de inserir (`Material.query().where('slug', slug)` e os
- *   seus pares) devolvem "já existe" e são seguros; `company/addresses` e
- *   `administrator/producers` inserem direto e ficam sem `retry` por isso -
- *   dois endereços iguais são um endereço duplicado, não um conflito.
+ *   que checam antes de inserir (`Course.query().where('slug', slug)` no
+ *   `create.use-case.ts` de curso) devolvem `409 COURSE_ALREADY_EXISTS` e são
+ *   seguros; a turma insere direto e fica sem `retry` por isso - duas turmas de
+ *   mesmo nome no mesmo curso são um cadastro duplicado, não um conflito.
  *
- * O critério nasceu de uma divergência: sete recursos ofereciam o reenvio no
- * cadastro e não na edição, que é o avesso da regra acima.
+ * O critério nasceu de uma divergência nos projetos irmãos: vários recursos
+ * ofereciam o reenvio no cadastro e não na edição, que é o avesso da regra
+ * acima.
  */
 export function applyMutationError<
   TValues extends FieldValues,

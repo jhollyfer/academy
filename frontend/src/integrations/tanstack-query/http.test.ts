@@ -111,7 +111,10 @@ test('500 é erro de servidor', async () => {
   respond(500, {
     message: 'Erro interno do servidor',
     status: 500,
-    code: HTTPErrorCode.SIGN_IN_ERROR,
+    // Literal, e não uma chave de `HTTPErrorCode`: os `*_ERROR` de 500 não
+    // entram no mapa - quem os trata é a faixa `isServerError`, e é isto que o
+    // teste comprova.
+    code: 'COURSE_LIST_ERROR',
   })
 
   const error = await rejection(request('/authentication/sign-in'))

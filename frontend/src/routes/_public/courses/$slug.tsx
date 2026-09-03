@@ -20,7 +20,7 @@ function courseJsonLd(course: CourseResponse) {
     '@type': 'Course',
     name: course.name,
     description: course.description,
-    url: absoluteUrl(`/cursos/${course.slug}`),
+    url: absoluteUrl(`/courses/${course.slug}`),
     inLanguage: 'pt-BR',
     provider: {
       '@type': 'EducationalOrganization',
@@ -42,7 +42,7 @@ function courseJsonLd(course: CourseResponse) {
       price: (course.enrollmentFeeInCents / 100).toFixed(2),
       priceCurrency: 'BRL',
       availability: 'https://schema.org/InStock',
-      url: absoluteUrl('/matricula'),
+      url: absoluteUrl('/enrollment'),
     },
   }
 
@@ -108,7 +108,7 @@ function courseJsonLd(course: CourseResponse) {
   return jsonLd
 }
 
-export const Route = createFileRoute('/_public/cursos/$slug')({
+export const Route = createFileRoute('/_public/courses/$slug')({
   loader: async ({ context, params }) => {
     /*
      * A lista da vitrine junto com o curso, e por `prefetchQuery`.
@@ -118,7 +118,7 @@ export const Route = createFileRoute('/_public/cursos/$slug')({
      * `NONE` e o HTML do servidor anunciava "Avise quando abrir a turma" - com
      * turma aberta e 39 vagas. A hidratação corrigia depois, mas o buscador e
      * quem está sem JavaScript leem o HTML, e nele não havia link nenhum para
-     * `/matricula`. A home já fazia isto; a página do curso é que ficou de fora.
+     * `/enrollment`. A home já fazia isto; a página do curso é que ficou de fora.
      *
      * `prefetchQuery` e não `ensureQueryData` pelo mesmo motivo da home: a
      * lista é enfeite do botão, e uma consulta fora do ar não pode derrubar a
@@ -150,11 +150,11 @@ export const Route = createFileRoute('/_public/cursos/$slug')({
     // O título nomeia a cidade: a busca que traz aluno é "curso de robótica
     // Benjamin Constant", e um título só com o nome do curso concorre com o
     // mundo inteiro.
-    const title = `${loaderData.name} em Benjamin Constant - ${SITE_TITLE}`
+    const title = `${loaderData.name} em Benjamin Constant · ${SITE_TITLE}`
     const description =
       loaderData.tagline ?? loaderData.description.slice(0, 155)
 
-    const url = absoluteUrl(`/cursos/${loaderData.slug}`)
+    const url = absoluteUrl(`/courses/${loaderData.slug}`)
 
     return {
       meta: [

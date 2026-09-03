@@ -16,14 +16,15 @@ type FormShellProps = {
 /**
  * A casca de todo formulário de criar/editar do painel.
  *
- * Os 39 formulários abriam com as mesmas ~55 linhas: `PageShell`, cabeçalho
- * fixo com voltar/título/descartar/salvar, e o `<form>` no conteúdo que rola.
- * Só o miolo mudava. Repetido 39 vezes, um ajuste de cabeçalho vira 39 edições
- * - e a 40ª tela nasce com o cabeçalho da versão anterior.
+ * Os quatro formulários do painel abriam com as mesmas ~55 linhas: `PageShell`,
+ * cabeçalho fixo com voltar/título/descartar/salvar, e o `<form>` no conteúdo
+ * que rola. Só o miolo mudava. Repetida em cada um, uma correção de cabeçalho
+ * vira quatro edições - e a quinta tela nasce com o cabeçalho da versão
+ * anterior.
  *
  * Compound e não props `title`/`actions`: as telas divergem no miolo e no
- * cabeçalho. `administrator/companies` põe quatro blocos de campos onde as
- * outras põem um, e a que precisar de um terceiro botão ao lado do `Salvar`
+ * cabeçalho. O curso põe identificação, números, grade e FAQ onde a turma põe
+ * um bloco só, e a que precisar de um terceiro botão ao lado do `Salvar`
  * escreve o botão dentro de `FormShellActions`. Com prop, cada divergência
  * dessas vira mais uma prop opcional aqui dentro.
  *

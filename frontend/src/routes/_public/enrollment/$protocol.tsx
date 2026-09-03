@@ -3,7 +3,7 @@ import { storefrontEnrollmentQueryOptions } from '#/integrations/tanstack-query/
 import { HTTPError, HTTPStatus } from '#/integrations/tanstack-query/http'
 import { SITE_TITLE } from '#/lib/site'
 
-export const Route = createFileRoute('/_public/matricula/$protocol')({
+export const Route = createFileRoute('/_public/enrollment/$protocol')({
   loader: async ({ context, params }) => {
     try {
       return await context.queryClient.ensureQueryData(
@@ -40,7 +40,7 @@ export const Route = createFileRoute('/_public/matricula/$protocol')({
   },
   head: () => ({
     meta: [
-      { title: `Sua matrícula - ${SITE_TITLE}` },
+      { title: `Sua matrícula · ${SITE_TITLE}` },
       // A URL contém o protocolo, que é a credencial do candidato. Indexá-la
       // colocaria o dado pessoal de alguém no resultado de busca.
       { name: 'robots', content: 'noindex, nofollow' },

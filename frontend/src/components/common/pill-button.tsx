@@ -45,6 +45,25 @@ const pillVariants = cva(
         /** A secundária. Só a borda, para não competir com a pílula ao lado. */
         outline:
           'border-foreground bg-transparent text-foreground hover:bg-foreground/8 hover:text-foreground',
+        /**
+         * A ação primária dentro de bloco de marca: neon sólido, texto preto,
+         * caixa alta. É a barra de CTA das artes de divulgação.
+         *
+         * Existe porque `ink` e `outline` são construídos sobre `--foreground`,
+         * que é quase preto no tema claro: sobre o `--brand-ink` do hero os dois
+         * viravam preto sobre preto e o botão sumia. Este par não depende do
+         * tema, pelo mesmo motivo do bloco que o hospeda.
+         *
+         * O texto é `--brand-ink` e não preto puro: é a cor do bloco, então o
+         * botão lê como um recorte iluminado dele em vez de um adesivo colado
+         * por cima.
+         */
+        neon: 'border-transparent bg-neon text-brand-ink uppercase tracking-wide hover:bg-neon/90 hover:text-brand-ink',
+        /**
+         * A secundária dentro de bloco de marca: contorno neon, sem preenchimento.
+         */
+        'neon-outline':
+          'border-neon bg-transparent text-neon hover:bg-neon/10 hover:text-neon',
       },
       scale: {
         md: 'h-10 gap-2 px-5 text-sm',
@@ -79,7 +98,7 @@ function PillButton({
 }: PillButtonProps): React.JSX.Element {
   /*
     Quase toda pílula desta vitrine é um link: "Garanta sua vaga" leva a
-    `/matricula`, "Ver os cursos" é uma âncora. O `Button` do Base UI assume
+    `/enrollment`, "Ver os cursos" é uma âncora. O `Button` do Base UI assume
     `nativeButton` verdadeiro, e quando o elemento final não é um `<button>` ele
     avisa no console **a cada render** - com a árvore inteira junto. São sete
     botões assim só na home, e o custo não é o aviso: é o console engasgando a

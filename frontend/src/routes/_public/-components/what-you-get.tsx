@@ -11,12 +11,12 @@ import type { Icon } from '@phosphor-icons/react'
 
 import { CardContent, CardTitle, CardDescription } from '#/components/ui/card'
 import { SectionCard } from '#/components/common/section-card'
-import { Highlight } from '#/components/common/highlight'
 import { EnrollmentCta } from '#/components/common/enrollment-cta'
 import { storefrontCoursesQueryOptions } from '#/integrations/tanstack-query/queries'
 import { scheduleSummary } from '#/lib/enrollment-state'
 import { pluralize } from '#/lib/format'
 import { REVEAL, STAGGER } from './reveal'
+import { SectionTitle } from './section-title'
 import { cn } from '#/lib/utils'
 
 /**
@@ -105,21 +105,24 @@ export function WhatYouGet(): React.JSX.Element {
         <div
           className={cn(
             REVEAL,
-            'flex flex-col justify-between gap-10 rounded-block bg-foreground dark:bg-card p-8 sm:p-10',
+            'flex flex-col justify-between gap-10 rounded-block bg-brand-ink p-8 sm:p-10',
           )}
         >
-          <h2 className="display-title text-heading-lg font-semibold text-balance text-background dark:text-card-foreground sm:text-display-md">
-            O que você <Highlight variant="slab">leva</Highlight> daqui
-          </h2>
+          <SectionTitle
+            tone="ink"
+            className="lg:text-display-md"
+            lead="O que você"
+            accent="leva daqui"
+          />
 
           <div>
-            <p className="mb-7 text-body-md text-background/70 dark:text-muted-foreground">
+            <p className="mb-7 text-body-md text-white/70">
               Tudo o que a aula precisa já está no laboratório. Você leva o
               caderno e a vontade.
             </p>
 
             <EnrollmentCta
-              tone="slab"
+              tone="neon"
               scale="lg"
               className="w-full sm:w-auto"
             />
@@ -135,18 +138,21 @@ export function WhatYouGet(): React.JSX.Element {
             >
               <CardContent className="flex flex-col gap-4">
                 {/*
-                  O círculo verde deslocado atrás do ícone, como na referência.
-                  Dois elementos e não uma borda: o deslocamento é o que dá a
-                  sensação de recorte colado, e uma borda ficaria concêntrica.
+                  Um elemento só, e o ícone centrado dentro dele.
+                  Eram dois: um círculo de 36px deslocado em -4px e o ícone
+                  centrado numa caixa de 44px. Os dois centros ficavam a 8px de
+                  distância, então o ícone caía no canto inferior direito do
+                  verde - a "sensação de recorte colado" que o comentário
+                  anterior prometia lia como desalinhamento, e era.
+
+                  O círculo é o mesmo do botão flutuante do WhatsApp: ícone
+                  centrado num disco de `--primary`. É o único desenho de ícone
+                  em disco que o site tem, e agora os dois concordam.
                 */}
-                <span className="relative inline-flex size-11 items-center justify-center">
-                  <span
-                    aria-hidden
-                    className="absolute -top-1 -left-1 size-9 rounded-full bg-primary"
-                  />
+                <span className="inline-flex size-11 items-center justify-center rounded-full bg-primary">
                   <item.icon
-                    weight="duotone"
-                    className="relative size-7 text-primary-foreground"
+                    weight="regular"
+                    className="size-6 text-primary-foreground"
                   />
                 </span>
 

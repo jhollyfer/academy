@@ -113,7 +113,7 @@ export function ReceiptUpload({
       >
         {busy && <Spinner className="animate-spin" />}
         {!busy && <Paperclip />}
-        {busy && 'Enviando...'}
+        {busy && 'Enviando…'}
         {!busy && 'Anexar comprovante'}
       </Button>
 

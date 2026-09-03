@@ -25,32 +25,3 @@ export function getStorageDownloadUrl(
 ): string {
   return BASE_URL.concat('/storages/').concat(storage.id).concat('/download')
 }
-
-/** As entidades que têm página pública, e portanto QR. */
-export type QrEntity = 'producer' | 'community' | 'company' | 'organization'
-
-/**
- * A URL do QR de uma página pública.
- *
- * Mora aqui pelo mesmo motivo das duas de cima: é endereço que o **navegador**
- * busca direto, como `src` de imagem ou `href` de download, e não algo que passe
- * por `request()`.
- *
- * `download` liga o `Content-Disposition` no servidor. Tem que ser assim: o
- * atributo `download` de um `<a>` é ignorado entre origens, e a API responde
- * numa origem diferente da do app.
- */
-export function getEntityQrUrl(
-  entity: QrEntity,
-  slug: string,
-  download = false,
-): string {
-  const url = BASE_URL.concat('/storefront/qrcode/')
-    .concat(entity)
-    .concat('/')
-    .concat(slug)
-
-  if (!download) return url
-
-  return url.concat('?download=1')
-}

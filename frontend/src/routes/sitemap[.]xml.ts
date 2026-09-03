@@ -39,7 +39,7 @@ export const Route = createFileRoute('/sitemap.xml')({
               if (!course.slug) continue
 
               entries.push({
-                path: `/cursos/${course.slug}`,
+                path: `/courses/${course.slug}`,
                 lastModified: course.updatedAt?.slice(0, 10),
                 priority: 0.8,
               })

@@ -36,7 +36,7 @@ type EnrollmentCtaProps = Merge<
  *
  * É o único componente que decide para onde "Garanta sua vaga" leva, e ele
  * existe porque a página tinha quatro botões com esse texto levando todos a
- * `/matricula` sem perguntar se havia turma. Quem chegava lá lia "nenhuma turma
+ * `/enrollment` sem perguntar se havia turma. Quem chegava lá lia "nenhuma turma
  * aberta" depois de clicar num convite.
  *
  * Sem turma anunciada o botão deixa de prometer matrícula: vira conversa no
@@ -100,7 +100,7 @@ export function EnrollmentCta({
       render={
         // `search` e não caminho: a matrícula lê `?curso` para já abrir no curso
         // de onde a pessoa veio, e recarregar a página não perde a escolha.
-        <Link to="/matricula" search={search}>
+        <Link to="/enrollment" search={search}>
           {label}
           <ArrowRight />
         </Link>

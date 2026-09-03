@@ -2,8 +2,8 @@
  * A trilha do painel, derivada das rotas que casaram.
  *
  * Das rotas, e não do `location.pathname` sozinho, por um motivo só: um caminho
- * partido em segmentos produz destinos que não existem - `/admin/cursos/$id` é
- * tela, mas `/admin/cursos/abc-123` só é navegável porque essa rota casou. O
+ * partido em segmentos produz destinos que não existem - `/administrator/courses/$id` é
+ * tela, mas `/administrator/courses/abc-123` só é navegável porque essa rota casou. O
  * conjunto de `pathname` das rotas casadas responde quais prefixos existem de
  * verdade, e só esses viram link.
  *
@@ -22,12 +22,12 @@ export type Crumb = {
  * `if`: segmento novo sem rótulo aqui aparece cru, e não some.
  */
 const SEGMENT_LABELS: Record<string, string | undefined> = {
-  admin: 'Painel',
-  cursos: 'Cursos',
-  turmas: 'Turmas',
-  matriculas: 'Matrículas',
-  novo: 'Novo',
-  nova: 'Nova',
+  administrator: 'Painel',
+  courses: 'Cursos',
+  classes: 'Turmas',
+  enrollments: 'Matrículas',
+  new: 'Novo',
+  edit: 'Editar',
 }
 
 function segments(path: string): Array<string> {
@@ -36,9 +36,9 @@ function segments(path: string): Array<string> {
 
 /** O que o roteador chama de match, reduzido ao que a trilha precisa. */
 export type BreadcrumbMatch = {
-  /** Com os parâmetros por preencher: `/admin/turmas/$id`. */
+  /** Com os parâmetros por preencher: `/administrator/classes/$id`. */
   fullPath: string
-  /** Com os parâmetros preenchidos: `/admin/turmas/abc-123`. */
+  /** Com os parâmetros preenchidos: `/administrator/classes/abc-123`. */
   pathname: string
 }
 

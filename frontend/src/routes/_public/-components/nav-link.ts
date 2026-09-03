@@ -33,7 +33,7 @@ export const navLinkVariants = cva('transition-colors', {
        * ícone; nos de texto puro não há segundo filho para separar.
        */
       footer:
-        'inline-flex min-h-11 items-center gap-2 text-background/70 hover:text-background dark:text-muted-foreground dark:hover:text-card-foreground',
+        'inline-flex min-h-11 items-center gap-2 text-white/70 hover:text-white',
     },
   },
   defaultVariants: {

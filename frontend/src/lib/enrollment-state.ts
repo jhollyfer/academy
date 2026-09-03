@@ -5,7 +5,7 @@ import type { ClassResponse, CourseResponse } from '#/integrations/response'
  * O estado da matrícula, derivado das turmas anunciadas.
  *
  * Existe porque a página tinha duas verdades ao mesmo tempo: quatro CTAs
- * "Garanta sua vaga" levavam a `/matricula`, que respondia "nenhuma turma
+ * "Garanta sua vaga" levavam a `/enrollment`, que respondia "nenhuma turma
  * aberta", enquanto a página do curso anunciava turma com 40 vagas. Não era
  * texto desencontrado - era cada tela perguntando ao seu jeito.
  *
@@ -97,7 +97,7 @@ export function courseCapacity(course: CourseResponse): number {
 }
 
 /**
- * Os horários das turmas do curso numa frase: `"08h–10h e 10h–12h"`. Turma sem
+ * Os horários das turmas do curso numa frase: `"08h às 10h e 10h às 12h"`. Turma sem
  * horário fechado entra pelo nome, que é o que a secretaria escreveu.
  */
 export function courseTimesLabel(course: CourseResponse): string {
@@ -148,7 +148,7 @@ function earliestStart(classes: ReadonlyArray<ClassResponse>): string {
 }
 
 /**
- * O horário de uma turma, como a página o escreve: `"08h–10h"`.
+ * O horário de uma turma, como a página o escreve: `"08h às 10h"`.
  *
  * A hora chega `"08:00:00"` do Postgres e vira `08h`; minuto quebrado aparece
  * (`"08h30"`), porque uma turma das 8h30 não pode ser anunciada como das 8h.
@@ -167,7 +167,7 @@ export function formatTimeRange(
 
   if (!end) return start
 
-  return `${start}–${end}`
+  return `${start} às ${end}`
 }
 
 function formatTime(value: string | null): string {
@@ -214,7 +214,7 @@ export type ScheduleSummary = {
   totalSeats: number
   /** `"manhã, tarde e noite"`, na ordem do dia. Vazio sem turma. */
   shiftsLabel: string
-  /** `"08h–10h"` da primeira turma do dia à última. Vazio sem horário. */
+  /** `"08h às 10h"` da primeira turma do dia à última. Vazio sem horário. */
   timesLabel: string
 }
 
@@ -255,7 +255,7 @@ function shiftLabels(classes: ReadonlyArray<ClassResponse>): Array<string> {
 
 /**
  * Da primeira hora à última: `"08h às 20h"`. Uma turma só, ou horários que não
- * variam, devolve o intervalo dela - `"08h–10h"`.
+ * variam, devolve o intervalo dela - `"08h às 10h"`.
  */
 function timesLabel(classes: ReadonlyArray<ClassResponse>): string {
   const withTime = classes.filter((entity) => entity.startsAtTime)

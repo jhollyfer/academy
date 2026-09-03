@@ -26,7 +26,12 @@ export function FormShellContent({
 
   return (
     <PageShellContent>
-      <form data-slot="form-shell-content" id={formId} {...props}>
+      {/*
+        `method="post"` antes do spread: envio antes da hidratação é nativo, e
+        o GET padrão do HTML levaria cada campo do formulário para a query
+        string. Quem passar `method` na chamada continua vencendo.
+      */}
+      <form method="post" data-slot="form-shell-content" id={formId} {...props}>
         {children}
       </form>
     </PageShellContent>
@@ -43,9 +48,9 @@ type FormShellCardProps = Merge<
  *
  * `Card` + `CardContent` + a coluna com `gap-4` que todo formulário do painel
  * escrevia à mão. Peça separada e não embutida no `FormShellContent` porque a
- * quantidade varia: uma tela simples tem um, `administrator/companies` tem
- * quatro, e `$company/impact-reports` tem layout próprio e não usa nenhum. Uma
- * prop booleana de escape seria a mesma coisa com um nome pior.
+ * quantidade varia: a turma tem um, o curso tem quatro, e uma tela de layout
+ * próprio não usa nenhum. Uma prop booleana de escape seria a mesma coisa com
+ * um nome pior.
  */
 export function FormShellCard({
   className,

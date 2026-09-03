@@ -1,11 +1,14 @@
+import * as React from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { request } from './http'
+import { useMultipartUpload } from '#/hooks/use-multipart-upload'
 import type { UseMutationOptions } from '@tanstack/react-query'
 import type { HTTPError } from './http'
 import type {
   ClassResponse,
   CourseResponse,
   EnrollmentResponse,
+  StorageResponse,
   StorefrontEnrollmentResponse,
 } from '../response'
 import type {
@@ -37,6 +40,77 @@ type MutationProps<TData, TPayload, TError = HTTPError> = Omit<
 >
 
 // ---------------------------------------------------------------------------
+// /storages
+// ---------------------------------------------------------------------------
+
+/**
+ * Envia um arquivo e devolve o registro com a `url` derivada.
+ *
+ * O envio inteiro é do `useMultipartUpload`: o binário não passa pela API, e o
+ * que acontece aqui dentro são três chamadas - abrir, subir direto ao bucket,
+ * confirmar. Esta mutation existe por cima dele para dar o `isPending` e os
+ * callbacks a quem só quer "subiu ou não", que é o caso do campo de imagem
+ * única. Quem precisa da barra de progresso e do cancelamento usa o hook
+ * direto, porque `useMutation` não tem por onde entregar progresso.
+ *
+ * O erro é `Error` e não `HTTPError`: o hook recusa localmente o tipo de
+ * arquivo antes de gastar requisição, e essa recusa não tem status HTTP.
+ *
+ * O arquivo nasce **sem dono**: quem anexa é que guarda a referência,
+ * informando o `id` devolvido aqui em `coverId` ou `avatarId` da entidade que
+ * recebe o anexo. Por isso a mutation não invalida nada - não há listagem de
+ * anexos para atualizar.
+ *
+ * O `AbortSignal` é de um controller que vive enquanto o componente vive, e é
+ * abortado quando ele sai de cena. Um controller que nascesse e morresse na
+ * mesma linha da chamada daria um sinal que ninguém pode disparar: sair da tela
+ * no meio do envio deixaria as partes subindo até o fim, gastando banda por um
+ * arquivo que já não interessa a ninguém - e o registro `PENDING` que sobrasse
+ * só sumiria na varredura do servidor.
+ */
+export function useStorageCreate(
+  options?: MutationProps<StorageResponse, File, Error>,
+) {
+  const { upload } = useMultipartUpload()
+  const controller = React.useRef<AbortController | null>(null)
+
+  React.useEffect(() => {
+    return () => controller.current?.abort()
+  }, [])
+
+  return useMutation<StorageResponse, Error, File>({
+    ...options,
+    mutationFn: function (file) {
+      // Um por envio: um controller abortado não volta a valer, e reaproveitá-lo
+      // faria o envio seguinte nascer cancelado.
+      controller.current = new AbortController()
+
+      return upload(file, () => undefined, controller.current.signal)
+    },
+  })
+}
+
+/**
+ * Apaga um arquivo órfão: o binário e a linha em `storages`.
+ *
+ * É o par do `useStorageCreate`, e fecha o buraco que ele abre: o upload
+ * acontece na hora da escolha, **antes** de o formulário ser salvo, então todo
+ * anexo trocado ou removido da tela ficava em disco para sempre.
+ *
+ * O backend recusa com `409 STORAGE_IN_USE` o arquivo que alguém referencia,
+ * então chamar esta mutation sobre um anexo já salvo é seguro: a resposta é um
+ * erro, não uma imagem furada em outro cadastro.
+ */
+export function useStorageDelete(options?: MutationProps<void, string>) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return request<void>('/storages/'.concat(id), { method: 'DELETE' })
+    },
+  })
+}
+
+// ---------------------------------------------------------------------------
 // authentication
 // ---------------------------------------------------------------------------
 
@@ -48,7 +122,7 @@ type MutationProps<TData, TPayload, TError = HTTPError> = Omit<
  * guard reusa a ausência de sessão que ele cacheou um segundo antes, e o login
  * "não funciona" sem erro nenhum na tela.
  */
-export function useSignIn(
+export function useAuthenticationSignIn(
   options?: MutationProps<void, AuthenticationSignInPayload>,
 ) {
   return useMutation<void, HTTPError, AuthenticationSignInPayload>({
@@ -62,7 +136,7 @@ export function useSignIn(
   })
 }
 
-export function useSignOut(options?: MutationProps<void, void>) {
+export function useAuthenticationSignOut(options?: MutationProps<void, void>) {
   return useMutation<void, HTTPError, void>({
     ...options,
     mutationFn: function () {
@@ -104,7 +178,7 @@ export function useCourseUpdate(
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<CourseResponse>(`/administrator/courses/${id}`, {
+      return request<CourseResponse>('/administrator/courses/'.concat(id), {
         method: 'PUT',
         body: JSON.stringify(payload),
       })
@@ -116,7 +190,7 @@ export function useCourseArchive(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>(`/administrator/courses/${id}/archive`, {
+      return request<void>('/administrator/courses/'.concat(id, '/archive'), {
         method: 'PATCH',
       })
     },
@@ -127,7 +201,7 @@ export function useCourseUnarchive(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>(`/administrator/courses/${id}/unarchive`, {
+      return request<void>('/administrator/courses/'.concat(id, '/unarchive'), {
         method: 'PATCH',
       })
     },
@@ -139,7 +213,9 @@ export function useCourseDelete(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>(`/administrator/courses/${id}`, { method: 'DELETE' })
+      return request<void>('/administrator/courses/'.concat(id), {
+        method: 'DELETE',
+      })
     },
   })
 }
@@ -172,7 +248,7 @@ export function useClassUpdate(
     {
       ...options,
       mutationFn: function (payload) {
-        return request<ClassResponse>(`/administrator/classes/${id}`, {
+        return request<ClassResponse>('/administrator/classes/'.concat(id), {
           method: 'PUT',
           body: JSON.stringify(payload),
         })
@@ -185,7 +261,7 @@ export function useClassArchive(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>(`/administrator/classes/${id}/archive`, {
+      return request<void>('/administrator/classes/'.concat(id, '/archive'), {
         method: 'PATCH',
       })
     },
@@ -196,7 +272,7 @@ export function useClassUnarchive(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>(`/administrator/classes/${id}/unarchive`, {
+      return request<void>('/administrator/classes/'.concat(id, '/unarchive'), {
         method: 'PATCH',
       })
     },
@@ -207,7 +283,9 @@ export function useClassDelete(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>(`/administrator/classes/${id}`, { method: 'DELETE' })
+      return request<void>('/administrator/classes/'.concat(id), {
+        method: 'DELETE',
+      })
     },
   })
 }
@@ -237,10 +315,13 @@ export function useEnrollmentUpdate(
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<EnrollmentResponse>(`/administrator/enrollments/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-      })
+      return request<EnrollmentResponse>(
+        '/administrator/enrollments/'.concat(id),
+        {
+          method: 'PUT',
+          body: JSON.stringify(payload),
+        },
+      )
     },
   })
 }
@@ -249,9 +330,12 @@ export function useEnrollmentArchive(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>(`/administrator/enrollments/${id}/archive`, {
-        method: 'PATCH',
-      })
+      return request<void>(
+        '/administrator/enrollments/'.concat(id, '/archive'),
+        {
+          method: 'PATCH',
+        },
+      )
     },
   })
 }
@@ -260,9 +344,12 @@ export function useEnrollmentUnarchive(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>(`/administrator/enrollments/${id}/unarchive`, {
-        method: 'PATCH',
-      })
+      return request<void>(
+        '/administrator/enrollments/'.concat(id, '/unarchive'),
+        {
+          method: 'PATCH',
+        },
+      )
     },
   })
 }
@@ -271,7 +358,7 @@ export function useEnrollmentDelete(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>(`/administrator/enrollments/${id}`, {
+      return request<void>('/administrator/enrollments/'.concat(id), {
         method: 'DELETE',
       })
     },
@@ -329,7 +416,7 @@ export function useEnrollmentAttach(
     ...options,
     mutationFn: function (payload) {
       return request<StorefrontEnrollmentResponse>(
-        `/storefront/enrollments/${protocol}/attachments`,
+        '/storefront/enrollments/'.concat(protocol, '/attachments'),
         {
           method: 'POST',
           body: JSON.stringify(payload),

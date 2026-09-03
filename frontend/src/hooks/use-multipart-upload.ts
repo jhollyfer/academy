@@ -130,7 +130,7 @@ async function open(
   if (saved) {
     try {
       return await request<StorageUploadResponse>(
-        `${basePath}/${saved.storageId}/parts`,
+        basePath.concat('/', saved.storageId, '/parts'),
       )
     } catch (error) {
       if (!(error instanceof HTTPError) || error.status !== 404) throw error
@@ -201,7 +201,7 @@ async function send(
     // recém-assinadas - as antigas podem já ter expirado.
     if (ready.length === 0) {
       batch = await request<StorageUploadResponse>(
-        `${basePath}/${initial.storage.id}/parts`,
+        basePath.concat('/', initial.storage.id, '/parts'),
       )
 
       for (const part of batch.uploaded) {
@@ -255,10 +255,13 @@ async function complete(
 
   if (uploadId) body.parts = parts
 
-  return request<StorageResponse>(`${basePath}/${storageId}/complete`, {
-    method: 'POST',
-    body: JSON.stringify(body),
-  })
+  return request<StorageResponse>(
+    basePath.concat('/', storageId, '/complete'),
+    {
+      method: 'POST',
+      body: JSON.stringify(body),
+    },
+  )
 }
 
 /**

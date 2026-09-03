@@ -44,7 +44,7 @@ type UseResourceFormOptions<TValues extends FieldValues, TRecord, TPayload> = {
    * O formulário vazio.
    *
    * Ausente numa edição que só usa `values`: o registro chega da query e não há
-   * estado inicial a declarar - `administrator/customers` é o caso.
+   * estado inicial a declarar - a edição de turma é o caso.
    */
   defaults?: DefaultValues<TValues>
   /**
@@ -92,7 +92,7 @@ type UseResourceFormReturn<TValues extends FieldValues, TRecord, TPayload> = {
 /**
  * A fiação de um formulário de criar ou editar do painel.
  *
- * Os trinta e nove `form-create.tsx` / `form-edit.tsx` escreviam as mesmas ~25
+ * Os quatro `form-create.tsx` / `form-edit.tsx` escreviam as mesmas ~25
  * linhas antes de chegar no primeiro campo: `useForm` com o resolver do vine, a
  * mutation com `onError` e `onSuccess`, o `invalidateQueries`, o toast, o
  * `navigate` de volta e um `onValid` que limpa o `root` antes de enviar. O que
@@ -106,7 +106,7 @@ type UseResourceFormReturn<TValues extends FieldValues, TRecord, TPayload> = {
  * **O `queryClient` vem do `useQueryClient()`, e não do contexto da rota.** Nos
  * arquivos de formulário a leitura era `route.useRouteContext()`, para não
  * pedir de novo o que o `loader` já tinha. Aqui não há rota: o hook serve as
- * trinta e nove. É a mesma instância - `router.tsx:104` monta o
+ * quatro. É a mesma instância - `router.tsx:104` monta o
  * `QueryClientProvider` com o client do contexto do router, via
  * `setupRouterSsrQueryIntegration` -, então o cache é um só.
  *

@@ -1,36 +1,22 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { enrollmentsListQueryOptions } from '#/integrations/tanstack-query/queries'
-import { validateListSearch } from '#/lib/list-search'
-import { ENROLLMENT_STATUSES } from '#/lib/entity'
-import type { EnrollmentStatus } from '#/lib/entity'
-import type { ListSearch } from '#/lib/list-search'
-import type { Merge } from '#/lib/interfaces'
+import { TableSkeleton } from '#/components/common/table/table-skeleton'
+import { withExtra } from '#/lib/list-search'
+import { enrollmentsQueryOptions } from '#/integrations/tanstack-query/queries'
 
 /**
- * Os filtros da fila da secretaria: os de toda listagem, mais o status.
+ * `?courseId=`, `?classId=` e `?status=` recortam a fila, como o validator do
+ * backend aceita.
  *
- * O status entra na URL como o resto: "me manda as pendentes" é um link, e um
- * `useState` obrigaria a descrever o caminho por escrito.
+ * `as const` não é enfeite: sem ele `TKey` infere `string`, o retorno vira um
+ * índice aberto e a união de search do roteador deixa de fechar - os
+ * componentes genéricos da tabela voltam a não compilar.
  */
-function validateSearch(
-  search: Record<string, unknown>,
-): Merge<ListSearch, { status?: EnrollmentStatus }> {
-  // O retorno é um tipo só, e não uma união com e sem `status`: uma união faria
-  // o campo sumir do tipo em quem lê o search, e a tela não conseguiria nem ler
-  // o filtro que ela mesma escreveu.
-  const result: Merge<ListSearch, { status?: EnrollmentStatus }> =
-    validateListSearch(search)
+const validateSearch = withExtra(['courseId', 'classId', 'status'] as const)
 
-  const status = ENROLLMENT_STATUSES.find((value) => value === search.status)
-
-  if (status) result.status = status
-
-  return result
-}
-
-export const Route = createFileRoute('/_private/admin/matriculas/')({
+export const Route = createFileRoute('/_private/administrator/enrollments/')({
   validateSearch,
+  pendingComponent: () => <TableSkeleton />,
   loaderDeps: ({ search }) => search,
   loader: ({ context, deps }) =>
-    context.queryClient.ensureQueryData(enrollmentsListQueryOptions(deps)),
+    context.queryClient.ensureQueryData(enrollmentsQueryOptions(deps)),
 })

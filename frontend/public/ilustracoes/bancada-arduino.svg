@@ -1,16 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none" role="img" aria-hidden="true">
-  <!-- TODO: placeholder no estilo certo, ate a arte final chegar. Ver _estilo.md -->
-  <g stroke="#101613" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="24" y="196" width="352" height="26" rx="8" fill="#F2954B"/>
-    <rect x="52" y="120" width="132" height="76" rx="10" fill="#4B8FE3"/>
-    <rect x="70" y="138" width="40" height="20" rx="4" fill="#FBF8F0"/>
+  <!--
+    TODO: placeholder no estilo certo, ate a arte final chegar. Ver _estilo.md
+
+    Esta e a unica que mora sobre o bloco de marca, entao ela segue a paleta de
+    tres cores: contorno branco, preenchimento no preto esverdeado do bloco e o
+    neon so no que precisa chamar. As outras nove continuam na paleta clara,
+    porque moram sobre blocos claros.
+
+    `currentColor` no contorno: quem define a cor e a classe do `<img>`... nao
+    funciona em `<img>`, entao o branco vai literal. Trocar para `<svg>` inline
+    resolveria, e custaria o cache do arquivo separado.
+  -->
+  <g stroke="#FBF8F0" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="24" y="196" width="352" height="26" rx="8" fill="#1B241F"/>
+    <rect x="52" y="120" width="132" height="76" rx="10" fill="#141B17"/>
+    <rect x="70" y="138" width="40" height="20" rx="4" fill="#88FF9A"/>
     <path d="M126 138h40M126 150h40M126 162h28"/>
-    <rect x="212" y="140" width="136" height="56" rx="10" fill="#A8E89B"/>
-    <path d="M228 156h12M252 156h12M276 156h12M300 156h12M324 156h12"/>
-    <path d="M228 180h12M252 180h12M276 180h12M300 180h12M324 180h12"/>
-    <path d="M184 158c26-4 26-30 52-30" stroke="#F2954B"/>
-    <path d="M184 176c34 6 34 24 68 24" stroke="#4B8FE3"/>
-    <circle cx="236" cy="128" r="10" fill="#F2954B"/>
+    <rect x="212" y="140" width="136" height="56" rx="10" fill="#141B17"/>
+    <path d="M228 156h12M252 156h12M276 156h12M300 156h12M324 156h12" stroke="#88FF9A"/>
+    <path d="M228 180h12M252 180h12M276 180h12M300 180h12M324 180h12" stroke="#88FF9A"/>
+    <path d="M184 158c26-4 26-30 52-30" stroke="#88FF9A"/>
+    <path d="M184 176c34 6 34 24 68 24"/>
+    <circle cx="236" cy="128" r="10" fill="#88FF9A"/>
     <path d="M60 222v34M340 222v34"/>
   </g>
 </svg>

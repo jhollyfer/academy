@@ -56,7 +56,7 @@ export function FormShellActions(
  * `Link` e não `onClick` com `navigate()`: descartar é navegação, e como link
  * ele responde a abrir em nova aba, ao clique do meio e ao menu de contexto.
  *
- * Sem children escreve "Descartar", que é o que os 39 formulários dizem.
+ * Sem children escreve "Descartar", que é o que os quatro formulários dizem.
  */
 export function FormShellDiscard({
   children = 'Descartar',

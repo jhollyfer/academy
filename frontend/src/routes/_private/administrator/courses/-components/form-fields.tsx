@@ -18,8 +18,28 @@ import {
   SelectValue,
 } from '#/components/ui/select'
 import { ACTIVE_STATUSES, COURSE_ACCENTS } from '#/lib/entity'
+import { ACTIVE_STATUS_LABELS, COURSE_ACCENT_LABELS } from '#/lib/labels'
+import {
+  ImageField,
+  ImageFieldActions,
+  ImageFieldContent,
+  ImageFieldDescription,
+  ImageFieldPreview,
+  ImageFieldRemove,
+  ImageFieldUpload,
+} from '#/components/common/image-field'
 import type { UseFormReturn } from 'react-hook-form'
 import type { AdministratorCourseCreatePayload } from '#/lib/validator'
+import type { CourseResponse } from '#/integrations/response'
+
+/**
+ * A forma que o formulário segura: a de **criação**.
+ *
+ * A edição usa a mesma, e não a de atualização: aquela é toda `.optional()`, e
+ * o `vineResolver` deixaria passar um campo obrigatório apagado - a API leria o
+ * campo ausente como "não mexer" e o valor antigo ficaria.
+ */
+export type CourseFormType = AdministratorCourseCreatePayload
 
 /**
  * Os campos do curso, compartilhados entre criar e editar.
@@ -33,21 +53,26 @@ import type { AdministratorCourseCreatePayload } from '#/lib/validator'
  * curso e ementa em dois cliques abriria uma janela em que a página pública
  * mostra metade do que a pessoa escreveu.
  */
-const ACCENT_LABELS: Record<string, string> = {
-  ROBOTICS: 'Robótica',
-  WEB: 'Desenvolvimento web',
-}
-
-const STATUS_LABELS: Record<string, string> = {
-  ACTIVE: 'No ar',
-  INACTIVE: 'Fora do ar',
+type CourseFormFieldsProps = {
+  form: UseFormReturn<CourseFormType>
+  /**
+   * O prefixo dos `id` dos campos.
+   *
+   * Existe porque `htmlFor` casa por `id` no documento inteiro: sem ele, criar e
+   * editar na mesma página - ou o formulário dentro de um dialog sobre a
+   * listagem - dariam dois `id="name"`, e o clique no rótulo focaria o campo
+   * errado.
+   */
+  idPrefix: string
+  /** A capa já salva, para o preview nascer preenchido na edição. */
+  previewUrl?: string | null
 }
 
 export function CourseFormFields({
   form,
-}: {
-  form: UseFormReturn<AdministratorCourseCreatePayload>
-}): React.JSX.Element {
+  idPrefix,
+  previewUrl,
+}: CourseFormFieldsProps): React.JSX.Element {
   const modules = useFieldArray({ control: form.control, name: 'modules' })
   const faqs = useFieldArray({ control: form.control, name: 'faqs' })
 
@@ -61,8 +86,14 @@ export function CourseFormFields({
           name="name"
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="name">Nome do curso</FieldLabel>
-              <Input {...field} id="name" aria-invalid={fieldState.invalid} />
+              <FieldLabel htmlFor={`${idPrefix}-name`}>
+                Nome do curso
+              </FieldLabel>
+              <Input
+                {...field}
+                id={`${idPrefix}-name`}
+                aria-invalid={fieldState.invalid}
+              />
               {fieldState.error && (
                 <FieldError>{fieldState.error.message}</FieldError>
               )}
@@ -75,11 +106,13 @@ export function CourseFormFields({
           name="slug"
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="slug">Endereço na URL</FieldLabel>
+              <FieldLabel htmlFor={`${idPrefix}-slug`}>
+                Endereço na URL
+              </FieldLabel>
               <Input
                 {...field}
                 value={field.value ?? ''}
-                id="slug"
+                id={`${idPrefix}-slug`}
                 placeholder="Deixe em branco para sair do nome"
                 aria-invalid={fieldState.invalid}
               />
@@ -95,11 +128,11 @@ export function CourseFormFields({
           name="tagline"
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="tagline">Chamada</FieldLabel>
+              <FieldLabel htmlFor={`${idPrefix}-tagline`}>Chamada</FieldLabel>
               <Input
                 {...field}
                 value={field.value ?? ''}
-                id="tagline"
+                id={`${idPrefix}-tagline`}
                 placeholder="A linha que aparece embaixo do nome no card"
                 aria-invalid={fieldState.invalid}
               />
@@ -110,15 +143,56 @@ export function CourseFormFields({
           )}
         />
 
+        {/*
+          A capa do curso. O arquivo sobe na hora da escolha e o formulário
+          guarda só o `coverId` - é o mesmo contrato de `POST /storages` que o
+          comprovante da matrícula usa, e por isso o campo é o `image-field/` do
+          kit e não um input de arquivo desta tela.
+        */}
+        <Controller
+          control={form.control}
+          name="coverId"
+          render={({ field, fieldState }) => (
+            <ImageField
+              id={`${idPrefix}-coverId`}
+              value={field.value ?? null}
+              onValueChange={field.onChange}
+              previewUrl={previewUrl}
+            >
+              <FieldLabel htmlFor={`${idPrefix}-coverId`}>Capa</FieldLabel>
+              <ImageFieldContent>
+                {/* O `alt` é vazio porque o nome do curso está no campo logo
+                    acima: anunciar "capa de X" repetiria o que o leitor de tela
+                    acabou de ler. Os children são a sigla de quando não há
+                    imagem. */}
+                <ImageFieldPreview alt="">Capa</ImageFieldPreview>
+                <ImageFieldActions>
+                  <ImageFieldUpload>Enviar capa</ImageFieldUpload>
+                  <ImageFieldRemove />
+                </ImageFieldActions>
+              </ImageFieldContent>
+              <ImageFieldDescription>
+                É a imagem que abre o card do curso na vitrine. JPEG, PNG ou
+                WebP.
+              </ImageFieldDescription>
+              {fieldState.error && (
+                <FieldError>{fieldState.error.message}</FieldError>
+              )}
+            </ImageField>
+          )}
+        />
+
         <Controller
           control={form.control}
           name="description"
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="description">Descrição</FieldLabel>
+              <FieldLabel htmlFor={`${idPrefix}-description`}>
+                Descrição
+              </FieldLabel>
               <Textarea
                 {...field}
-                id="description"
+                id={`${idPrefix}-description`}
                 rows={5}
                 aria-invalid={fieldState.invalid}
               />
@@ -135,15 +209,20 @@ export function CourseFormFields({
             name="accent"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="accent">Tema do curso</FieldLabel>
+                <FieldLabel htmlFor={`${idPrefix}-accent`}>
+                  Tema do curso
+                </FieldLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger id="accent" aria-invalid={fieldState.invalid}>
+                  <SelectTrigger
+                    id={`${idPrefix}-accent`}
+                    aria-invalid={fieldState.invalid}
+                  >
                     <SelectValue placeholder="Escolha" />
                   </SelectTrigger>
                   <SelectContent>
                     {COURSE_ACCENTS.map((accent) => (
                       <SelectItem key={accent} value={accent}>
-                        {ACCENT_LABELS[accent] ?? accent}
+                        {COURSE_ACCENT_LABELS[accent] ?? accent}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -160,18 +239,18 @@ export function CourseFormFields({
             name="status"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="status">Situação</FieldLabel>
+                <FieldLabel htmlFor={`${idPrefix}-status`}>Situação</FieldLabel>
                 <Select
                   value={field.value ?? 'ACTIVE'}
                   onValueChange={field.onChange}
                 >
-                  <SelectTrigger id="status">
+                  <SelectTrigger id={`${idPrefix}-status`}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {ACTIVE_STATUSES.map((status) => (
                       <SelectItem key={status} value={status}>
-                        {STATUS_LABELS[status] ?? status}
+                        {ACTIVE_STATUS_LABELS[status] ?? status}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -226,11 +305,13 @@ export function CourseFormFields({
           name="requirements"
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="requirements">Requisitos</FieldLabel>
+              <FieldLabel htmlFor={`${idPrefix}-requirements`}>
+                Requisitos
+              </FieldLabel>
               <Textarea
                 {...field}
                 value={field.value ?? ''}
-                id="requirements"
+                id={`${idPrefix}-requirements`}
                 rows={3}
               />
               {fieldState.error && (
@@ -245,13 +326,13 @@ export function CourseFormFields({
           name="projectOutcome"
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="projectOutcome">
+              <FieldLabel htmlFor={`${idPrefix}-projectOutcome`}>
                 O que o aluno vai construir
               </FieldLabel>
               <Textarea
                 {...field}
                 value={field.value ?? ''}
-                id="projectOutcome"
+                id={`${idPrefix}-projectOutcome`}
                 rows={3}
               />
               {fieldState.error && (
@@ -411,7 +492,7 @@ function NumberField({
   hint,
   nullable,
 }: {
-  form: UseFormReturn<AdministratorCourseCreatePayload>
+  form: UseFormReturn<CourseFormType>
   name:
     | 'workloadHours'
     | 'durationMonths'
@@ -460,4 +541,86 @@ function NumberField({
       )}
     />
   )
+}
+
+/**
+ * Os campos que o backend pode acusar num 422 ou num 409.
+ *
+ * Escrito uma vez e usado nos dois formulários: uma lista por tela divergiria, e
+ * o campo de fora vira erro que aparece no rodapé em vez de no input.
+ */
+export const COURSE_FIELDS = [
+  'name',
+  'slug',
+  'tagline',
+  'description',
+  'accent',
+  'workloadHours',
+  'durationMonths',
+  'minimumAge',
+  'requirements',
+  'projectOutcome',
+  'enrollmentFeeInCents',
+  'monthlyFeeInCents',
+  'coverId',
+  'position',
+  'status',
+] as const
+
+/** O formulário vazio. */
+export const COURSE_FORM_DEFAULTS: CourseFormType = {
+  name: '',
+  slug: undefined,
+  tagline: null,
+  description: '',
+  accent: 'ROBOTICS',
+  workloadHours: 32,
+  durationMonths: 4,
+  minimumAge: null,
+  requirements: null,
+  projectOutcome: null,
+  enrollmentFeeInCents: 5000,
+  monthlyFeeInCents: 15000,
+  coverId: null,
+  position: 0,
+  status: 'ACTIVE',
+  modules: [],
+  faqs: [],
+}
+
+/**
+ * O registro carregado, na forma que o formulário segura.
+ *
+ * A conversão existe porque a resposta traz mais do que o formulário edita -
+ * `id`, `createdAt`, a contagem de turmas - e porque a grade e o FAQ chegam com
+ * `id` e `position`, que o payload de escrita não aceita: a ordem é o índice do
+ * array, e mandar `position` de volta seria o cliente decidindo o que o servidor
+ * já decide.
+ */
+export function courseToValues(course: CourseResponse): CourseFormType {
+  return {
+    name: course.name,
+    slug: course.slug,
+    tagline: course.tagline,
+    description: course.description,
+    accent: course.accent,
+    workloadHours: course.workloadHours,
+    durationMonths: course.durationMonths,
+    minimumAge: course.minimumAge,
+    requirements: course.requirements,
+    projectOutcome: course.projectOutcome,
+    enrollmentFeeInCents: course.enrollmentFeeInCents,
+    monthlyFeeInCents: course.monthlyFeeInCents,
+    coverId: course.coverId,
+    position: course.position,
+    status: course.status,
+    modules: (course.modules ?? []).map((entry) => ({
+      title: entry.title,
+      description: entry.description,
+    })),
+    faqs: (course.faqs ?? []).map((entry) => ({
+      question: entry.question,
+      answer: entry.answer,
+    })),
+  }
 }

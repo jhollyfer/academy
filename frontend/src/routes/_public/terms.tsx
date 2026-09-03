@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { SITE_TITLE, absoluteUrl } from '#/lib/site'
 
-const PATH = '/termos'
+const PATH = '/terms'
 
-export const Route = createFileRoute('/_public/termos')({
+export const Route = createFileRoute('/_public/terms')({
   head: () => {
-    const title = `Termos de uso - ${SITE_TITLE}`
+    const title = `Termos de uso · ${SITE_TITLE}`
     const description =
       'As regras da matrícula, do pagamento e da participação nos cursos da Maiyu Academy.'
 

@@ -24,7 +24,7 @@ export const Route = createFileRoute('/authentication')({
     // Destino fixo, e não derivado do papel como na referência: aqui há um
     // painel só. `OWNER` e `ADMINISTRATOR` diferem no que podem apagar, não em
     // onde entram.
-    throw redirect({ to: '/admin' })
+    throw redirect({ to: '/administrator' })
   },
   component: RouteComponent,
 })

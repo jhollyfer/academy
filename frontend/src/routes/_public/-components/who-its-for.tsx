@@ -2,8 +2,8 @@ import type * as React from 'react'
 
 import { CardContent, CardTitle, CardDescription } from '#/components/ui/card'
 import { SectionCard } from '#/components/common/section-card'
-import { Highlight } from '#/components/common/highlight'
 import { REVEAL, STAGGER } from './reveal'
+import { SectionTitle } from './section-title'
 import { cn } from '#/lib/utils'
 
 const PROFILES = [
@@ -32,22 +32,29 @@ const PROFILES = [
  * depois de pagar a inscrição. Dizer não antes do Pix é mais barato para os
  * dois lados.
  *
- * O último período é a única vez em que a página fala de emprego, e é para
- * negar. Escola que estreia sem aluno formado não tem como prometer carreira.
+ * O último período é onde a página resolve a única tensão que ela tem: a seção
+ * de missão diz que a escola existe para abrir a porta do mercado de TI, e esta
+ * diz que ninguém sai daqui com vaga garantida. As duas são verdade, e a frase
+ * as separa em vez de deixar o leitor supor a mais generosa - escola que estreia
+ * sem aluno formado não tem como prometer carreira.
  */
 export function WhoItsFor(): React.JSX.Element {
   return (
-    <section data-slot="home-who-its-for" className="px-3 py-3 sm:px-4 sm:py-4">
-      <div className="rounded-block border border-border bg-background px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
+    <section data-slot="home-who-its-for" className="bg-background">
+      {/*
+        Sangria total, como as faixas escuras: sem raio, sem borda e sem
+        respiro lateral no invólucro. Cada seção era um cartão flutuando
+        sobre o fundo, e empilhadas viravam uma pilha de cartões com
+        listras de fundo entre eles. O recuo que sobra é o do conteúdo,
+        no `mx-auto max-w-7xl` de dentro.
+      */}
+      <div className="relative px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         <div className="mx-auto max-w-7xl">
-          <h2
-            className={cn(
-              REVEAL,
-              'display-title max-w-[18ch] text-heading-lg font-semibold text-balance text-foreground sm:text-display-md lg:text-display-lg',
-            )}
-          >
-            Para quem é esta <Highlight variant="fill">turma</Highlight>
-          </h2>
+          <SectionTitle
+            className={REVEAL}
+            lead="Para quem é"
+            accent="esta turma"
+          />
 
           <div className="mt-12 grid gap-4 lg:grid-cols-3">
             {PROFILES.map((profile, index) => (
@@ -79,9 +86,10 @@ export function WhoItsFor(): React.JSX.Element {
                 Não é para quem
               </strong>{' '}
               procura curso online, aula gravada ou certificado rápido. As aulas
-              são presenciais, aos sábados, e exigem presença. Também não é para
-              quem espera emprego garantido no fim. O que a escola entrega é a
-              base e o projeto.
+              são presenciais, aos sábados, e exigem presença. E abrir a porta
+              do mercado, que é o que a escola existe para fazer, não é o mesmo
+              que garantir a passagem por ela: no fim do curso o que você leva é
+              a base e o projeto, não uma vaga.
             </p>
           </div>
         </div>

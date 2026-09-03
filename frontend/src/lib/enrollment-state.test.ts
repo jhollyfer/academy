@@ -117,11 +117,11 @@ describe('enrollmentStateFrom com várias turmas por curso', () => {
 
 describe('formatTimeRange', () => {
   it('a hora do Postgres vira a hora da página', () => {
-    expect(formatTimeRange('08:00:00', '10:00:00')).toBe('08h–10h')
+    expect(formatTimeRange('08:00:00', '10:00:00')).toBe('08h às 10h')
   })
 
   it('minuto quebrado aparece: turma das 8h30 não é turma das 8h', () => {
-    expect(formatTimeRange('08:30:00', '10:30:00')).toBe('08h30–10h30')
+    expect(formatTimeRange('08:30:00', '10:30:00')).toBe('08h30 às 10h30')
   })
 
   it('sem horário fechado não inventa travessão', () => {
@@ -221,7 +221,7 @@ describe('courseTimesLabel', () => {
       ]),
     )
 
-    expect(label).toBe('08h–10h e 10h–12h')
+    expect(label).toBe('08h às 10h e 10h às 12h')
   })
 
   it('turma sem horário entra pelo nome, que é o que a secretaria escreveu', () => {

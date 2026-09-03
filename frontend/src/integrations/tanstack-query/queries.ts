@@ -11,6 +11,7 @@ import type {
   Paginated,
 } from '../response'
 import type { ListSearch } from '#/lib/list-search'
+import type { Merge } from '#/lib/interfaces'
 
 /**
  * As leituras da API, num lugar só.
@@ -26,26 +27,50 @@ import type { ListSearch } from '#/lib/list-search'
  */
 
 /**
- * Converte o filtro da URL em query string.
+ * Monta a query string ignorando o que não foi preenchido.
  *
- * Chave com valor `undefined` **não entra**: `?search=undefined` é uma busca
- * pela palavra "undefined", e o backend a aplicaria sem reclamar.
+ * Descarta por falsidade e não por `!== undefined`: o valor pode chegar `null`
+ * (o search param existe e está limpo) ou `''`, e `String(null)` viraria o texto
+ * "null" no filtro. `page` e `perPage` são `min(1)` no validator, mas número é
+ * testado por tipo e não por verdade - um filtro numérico que aceite `0` não
+ * pode sumir por ser falso.
  */
-function params(search: Record<string, unknown>): string {
-  const query = new URLSearchParams()
+function search(
+  params:
+    ListSearch | CourseListSearch | ClassListSearch | EnrollmentListSearch,
+): string {
+  const entries = Object.entries(params).filter(
+    ([, value]) => typeof value === 'number' || Boolean(value),
+  )
 
-  for (const [key, value] of Object.entries(search)) {
-    if (value === undefined || value === null || value === '') continue
+  if (entries.length === 0) return ''
 
-    query.set(key, String(value))
-  }
-
-  const text = query.toString()
-
-  if (!text) return ''
-
-  return `?${text}`
+  return '?'.concat(
+    new URLSearchParams(
+      entries.map(([key, value]) => [key, String(value)]),
+    ).toString(),
+  )
 }
+
+/**
+ * Os filtros de cada listagem, declarados aqui e não inline na assinatura: o
+ * `validateSearch` da rota, o `loaderDeps` e o componente têm de concordar sobre
+ * a forma, e um tipo com nome é o que faz o `tsc` cobrar os três.
+ */
+export type CourseListSearch = Merge<
+  ListSearch,
+  { status?: string; accent?: string }
+>
+
+export type ClassListSearch = Merge<
+  ListSearch,
+  { courseId?: string; status?: string }
+>
+
+export type EnrollmentListSearch = Merge<
+  ListSearch,
+  { courseId?: string; classId?: string; status?: string }
+>
 
 // ---------------------------------------------------------------------------
 // account
@@ -56,108 +81,96 @@ function params(search: Record<string, unknown>): string {
  * por isso não tem `retry`: um 401 aqui é resposta, não falha de rede, e
  * repetir três vezes só atrasa o redirecionamento para o login.
  */
-export function accountQueryOptions() {
-  return queryOptions({
+export const accountQueryOptions = () =>
+  queryOptions({
     queryKey: queryKeys.account.all,
     queryFn: ({ signal }) =>
       request<AccountResponse>('/account/profile', { signal }),
     retry: false,
   })
-}
 
 // ---------------------------------------------------------------------------
 // administrator/courses
 // ---------------------------------------------------------------------------
 
-export function coursesListQueryOptions(search: ListSearch) {
-  return queryOptions({
-    queryKey: queryKeys.courses.list(search),
+export const coursesQueryOptions = (params: CourseListSearch) =>
+  queryOptions({
+    queryKey: queryKeys.courses.list(params),
     queryFn: ({ signal }) =>
       request<Paginated<CourseResponse>>(
-        `/administrator/courses${params(search)}`,
+        '/administrator/courses'.concat(search(params)),
         { signal },
       ),
     // Mantém a página anterior enquanto a nova carrega. Sem isto a tabela some e
     // reaparece a cada troca de filtro, e a página inteira pula de altura.
     placeholderData: keepPreviousData,
   })
-}
 
-export function courseDetailQueryOptions(id: string) {
-  return queryOptions({
+export const courseQueryOptions = (id: string) =>
+  queryOptions({
     queryKey: queryKeys.courses.detail(id),
     queryFn: ({ signal }) =>
-      request<CourseResponse>(`/administrator/courses/${id}`, { signal }),
+      request<CourseResponse>('/administrator/courses/'.concat(id), { signal }),
   })
-}
 
 // ---------------------------------------------------------------------------
 // administrator/classes
 // ---------------------------------------------------------------------------
 
-export function classesListQueryOptions(
-  search: ListSearch & { courseId?: string },
-) {
-  return queryOptions({
-    queryKey: queryKeys.classes.list(search),
+export const classesQueryOptions = (params: ClassListSearch) =>
+  queryOptions({
+    queryKey: queryKeys.classes.list(params),
     queryFn: ({ signal }) =>
       request<Paginated<ClassResponse>>(
-        `/administrator/classes${params(search)}`,
+        '/administrator/classes'.concat(search(params)),
         { signal },
       ),
     placeholderData: keepPreviousData,
   })
-}
 
-export function classDetailQueryOptions(id: string) {
-  return queryOptions({
+export const classQueryOptions = (id: string) =>
+  queryOptions({
     queryKey: queryKeys.classes.detail(id),
     queryFn: ({ signal }) =>
-      request<ClassResponse>(`/administrator/classes/${id}`, { signal }),
+      request<ClassResponse>('/administrator/classes/'.concat(id), { signal }),
   })
-}
 
 // ---------------------------------------------------------------------------
 // administrator/enrollments
 // ---------------------------------------------------------------------------
 
-export function enrollmentsListQueryOptions(
-  search: ListSearch & { courseId?: string; classId?: string; status?: string },
-) {
-  return queryOptions({
-    queryKey: queryKeys.enrollments.list(search),
+export const enrollmentsQueryOptions = (params: EnrollmentListSearch) =>
+  queryOptions({
+    queryKey: queryKeys.enrollments.list(params),
     queryFn: ({ signal }) =>
       request<Paginated<EnrollmentResponse>>(
-        `/administrator/enrollments${params(search)}`,
+        '/administrator/enrollments'.concat(search(params)),
         {
           signal,
         },
       ),
     placeholderData: keepPreviousData,
   })
-}
 
-export function enrollmentDetailQueryOptions(id: string) {
-  return queryOptions({
+export const enrollmentQueryOptions = (id: string) =>
+  queryOptions({
     queryKey: queryKeys.enrollments.detail(id),
     queryFn: ({ signal }) =>
-      request<EnrollmentResponse>(`/administrator/enrollments/${id}`, {
+      request<EnrollmentResponse>('/administrator/enrollments/'.concat(id), {
         signal,
       }),
   })
-}
 
 // ---------------------------------------------------------------------------
 // storefront
 // ---------------------------------------------------------------------------
 
-export function storefrontCoursesQueryOptions() {
-  return queryOptions({
+export const storefrontCoursesQueryOptions = () =>
+  queryOptions({
     queryKey: queryKeys.storefront.courses(),
     queryFn: ({ signal }) =>
       request<Paginated<CourseResponse>>('/storefront/courses', { signal }),
   })
-}
 
 /**
  * O FAQ da escola, o que a home mostra.
@@ -167,21 +180,19 @@ export function storefrontCoursesQueryOptions() {
  * alcança. Elas viviam no banco sem endpoint que as servisse, e a home não
  * renderizava FAQ nenhum por causa disso.
  */
-export function storefrontFaqsQueryOptions() {
-  return queryOptions({
+export const storefrontFaqsQueryOptions = () =>
+  queryOptions({
     queryKey: queryKeys.storefront.faqs(),
     queryFn: ({ signal }) =>
       request<Paginated<CourseFaqResponse>>('/storefront/faqs', { signal }),
   })
-}
 
-export function storefrontCourseQueryOptions(slug: string) {
-  return queryOptions({
+export const storefrontCourseQueryOptions = (slug: string) =>
+  queryOptions({
     queryKey: queryKeys.storefront.course(slug),
     queryFn: ({ signal }) =>
-      request<CourseResponse>(`/storefront/courses/${slug}`, { signal }),
+      request<CourseResponse>('/storefront/courses/'.concat(slug), { signal }),
   })
-}
 
 /**
  * O acompanhamento da matrícula pelo protocolo.
@@ -190,16 +201,15 @@ export function storefrontCourseQueryOptions(slug: string) {
  * resposta - insistir só faz o candidato olhar um spinner antes de ler que o
  * número não existe.
  */
-export function storefrontEnrollmentQueryOptions(protocol: string) {
-  return queryOptions({
+export const storefrontEnrollmentQueryOptions = (protocol: string) =>
+  queryOptions({
     queryKey: queryKeys.storefront.enrollment(protocol),
     queryFn: ({ signal }) =>
       request<StorefrontEnrollmentResponse>(
-        `/storefront/enrollments/${protocol}`,
+        '/storefront/enrollments/'.concat(protocol),
         {
           signal,
         },
       ),
     retry: false,
   })
-}

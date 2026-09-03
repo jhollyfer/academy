@@ -9,7 +9,7 @@
  * matrícula -, e um dos dois teria que importar do `-components/` do outro.
  */
 const ILLUSTRATIONS: Record<string, string> = {
-  robotica: '/ilustracoes/robo-seguidor-de-linha.svg',
+  robotics: '/ilustracoes/robo-seguidor-de-linha.svg',
   'web-development': '/ilustracoes/notebook-com-codigo.svg',
 }
 

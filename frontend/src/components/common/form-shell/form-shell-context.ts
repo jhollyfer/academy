@@ -7,7 +7,7 @@ import type { LinkProps } from '@tanstack/react-router'
  * Os três nascem no topo, no `FormShell`, e são usados três níveis abaixo: o
  * `formId` liga o `Salvar` do cabeçalho fixo ao `<form>` que rola no conteúdo,
  * e o destino de volta é o mesmo da seta e do `Descartar`. Passá-los por prop
- * até lá seria repetir os três em cada parte, em cada um dos 39 formulários -
+ * até lá seria repetir os três em cada parte, em cada um dos quatro formulários -
  * e três fontes de verdade para a mesma decisão.
  *
  * O título **não** está aqui: ele é markup, e markup vai por slot.

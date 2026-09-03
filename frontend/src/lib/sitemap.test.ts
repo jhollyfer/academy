@@ -4,13 +4,13 @@ import { buildSitemap, STATIC_ENTRIES } from './sitemap'
 describe('buildSitemap', () => {
   it('monta URL absoluta sem barra dobrada', () => {
     const xml = buildSitemap('https://academy.maiyu.com.br/', [
-      { path: '/cursos/robotica' },
+      { path: '/courses/robotics' },
     ])
 
     expect(xml).toContain(
-      '<loc>https://academy.maiyu.com.br/cursos/robotica</loc>',
+      '<loc>https://academy.maiyu.com.br/courses/robotics</loc>',
     )
-    expect(xml).not.toContain('//cursos')
+    expect(xml).not.toContain('//courses')
   })
 
   it('a raiz sai sem barra no fim, e não como origem duplicada', () => {
@@ -30,7 +30,7 @@ describe('buildSitemap', () => {
   })
 
   it('omite lastmod e priority quando não vêm', () => {
-    const xml = buildSitemap('https://exemplo.com', [{ path: '/sobre' }])
+    const xml = buildSitemap('https://exemplo.com', [{ path: '/about' }])
 
     expect(xml).not.toContain('<lastmod>')
     expect(xml).not.toContain('<priority>')
@@ -38,7 +38,7 @@ describe('buildSitemap', () => {
 
   it('inclui lastmod e priority quando vêm', () => {
     const xml = buildSitemap('https://exemplo.com', [
-      { path: '/sobre', lastModified: '2026-01-31', priority: 0.5 },
+      { path: '/about', lastModified: '2026-01-31', priority: 0.5 },
     ])
 
     expect(xml).toContain('<lastmod>2026-01-31</lastmod>')
@@ -48,12 +48,6 @@ describe('buildSitemap', () => {
   it('a lista estática cobre a home, a matrícula e as páginas legais', () => {
     const paths = STATIC_ENTRIES.map((entry) => entry.path)
 
-    expect(paths).toEqual([
-      '/',
-      '/matricula',
-      '/sobre',
-      '/termos',
-      '/privacidade',
-    ])
+    expect(paths).toEqual(['/', '/enrollment', '/about', '/terms', '/privacy'])
   })
 })

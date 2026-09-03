@@ -161,7 +161,7 @@ export function cpf() {
  * Telefone com DDD, guardado só em dígitos.
  *
  * Espelha `cpf()`: o `parse()` tira a máscara antes de qualquer validação, então
- * `(97) 98460-0872` e `97984600872` gravam o mesmo valor.
+ * `(97) 98431-7149` e `97984317149` gravam o mesmo valor.
  *
  * Os dois lados normalizam, e nenhum confia no outro: o formulário limpa antes
  * de enviar, e um cliente que chame a API direto com o número mascarado é aceito
@@ -298,7 +298,7 @@ export const PaginationValidator = vine.create(vine.object(paginationFields()))
 
 /**
  * O identificador público de um recurso do site. Slug e não uuid: é o que
- * aparece em `/cursos/:slug`, e trocar um pelo outro na URL da landing seria
+ * aparece em `/courses/:slug`, e trocar um pelo outro na URL da landing seria
  * expor a chave interna sem ganho nenhum.
  */
 export const SlugValidator = vine.create({

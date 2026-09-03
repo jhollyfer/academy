@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Link, createLazyFileRoute } from '@tanstack/react-router'
+import { Link, createLazyFileRoute, getRouteApi } from '@tanstack/react-router'
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import {
@@ -18,11 +18,12 @@ import { PillButton } from '#/components/common/pill-button'
 import { whatsappUrl } from '#/lib/site'
 import { formatDate, formatMoney } from '#/lib/format'
 import { EnrollmentStatuses } from '#/lib/entity'
-import { Route as ProtocolRoute } from './$protocol'
 import { ReceiptUpload } from './-components/receipt-upload'
 import type { EnrollmentStatus } from '#/lib/entity'
 
-export const Route = createLazyFileRoute('/_public/matricula/$protocol')({
+const route = getRouteApi('/_public/enrollment/$protocol')
+
+export const Route = createLazyFileRoute('/_public/enrollment/$protocol')({
   component: RouteComponent,
   notFoundComponent: ProtocolNotFound,
 })
@@ -45,7 +46,7 @@ function ProtocolNotFound(): React.JSX.Element {
   return (
     <div className="mx-auto max-w-2xl px-4 py-24 text-center">
       <div className="text-foreground [&_svg]:mx-auto [&_svg]:size-10">
-        <Warning weight="fill" />
+        <Warning weight="regular" />
       </div>
 
       <h1 className="mt-5 text-3xl leading-[1.05] font-semibold tracking-tight text-foreground sm:text-4xl">
@@ -62,7 +63,7 @@ function ProtocolNotFound(): React.JSX.Element {
         <PillButton
           tone="ink"
           scale="lg"
-          render={<Link to="/matricula">Fazer minha matrícula</Link>}
+          render={<Link to="/enrollment">Fazer minha matrícula</Link>}
         />
 
         <Button
@@ -110,24 +111,24 @@ const STATUS_VIEW: Record<
   { icon: React.ReactNode; title: string; description: string }
 > = {
   PENDING: {
-    icon: <Hourglass weight="fill" />,
+    icon: <Hourglass weight="regular" />,
     title: 'Matrícula recebida',
     description:
       'Sua vaga está reservada. Assim que a secretaria conferir o comprovante do Pix, ela confirma e avisa você.',
   },
   CONFIRMED: {
-    icon: <CheckCircle weight="fill" />,
+    icon: <CheckCircle weight="regular" />,
     title: 'Matrícula confirmada',
     description: 'Está tudo certo. Nos vemos no primeiro sábado de aula.',
   },
   WAITLIST: {
-    icon: <Hourglass weight="fill" />,
+    icon: <Hourglass weight="regular" />,
     title: 'Você está na fila de espera',
     description:
       'A turma encheu antes do seu envio. Você não perdeu o lugar na fila: se abrir vaga, a secretaria chama pela ordem.',
   },
   CANCELLED: {
-    icon: <Warning weight="fill" />,
+    icon: <Warning weight="regular" />,
     title: 'Matrícula cancelada',
     description:
       'Se isso não era o esperado, fale com a secretaria pelo WhatsApp.',
@@ -151,7 +152,7 @@ const PIX_KEY = '00.000.000/0001-00'
 const COPIED_RESET_MS = 2_000
 
 function RouteComponent(): React.JSX.Element {
-  const { protocol } = ProtocolRoute.useParams()
+  const { protocol } = route.useParams()
   const { data: enrollment } = useSuspenseQuery(
     storefrontEnrollmentQueryOptions(protocol),
   )
@@ -206,7 +207,7 @@ function RouteComponent(): React.JSX.Element {
       <div className="relative mx-auto max-w-2xl px-4 py-16 lg:py-20">
         <div className="text-foreground [&_svg]:size-10">{view.icon}</div>
 
-        <h1 className="display-title mt-5 text-heading-lg font-semibold sm:text-display-md">
+        <h1 className="brand-title mt-5 text-heading-lg text-foreground sm:text-display-md">
           {view.title}
         </h1>
         <p className="mt-4 max-w-[52ch] text-body-md text-muted-foreground">
@@ -295,7 +296,7 @@ function RouteComponent(): React.JSX.Element {
                 <div className="mt-8">
                   {hasReceipt && (
                     <Alert className="mb-4">
-                      <CheckCircle weight="fill" />
+                      <CheckCircle weight="regular" />
                       <AlertTitle>
                         Comprovante enviado. A secretaria vai conferir.
                       </AlertTitle>

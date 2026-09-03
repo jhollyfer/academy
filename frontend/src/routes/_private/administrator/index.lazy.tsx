@@ -2,8 +2,8 @@ import type * as React from 'react'
 import { createLazyFileRoute, Link } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import {
-  classesListQueryOptions,
-  enrollmentsListQueryOptions,
+  classesQueryOptions,
+  enrollmentsQueryOptions,
 } from '#/integrations/tanstack-query/queries'
 import { Badge } from '#/components/ui/badge'
 import { Card, CardContent } from '#/components/ui/card'
@@ -13,16 +13,16 @@ import { formatDate } from '#/lib/format'
 import { ClassStatuses, EnrollmentStatuses } from '#/lib/entity'
 import type { EnrollmentStatus } from '#/lib/entity'
 
-export const Route = createLazyFileRoute('/_private/admin/')({
+export const Route = createLazyFileRoute('/_private/administrator/')({
   component: RouteComponent,
 })
 
 function RouteComponent(): React.JSX.Element {
   const { data: classes } = useSuspenseQuery(
-    classesListQueryOptions({ perPage: 100 }),
+    classesQueryOptions({ perPage: 100 }),
   )
   const { data: enrollments } = useSuspenseQuery(
-    enrollmentsListQueryOptions({ perPage: 100 }),
+    enrollmentsQueryOptions({ perPage: 100 }),
   )
 
   const rows = enrollments.data
@@ -96,7 +96,7 @@ function RouteComponent(): React.JSX.Element {
                   <CardContent className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <Link
-                        to="/admin/turmas/$id"
+                        to="/administrator/classes/$id"
                         params={{ id: entity.id }}
                         className="font-medium hover:underline"
                       >
@@ -159,7 +159,7 @@ function Stat({
         painel.
       */}
       <CardContent>
-        <Link to="/admin/matriculas" search={to} className="block">
+        <Link to="/administrator/enrollments" search={to} className="block">
           <dt className="text-sm text-muted-foreground">{label}</dt>
           <dd className="mt-1 text-3xl font-semibold tabular-nums">{value}</dd>
           <p className="mt-1 text-xs text-muted-foreground">{hint}</p>

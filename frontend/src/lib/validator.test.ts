@@ -1,0 +1,182 @@
+import { describe, expect, it } from 'vitest'
+import {
+  AdministratorClassCreateValidator,
+  AdministratorCourseCreateValidator,
+  AuthenticationSignInValidator,
+  StorefrontEnrollmentCreateValidator,
+} from './validator'
+
+/**
+ * O `validator.ts` é cópia literal de `backend/app/core/validator.ts`, e é o
+ * único arquivo do frontend em que uma divergência silenciosa com o servidor
+ * vira 422 na cara de quem preencheu o formulário certo.
+ *
+ * O que se testa aqui é o que o schema **decide**, não o que o VineJS faz: a
+ * normalização de máscara, os aceites que não podem ser booleanos e as regras
+ * que a tela não tem como reproduzir sozinha. Formato de e-mail e `minLength`
+ * de string ficam de fora - testá-los é testar a biblioteca.
+ */
+
+/** Os campos que um erro acusou, para comparar por nome em vez de por posição. */
+function fieldsOf(error: { messages: Array<{ field: string }> } | null) {
+  if (!error) return []
+
+  return error.messages.map((m) => m.field).sort()
+}
+
+const COURSE = {
+  name: 'Robótica',
+  description: 'Monta, programa e vê funcionar.',
+  accent: 'ROBOTICS',
+  workloadHours: 32,
+  durationMonths: 4,
+  enrollmentFeeInCents: 15000,
+  monthlyFeeInCents: 15000,
+  position: 0,
+  status: 'ACTIVE',
+  modules: [],
+  faqs: [],
+}
+
+const CLASS = {
+  courseId: '3f6c1a7e-9b2d-4f8a-8c1e-2d5b7a9c0e11',
+  name: 'Turma 1 / 2026',
+  startsAt: '2026-03-07',
+  weekday: 'SATURDAY',
+  shift: 'MORNING',
+  location: 'Benjamin Constant/AM',
+  capacity: 40,
+  status: 'OPEN',
+}
+
+const ENROLLMENT = {
+  classId: '3f6c1a7e-9b2d-4f8a-8c1e-2d5b7a9c0e11',
+  studentName: 'Maria Souza',
+  studentBirthDate: '2008-05-14',
+  email: 'maria@mail.com',
+  phone: '97984317149',
+  termsAccepted: true,
+  lgpdConsent: true,
+}
+
+describe('curso', () => {
+  it('aceita o cadastro mínimo', async () => {
+    const [error] = await AdministratorCourseCreateValidator.tryValidate(COURSE)
+
+    expect(fieldsOf(error)).toEqual([])
+  })
+
+  it('recusa acento fora do enum', async () => {
+    const [error] = await AdministratorCourseCreateValidator.tryValidate({
+      ...COURSE,
+      accent: 'MUSICA',
+    })
+
+    expect(fieldsOf(error)).toContain('accent')
+  })
+
+  it('recusa idade mínima negativa', async () => {
+    const [error] = await AdministratorCourseCreateValidator.tryValidate({
+      ...COURSE,
+      minimumAge: -1,
+    })
+
+    expect(fieldsOf(error)).toContain('minimumAge')
+  })
+})
+
+describe('turma', () => {
+  it('aceita o cadastro mínimo', async () => {
+    const [error] = await AdministratorClassCreateValidator.tryValidate(CLASS)
+
+    expect(fieldsOf(error)).toEqual([])
+  })
+
+  it('recusa horário fora de HH:MM', async () => {
+    const [error] = await AdministratorClassCreateValidator.tryValidate({
+      ...CLASS,
+      startsAtTime: '8h',
+    })
+
+    expect(fieldsOf(error)).toContain('startsAtTime')
+  })
+
+  it('aceita horário ausente: a secretaria pode não tê-lo fechado', async () => {
+    const [error] = await AdministratorClassCreateValidator.tryValidate({
+      ...CLASS,
+      startsAtTime: null,
+      endsAtTime: null,
+    })
+
+    expect(fieldsOf(error)).toEqual([])
+  })
+})
+
+describe('matrícula', () => {
+  it('aceita o envio mínimo', async () => {
+    const [error] =
+      await StorefrontEnrollmentCreateValidator.tryValidate(ENROLLMENT)
+
+    expect(fieldsOf(error)).toEqual([])
+  })
+
+  it('grava o telefone só em dígitos, com ou sem máscara', async () => {
+    const [, comMascara] =
+      await StorefrontEnrollmentCreateValidator.tryValidate({
+        ...ENROLLMENT,
+        phone: '(97) 98431-7149',
+      })
+
+    expect(comMascara?.phone).toBe('97984317149')
+  })
+
+  it('recusa texto que não tem dígito nenhum no telefone', async () => {
+    // A regra existe para "nao tenho fone" não virar string vazia e passar
+    // calado por um campo opcional.
+    const [error] = await StorefrontEnrollmentCreateValidator.tryValidate({
+      ...ENROLLMENT,
+      phone: 'nao tenho fone',
+    })
+
+    expect(fieldsOf(error)).toContain('phone')
+  })
+
+  it('grava o CPF só em dígitos e confere o dígito verificador', async () => {
+    const [, valido] = await StorefrontEnrollmentCreateValidator.tryValidate({
+      ...ENROLLMENT,
+      studentDocument: '529.982.247-25',
+    })
+
+    expect(valido?.studentDocument).toBe('52998224725')
+
+    const [error] = await StorefrontEnrollmentCreateValidator.tryValidate({
+      ...ENROLLMENT,
+      studentDocument: '111.111.111-11',
+    })
+
+    expect(fieldsOf(error)).toContain('studentDocument')
+  })
+
+  it('recusa aceite desmarcado, e não o grava como `false`', async () => {
+    // `literal(true)` e não booleano: "false" não é um consentimento que valha
+    // gravar, é o formulário enviado sem a caixa marcada.
+    const [error] = await StorefrontEnrollmentCreateValidator.tryValidate({
+      ...ENROLLMENT,
+      termsAccepted: false,
+      lgpdConsent: false,
+    })
+
+    expect(fieldsOf(error)).toEqual(['lgpdConsent', 'termsAccepted'])
+  })
+})
+
+describe('sign-in', () => {
+  it('recusa e-mail malformado sem vazar qual dos dois campos falhou', async () => {
+    const [error] = await AuthenticationSignInValidator.tryValidate({
+      email: 'maria',
+      password: 'Administrator1!',
+    })
+
+    expect(fieldsOf(error)).toEqual(['email'])
+  })
+})

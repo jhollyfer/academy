@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { SITE_TITLE, absoluteUrl } from '#/lib/site'
 
-const PATH = '/privacidade'
+const PATH = '/privacy'
 
-export const Route = createFileRoute('/_public/privacidade')({
+export const Route = createFileRoute('/_public/privacy')({
   head: () => {
-    const title = `Política de privacidade - ${SITE_TITLE}`
+    const title = `Política de privacidade · ${SITE_TITLE}`
     const description =
       'Como a Maiyu Academy coleta, usa e guarda os dados de quem se matricula, incluindo dados de menores de idade.'
 

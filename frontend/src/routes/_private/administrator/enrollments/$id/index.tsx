@@ -1,12 +1,14 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
-import { enrollmentDetailQueryOptions } from '#/integrations/tanstack-query/queries'
+import { enrollmentQueryOptions } from '#/integrations/tanstack-query/queries'
 import { HTTPError, HTTPStatus } from '#/integrations/tanstack-query/http'
 
-export const Route = createFileRoute('/_private/admin/matriculas/$id/')({
+export const Route = createFileRoute(
+  '/_private/administrator/enrollments/$id/',
+)({
   loader: async ({ context, params }) => {
     try {
       return await context.queryClient.ensureQueryData(
-        enrollmentDetailQueryOptions(params.id),
+        enrollmentQueryOptions(params.id),
       )
     } catch (error) {
       /*

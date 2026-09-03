@@ -39,7 +39,7 @@ function escapeXml(value: string): string {
  * Junta a origem ao caminho sem duplicar nem comer a barra.
  *
  * A origem vem de configuração e pode chegar com barra no fim; o caminho é
- * escrito no código e começa com uma. Concatenar direto daria `//cursos`, que é
+ * escrito no código e começa com uma. Concatenar direto daria `//courses`, que é
  * outra URL para o rastreador.
  */
 function absolute(origin: string, path: string): string {
@@ -84,8 +84,8 @@ export function buildSitemap(
  */
 export const STATIC_ENTRIES: Array<SitemapEntry> = [
   { path: '/', priority: 1 },
-  { path: '/matricula', priority: 0.9 },
-  { path: '/sobre', priority: 0.5 },
-  { path: '/termos', priority: 0.2 },
-  { path: '/privacidade', priority: 0.2 },
+  { path: '/enrollment', priority: 0.9 },
+  { path: '/about', priority: 0.5 },
+  { path: '/terms', priority: 0.2 },
+  { path: '/privacy', priority: 0.2 },
 ]

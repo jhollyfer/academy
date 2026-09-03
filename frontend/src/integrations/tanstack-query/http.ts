@@ -13,6 +13,10 @@ import * as server from './http.server'
 /**
  * O corpo de erro que toda rota da API devolve. Espelha
  * `HTTPExceptionPayload` em `backend/app/exceptions/http.exception.ts`.
+ *
+ * `errors` é `Record<string, string>` e não `Record<string, Array<string>>`: o
+ * handler do backend guarda **a primeira** mensagem de cada campo, e não a
+ * lista. Tratar como array aqui faria a tela imprimir `[object Object]`.
  */
 export type HTTPErrorBody = {
   message: string
@@ -42,10 +46,15 @@ export const HTTPStatus = {
 } as const
 
 /**
- * Os `code`s que a autenticação pode devolver, conforme `backend/openapi.json`.
+ * Os `code`s que mudam o que a tela faz, conforme `backend/openapi.json`.
  * Comparar por `code` e não por mensagem: a mensagem é texto de UI e muda.
+ *
+ * Não é a lista inteira do backend, de propósito: os `*_LIST_ERROR`,
+ * `*_SHOW_ERROR` e companhia são 500 com nome de rota, e quem os trata é a
+ * faixa `isServerError`, não um `if` por recurso.
  */
 export const HTTPErrorCode = {
+  /** 401 do sign-in: e-mail ou senha errados. **Não** merece refresh. */
   INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
   /**
    * Sessão ausente ou expirada, vindo do guard
@@ -55,10 +64,15 @@ export const HTTPErrorCode = {
    */
   UNAUTHORIZED: 'UNAUTHORIZED',
   VALIDATION_ERROR: 'VALIDATION_ERROR',
-  USER_ALREADY_EXISTS: 'USER_ALREADY_EXISTS',
-  COMPANY_ALREADY_EXISTS: 'COMPANY_ALREADY_EXISTS',
-  SIGN_IN_ERROR: 'SIGN_IN_ERROR',
-  SIGN_UP_ERROR: 'SIGN_UP_ERROR',
+  /** 403 do middleware de papel: tem sessão, não tem o papel exigido. */
+  ACCESS_DENIED: 'ACCESS_DENIED',
+  /**
+   * 409 de `DELETE /storages/:id`: alguém referencia o arquivo. É o que faz o
+   * campo de imagem poder apagar o órfão sem furar a imagem de outro cadastro.
+   */
+  STORAGE_IN_USE: 'STORAGE_IN_USE',
+  /** 422 de `POST /storages/:id/complete`: o objeto no bucket não bate. */
+  STORAGE_SIZE_MISMATCH: 'STORAGE_SIZE_MISMATCH',
   /** Local, não vem do servidor: falha de rede normalizada. */
   NETWORK_ERROR: 'NETWORK_ERROR',
   /** Local: resposta de erro sem corpo JSON válido (proxy, HTML de erro). */

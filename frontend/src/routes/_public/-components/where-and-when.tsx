@@ -11,12 +11,12 @@ import type { Icon } from '@phosphor-icons/react'
 
 import { PillButton } from '#/components/common/pill-button'
 import { Separator } from '#/components/ui/separator'
-import { Highlight } from '#/components/common/highlight'
 import { storefrontCoursesQueryOptions } from '#/integrations/tanstack-query/queries'
 import { enrollmentStateFrom, scheduleSummary } from '#/lib/enrollment-state'
 import { formatDate } from '#/lib/format'
 import { CAMPUS, ENROLLMENT_DESK, whatsappUrl } from '#/lib/site'
 import { REVEAL } from './reveal'
+import { SectionTitle } from './section-title'
 import { cn } from '#/lib/utils'
 
 const DIRECTIONS_MESSAGE =
@@ -66,20 +66,15 @@ export function WhereAndWhen(): React.JSX.Element {
   ]
 
   return (
-    <section
-      data-slot="home-where-and-when"
-      className="px-3 py-3 sm:px-4 sm:py-4"
-    >
-      <div className="rounded-block border border-border bg-card px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
+    <section data-slot="home-where-and-when" className="bg-card">
+      {/*
+        Sangria total, como as faixas escuras: sem raio, sem borda e sem
+        respiro lateral no invólucro. O recuo que sobra é o do conteúdo,
+        no `mx-auto max-w-7xl` de dentro.
+      */}
+      <div className="relative px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-20">
-          <h2
-            className={cn(
-              REVEAL,
-              'display-title text-heading-lg font-semibold text-balance text-foreground sm:text-display-md lg:text-display-lg',
-            )}
-          >
-            Onde e <Highlight variant="fill">quando</Highlight>
-          </h2>
+          <SectionTitle className={REVEAL} lead="Onde e" accent="quando" />
 
           <div className={cn(REVEAL, 'delay-100')}>
             <dl className="grid gap-5">
@@ -89,7 +84,7 @@ export function WhereAndWhen(): React.JSX.Element {
 
                   <div className="flex items-start gap-4">
                     <row.icon
-                      weight="duotone"
+                      weight="regular"
                       aria-hidden
                       className="mt-0.5 size-6 shrink-0 text-foreground"
                     />

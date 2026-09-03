@@ -6,8 +6,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '#/components/ui/accordion'
-import { Highlight } from '#/components/common/highlight'
 import { REVEAL } from './reveal'
+import { SectionTitle } from './section-title'
 import { cn } from '#/lib/utils'
 import type { CourseFaqResponse } from '#/integrations/response'
 
@@ -44,17 +44,17 @@ export function Faq({
   if (faqs.length === 0) return <></>
 
   return (
-    <section data-slot="home-faq" className="px-3 py-3 sm:px-4 sm:py-4">
-      <div className="rounded-block border border-border bg-background px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
+    <section data-slot="home-faq" className="bg-background">
+      {/*
+        Sangria total, como as faixas escuras: sem raio, sem borda e sem
+        respiro lateral no invólucro. Cada seção era um cartão flutuando
+        sobre o fundo, e empilhadas viravam uma pilha de cartões com
+        listras de fundo entre eles. O recuo que sobra é o do conteúdo,
+        no `mx-auto max-w-7xl` de dentro.
+      */}
+      <div className="relative px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-20">
-          <h2
-            className={cn(
-              REVEAL,
-              'display-title text-heading-lg font-semibold text-balance text-foreground sm:text-display-md lg:text-display-lg',
-            )}
-          >
-            {title} <Highlight variant="outline">{highlight}</Highlight>
-          </h2>
+          <SectionTitle className={REVEAL} lead={title} accent={highlight} />
 
           {/*
             `keepMounted` porque o `aria-controls` abaixo é escrito à mão. Por

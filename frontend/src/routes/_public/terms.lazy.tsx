@@ -4,7 +4,7 @@ import { LegalPage } from './-components/legal-page'
 import { ADDRESS, WHATSAPP_NUMBER } from '#/lib/site'
 import { formatPhone } from '#/lib/format'
 
-export const Route = createLazyFileRoute('/_public/termos')({
+export const Route = createLazyFileRoute('/_public/terms')({
   component: RouteComponent,
 })
 

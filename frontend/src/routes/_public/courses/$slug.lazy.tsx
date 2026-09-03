@@ -1,5 +1,5 @@
 import type * as React from 'react'
-import { createLazyFileRoute } from '@tanstack/react-router'
+import { createLazyFileRoute, getRouteApi } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { CalendarBlank, Clock, MapPin, Users } from '@phosphor-icons/react'
 
@@ -7,8 +7,8 @@ import { Badge } from '#/components/ui/badge'
 import { CardContent } from '#/components/ui/card'
 import { SectionCard } from '#/components/common/section-card'
 import { Separator } from '#/components/ui/separator'
-import { Highlight } from '#/components/common/highlight'
-import { Leaf } from '#/components/common/marks'
+import { CircuitTrails, Leaf } from '#/components/common/marks'
+import { SectionTitle } from '../-components/section-title'
 import { EnrollmentCta } from '#/components/common/enrollment-cta'
 import { storefrontCourseQueryOptions } from '#/integrations/tanstack-query/queries'
 import { formatDate, formatMoney } from '#/lib/format'
@@ -20,10 +20,11 @@ import {
 import { Faq } from '../-components/faq'
 import { REVEAL, STAGGER } from '../-components/reveal'
 import { WhatsappFloat } from '../-components/whatsapp-float'
-import { Route as CourseRoute } from './$slug'
 import { cn } from '#/lib/utils'
 
-export const Route = createLazyFileRoute('/_public/cursos/$slug')({
+const route = getRouteApi('/_public/courses/$slug')
+
+export const Route = createLazyFileRoute('/_public/courses/$slug')({
   component: RouteComponent,
 })
 
@@ -32,40 +33,47 @@ export const Route = createLazyFileRoute('/_public/cursos/$slug')({
  * decisão de design e não coluna do banco.
  */
 const ILLUSTRATIONS: Record<string, string> = {
-  robotica: '/ilustracoes/robo-seguidor-de-linha.svg',
+  robotics: '/ilustracoes/robo-seguidor-de-linha.svg',
   'web-development': '/ilustracoes/notebook-com-codigo.svg',
 }
 
 const FALLBACK_ILLUSTRATION = '/ilustracoes/bancada-arduino.svg'
 
 function RouteComponent(): React.JSX.Element {
-  const { slug } = CourseRoute.useParams()
+  const { slug } = route.useParams()
   const { data: course } = useSuspenseQuery(storefrontCourseQueryOptions(slug))
 
   return (
     <>
-      <section className="px-3 pt-3 sm:px-4 sm:pt-4">
-        <div className="relative overflow-hidden rounded-block bg-primary px-6 py-14 sm:px-10 lg:px-14 lg:py-20">
-          <Leaf className="-top-24 -right-20 size-96 text-primary-foreground/5" />
+      {/* A mesma faixa da home e da página institucional. */}
+      <section className="relative overflow-hidden bg-brand-ink">
+        <CircuitTrails className="text-neon/25" />
+        <Leaf className="-top-24 -right-20 size-96 text-neon/5" />
 
+        <div className="relative px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
           <div className="relative mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[1.2fr_1fr]">
             <div className={cn(REVEAL)}>
-              <Badge className="h-6 border-transparent bg-foreground px-3 text-xs text-background">
+              {/* Contorno neon sobre o bloco, e não o par `foreground` que
+                  inverte com o tema: aqui o fundo é fixo nos dois. */}
+              <Badge className="h-6 border-neon/40 bg-transparent px-3 text-xs text-neon">
                 Módulo 1
               </Badge>
 
-              <h1 className="display-title mt-5 max-w-[18ch] text-display-md font-semibold text-balance text-primary-foreground sm:text-display-lg lg:text-display-xl">
+              {/* O nome do curso vem do banco e não se parte em duas linhas
+                  fixas, então aqui não cabe o `SectionTitle`. O que se
+                  aproveita é a tipografia da marca. */}
+              <h1 className="brand-title mt-5 max-w-[18ch] text-display-md text-balance text-white sm:text-display-lg lg:text-display-xl">
                 {course.name}
               </h1>
 
               {course.tagline && (
-                <p className="mt-6 max-w-[52ch] text-body-lg text-primary-foreground">
+                <p className="mt-6 max-w-[52ch] text-body-lg text-white/85">
                   {course.tagline}
                 </p>
               )}
 
               <EnrollmentCta
-                tone="ink"
+                tone="neon"
                 scale="lg"
                 className="mt-8"
                 courseSlug={course.slug}
@@ -122,13 +130,13 @@ function RouteComponent(): React.JSX.Element {
         </div>
       </section>
 
-      <section className="px-3 py-3 sm:px-4 sm:py-4">
-        <div className="rounded-block border border-border bg-background px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
+      {/* Sangria total, como as seções da home: sem raio, sem borda e sem
+          respiro lateral no invólucro. */}
+      <section className="bg-background">
+        <div className="relative px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
           <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
             <div className={cn(REVEAL)}>
-              <h2 className="display-title text-heading-lg font-semibold text-balance text-foreground sm:text-display-md">
-                Sobre o <Highlight variant="outline">curso</Highlight>
-              </h2>
+              <SectionTitle lead="Sobre" accent="o curso" />
 
               <p className="mt-6 max-w-[52ch] text-body-md text-muted-foreground">
                 {course.description}
@@ -195,22 +203,15 @@ function RouteComponent(): React.JSX.Element {
         </div>
       </section>
 
-      <section className="px-3 py-3 sm:px-4 sm:py-4">
-        <div className="rounded-block border border-border bg-card px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
+      <section className="bg-card">
+        <div className="relative px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
           <div className="mx-auto max-w-7xl">
-            <h2
-              className={cn(
-                REVEAL,
-                'display-title text-heading-lg font-semibold text-balance text-foreground sm:text-display-md',
-              )}
-            >
-              Quanto <Highlight variant="fill">custa</Highlight>
-            </h2>
+            <SectionTitle className={REVEAL} lead="Quanto" accent="custa" />
 
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:max-w-3xl">
               <SectionCard className={cn(REVEAL)}>
                 <CardContent>
-                  <p className="display-title text-display-md leading-none font-semibold text-foreground lg:text-display-lg">
+                  <p className="brand-title text-display-md leading-none text-foreground lg:text-display-lg">
                     {formatMoney(course.enrollmentFeeInCents)}
                   </p>
                   <p className="mt-3 text-muted-foreground">
@@ -221,7 +222,7 @@ function RouteComponent(): React.JSX.Element {
 
               <SectionCard className={cn(REVEAL, 'delay-100')}>
                 <CardContent>
-                  <p className="display-title text-display-md leading-none font-semibold text-foreground lg:text-display-lg">
+                  <p className="brand-title text-display-md leading-none text-foreground lg:text-display-lg">
                     {formatMoney(course.monthlyFeeInCents)}
                   </p>
                   <p className="mt-3 text-muted-foreground">
@@ -270,11 +271,20 @@ function Fact({
 }): React.JSX.Element {
   return (
     <div className="flex flex-col-reverse gap-1">
-      <dt className="inline-flex items-center gap-2 text-sm text-primary-foreground [&_svg]:size-4">
+      {/*
+        Branco literal, e não `--primary-foreground`.
+        O token era o certo quando este bloco era verde: ali o par
+        `primary`/`primary-foreground` casava. O bloco virou `--brand-ink`, que
+        é escuro nos dois temas, e no tema **escuro** o `--primary` é o neon -
+        logo o `--primary-foreground` dele é quase preto. Dava 1,19:1, medido:
+        o rótulo e o valor sumiam para quem estava no escuro e apareciam para
+        quem estava no claro.
+      */}
+      <dt className="inline-flex items-center gap-2 text-sm text-white/70 [&_svg]:size-4 [&_svg]:text-neon/70">
         {icon}
         {label}
       </dt>
-      <dd className="text-heading-sm text-primary-foreground">{children}</dd>
+      <dd className="text-heading-sm text-white">{children}</dd>
     </div>
   )
 }

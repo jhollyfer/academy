@@ -52,8 +52,8 @@ export function absoluteUrl(path: string): string {
  * programação" concorre com o mundo inteiro e não ganha de ninguém.
  */
 export const SITE_DESCRIPTION =
-  'Escola de tecnologia em Benjamin Constant, no Amazonas. Cursos presenciais de robótica e ' +
-  'desenvolvimento web, aos sábados.'
+  'Escola de tecnologia no Alto Solimões, em Benjamin Constant. Cursos presenciais de robótica ' +
+  'e desenvolvimento web, aos sábados, para a juventude da região.'
 
 /**
  * O título da raiz, que é o nome mais o posicionamento.
@@ -64,7 +64,7 @@ export const SITE_DESCRIPTION =
  * longo demais para o que o buscador mostra.
  */
 export const SITE_TAGLINE =
-  'Maiyu Academy - Escola de Tecnologia em Benjamin Constant'
+  'Maiyu Academy · Escola de Tecnologia em Benjamin Constant'
 
 /**
  * O WhatsApp da secretaria, só dígitos com o código do país.
@@ -73,7 +73,7 @@ export const SITE_TAGLINE =
  * site fecha o ciclo em vez de competir com ele: o botão flutuante e os CTAs
  * abrem uma conversa com a mensagem já escrita.
  */
-export const WHATSAPP_NUMBER = '5597984600872'
+export const WHATSAPP_NUMBER = '5597984317149'
 
 /**
  * A cidade da escola, para o JSON-LD e para o texto que só precisa dizer onde

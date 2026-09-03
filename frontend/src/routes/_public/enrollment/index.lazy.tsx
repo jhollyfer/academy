@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { createLazyFileRoute, useRouter } from '@tanstack/react-router'
+import {
+  createLazyFileRoute,
+  getRouteApi,
+  useRouter,
+} from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Controller, useForm } from 'react-hook-form'
 import { vineResolver } from '@hookform/resolvers/vine'
@@ -13,6 +17,7 @@ import type { Merge } from '#/lib/interfaces'
 import { LEGAL_AGE } from '#/lib/entity'
 import { applyMutationError } from '#/lib/form-errors'
 import { errorId, invalidProps } from '#/lib/form-a11y'
+import { DatePicker } from '#/components/common/date-picker'
 import {
   SHIFT_LABELS,
   WAITING_LIST_MESSAGE,
@@ -34,10 +39,11 @@ import {
   FieldLabel,
 } from '#/components/ui/field'
 import { formatMoney, formatDate } from '#/lib/format'
-import { Route as EnrollmentRoute } from './index'
 import type { ClassResponse } from '#/integrations/response'
 
-export const Route = createLazyFileRoute('/_public/matricula/')({
+const route = getRouteApi('/_public/enrollment/')
+
+export const Route = createLazyFileRoute('/_public/enrollment/')({
   component: RouteComponent,
 })
 
@@ -84,6 +90,22 @@ type FormValues = Merge<
  * e o total de passos muda junto. Mostrar um passo que vai ser pulado é prometer
  * um trabalho que não existe.
  */
+/**
+ * A faixa de anos que o seletor de nascimento oferece.
+ *
+ * Fim é hoje: nascer no futuro não acontece, e deixar o dropdown listar 2030
+ * convida ao erro de digitação que o validator só reprova depois do envio.
+ * Início em 1920 porque é folgado o bastante para qualquer responsável legal e
+ * curto o bastante para a lista de anos caber num rolar.
+ *
+ * Fora do componente: são dois `new Date()` que não dependem de nada da tela, e
+ * dentro dele nasceriam a cada tecla digitada no formulário.
+ */
+const BIRTH_RANGE = {
+  start: new Date(1920, 0, 1),
+  end: new Date(),
+} as const
+
 const STEPS = ['curso', 'aluno', 'responsavel', 'revisao'] as const
 
 /**
@@ -202,7 +224,7 @@ function seatsLabel(remaining: number | undefined): string {
 
 function RouteComponent(): React.JSX.Element {
   const router = useRouter()
-  const search = EnrollmentRoute.useSearch()
+  const search = route.useSearch()
   const { data } = useSuspenseQuery(storefrontCoursesQueryOptions())
 
   const courses = data.data
@@ -392,7 +414,7 @@ function RouteComponent(): React.JSX.Element {
   const mutation = useEnrollmentCreate({
     onSuccess: async function (enrollment) {
       await router.navigate({
-        to: '/matricula/$protocol',
+        to: '/enrollment/$protocol',
         params: { protocol: enrollment.protocol },
       })
     },
@@ -452,7 +474,7 @@ function RouteComponent(): React.JSX.Element {
   if (options.length === 0) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-24 text-center">
-        <h1 className="display-title text-heading-lg font-semibold text-foreground sm:text-display-md">
+        <h1 className="brand-title text-heading-lg text-foreground sm:text-display-md">
           Nenhuma turma aberta <Highlight variant="fill">agora</Highlight>
         </h1>
         <p className="mx-auto mt-5 max-w-[46ch] text-body-md text-muted-foreground">
@@ -482,7 +504,7 @@ function RouteComponent(): React.JSX.Element {
   return (
     <div className="relative">
       <div className="relative mx-auto max-w-2xl px-4 py-16 lg:py-20">
-        <h1 className="display-title text-heading-lg font-semibold sm:text-display-md">
+        <h1 className="brand-title text-heading-lg text-foreground sm:text-display-md">
           Sua <span className="text-foreground">matrícula</span>
         </h1>
 
@@ -495,7 +517,16 @@ function RouteComponent(): React.JSX.Element {
           Passo {index + 1} de {steps.length}
         </p>
 
-        <form onSubmit={form.handleSubmit(submit)} className="mt-10">
+        {/*
+          `method="post"` pelo mesmo motivo do sign-in: envio antes da
+          hidratação é nativo, e o GET padrão levaria CPF, telefone e data de
+          nascimento do candidato para a query string.
+        */}
+        <form
+          method="post"
+          onSubmit={form.handleSubmit(submit)}
+          className="mt-10"
+        >
           {step === 'curso' && (
             <FieldGroup>
               <fieldset>
@@ -697,17 +728,31 @@ function RouteComponent(): React.JSX.Element {
                         Data de nascimento
                       </FieldLabel>
                       {/*
-                        `type="date"` nativo e não um seletor de calendário: a
-                        data é de nascimento, e um calendário obriga a navegar
-                        vinte anos para trás. O teclado do celular já abre o
-                        seletor certo.
+                        O `DatePicker` do kit, o mesmo do painel e o mesmo dos
+                        projetos irmãos. Antes era `<input type="date">` nativo,
+                        com o argumento de que um calendário obrigaria a navegar
+                        vinte anos para trás - e o argumento caiu quando o
+                        componente passou a usar `captionLayout="dropdown"`:
+                        escolher o ano é um clique, não duzentos.
+
+                        O nativo tinha dois defeitos que este não tem: cada
+                        navegador o desenha de um jeito e nenhum aceita estilo,
+                        e o formato que ele mostra segue o sistema operacional -
+                        quem tem o sistema em inglês via `mm/dd/aaaa` num
+                        formulário em português, e digitava a data trocada.
+
+                        `startMonth`/`endMonth` cercam a lista de anos no que o
+                        campo aceita: de 1920 até hoje. Data de nascimento no
+                        futuro não existe.
                       */}
-                      <Input
-                        {...field}
+                      <DatePicker
                         id="studentBirthDate"
-                        type="date"
-                        required
-                        autoComplete="bday"
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        onBlur={field.onBlur}
+                        placeholder="Escolha a data"
+                        startMonth={BIRTH_RANGE.start}
+                        endMonth={BIRTH_RANGE.end}
                         {...invalidProps(
                           fieldState.invalid,
                           'studentBirthDate',
@@ -789,7 +834,7 @@ function RouteComponent(): React.JSX.Element {
                     pattern={PHONE_PATTERN}
                     required
                     autoComplete="tel"
-                    placeholder="(97) 98460-0872"
+                    placeholder="(97) 98431-7149"
                     {...invalidProps(Boolean(errors.phone), 'phone')}
                   />
                   {errors.phone && (
@@ -892,7 +937,7 @@ function RouteComponent(): React.JSX.Element {
                     pattern={PHONE_PATTERN}
                     required
                     autoComplete="section-responsavel tel"
-                    placeholder="(97) 98460-0872"
+                    placeholder="(97) 98431-7149"
                     {...invalidProps(
                       Boolean(errors.guardianPhone),
                       'guardianPhone',
@@ -955,7 +1000,7 @@ function RouteComponent(): React.JSX.Element {
                         <span className="text-muted-foreground">
                           Li e aceito os{' '}
                           <a
-                            href="/termos"
+                            href="/terms"
                             target="_blank"
                             className="text-foreground hover:underline"
                           >
@@ -991,7 +1036,7 @@ function RouteComponent(): React.JSX.Element {
                           Autorizo o uso dos meus dados para processar esta
                           matrícula, conforme a{' '}
                           <a
-                            href="/privacidade"
+                            href="/privacy"
                             target="_blank"
                             className="text-foreground hover:underline"
                           >
@@ -1074,7 +1119,7 @@ function RouteComponent(): React.JSX.Element {
                 disabled={mutation.isPending || !consented}
                 aria-describedby={consentHintId}
               >
-                {mutation.isPending && 'Enviando...'}
+                {mutation.isPending && 'Enviando…'}
                 {!mutation.isPending && 'Enviar matrícula'}
                 <CheckCircle />
               </Button>

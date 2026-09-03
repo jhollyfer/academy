@@ -24,13 +24,13 @@ import { whatsappUrl } from '#/lib/site'
  * celular leem a mesma coisa, e duas cópias divergiriam no primeiro link novo.
  */
 const LINKS = [
-  { to: '/cursos/$slug', params: { slug: 'robotica' }, label: 'Robótica' },
+  { to: '/courses/$slug', params: { slug: 'robotics' }, label: 'Robótica' },
   {
-    to: '/cursos/$slug',
+    to: '/courses/$slug',
     params: { slug: 'web-development' },
     label: 'Desenvolvimento web',
   },
-  { to: '/sobre', params: undefined, label: 'A escola' },
+  { to: '/about', params: undefined, label: 'Quem somos' },
 ] as const
 
 const HEADER_MESSAGE =
@@ -78,6 +78,18 @@ export function Header(): React.JSX.Element {
         </Link>
 
         <div className="ml-auto flex items-center gap-2 lg:ml-0 lg:justify-self-end">
+          {/*
+            O mesmo botão do painel, e não um segundo: ele faltava aqui, e a
+            vitrine seguia o tema do sistema sem ninguém poder trocar.
+
+            Primeiro da direita, e não entre o WhatsApp e a matrícula: ali ele
+            partia ao meio o par de ações - contato e matrícula são as duas
+            coisas que a barra pede, e um interruptor de aparência entre elas
+            lia como se fosse uma terceira. Preferência de exibição fica na
+            ponta, antes do que a pessoa veio fazer.
+          */}
+          <ThemeToggle className="size-11 lg:size-8" />
+
           <PillButton
             tone="outline"
             scale="md"
@@ -94,14 +106,7 @@ export function Header(): React.JSX.Element {
             }
           />
 
-          {/*
-            O mesmo botão do painel, e não um segundo: ele faltava aqui, e a
-            vitrine seguia o tema do sistema sem ninguém poder trocar. Fica
-            antes da pílula de matrícula de propósito - o CTA é o último
-            elemento da barra em toda largura.
-          */}
-          <ThemeToggle className="size-11 lg:size-8" />
-
+          {/* O CTA é o último elemento da barra em toda largura. */}
           <EnrollmentCta className="hidden sm:inline-flex" />
 
           {/*
@@ -172,7 +177,7 @@ export function Header(): React.JSX.Element {
 
               {/*
                 O CTA também dentro de `SheetClose`: ele navega para
-                `/matricula`, e sem fechar o painel a rota trocava atrás de um
+                `/enrollment`, e sem fechar o painel a rota trocava atrás de um
                 Sheet aberto, com o scroll da página preso.
               */}
               <SheetFooter>

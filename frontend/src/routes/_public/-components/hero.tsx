@@ -2,8 +2,7 @@ import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
 import { PillButton } from '#/components/common/pill-button'
-import { Highlight } from '#/components/common/highlight'
-import { Sparkles, Petal } from '#/components/common/marks'
+import { CircuitTrails, Petal } from '#/components/common/marks'
 import { EnrollmentCta } from '#/components/common/enrollment-cta'
 import { storefrontCoursesQueryOptions } from '#/integrations/tanstack-query/queries'
 import { enrollmentStateFrom, scheduleSummary } from '#/lib/enrollment-state'
@@ -59,36 +58,96 @@ export function Hero(): React.JSX.Element {
   }
 
   return (
-    <section data-slot="home-hero" className="px-3 pt-3 sm:px-4 sm:pt-4">
-      <div className="relative overflow-hidden rounded-block bg-primary px-6 pt-14 pb-0 sm:px-10 lg:px-14 lg:pt-20">
-        <Petal className="-top-24 -right-20 size-96 text-primary-foreground/5" />
+    <section
+      data-slot="home-hero"
+      className="relative overflow-hidden bg-brand-ink"
+    >
+      {/*
+        Sangria total, como a seção dos cursos: a faixa atravessa a largura
+        inteira, sem raio e sem respiro lateral no invólucro. O recuo que sobra
+        é o do conteúdo, e mora no `mx-auto max-w-7xl` de dentro. Antes cada
+        bloco de marca era um cartão flutuando sobre o fundo do tema, e
+        empilhados viravam uma pilha de cartões com listras claras entre eles.
 
-        <div className="relative mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.15fr_1fr] lg:items-end lg:gap-16">
+        O bloco da marca: preto esverdeado, e **igual nos dois temas**.
+        `bg-brand-ink` é literal, não token de tema, pelo mesmo motivo do preto
+        do `not-found-page`. O hero é a assinatura da escola; ele não vira creme
+        porque alguém está no tema claro. O tema decide o resto da página.
+      */}
+      <div className="relative px-4 pt-14 pb-0 sm:px-6 lg:px-8 lg:pt-20">
+        <CircuitTrails className="text-neon/25" />
+        <Petal className="-top-24 -right-20 size-96 text-neon/5" />
+
+        <div className="relative mx-auto grid max-w-7xl gap-10">
+          {/*
+            O padrão de título da marca: primeira linha branca, segunda em neon.
+            Duas linhas e não três, que é o teto do condensado itálico em caixa
+            alta - a partir da terceira ele deixa de ser título e vira bloco.
+
+            `<span>` com `block` e não `<br>`: a quebra aqui é estrutura do
+            título, não uma quebra de conveniência, e um `<br>` some no
+            `text-balance` de telas estreitas justamente onde ela mais importa.
+
+            O texto no código fica em caixa mista e quem sobe para caixa alta é a
+            `@utility brand-title`. Leitor de tela pronuncia "você" como palavra;
+            "VOCÊ" escrito no JSX ele pode soletrar como sigla.
+          */}
           <h1
             className={cn(
               REVEAL,
-              'display-title text-display-md font-semibold text-balance text-primary-foreground sm:text-display-lg lg:text-display-xl',
+              'brand-title text-display-md text-balance sm:text-display-lg lg:text-display-xl',
             )}
           >
-            Você não precisa sair daqui
-            <br className="hidden sm:block" /> para aprender{' '}
-            <Highlight variant="ink">tecnologia</Highlight>
-            <Sparkles className="ml-3 inline-block size-6 align-super text-primary-foreground/50" />
+            <span className="block text-white">
+              Você não precisa sair daqui
+            </span>
+            <span className="block text-neon">para aprender tecnologia</span>
           </h1>
 
-          <div className={cn(REVEAL, 'delay-100')}>
-            <p className="max-w-[46ch] text-body-md text-primary-foreground sm:text-body-lg">
+          {/*
+            O apoio numa segunda linha, e não numa coluna ao lado do título.
+            Em coluna o `h1` ficava com ~600px e o condensado em caixa alta
+            quebrava em quatro linhas; o teto do desenho é duas. Largura inteira
+            resolve sem encolher a tipografia, que nas artes é o elemento
+            grande.
+
+            `max-w-[52ch]` no bloco: o título usa a largura toda, o parágrafo
+            não pode. Linha de texto corrido acompanhando 1280px é ilegível.
+          */}
+          <div className={cn(REVEAL, 'delay-100 max-w-[52ch]')}>
+            {/*
+              De quem é a escola, antes do horário. O hero dizia o que ela
+              oferece e quando; não dizia para quem.
+
+              "Toda ela", e não "indígenas e não indígenas": listar os dois
+              grupos nomeia uma divisão para em seguida negá-la, e quem lê fica
+              com a divisão. A frase inclusiva é a que não separa ninguém para
+              depois somar. O compromisso explícito - sem distinção de raça, cor
+              ou etnia - está na seção de missão, onde é afirmação da escola
+              sobre si e não rótulo colado em quem lê.
+
+              Sem o superlativo aqui: "a primeira" entra como propósito
+              declarado na seção da escola e na de missão, onde há espaço para
+              a frase inteira. No hero ele viraria alegação seca, e a página
+              não afirma nada que precise defender.
+            */}
+            <p className="max-w-[46ch] text-body-md font-medium text-white sm:text-body-lg">
+              Uma escola de tecnologia no Alto Solimões, para a juventude daqui.
+              Toda ela.
+            </p>
+
+            <p className="mt-3 max-w-[46ch] text-body-md text-white/80 sm:text-body-lg">
               {schedule}
             </p>
 
             {seats && (
-              <p className="mt-2 text-body-md text-primary-foreground sm:text-body-lg">
+              <p className="mt-2 text-body-md text-white/80 sm:text-body-lg">
                 {seats}
               </p>
             )}
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <EnrollmentCta tone="ink" scale="lg" />
+              <EnrollmentCta tone="neon" scale="lg" />
 
               {/*
                 Âncora e não `Link`: os cursos são a seção logo abaixo, e não uma
@@ -96,7 +155,7 @@ export function Hero(): React.JSX.Element {
                 até eles.
               */}
               <PillButton
-                tone="outline"
+                tone="neon-outline"
                 scale="lg"
                 render={<a href="#cursos">Ver os cursos</a>}
               />
@@ -108,6 +167,12 @@ export function Hero(): React.JSX.Element {
           A ilustração encosta na base do bloco e transborda um pouco, que é o
           que impede o retângulo verde de terminar num corte reto. `mt-12` e não
           margem negativa: negativa criaria rolagem horizontal em 360px.
+
+          A partir de `lg` ela sobe. Com o título ocupando a largura inteira, o
+          apoio e o CTA terminam na metade da altura do bloco, e sobrava uma
+          faixa de preto chapado entre o último botão e a bancada. A margem
+          negativa puxa o desenho para dentro dessa faixa; ele fica à direita do
+          vazio que o parágrafo deixou, que é como as artes distribuem o peso.
         */}
         <img
           src="/ilustracoes/bancada-arduino.svg"
@@ -120,7 +185,7 @@ export function Hero(): React.JSX.Element {
           fetchPriority="high"
           className={cn(
             REVEAL,
-            'delay-200 relative mx-auto mt-12 w-full max-w-lg',
+            'delay-200 relative mx-auto mt-10 w-full max-w-md lg:-mt-20 lg:max-w-xl',
           )}
         />
       </div>

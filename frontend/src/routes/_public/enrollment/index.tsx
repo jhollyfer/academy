@@ -19,13 +19,13 @@ function validateSearch(search: Record<string, unknown>): { curso?: string } {
   return {}
 }
 
-export const Route = createFileRoute('/_public/matricula/')({
+export const Route = createFileRoute('/_public/enrollment/')({
   validateSearch,
   loader: ({ context }) =>
     context.queryClient.ensureQueryData(storefrontCoursesQueryOptions()),
   head: () => ({
     meta: [
-      { title: `Matrícula - ${SITE_TITLE}` },
+      { title: `Matrícula · ${SITE_TITLE}` },
       {
         name: 'description',
         content:

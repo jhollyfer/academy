@@ -1,8 +1,7 @@
 import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
-import { Highlight } from '#/components/common/highlight'
-import { Leaf } from '#/components/common/marks'
+import { CircuitTrails, Leaf } from '#/components/common/marks'
 import { EnrollmentCta } from '#/components/common/enrollment-cta'
 import { storefrontCoursesQueryOptions } from '#/integrations/tanstack-query/queries'
 import { enrollmentStateFrom, scheduleSummary } from '#/lib/enrollment-state'
@@ -24,7 +23,7 @@ export function FinalBanner(): React.JSX.Element {
 
   let heading = (
     <>
-      A próxima turma ainda não tem <Highlight variant="ink">data</Highlight>
+      A próxima turma ainda não tem <span className="text-neon">data</span>
     </>
   )
   let support =
@@ -34,7 +33,7 @@ export function FinalBanner(): React.JSX.Element {
     heading = (
       <>
         A próxima turma começa em{' '}
-        <Highlight variant="ink">{formatMonthYear(state.startsAt)}</Highlight>
+        <span className="text-neon">{formatMonthYear(state.startsAt)}</span>
       </>
     )
 
@@ -52,10 +51,16 @@ export function FinalBanner(): React.JSX.Element {
   return (
     <section
       data-slot="home-final-banner"
-      className="px-3 py-3 sm:px-4 sm:py-4"
+      className="relative overflow-hidden bg-brand-ink"
     >
-      <div className="relative overflow-hidden rounded-block bg-primary px-6 py-14 sm:px-10 lg:px-14 lg:py-16">
-        <Leaf className="-top-20 -right-16 size-80 -rotate-12 text-primary-foreground/5" />
+      {/*
+        O bloco de marca fecha a página do mesmo jeito que abre. Era
+        `bg-primary`, o verde chapado: o hero e o convite final são as duas
+        pontas da mesma assinatura, e só uma delas tinha virado.
+      */}
+      <div className="relative px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
+        <CircuitTrails className="text-neon/20" />
+        <Leaf className="-top-20 -right-16 size-80 -rotate-12 text-neon/5" />
 
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[minmax(0,18rem)_1fr] lg:gap-16">
           <img
@@ -68,15 +73,21 @@ export function FinalBanner(): React.JSX.Element {
           />
 
           <div className={cn(REVEAL, 'delay-100')}>
-            <h2 className="display-title max-w-[18ch] text-heading-lg font-semibold text-balance text-primary-foreground sm:text-display-md lg:text-display-lg">
+            {/*
+              Aqui o `SectionTitle` não serve: o título é montado no corpo do
+              componente e muda de forma conforme haja turma anunciada, então
+              ele não se parte em duas linhas fixas. O que se aproveita é a
+              tipografia da marca.
+            */}
+            <h2 className="brand-title max-w-[18ch] text-heading-lg text-balance text-white sm:text-display-md lg:text-display-lg">
               {heading}
             </h2>
 
-            <p className="mt-5 max-w-[52ch] text-body-md text-primary-foreground sm:text-body-lg">
+            <p className="mt-5 max-w-[52ch] text-body-md text-white/85 sm:text-body-lg">
               {support}
             </p>
 
-            <EnrollmentCta tone="ink" scale="lg" className="mt-8" />
+            <EnrollmentCta tone="neon" scale="lg" className="mt-8" />
           </div>
         </div>
       </div>

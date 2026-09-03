@@ -21,50 +21,44 @@ const FOOTER_MESSAGE = 'Olá! Quero saber mais sobre os cursos da Maiyu Academy.
  */
 export function Footer(): React.JSX.Element {
   return (
-    <footer className="mt-3 rounded-t-block bg-foreground px-4 dark:bg-card pt-16 pb-10 sm:mt-4">
+    <footer className="bg-brand-ink px-4 pt-16 pb-10">
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <p className="text-heading-sm text-background dark:text-card-foreground">
-              Maiyu Academy
-            </p>
-            <p className="mt-3 max-w-[38ch] text-body-sm text-background/70 dark:text-muted-foreground">
+            <p className="text-heading-sm text-white">Maiyu Academy</p>
+            <p className="mt-3 max-w-[38ch] text-body-sm text-white/70">
               Escola de tecnologia em {ADDRESS.city}, no Amazonas. Aulas
               presenciais aos sábados.
             </p>
             {/* TODO: acrescentar o logradouro quando `ADDRESS.street` for preenchido. */}
-            <p className="mt-4 text-sm text-background/70 dark:text-muted-foreground">
+            <p className="mt-4 text-sm text-white/70">
               {ADDRESS.city}, {ADDRESS.state}
             </p>
           </div>
 
           <nav aria-label="Cursos" className="grid content-start gap-1 text-sm">
-            <p className="font-medium text-background dark:text-card-foreground">
-              Cursos
-            </p>
+            <p className="font-medium text-white">Cursos</p>
             <Link
-              to="/cursos/$slug"
-              params={{ slug: 'robotica' }}
+              to="/courses/$slug"
+              params={{ slug: 'robotics' }}
               className={navLinkVariants()}
             >
               Robótica
             </Link>
             <Link
-              to="/cursos/$slug"
+              to="/courses/$slug"
               params={{ slug: 'web-development' }}
               className={navLinkVariants()}
             >
               Desenvolvimento web
             </Link>
-            <Link to="/sobre" className={navLinkVariants()}>
-              A escola
+            <Link to="/about" className={navLinkVariants()}>
+              Quem somos
             </Link>
           </nav>
 
           <div className="grid content-start gap-1 text-sm">
-            <p className="font-medium text-background dark:text-card-foreground">
-              Contato
-            </p>
+            <p className="font-medium text-white">Contato</p>
             <a
               href={whatsappUrl(FOOTER_MESSAGE)}
               target="_blank"
@@ -86,21 +80,19 @@ export function Footer(): React.JSX.Element {
           </div>
 
           <nav aria-label="Legal" className="grid content-start gap-1 text-sm">
-            <p className="font-medium text-background dark:text-card-foreground">
-              Legal
-            </p>
-            <Link to="/privacidade" className={navLinkVariants()}>
+            <p className="font-medium text-white">Legal</p>
+            <Link to="/privacy" className={navLinkVariants()}>
               Privacidade
             </Link>
-            <Link to="/termos" className={navLinkVariants()}>
+            <Link to="/terms" className={navLinkVariants()}>
               Termos de uso
             </Link>
           </nav>
         </div>
 
-        <Separator className="my-10 bg-background/20 dark:bg-foreground/20" />
+        <Separator className="my-10 bg-neon/15" />
 
-        <p className="text-sm text-background/70 dark:text-muted-foreground">
+        <p className="text-sm text-white/70">
           © {new Date().getFullYear()} Maiyu Academy
         </p>
       </div>

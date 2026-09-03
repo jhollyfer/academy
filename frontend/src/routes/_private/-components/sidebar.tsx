@@ -38,7 +38,7 @@ import {
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
-import { useSignOut } from '#/integrations/tanstack-query/mutations'
+import { useAuthenticationSignOut } from '#/integrations/tanstack-query/mutations'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { initials } from '#/lib/labels'
 
@@ -54,10 +54,14 @@ import { initials } from '#/lib/labels'
  * turma antes da matrícula.
  */
 const NAVIGATION = linkOptions([
-  { to: '/admin', label: 'Visão geral', icon: CheckerboardIcon },
-  { to: '/admin/cursos', label: 'Cursos', icon: BookOpenIcon },
-  { to: '/admin/turmas', label: 'Turmas', icon: GraduationCapIcon },
-  { to: '/admin/matriculas', label: 'Matrículas', icon: UsersThreeIcon },
+  { to: '/administrator', label: 'Visão geral', icon: CheckerboardIcon },
+  { to: '/administrator/courses', label: 'Cursos', icon: BookOpenIcon },
+  { to: '/administrator/classes', label: 'Turmas', icon: GraduationCapIcon },
+  {
+    to: '/administrator/enrollments',
+    label: 'Matrículas',
+    icon: UsersThreeIcon,
+  },
 ])
 
 type NavigationItemType = (typeof NAVIGATION)[number]
@@ -68,7 +72,7 @@ type NavigationItemType = (typeof NAVIGATION)[number]
  * A regra é "o mais específico ganha". Com casamento difuso sozinho, `/admin`
  * é prefixo dos outros três e acenderia junto com eles em toda tela do painel.
  *
- * Difuso é o que se quer para o resto: em `/admin/turmas/abc-123` quem deve
+ * Difuso é o que se quer para o resto: em `/administrator/classes/abc-123` quem deve
  * estar marcado é Turmas.
  */
 function useActiveTo(
@@ -141,7 +145,7 @@ export function Sidebar(): React.JSX.Element {
 
   const active = useActiveTo(NAVIGATION)
 
-  const signOut = useSignOut({
+  const signOut = useAuthenticationSignOut({
     onSuccess: async function () {
       // Invalidar **antes** de navegar: o guard de `_private` lê o cache no
       // `beforeLoad`, e sem isto ele encontraria a sessão que acabou de morrer
@@ -158,7 +162,9 @@ export function Sidebar(): React.JSX.Element {
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
-              render={<Link to="/admin" className="flex flex-row gap-4" />}
+              render={
+                <Link to="/administrator" className="flex flex-row gap-4" />
+              }
               onClick={() => setOpenMobile(false)}
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
@@ -200,7 +206,10 @@ export function Sidebar(): React.JSX.Element {
             <SidebarMenuButton size="lg" render={<div />}>
               <Avatar className="size-8 rounded-lg">
                 <AvatarImage src={account?.avatar?.url} alt={account?.name} />
-                <AvatarFallback className="rounded-lg">
+                {/* `text-foreground` e nao o `--muted-foreground` do registry: a
+                    sigla sobre `--muted` dava 4,24:1 no tema escuro, abaixo dos
+                    4,5 de AA. O nome ao lado ja usa esta cor. */}
+                <AvatarFallback className="rounded-lg text-foreground">
                   {initials(account?.name)}
                 </AvatarFallback>
               </Avatar>

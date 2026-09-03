@@ -22,7 +22,7 @@ export function formatCpf(cpf: string | null | undefined): string {
 
 /**
  * Fixo tem dez dígitos e celular tem onze, e a diferença está no tamanho do
- * segundo grupo - `(97) 3333-4444` contra `(97) 98460-0872`. É a mesma regra que
+ * segundo grupo - `(97) 3333-4444` contra `(97) 98431-7149`. É a mesma regra que
  * a máscara `phone-br` aplica na digitação.
  */
 export function formatPhone(phone: string | null | undefined): string {

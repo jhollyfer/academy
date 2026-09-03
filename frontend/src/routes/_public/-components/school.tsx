@@ -1,9 +1,9 @@
 import type * as React from 'react'
 
-import { Highlight } from '#/components/common/highlight'
 import { CAMPUS } from '#/lib/site'
 import { Leaf } from '#/components/common/marks'
 import { REVEAL } from './reveal'
+import { SectionTitle } from './section-title'
 import { cn } from '#/lib/utils'
 
 /**
@@ -14,6 +14,11 @@ import { cn } from '#/lib/utils'
  * conexão que cai. É a razão de a escola existir, e por isso ela é a segunda
  * coisa que a página diz.
  *
+ * "Nasce para ser a primeira" e não "é a primeira": o pioneirismo entra como
+ * propósito declarado, que é o que a escola pode sustentar hoje. Afirmar o
+ * superlativo seria uma alegação de mercado que alguém pode contestar, e a
+ * página inteira foi escrita para não precisar defender nenhuma.
+ *
  * O prédio das aulas aparece pelo nome, e vem de `CAMPUS` em vez de escrito
  * aqui: o mesmo nome sai no bloco de "onde e quando" e no rodapé da matrícula,
  * e três cópias divergiriam no dia em que a escola mudasse de sala.
@@ -23,9 +28,19 @@ import { cn } from '#/lib/utils'
  */
 export function School(): React.JSX.Element {
   return (
-    <section data-slot="home-school" className="px-3 py-3 sm:px-4 sm:py-4">
-      <div className="relative overflow-hidden rounded-block border border-border bg-background px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
-        <Leaf className="-bottom-24 -left-24 size-80 rotate-12 text-primary/40" />
+    <section
+      data-slot="home-school"
+      className="relative overflow-hidden bg-background"
+    >
+      {/*
+        Sangria total, como as faixas escuras: sem raio, sem borda e sem
+        respiro lateral no invólucro. Cada seção era um cartão flutuando
+        sobre o fundo, e empilhadas viravam uma pilha de cartões com
+        listras de fundo entre eles. O recuo que sobra é o do conteúdo,
+        no `mx-auto max-w-7xl` de dentro.
+      */}
+      <div className="relative px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+        <Leaf className="-bottom-24 -left-24 size-80 rotate-12 text-primary/10" />
 
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2 lg:gap-20">
           <img
@@ -38,16 +53,14 @@ export function School(): React.JSX.Element {
           />
 
           <div className={cn(REVEAL, 'delay-100')}>
-            <h2 className="display-title text-heading-lg font-semibold text-balance text-foreground sm:text-display-md lg:text-display-lg">
-              Tecnologia se aprende{' '}
-              <Highlight variant="outline">aqui</Highlight> mesmo
-            </h2>
+            <SectionTitle lead="Quem" accent="somos" />
 
             <div className="mt-7 space-y-5 text-body-md text-muted-foreground sm:text-body-lg">
               <p>
-                A Maiyu Academy é uma escola de tecnologia presencial em
-                Benjamin Constant, no Alto Solimões. As aulas acontecem no{' '}
-                {CAMPUS.name}, aos sábados, com bancada e computador no local.
+                A Maiyu Academy nasce para ser a primeira escola de tecnologia
+                do Alto Solimões. Presencial, em Benjamin Constant: as aulas
+                acontecem no {CAMPUS.name}, aos sábados, com bancada e
+                computador no local.
               </p>
               <p>
                 Quem mora aqui não precisa se mudar para Manaus nem depender de
@@ -55,8 +68,9 @@ export function School(): React.JSX.Element {
                 professor está na sala e o kit fica na sua mão.
               </p>
               <p>
-                São dois cursos, em turmas de manhã, tarde e noite. Robótica e
-                desenvolvimento web, os dois começando do zero.
+                Começa com dois cursos, robótica e desenvolvimento web, em
+                turmas de manhã, tarde e noite. Os dois do zero, para quem nunca
+                escreveu uma linha de código.
               </p>
             </div>
           </div>

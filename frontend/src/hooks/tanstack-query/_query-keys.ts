@@ -7,11 +7,17 @@ import type { ListSearch } from '#/lib/list-search'
  * só. São formatos diferentes de cache para o mesmo recurso, e ambos começam
  * pelo mesmo prefixo - invalidar por ele cobre os dois de uma vez.
  *
+ * O arquivo é seccionado por comentário. Todo recurso tem o mesmo bloco de três
+ * linhas - `all`, `list` e `detail` -, e é de propósito: um formato por recurso
+ * é onde um deles ganha uma chave que a invalidação do vizinho não alcança.
+ *
  * Centralizadas porque o loader da rota e o componente têm de chegar
  * **exatamente** à mesma chave: se divergirem, o loader enche um cache e o
  * componente lê outro, a tela pisca em `pending` e ninguém entende por quê.
  */
 export const queryKeys = {
+  // Sessão
+
   /**
    * A sessão. Fica aqui, e não solta em `queries.ts`, porque tem dois donos: o
    * `beforeLoad` que enche o cache e o `onSuccess` do sign-in que o invalida.
@@ -23,6 +29,8 @@ export const queryKeys = {
     all: ['account'] as const,
   },
 
+  // Painel
+
   courses: {
     all: ['courses'] as const,
     list: (params: ListSearch) => ['courses', 'list', params] as const,
@@ -31,22 +39,17 @@ export const queryKeys = {
 
   classes: {
     all: ['classes'] as const,
-    list: (params: ListSearch & { courseId?: string }) =>
-      ['classes', 'list', params] as const,
+    list: (params: ListSearch) => ['classes', 'list', params] as const,
     detail: (id: string) => ['classes', 'detail', id] as const,
   },
 
   enrollments: {
     all: ['enrollments'] as const,
-    list: (
-      params: ListSearch & {
-        courseId?: string
-        classId?: string
-        status?: string
-      },
-    ) => ['enrollments', 'list', params] as const,
+    list: (params: ListSearch) => ['enrollments', 'list', params] as const,
     detail: (id: string) => ['enrollments', 'detail', id] as const,
   },
+
+  // Vitrine
 
   /**
    * A vitrine. Prefixo próprio e não um recorte de `courses`: são caches

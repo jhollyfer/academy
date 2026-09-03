@@ -16,7 +16,7 @@ import { HTTPError } from '#/integrations/tanstack-query/http'
 /**
  * O que este teste cobra é a **fiação**, que é tudo o que o hook faz.
  *
- * Os trinta e nove formulários escreviam essas ligações à mão, e cada uma tem
+ * Os quatro formulários escreviam essas ligações à mão, e cada uma tem
  * um jeito silencioso de quebrar: o `retry` oferecido num cadastro que insere
  * direto duplica o registro, o `invalidateQueries` esquecido deixa a listagem
  * com o dado velho, e o `payload` sem o id manda um `PUT` que a API recusa.
@@ -88,7 +88,7 @@ function setup(overrides: Record<string, unknown> = {}) {
       fields: FIELDS,
       mutation: stub.useStub,
       invalidate: ['courses'],
-      backTo: '/admin/cursos',
+      backTo: '/administrator/courses',
       success: (created) => `${created.name} criado.`,
       ...overrides,
     }),
@@ -115,7 +115,7 @@ describe('useResourceForm', () => {
 
     expect(result.current.shell).toEqual({
       formId: 'courses-create',
-      backTo: '/admin/cursos',
+      backTo: '/administrator/courses',
       backParams: { company: 'acme' },
       isPending: false,
     })
@@ -156,7 +156,7 @@ describe('useResourceForm', () => {
     expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['courses'] })
     expect(toast.success).toHaveBeenCalledWith('Algodão criado.')
     expect(navigate).toHaveBeenCalledWith({
-      to: '/admin/cursos',
+      to: '/administrator/courses',
       params: undefined,
     })
     expect(result.current.mutation.isPending).toBe(false)

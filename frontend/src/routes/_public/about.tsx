@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { SITE_TITLE, absoluteUrl } from '#/lib/site'
 
-const PATH = '/sobre'
+const PATH = '/about'
 
-export const Route = createFileRoute('/_public/sobre')({
+export const Route = createFileRoute('/_public/about')({
   head: () => {
-    const title = `A escola - ${SITE_TITLE}`
+    const title = `Quem somos · ${SITE_TITLE}`
     const description =
       'Quem é a Maiyu Academy, quem dá aula e onde as aulas acontecem em Benjamin Constant.'
 

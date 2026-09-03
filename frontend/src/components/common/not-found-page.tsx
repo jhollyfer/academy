@@ -62,7 +62,7 @@ export function NotFoundPage({
 
       {/* bg-black é literal (não token), propositalmente igual em light/dark */}
       <div className="relative flex h-[40dvh] items-center justify-center overflow-hidden bg-black md:h-auto md:rounded-l-3xl">
-        <span className="display-title leading-none text-[8rem] font-black text-white select-none md:text-[10rem]">
+        <span className="brand-title leading-none text-[8rem] text-white select-none md:text-[10rem]">
           {code}
         </span>
         {/*
@@ -85,7 +85,7 @@ export function NotFoundPageTitle({
     <h1
       data-slot="not-found-page-title"
       className={cn(
-        'display-title text-display-md font-bold text-foreground md:text-display-lg',
+        'brand-title text-display-md text-foreground md:text-display-lg',
         className,
       )}
       {...props}

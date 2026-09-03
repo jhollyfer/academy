@@ -28,7 +28,7 @@ export function getRouter() {
     /*
      * ponytail: `defaultPendingMs` fica no padrão (1000ms) até haver medida.
      *
-     * As 30 listagens ganharam `pendingComponent`, mas com `defaultPreload:
+     * As três listagens ganharam `pendingComponent`, mas com `defaultPreload:
      * 'intent'` o chunk e o loader começam no hover, e a maioria dos cliques
      * chega quente - nesses o esqueleto não deve aparecer. Baixar o valor agora
      * arrisca piscar esqueleto em navegação instantânea, porque o
