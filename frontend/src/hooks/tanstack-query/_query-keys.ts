@@ -36,6 +36,12 @@ export const queryKeys = {
     enrollments: () => ['portal', 'enrollments'] as const,
   },
 
+  users: {
+    all: ['users'] as const,
+    list: (params: Record<string, unknown>) => ['users', 'list', params] as const,
+    detail: (id: string) => ['users', 'detail', id] as const,
+  },
+
   account: {
     all: ['account'] as const,
   },

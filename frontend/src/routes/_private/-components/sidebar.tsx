@@ -11,6 +11,7 @@ import {
   CheckerboardIcon,
   GraduationCapIcon,
   SignOutIcon,
+  UserGearIcon,
   UsersThreeIcon,
 } from '@phosphor-icons/react'
 
@@ -41,6 +42,8 @@ import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
 import { useAuthenticationSignOut } from '#/integrations/tanstack-query/mutations'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { initials } from '#/lib/labels'
+import { homeForRole, UserRoles  } from '#/lib/entity'
+import type {UserRole} from '#/lib/entity';
 
 /**
  * Os destinos do painel, tipados contra a árvore de rotas.
@@ -53,7 +56,7 @@ import { initials } from '#/lib/labels'
  * A ordem é a do trabalho da secretaria: o curso existe antes da turma, e a
  * turma antes da matrícula.
  */
-const NAVIGATION = linkOptions([
+const STAFF_NAVIGATION = linkOptions([
   { to: '/administrator', label: 'Visão geral', icon: CheckerboardIcon },
   { to: '/administrator/courses', label: 'Cursos', icon: BookOpenIcon },
   { to: '/administrator/classes', label: 'Turmas', icon: GraduationCapIcon },
@@ -62,9 +65,61 @@ const NAVIGATION = linkOptions([
     label: 'Matrículas',
     icon: UsersThreeIcon,
   },
+  { to: '/administrator/users', label: 'Usuários', icon: UserGearIcon },
 ])
 
-type NavigationItemType = (typeof NAVIGATION)[number]
+/**
+ * O menu de quem é atendido pela escola.
+ *
+ * Separado e não filtrado do de cima: os dois grupos não compartilham nenhum
+ * destino, porque o servidor barra um do outro. Um item escondido por
+ * `roles: [...]` daria a impressão de que a lista é uma só com recortes, e o
+ * primeiro destino comum que alguém acrescentasse por engano viraria um 403.
+ */
+const PORTAL_NAVIGATION = linkOptions([
+  { to: '/portal', label: 'Minhas matrículas', icon: UsersThreeIcon },
+])
+
+type NavigationItemType =
+  | (typeof STAFF_NAVIGATION)[number]
+  | (typeof PORTAL_NAVIGATION)[number]
+
+/**
+ * Qual menu cada papel vê, e sob que rótulo.
+ *
+ * `Record` sobre o papel inteiro, e não um `if` sobre `PORTAL_USER_ROLES`:
+ * papel novo no backend não cai calado no menu da secretaria - ele quebra a
+ * compilação até alguém dizer o que aquela pessoa enxerga. É o mesmo desenho do
+ * `simple-hub`.
+ */
+const NAVIGATION: Record<
+  UserRole,
+  { label: string; items: ReadonlyArray<NavigationItemType> }
+> = {
+  OWNER: { label: 'Secretaria', items: STAFF_NAVIGATION },
+  ADMINISTRATOR: { label: 'Secretaria', items: STAFF_NAVIGATION },
+  RESPONSIBLE: { label: 'Meu acesso', items: PORTAL_NAVIGATION },
+  STUDENT: { label: 'Meu acesso', items: PORTAL_NAVIGATION },
+}
+
+/**
+ * O menu vazio, para enquanto o cache não respondeu.
+ *
+ * Vazio e não o da secretaria: um piscar de itens que a pessoa não pode abrir
+ * termina em 403 se ela for rápida no clique.
+ */
+const EMPTY_NAVIGATION: {
+  label: string
+  items: ReadonlyArray<NavigationItemType>
+} = { label: '', items: [] }
+
+function navigationOf(
+  role: UserRole | undefined,
+): { label: string; items: ReadonlyArray<NavigationItemType> } {
+  if (role === undefined) return EMPTY_NAVIGATION
+
+  return NAVIGATION[role]
+}
 
 /**
  * O destino do item que deve aparecer marcado, ou `undefined`.
@@ -143,7 +198,8 @@ export function Sidebar(): React.JSX.Element {
   // a mesma chave. Aqui não sai requisição nova.
   const { data: account } = useQuery(accountQueryOptions())
 
-  const active = useActiveTo(NAVIGATION)
+  const navigation = navigationOf(account?.role)
+  const active = useActiveTo(navigation.items)
 
   const signOut = useAuthenticationSignOut({
     onSuccess: async function () {
@@ -163,7 +219,12 @@ export function Sidebar(): React.JSX.Element {
             <SidebarMenuButton
               size="lg"
               render={
-                <Link to="/administrator" className="flex flex-row gap-4" />
+                // O destino do papel, e não `/administrator` fixo: para quem é
+                // do portal aquele link responde 403.
+                <Link
+                  to={homeForRole(account?.role ?? UserRoles.STUDENT)}
+                  className="flex flex-row gap-4"
+                />
               }
               onClick={() => setOpenMobile(false)}
             >
@@ -181,9 +242,9 @@ export function Sidebar(): React.JSX.Element {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Secretaria</SidebarGroupLabel>
+          <SidebarGroupLabel>{navigation.label}</SidebarGroupLabel>
           <SidebarMenu>
-            {NAVIGATION.map((item) => (
+            {navigation.items.map((item) => (
               <NavigationItem
                 key={item.to}
                 item={item}

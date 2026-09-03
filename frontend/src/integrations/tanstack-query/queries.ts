@@ -7,6 +7,7 @@ import type {
   CourseFaqResponse,
   CourseResponse,
   EnrollmentResponse,
+  ManagedUserResponse,
   StorefrontEnrollmentResponse,
   Paginated,
 } from '../response'
@@ -150,6 +151,30 @@ export const enrollmentsQueryOptions = (params: EnrollmentListSearch) =>
         },
       ),
     placeholderData: keepPreviousData,
+  })
+
+// ---------------------------------------------------------------------------
+// administrator/users
+// ---------------------------------------------------------------------------
+
+export const usersQueryOptions = (params: ListSearch) =>
+  queryOptions({
+    queryKey: queryKeys.users.list(params),
+    queryFn: ({ signal }) =>
+      request<Paginated<ManagedUserResponse>>(
+        '/administrator/users'.concat(search(params)),
+        { signal },
+      ),
+    placeholderData: keepPreviousData,
+  })
+
+export const userQueryOptions = (id: string) =>
+  queryOptions({
+    queryKey: queryKeys.users.detail(id),
+    queryFn: ({ signal }) =>
+      request<ManagedUserResponse>('/administrator/users/'.concat(id), {
+        signal,
+      }),
   })
 
 // ---------------------------------------------------------------------------

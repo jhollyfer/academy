@@ -87,6 +87,23 @@ export type StorageUploadResponse = {
  *
  * `password` nunca vem: o model o marca com `serializeAs: null`.
  */
+/**
+ * O usuário como o painel de gestão o devolve: o `AccountResponse` mais os dois
+ * lados do vínculo de guarda.
+ *
+ * Separado porque `/account/profile` não carrega essas relações - declará-las lá
+ * prometeria um campo que a rota não devolve.
+ */
+export type ManagedUserResponse = AccountResponse & {
+  // Os dois carimbos do convite. Nulos para quem a secretaria cadastrou já com
+  // senha, e é a diferença entre eles que a coluna "Acesso" mostra: convidado e
+  // ainda não entrou é um estado, e nunca convidado é outro.
+  invitedAt: string | null
+  emailVerifiedAt: string | null
+  dependents: Array<AccountResponse>
+  responsibles: Array<AccountResponse>
+}
+
 export type AccountResponse = {
   id: string
   name: string

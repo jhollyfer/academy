@@ -12,7 +12,7 @@ import {
   NotFoundPageTitle,
 } from '#/components/common/not-found-page'
 import { Button } from '#/components/ui/button'
-import { HTTPError } from '#/integrations/tanstack-query/http'
+import { HTTPError, HTTPStatus } from '#/integrations/tanstack-query/http'
 
 export function getRouter() {
   const context = getContext()
@@ -68,6 +68,24 @@ export function getRouter() {
         error.status < 500
       )
         handled = error
+
+      // 403 tem texto próprio. O genérico abaixo sugere que o link mudou de
+      // lugar, e aqui é o contrário: o endereço está certo, quem entrou é que
+      // não alcança. Mandar essa pessoa procurar o link novo é mandá-la
+      // procurar o que não existe.
+      if (handled?.status === HTTPStatus.FORBIDDEN)
+        return (
+          <NotFoundPage code="403">
+            <NotFoundPageTitle>Acesso negado</NotFoundPageTitle>
+            <NotFoundPageDescription>
+              Sua conta não tem permissão para esta área. Se precisa dela, peça à
+              secretaria.
+            </NotFoundPageDescription>
+            <NotFoundPageActions>
+              <NotFoundPageHomeButton />
+            </NotFoundPageActions>
+          </NotFoundPage>
+        )
 
       if (handled)
         return (

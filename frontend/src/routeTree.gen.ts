@@ -30,6 +30,7 @@ import { Route as PrivateAdministratorClassesIndexRouteImport } from './routes/_
 import { Route as PrivateAdministratorClassesNewRouteImport } from './routes/_private/administrator/classes/new'
 import { Route as PrivateAdministratorCoursesIndexRouteImport } from './routes/_private/administrator/courses/index'
 import { Route as PrivateAdministratorEnrollmentsIndexRouteImport } from './routes/_private/administrator/enrollments/index'
+import { Route as PrivateAdministratorUsersIndexRouteImport } from './routes/_private/administrator/users/index'
 import { Route as AuthenticationInviteTokenIndexRouteImport } from './routes/authentication/invite/$token/index'
 import { Route as PrivateAdministratorClassesIdIndexRouteImport } from './routes/_private/administrator/classes/$id/index'
 import { Route as PrivateAdministratorClassesIdEditRouteImport } from './routes/_private/administrator/classes/$id/edit'
@@ -181,6 +182,16 @@ const PrivateAdministratorEnrollmentsIndexRoute =
       (d) => d.Route,
     ),
   )
+const PrivateAdministratorUsersIndexRoute =
+  PrivateAdministratorUsersIndexRouteImport.update({
+    id: '/administrator/users/',
+    path: '/administrator/users/',
+    getParentRoute: () => PrivateLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/_private/administrator/users/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 const AuthenticationInviteTokenIndexRoute =
   AuthenticationInviteTokenIndexRouteImport.update({
     id: '/invite/$token/',
@@ -261,6 +272,7 @@ export interface FileRoutesByFullPath {
   '/administrator/classes/': typeof PrivateAdministratorClassesIndexRoute
   '/administrator/courses/': typeof PrivateAdministratorCoursesIndexRoute
   '/administrator/enrollments/': typeof PrivateAdministratorEnrollmentsIndexRoute
+  '/administrator/users/': typeof PrivateAdministratorUsersIndexRoute
   '/authentication/invite/$token/': typeof AuthenticationInviteTokenIndexRoute
   '/administrator/classes/$id/edit': typeof PrivateAdministratorClassesIdEditRoute
   '/administrator/courses/$id/edit': typeof PrivateAdministratorCoursesIdEditRoute
@@ -286,6 +298,7 @@ export interface FileRoutesByTo {
   '/administrator/classes': typeof PrivateAdministratorClassesIndexRoute
   '/administrator/courses': typeof PrivateAdministratorCoursesIndexRoute
   '/administrator/enrollments': typeof PrivateAdministratorEnrollmentsIndexRoute
+  '/administrator/users': typeof PrivateAdministratorUsersIndexRoute
   '/authentication/invite/$token': typeof AuthenticationInviteTokenIndexRoute
   '/administrator/classes/$id/edit': typeof PrivateAdministratorClassesIdEditRoute
   '/administrator/courses/$id/edit': typeof PrivateAdministratorCoursesIdEditRoute
@@ -315,6 +328,7 @@ export interface FileRoutesById {
   '/_private/administrator/classes/': typeof PrivateAdministratorClassesIndexRoute
   '/_private/administrator/courses/': typeof PrivateAdministratorCoursesIndexRoute
   '/_private/administrator/enrollments/': typeof PrivateAdministratorEnrollmentsIndexRoute
+  '/_private/administrator/users/': typeof PrivateAdministratorUsersIndexRoute
   '/authentication/invite/$token/': typeof AuthenticationInviteTokenIndexRoute
   '/_private/administrator/classes/$id/edit': typeof PrivateAdministratorClassesIdEditRoute
   '/_private/administrator/courses/$id/edit': typeof PrivateAdministratorCoursesIdEditRoute
@@ -343,6 +357,7 @@ export interface FileRouteTypes {
     | '/administrator/classes/'
     | '/administrator/courses/'
     | '/administrator/enrollments/'
+    | '/administrator/users/'
     | '/authentication/invite/$token/'
     | '/administrator/classes/$id/edit'
     | '/administrator/courses/$id/edit'
@@ -368,6 +383,7 @@ export interface FileRouteTypes {
     | '/administrator/classes'
     | '/administrator/courses'
     | '/administrator/enrollments'
+    | '/administrator/users'
     | '/authentication/invite/$token'
     | '/administrator/classes/$id/edit'
     | '/administrator/courses/$id/edit'
@@ -396,6 +412,7 @@ export interface FileRouteTypes {
     | '/_private/administrator/classes/'
     | '/_private/administrator/courses/'
     | '/_private/administrator/enrollments/'
+    | '/_private/administrator/users/'
     | '/authentication/invite/$token/'
     | '/_private/administrator/classes/$id/edit'
     | '/_private/administrator/courses/$id/edit'
@@ -553,6 +570,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateAdministratorEnrollmentsIndexRouteImport
       parentRoute: typeof PrivateLayoutRoute
     }
+    '/_private/administrator/users/': {
+      id: '/_private/administrator/users/'
+      path: '/administrator/users'
+      fullPath: '/administrator/users/'
+      preLoaderRoute: typeof PrivateAdministratorUsersIndexRouteImport
+      parentRoute: typeof PrivateLayoutRoute
+    }
     '/authentication/invite/$token/': {
       id: '/authentication/invite/$token/'
       path: '/invite/$token'
@@ -606,6 +630,7 @@ interface PrivateLayoutRouteChildren {
   PrivateAdministratorClassesIndexRoute: typeof PrivateAdministratorClassesIndexRoute
   PrivateAdministratorCoursesIndexRoute: typeof PrivateAdministratorCoursesIndexRoute
   PrivateAdministratorEnrollmentsIndexRoute: typeof PrivateAdministratorEnrollmentsIndexRoute
+  PrivateAdministratorUsersIndexRoute: typeof PrivateAdministratorUsersIndexRoute
   PrivateAdministratorClassesIdEditRoute: typeof PrivateAdministratorClassesIdEditRoute
   PrivateAdministratorCoursesIdEditRoute: typeof PrivateAdministratorCoursesIdEditRoute
   PrivateAdministratorClassesIdIndexRoute: typeof PrivateAdministratorClassesIdIndexRoute
@@ -623,6 +648,7 @@ const PrivateLayoutRouteChildren: PrivateLayoutRouteChildren = {
   PrivateAdministratorCoursesIndexRoute: PrivateAdministratorCoursesIndexRoute,
   PrivateAdministratorEnrollmentsIndexRoute:
     PrivateAdministratorEnrollmentsIndexRoute,
+  PrivateAdministratorUsersIndexRoute: PrivateAdministratorUsersIndexRoute,
   PrivateAdministratorClassesIdEditRoute:
     PrivateAdministratorClassesIdEditRoute,
   PrivateAdministratorCoursesIdEditRoute:

@@ -216,6 +216,47 @@ export function useCourseUpdate(
   })
 }
 
+// ---------------------------------------------------------------------------
+// administrator/users
+// ---------------------------------------------------------------------------
+
+export function useUserArchive(options?: MutationProps<void, string>) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return request<void>('/administrator/users/'.concat(id, '/archive'), {
+        method: 'PATCH',
+      })
+    },
+  })
+}
+
+export function useUserUnarchive(options?: MutationProps<void, string>) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return request<void>('/administrator/users/'.concat(id, '/unarchive'), {
+        method: 'PATCH',
+      })
+    },
+  })
+}
+
+/**
+ * Irreversível, e só o dono alcança - a API responde 403 para o resto. Recusa
+ * usuário vivo e usuário com matrícula vinculada.
+ */
+export function useUserDelete(options?: MutationProps<void, string>) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return request<void>('/administrator/users/'.concat(id), {
+        method: 'DELETE',
+      })
+    },
+  })
+}
+
 export function useCourseArchive(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
