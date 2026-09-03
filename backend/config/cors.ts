@@ -55,8 +55,13 @@ const corsConfig = defineConfig({
 
   /**
    * Response headers exposed to the browser.
+   *
+   * `content-disposition` não está entre os headers de resposta simples, então
+   * sem esta linha o JavaScript da página lê `null` ao procurá-lo - mesmo com a
+   * API mandando o header, e mesmo em desenvolvimento. É por ele que a
+   * exportação em CSV descobre o nome do arquivo a salvar.
    */
-  exposeHeaders: [],
+  exposeHeaders: ['content-disposition'],
 
   /**
    * Allow cookies/authorization headers on cross-origin requests.

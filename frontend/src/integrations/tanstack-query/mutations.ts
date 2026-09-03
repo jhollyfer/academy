@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { request } from './http'
+import { download, request } from './http'
 import { useMultipartUpload } from '#/hooks/use-multipart-upload'
 import type { UseMutationOptions } from '@tanstack/react-query'
 import type { HTTPError } from './http'
@@ -252,10 +252,10 @@ export function useUserUpdate(
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<ManagedUserResponse>(
-        '/administrator/users/'.concat(id),
-        { method: 'PUT', body: JSON.stringify(payload) },
-      )
+      return request<ManagedUserResponse>('/administrator/users/'.concat(id), {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      })
     },
   })
 }
@@ -472,6 +472,31 @@ export function useEnrollmentDelete(options?: MutationProps<void, string>) {
       return request<void>('/administrator/enrollments/'.concat(id), {
         method: 'DELETE',
       })
+    },
+  })
+}
+
+/**
+ * A exportação em CSV.
+ *
+ * É mutação e não query porque não é leitura de estado que a tela reflete: roda
+ * quando alguém clica, uma vez, e o resultado sai do app pelo disco. Como
+ * `useMutation` já dá `isPending` e `onError`, o botão desabilita e o erro vira
+ * toast sem nenhum estado escrito à mão.
+ *
+ * `download` e não `request` - a resposta é um arquivo, não JSON.
+ */
+export function useEnrollmentsExport(
+  options?: MutationProps<{ blob: Blob; filename: string | undefined }, void>,
+) {
+  return useMutation<
+    { blob: Blob; filename: string | undefined },
+    HTTPError,
+    void
+  >({
+    ...options,
+    mutationFn: function () {
+      return download('/administrator/enrollments/export')
     },
   })
 }

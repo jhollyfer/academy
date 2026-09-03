@@ -1,6 +1,7 @@
 import { getRouteApi } from '@tanstack/react-router'
 import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { DownloadSimpleIcon } from '@phosphor-icons/react'
 import { EnrollmentBulkActions } from './bulk-actions'
 import { enrollmentColumns } from './columns'
@@ -26,7 +27,8 @@ import {
 } from '#/components/common/table'
 import { Button } from '#/components/ui/button'
 import { UserRoles } from '#/lib/entity'
-import { BASE_URL } from '#/integrations/tanstack-query/http'
+import { saveBlob } from '#/lib/download'
+import { useEnrollmentsExport } from '#/integrations/tanstack-query/mutations'
 import { enrollmentsQueryOptions } from '#/integrations/tanstack-query/queries'
 
 const route = getRouteApi('/_private/administrator/enrollments/')
@@ -40,6 +42,16 @@ export function EnrollmentsTable(): React.JSX.Element {
   const { data, isPlaceholderData, isError, refetch } = useQuery(
     enrollmentsQueryOptions(search),
   )
+
+  const exportCsv = useEnrollmentsExport({
+    onSuccess: ({ blob, filename }) =>
+      // O nome vem do `Content-Disposition` da API; o daqui é o que sobra se o
+      // header não vier. Sem extensão o navegador salva um arquivo que o
+      // sistema não sabe abrir.
+      saveBlob(blob, filename ?? 'matriculas.csv'),
+    onError: (error) =>
+      toast.error(error.message, { id: 'enrollments-export' }),
+  })
 
   const table = useTable({
     rows: data?.data ?? [],
@@ -64,25 +76,22 @@ export function EnrollmentsTable(): React.JSX.Element {
         <TableTitle>Matrículas</TableTitle>
         <TableActions>
           {/*
-            A exportação é um `<a>` para a API, e não um fetch: o CSV é um
-            download, e o navegador sabe salvar arquivo melhor que qualquer
-            código que eu escrevesse aqui. O cookie de sessão viaja junto porque
-            é navegação de mesma origem lógica.
+            A exportação passa pelo cliente HTTP, e não por um `<a href>` para a
+            API. Âncora é navegação do navegador: o cookie vai junto, mas a
+            requisição não passa pelo `request`, que é quem renova o access token
+            vencido. Um dia depois do login o botão baixava o JSON do erro 401
+            com nome de planilha - arquivo que abre no Excel como lixo, sem
+            nenhum aviso de que a sessão é que estava velha.
           */}
           <Button
-            nativeButton={false}
             variant="outline"
             size="sm"
-            render={
-              <a
-                href={BASE_URL.concat('/administrator/enrollments/export')}
-                download
-              >
-                <DownloadSimpleIcon />
-                Exportar CSV
-              </a>
-            }
-          />
+            disabled={exportCsv.isPending}
+            onClick={() => exportCsv.mutate()}
+          >
+            <DownloadSimpleIcon />
+            Exportar CSV
+          </Button>
         </TableActions>
       </TableHeader>
 

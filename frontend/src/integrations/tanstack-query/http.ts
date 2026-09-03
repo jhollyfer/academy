@@ -8,6 +8,7 @@
  */
 
 import { createIsomorphicFn } from '@tanstack/react-start'
+import { filenameFromContentDisposition } from '#/lib/download'
 import * as server from './http.server'
 
 /**
@@ -276,7 +277,7 @@ async function refresh(
 ): Promise<string | undefined> {
   let renewed: string | undefined
 
-  await request<void>(
+  await send(
     '/authentication/refresh',
     { method: 'POST' },
     {
@@ -296,12 +297,17 @@ async function refresh(
  * expirada é renovada sem que a tela perceba. Todo caminho de falha - rede,
  * corpo ilegível, erro da API - sai daqui como `HTTPError` com `status`
  * preenchido, então quem trata nunca precisa de `instanceof`.
+ *
+ * Devolve a `Response` crua porque nem toda resposta é JSON: o CSV da
+ * exportação sai daqui pelo `download` abaixo. Quem lê o corpo são os dois
+ * invólucros; tudo o que vem antes - endereço, cookie, prazo, renovação de
+ * sessão - é igual e mora aqui, uma vez só.
  */
-export async function request<T>(
+async function send(
   path: string,
   init?: RequestInit,
   retry?: RequestRetry,
-): Promise<T> {
+): Promise<Response> {
   const cookie = retry?.cookie ?? inboundCookie()
 
   /**
@@ -374,7 +380,7 @@ export async function request<T>(
       // Se o refresh também falhar, o `HTTPError` dele sobe daqui e o guard da
       // rota trata como não autenticado - que é exatamente o que é.
       const renewed = await renew(cookie)
-      return await request<T>(path, init, {
+      return await send(path, init, {
         cookie: renewed,
         skipRefresh: true,
       })
@@ -388,9 +394,47 @@ export async function request<T>(
     })
   }
 
+  return response
+}
+
+/** A resposta da API lida como JSON, que é o caso de todas menos a exportação. */
+export async function request<T>(
+  path: string,
+  init?: RequestInit,
+  retry?: RequestRetry,
+): Promise<T> {
+  const response = await send(path, init, retry)
+
   // 204 do sign-in: `.json()` estouraria em corpo vazio.
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   if (response.status === 204) return undefined as T
 
   return await response.json()
+}
+
+/**
+ * A resposta da API lida como arquivo.
+ *
+ * Existe porque um `<a href download>` apontando para a API **não passa por
+ * aqui**: âncora é navegação do navegador, não deste módulo, e por isso não
+ * renova a sessão. O cookie até vai junto, mas com o access token vencido - um
+ * dia é o prazo dele - a API responde 401 e o navegador salva o JSON do erro
+ * com o nome do arquivo pedido. Baixar pelo mesmo caminho de todo o resto é o
+ * que faz o refresh acontecer antes de existir arquivo nenhum.
+ *
+ * O nome vem do `Content-Disposition`, quando a API o manda e o CORS o expõe
+ * (`exposeHeaders` em `backend/config/cors.ts`); quem chama decide o fallback.
+ */
+export async function download(
+  path: string,
+  init?: RequestInit,
+): Promise<{ blob: Blob; filename: string | undefined }> {
+  const response = await send(path, init)
+
+  return {
+    blob: await response.blob(),
+    filename: filenameFromContentDisposition(
+      response.headers.get('content-disposition'),
+    ),
+  }
 }
