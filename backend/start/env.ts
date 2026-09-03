@@ -33,6 +33,24 @@ export default await Env.create(new URL('../', import.meta.url), {
    */
   CORS_ORIGIN: Env.schema.string.optional(),
 
+  /**
+   * O `Domain` dos cookies de sessão. Ausente, o cookie nasce **host-only**: só
+   * volta para o host exato que o emitiu.
+   *
+   * Host-only quebra o SSR do frontend. Quem renderiza a primeira navegação é o
+   * Nitro, em `academy.maiyu.com.br`, e é ele - não o navegador - que chama esta
+   * API; um cookie preso em `api-academy.maiyu.com.br` nunca chega até lá, e
+   * todo F5 em rota privada vira 401 e volta para a tela de entrada. Em
+   * desenvolvimento não aparece porque cookie ignora porta: `localhost:3333` e
+   * `localhost:3000` são o mesmo domínio.
+   *
+   * O valor é o menor domínio que cobre os dois hosts - `.maiyu.com.br` hoje,
+   * porque a API está em `api-academy` e não em `api.academy`. Opcional de
+   * propósito: em desenvolvimento fica ausente, e ausente é o comportamento
+   * que este arquivo sempre teve.
+   */
+  COOKIE_DOMAIN: Env.schema.string.optional(),
+
   /*
   |----------------------------------------------------------
   | Variables for configuring database connection
