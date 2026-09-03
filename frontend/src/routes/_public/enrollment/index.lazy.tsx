@@ -16,7 +16,7 @@ import type { StorefrontEnrollmentCreatePayload } from '#/lib/validator'
 import type { Merge } from '#/lib/interfaces'
 import { LEGAL_AGE } from '#/lib/entity'
 import { applyMutationError } from '#/lib/form-errors'
-import { errorId, invalidProps } from '#/lib/form-a11y'
+import { errorDescribedBy, errorId, invalidProps } from '#/lib/form-a11y'
 import { DatePicker } from '#/components/common/date-picker'
 import {
   SHIFT_LABELS,
@@ -267,6 +267,18 @@ function RouteComponent(): React.JSX.Element {
    */
   const [courseId, setCourseId] = React.useState(preselectedCourse?.id ?? '')
 
+  /*
+   * O erro do curso, à mão, porque o curso não é campo do formulário.
+   *
+   * Sem ele o passo travava calado: `trigger` reprovava por `classId`, mas o
+   * `Controller` que desenha a mensagem só monta depois que existe um curso
+   * escolhido - então não havia onde a reprovação aparecer, e "Continuar"
+   * virava um clique morto. `shouldFocus` também não alcançava nada, porque o
+   * campo marcado estava desmontado.
+   */
+  const [courseMissing, setCourseMissing] = React.useState(false)
+  const courseGroup = React.useRef<HTMLDivElement>(null)
+
   const form = useForm<FormValues, unknown, StorefrontEnrollmentCreatePayload>({
     resolver: vineResolver(StorefrontEnrollmentCreateValidator),
     mode: 'onTouched',
@@ -388,6 +400,7 @@ function RouteComponent(): React.JSX.Element {
    */
   function changeCourse(value: string): void {
     setCourseId(value)
+    setCourseMissing(false)
     form.setValue('classId', '')
   }
 
@@ -445,12 +458,34 @@ function RouteComponent(): React.JSX.Element {
   })
 
   async function next() {
+    // O curso vem antes de tudo, e é cobrado à parte por não ser campo do
+    // formulário. Sem esta guarda o passo reprovava por `classId` sem ter onde
+    // dizê-lo, porque a lista de horários - que carrega a mensagem - só existe
+    // depois de haver curso.
+    if (step === 'curso' && !courseId) {
+      setCourseMissing(true)
+      courseGroup.current?.focus()
+
+      return
+    }
+
     // `shouldFocus` porque reprovar sem mover o foco deixa a pessoa parada no
     // botão "Continuar", com a mensagem de erro numa parte da tela que ela não
     // está lendo - e, no leitor de tela, sem anúncio nenhum de que algo mudou.
     const valid = await form.trigger(STEP_FIELDS[step], { shouldFocus: true })
 
-    if (!valid) return
+    if (!valid) {
+      // Marcar como tocado é o que faz o erro sumir sozinho quando a pessoa
+      // corrige. Com `mode: 'onTouched'`, o react-hook-form pula a validação no
+      // change enquanto o campo não tiver sido tocado - e ele só marca isso no
+      // blur. Num grupo de rádios não há blur ao marcar uma opção, então a
+      // turma ficava escolhida com "Informe a turma" ainda na tela.
+      for (const name of STEP_FIELDS[step]) {
+        form.setValue(name, form.getValues(name), { shouldTouch: true })
+      }
+
+      return
+    }
 
     setStep(steps[index + 1])
   }
@@ -549,10 +584,14 @@ function RouteComponent(): React.JSX.Element {
                   a barra de baixo mostra. Quem viaja no payload é o `classId`.
                 */}
                 <RadioGroup
+                  ref={courseGroup}
+                  tabIndex={-1}
                   required
                   name="courseId"
                   value={courseId}
                   onValueChange={changeCourse}
+                  aria-invalid={courseMissing}
+                  aria-describedby={errorDescribedBy(courseMissing, 'courseId')}
                   className="mt-5 grid gap-3 sm:grid-cols-2"
                 >
                   {selectableCourses.map((course) => (
@@ -590,6 +629,12 @@ function RouteComponent(): React.JSX.Element {
                     </label>
                   ))}
                 </RadioGroup>
+
+                {courseMissing && (
+                  <FieldError id={errorId('courseId')} className="mt-3">
+                    Escolha um curso
+                  </FieldError>
+                )}
               </fieldset>
 
               {/* `mt-2` sobre o `gap-4` do `FieldGroup`: são duas perguntas com
