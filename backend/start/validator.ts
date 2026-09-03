@@ -318,6 +318,10 @@ export const RULE_MESSAGES = {
   'cnpj.regex': 'CNPJ inválido',
   'cnpj.checkDigits': 'CNPJ inválido',
   'cpf.checkDigits': 'CPF inválido',
+
+  // A regra própria de `endsAtTime`: a mensagem do report é genérica, e esta
+  // é a que a tela mostra.
+  'endsAtTime.afterTimeField': 'O horário de término deve ser depois do de início',
   'cep.fixedLength': 'CEP deve ter 8 dígitos',
   'address.cep.fixedLength': 'CEP deve ter 8 dígitos',
   'uf.regex': 'UF deve ter 2 letras',

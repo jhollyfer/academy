@@ -44,6 +44,8 @@ const CLASS = {
   startsAt: '2026-03-07',
   weekday: 'SATURDAY',
   shift: 'MORNING',
+  startsAtTime: '08:00',
+  endsAtTime: '11:00',
   location: 'Benjamin Constant/AM',
   capacity: 40,
   status: 'OPEN',
@@ -101,11 +103,59 @@ describe('turma', () => {
     expect(fieldsOf(error)).toContain('startsAtTime')
   })
 
-  it('aceita horário ausente: a secretaria pode não tê-lo fechado', async () => {
+  it('cobra o horário: turma anunciada sem hora não diz quando aparecer', async () => {
+    // Era aceito, e virou exigência: `weekday` + `shift` não separam duas
+    // turmas do mesmo curso no mesmo sábado de manhã, a hora separa.
     const [error] = await AdministratorClassCreateValidator.tryValidate({
       ...CLASS,
       startsAtTime: null,
       endsAtTime: null,
+    })
+
+    expect(fieldsOf(error)).toContain('startsAtTime')
+    expect(fieldsOf(error)).toContain('endsAtTime')
+  })
+
+  it('campo em branco é cobrado como ausente, e não como formato', async () => {
+    // `convertEmptyStringsToNull` transforma o `''` do input vazio em `null`
+    // antes das regras, então a tela mostra "informe a hora" e não "formato
+    // inválido" - que seria a mensagem errada para um campo intocado.
+    const [error] = await AdministratorClassCreateValidator.tryValidate({
+      ...CLASS,
+      startsAtTime: '',
+    })
+
+    expect(fieldsOf(error)).toContain('startsAtTime')
+  })
+
+  it('recusa término antes do início', async () => {
+    const [error] = await AdministratorClassCreateValidator.tryValidate({
+      ...CLASS,
+      startsAtTime: '11:00',
+      endsAtTime: '08:00',
+    })
+
+    expect(fieldsOf(error)).toContain('endsAtTime')
+  })
+
+  it('recusa término igual ao início: aula de duração zero', async () => {
+    const [error] = await AdministratorClassCreateValidator.tryValidate({
+      ...CLASS,
+      startsAtTime: '08:00',
+      endsAtTime: '08:00',
+    })
+
+    expect(fieldsOf(error)).toContain('endsAtTime')
+  })
+
+  it('compara a hora do banco com a do formulário', async () => {
+    // O Postgres devolve `08:00:00` e o `<input type="time">` manda `08:00`.
+    // Sem cortar os segundos, `'08:00:00' <= '11:00'` seria falso por tamanho e
+    // a edição de uma turma existente passaria a acusar erro do nada.
+    const [error] = await AdministratorClassCreateValidator.tryValidate({
+      ...CLASS,
+      startsAtTime: '08:00:00',
+      endsAtTime: '11:00',
     })
 
     expect(fieldsOf(error)).toEqual([])

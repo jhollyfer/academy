@@ -54,6 +54,11 @@ export const RULE_MESSAGES = {
   // mensagem fala de DDD e não de formato.
   'phone.regex': 'Informe um telefone com DDD, como (92) 99999-0000',
   'cpf.checkDigits': 'CPF inválido',
+
+  // A regra própria de `endsAtTime`: a mensagem do report é genérica, e esta
+  // é a que a tela mostra.
+  'endsAtTime.afterTimeField':
+    'O horário de término deve ser depois do de início',
   'cep.fixedLength': 'CEP deve ter 8 dígitos',
   'address.cep.fixedLength': 'CEP deve ter 8 dígitos',
   'uf.fixedLength': 'UF deve ter 2 letras',

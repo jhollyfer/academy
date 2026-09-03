@@ -153,6 +153,10 @@ export function classPayload(
     startsAt: '2026-03-07',
     weekday: 'SATURDAY',
     shift: 'MORNING',
+    // Obrigatórios desde que `weekday` + `shift` deixaram de separar duas
+    // turmas do mesmo curso no mesmo sábado de manhã.
+    startsAtTime: '08:00',
+    endsAtTime: '11:00',
     location: 'Benjamin Constant/AM',
     capacity: 40,
     ...overrides,

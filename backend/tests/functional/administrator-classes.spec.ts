@@ -34,6 +34,61 @@ test.group('administrador > turmas', (group) => {
     assert.equal(entity.status, 'OPEN')
   })
 
+  test('recusa turma sem horário com 422', async ({ client, assert }) => {
+    // Era aceito: `startsAtTime` e `endsAtTime` eram nulos "enquanto a
+    // secretaria não fechou o horário". Turma anunciada assim não diz ao
+    // candidato quando aparecer, e duas turmas do mesmo curso no mesmo sábado
+    // de manhã ficavam indistinguíveis.
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+
+    const response = await client
+      .post('/administrator/classes')
+      .cookies(session)
+      .json(classPayload(course.id, { startsAtTime: null, endsAtTime: null }))
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'startsAtTime')
+    assert.property(body(response).errors, 'endsAtTime')
+  })
+
+  test('recusa término antes ou igual ao início', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+
+    const inverted = await client
+      .post('/administrator/classes')
+      .cookies(session)
+      .json(classPayload(course.id, { startsAtTime: '11:00', endsAtTime: '08:00' }))
+
+    inverted.assertStatus(422)
+    assert.property(body(inverted).errors, 'endsAtTime')
+
+    // Aula de duração zero também não existe.
+    const same = await client
+      .post('/administrator/classes')
+      .cookies(session)
+      .json(classPayload(course.id, { startsAtTime: '08:00', endsAtTime: '08:00' }))
+
+    same.assertStatus(422)
+  })
+
+  test('reenviar a hora com segundos, como o banco devolve, passa', async ({ client }) => {
+    // O Postgres devolve `08:00:00` e o formulário manda `08:00`. Comparar as
+    // duas sem cortar os segundos reprovaria a edição de uma turma existente
+    // que ninguém tocou.
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+    const entity = await createClass(client, session, course.id)
+
+    const response = await client
+      .put(`/administrator/classes/${entity.id}`)
+      .cookies(session)
+      .json({ startsAtTime: '08:00:00', endsAtTime: '11:00' })
+
+    response.assertStatus(200)
+  })
+
   test('recusa curso inexistente com 422 apontando o campo', async ({ client, assert }) => {
     const session = await authenticateAsOwner(client)
 
@@ -255,15 +310,6 @@ test.group('administrador > turmas > horário', (group) => {
     // formatos passam pelo validator, e é o do banco que volta na resposta.
     assert.equal(entity.startsAtTime.slice(0, 5), '08:00')
     assert.equal(entity.endsAtTime.slice(0, 5), '10:00')
-  })
-
-  test('turma sem horário fechado é estado legítimo, e vem nulo', async ({ client, assert }) => {
-    const session = await authenticateAsOwner(client)
-    const course = await createCourse(client, session)
-    const turma = await createClass(client, session, course.id)
-
-    assert.isNull(turma.startsAtTime)
-    assert.isNull(turma.endsAtTime)
   })
 
   test('recusa hora fora do relógio com 422 apontando o campo', async ({ client, assert }) => {

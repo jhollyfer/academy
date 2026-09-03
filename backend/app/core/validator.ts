@@ -438,8 +438,46 @@ export type AuthenticationInviteAcceptPayload = Infer<typeof AuthenticationInvit
  */
 const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/
 
+/**
+ * A hora depois da hora de outro campo.
+ *
+ * Não há regra pronta: `afterField` é de `vine.date()`, e estas são strings de
+ * hora de parede, sem dia. O `.slice(0, 5)` nos dois lados é o que faz a
+ * comparação valer - o Postgres devolve `08:00:00` e o `<input type="time">`
+ * manda `08:00`, e `'08:00:00' <= '10:00'` é falso por tamanho, não por hora.
+ * Com os dois em `HH:MM` zero-padded, a ordem alfabética **é** a cronológica.
+ *
+ * Sai calada quando o irmão não veio: numa atualização parcial o campo pode
+ * nem estar no payload, e reprovar ali seria cobrar um dado que ninguém enviou.
+ */
+const afterTimeField = vine.createRule(
+  (value: unknown, otherField: string, field: FieldContext) => {
+    if (typeof value !== 'string') return
+
+    const other = field.parent[otherField]
+
+    if (typeof other !== 'string') return
+    if (value.slice(0, 5) > other.slice(0, 5)) return
+
+    field.report('O horário de término deve ser depois do de início', 'afterTimeField', field, {
+      other: otherField,
+    })
+  }
+)
+
+/**
+ * A hora da aula.
+ *
+ * Obrigatória: `weekday` + `shift` não separam duas turmas do mesmo curso no
+ * mesmo sábado de manhã, a hora separa - e turma anunciada sem horário não diz
+ * ao candidato quando aparecer.
+ *
+ * A coluna segue `nullable` no banco, e de propósito: as turmas gravadas antes
+ * desta regra continuam legíveis, e a vitrine já sabe lidar com o nulo. O que
+ * muda é que salvar de novo passa a cobrar o horário.
+ */
 function time() {
-  return vine.string().trim().regex(TIME_PATTERN).nullable().optional()
+  return vine.string().trim().regex(TIME_PATTERN)
 }
 
 export const AdministratorClassCreateValidator = vine.create({
@@ -456,14 +494,8 @@ export const AdministratorClassCreateValidator = vine.create({
     .optional(),
   weekday: vine.enum(WEEKDAYS),
   shift: vine.enum(SHIFTS),
-  // A hora da aula. `weekday` + `shift` não separam duas turmas do mesmo curso
-  // no mesmo sábado de manhã; a hora separa.
-  //
-  // Nulas enquanto a secretaria não fechou o horário, e por isso não há
-  // `requiredIfExists` entre as duas: turma com hora de início e sem hora de
-  // fim é estado legítimo de cadastro em andamento.
   startsAtTime: time(),
-  endsAtTime: time(),
+  endsAtTime: time().use(afterTimeField('startsAtTime')),
   location: vine.string().trim().minLength(2).maxLength(200),
   capacity: vine.number().min(1).max(10_000),
   // `FULL` não entra: é derivado da ocupação, e digitá-lo criaria uma segunda
@@ -481,8 +513,11 @@ export const AdministratorClassUpdateValidator = vine.create({
     .optional(),
   weekday: vine.enum(WEEKDAYS).optional(),
   shift: vine.enum(SHIFTS).optional(),
-  startsAtTime: time(),
-  endsAtTime: time(),
+  // Opcionais aqui e obrigatórios na criação porque este é um PATCH: o que não
+  // veio no corpo fica como está. A ordem continua sendo cobrada quando os dois
+  // vêm juntos, que é o caso do formulário de edição.
+  startsAtTime: time().optional(),
+  endsAtTime: time().use(afterTimeField('startsAtTime')).optional(),
   location: vine.string().trim().minLength(2).maxLength(200).optional(),
   capacity: vine.number().min(1).max(10_000).optional(),
   status: vine.enum([ClassStatuses.OPEN, ClassStatuses.CLOSED]).optional(),

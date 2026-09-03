@@ -18,7 +18,6 @@ import {
   CLASS_FORM_DEFAULTS,
   ClassFormFields,
   optionalDate,
-  optionalTime,
 } from './form-fields'
 import type { ClassFormValues } from './form-fields'
 import { AdministratorClassCreateValidator } from '#/lib/validator'
@@ -52,12 +51,10 @@ export function ClassFormCreate(): React.JSX.Element {
     // `<input type="date">` fala `string`, o `vine.date()` quer `Date`. A
     // conversão é do envio, e não do campo: o input controlado por `Date`
     // voltaria a ser não-controlado no meio da digitação.
-    payload: ({ startsAt, endsAt, startsAtTime, endsAtTime, ...rest }) => ({
+    payload: ({ startsAt, endsAt, ...rest }) => ({
       ...rest,
       startsAt: new Date(startsAt),
       endsAt: optionalDate(endsAt),
-      startsAtTime: optionalTime(startsAtTime),
-      endsAtTime: optionalTime(endsAtTime),
     }),
   })
 

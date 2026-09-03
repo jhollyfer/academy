@@ -20,7 +20,6 @@ import {
   ClassFormFields,
   classToValues,
   optionalDate,
-  optionalTime,
 } from './form-fields'
 import type { ClassFormValues } from './form-fields'
 import { AdministratorClassCreateValidator } from '#/lib/validator'
@@ -69,12 +68,10 @@ export function ClassFormEdit(): React.JSX.Element {
     backParams: { id },
     success: (updated) => `${updated.name} salva.`,
     retry: 'class-update-error',
-    payload: ({ startsAt, endsAt, startsAtTime, endsAtTime, ...rest }) => ({
+    payload: ({ startsAt, endsAt, ...rest }) => ({
       ...rest,
       startsAt: new Date(startsAt),
       endsAt: optionalDate(endsAt),
-      startsAtTime: optionalTime(startsAtTime),
-      endsAtTime: optionalTime(endsAtTime),
     }),
   })
 
