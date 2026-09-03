@@ -5,6 +5,12 @@ import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
 import { Textarea } from '#/components/ui/textarea'
 import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from '#/components/ui/input-group'
+import {
   Field,
   FieldError,
   FieldGroup,
@@ -18,6 +24,7 @@ import {
   SelectValue,
 } from '#/components/ui/select'
 import { ACTIVE_STATUSES, COURSE_ACCENTS } from '#/lib/entity'
+import { formatCents, parseCents } from '#/lib/format'
 import { ACTIVE_STATUS_LABELS, COURSE_ACCENT_LABELS } from '#/lib/labels'
 import {
   ImageField,
@@ -289,17 +296,15 @@ export function CourseFormFields({
             name="durationMonths"
             label="Duração (meses)"
           />
-          <NumberField
+          <MoneyField
             form={form}
             name="enrollmentFeeInCents"
-            label="Inscrição (centavos)"
-            hint="15000 são R$ 150,00"
+            label="Inscrição"
           />
-          <NumberField
+          <MoneyField
             form={form}
             name="monthlyFeeInCents"
-            label="Mensalidade (centavos)"
-            hint="15000 são R$ 150,00"
+            label="Mensalidade"
           />
           <NumberField
             form={form}
@@ -504,13 +509,9 @@ function NumberField({
   nullable,
 }: {
   form: UseFormReturn<CourseFormType>
-  name:
-    | 'workloadHours'
-    | 'durationMonths'
-    | 'enrollmentFeeInCents'
-    | 'monthlyFeeInCents'
-    | 'minimumAge'
-    | 'position'
+  // Sem os dois campos de dinheiro: eles são do `MoneyField` abaixo, e tirá-los
+  // daqui é o que impede alguém devolvê-los ao input de número por engano.
+  name: 'workloadHours' | 'durationMonths' | 'minimumAge' | 'position'
   label: string
   hint?: string
   nullable?: boolean
@@ -545,6 +546,67 @@ function NumberField({
           {hint && !fieldState.error && (
             <p className="text-xs text-muted-foreground">{hint}</p>
           )}
+          {fieldState.error && (
+            <FieldError>{fieldState.error.message}</FieldError>
+          )}
+        </Field>
+      )}
+    />
+  )
+}
+
+/**
+ * Dinheiro, em reais na tela e em centavos no formulário.
+ *
+ * Os dois campos pediam o valor **em centavos**, com a dica "15000 são
+ * R$ 150,00" embaixo. Quem preenchia às pressas digitava `150` achando que
+ * eram cento e cinquenta reais e publicava um curso de R$ 1,50 - e o erro só
+ * aparecia na vitrine, para o candidato.
+ *
+ * O que muda é a entrada, não o armazenamento: o valor no formulário continua
+ * sendo o inteiro em centavos que o `money()` do validator espera, e a
+ * conversão acontece na borda, a cada tecla.
+ *
+ * Sem máscara, e a doc da casa é explícita sobre isso (`_doc-lib/use-mask-input.md`):
+ * dinheiro não é texto formatado, é número guardado em unidade menor, e pede
+ * componente próprio. O `parseCents` explica o modelo de acumulador.
+ */
+function MoneyField({
+  form,
+  name,
+  label,
+}: {
+  form: UseFormReturn<CourseFormType>
+  name: 'enrollmentFeeInCents' | 'monthlyFeeInCents'
+  label: string
+}): React.JSX.Element {
+  return (
+    <Controller
+      control={form.control}
+      name={name}
+      render={({ field, fieldState }) => (
+        <Field data-invalid={fieldState.invalid}>
+          <FieldLabel htmlFor={name}>{label}</FieldLabel>
+          <InputGroup data-invalid={fieldState.invalid}>
+            {/* O `R$` fica fora do texto editável: dentro, o cursor teria de
+                desviar do prefixo a cada tecla. */}
+            <InputGroupAddon>
+              <InputGroupText>R$</InputGroupText>
+            </InputGroupAddon>
+            <InputGroupInput
+              id={name}
+              // `decimal` e não `numeric`: no telefone é o teclado que traz a
+              // vírgula, e sem ela a pessoa procura por um separador que este
+              // campo nem usa.
+              inputMode="decimal"
+              value={formatCents(field.value)}
+              onBlur={field.onBlur}
+              onChange={(event) =>
+                field.onChange(parseCents(event.target.value))
+              }
+              aria-invalid={fieldState.invalid}
+            />
+          </InputGroup>
           {fieldState.error && (
             <FieldError>{fieldState.error.message}</FieldError>
           )}

@@ -52,6 +52,46 @@ export function formatMoney(cents: number): string {
 }
 
 /**
+ * Centavos como se digita num campo de dinheiro: `15000` vira `'150,00'`.
+ *
+ * Sem o `R$`, ao contrário do `formatMoney` acima. O símbolo do campo é um
+ * adorno ao lado do input, não texto editável: dentro dele, o cursor teria de
+ * desviar do prefixo a cada tecla, e o espaço que o `Intl` põe depois do `R$`
+ * não é o espaço comum - é um sem quebra, que quem edita não consegue apagar e
+ * quem compara em teste não enxerga.
+ */
+export function formatCents(cents: number): string {
+  return new Intl.NumberFormat('pt-BR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(cents / 100)
+}
+
+/**
+ * O que foi digitado num campo de dinheiro, de volta a centavos inteiros.
+ *
+ * **O campo é um acumulador de centavos**, e não um texto livre com vírgula:
+ * conta só os dígitos, e a vírgula sai do formato, não da digitação. Teclar
+ * `1`,`5`,`0`,`0`,`0` mostra `0,01 → 0,15 → 1,50 → 15,00 → 150,00`, que é como
+ * todo aplicativo de banco brasileiro se comporta.
+ *
+ * Isso é o que dispensa caso especial: colar "R$ 1.500,00" sobra `150000`,
+ * apagar um dígito refaz o formato sozinho, e não há o que decidir sobre `1.5`,
+ * `1,5` e `1.500` - as três ambiguidades que um campo de texto livre teria de
+ * resolver e erraria em pelo menos uma.
+ *
+ * O teto acompanha o `money()` do validator; sem ele, segurar uma tecla passa
+ * do limite e o erro só aparece no envio.
+ */
+export function parseCents(text: string): number {
+  const digits = text.replace(/\D/g, '')
+
+  if (!digits) return 0
+
+  return Math.min(Number(digits), 100_000_000)
+}
+
+/**
  * Uma data ISO da API na forma brasileira.
  *
  * `'2026-03-07'` chega como data pura, sem hora. Passá-la por `new Date()` a
