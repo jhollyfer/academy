@@ -21,6 +21,10 @@
       "description": "Os cursos como o candidato os vê, sem autenticação. Só curso `ACTIVE` e não removido, com a grade, o FAQ, a próxima turma e as vagas restantes. É o que a landing consome."
     },
     {
+      "name": "Site · FAQ",
+      "description": "As perguntas frequentes da escola, sem autenticação. Só as de `courseId` nulo - as que valem para a escola inteira. Pergunta de um curso sai junto do curso, em `GET /storefront/courses/:slug`, e por isso não aparece aqui."
+    },
+    {
       "name": "Site · Matrícula",
       "description": "A matrícula virtual, sem autenticação - quem se inscreve não tem conta e não vai ter. A criação devolve um `protocol`, e é só por ele que o candidato acompanha o próprio pedido depois. Turma lotada não recusa a inscrição: ela entra como `WAITLIST`."
     },
@@ -47,6 +51,10 @@
     {
       "name": "Painel · Usuários",
       "description": "Quem tem acesso, nos quatro papéis. A equipe da escola nasce com senha; responsável e aluno nascem por convite, porque a secretaria não deve escolher a senha de uma família. É aqui também que se liga um dependente ao seu responsável."
+    },
+    {
+      "name": "Portal · Matrículas",
+      "description": "As matrículas de quem está autenticado - as suas e as de quem depende dele. Separado do painel porque o recorte é outro: lá o papel decide o que se pode fazer, aqui decide o que é seu. Fora do escopo a resposta é `404` e não `403`: `403` confirmaria que o registro existe, que é justamente o que o recorte esconde."
     }
   ],
   "paths": {
@@ -3384,7 +3392,7 @@
         "operationId": "portalEnrollmentsPaginate",
         "summary": "Minhas matrículas",
         "tags": [
-          "Sem grupo"
+          "Portal · Matrículas"
         ],
         "responses": {
           "200": {
@@ -3494,9 +3502,9 @@
     "/portal/enrollments/{id}": {
       "get": {
         "operationId": "portalEnrollmentsShow",
-        "summary": "GET ",
+        "summary": "Detalhar matrícula",
         "tags": [
-          "Sem grupo"
+          "Portal · Matrículas"
         ],
         "responses": {
           "200": {
@@ -4514,13 +4522,35 @@
     "/storefront/faqs": {
       "get": {
         "operationId": "storefrontFaqs",
-        "summary": "GET ",
+        "summary": "Listar perguntas frequentes",
         "tags": [
-          "Sem grupo"
+          "Site · FAQ"
         ],
         "responses": {
           "200": {
-            "description": "Sucesso. O corpo desta resposta não está descrito: a feature não está registrada em `app/core/response.ts`."
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMeta"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/StorefrontFaqsItem"
+                      }
+                    }
+                  },
+                  "required": [
+                    "meta",
+                    "data"
+                  ]
+                }
+              }
+            }
           },
           "422": {
             "description": "Dados inválidos",
@@ -4796,17 +4826,11 @@
             ]
           },
           "startsAtTime": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "pattern": "^([01]\\d|2[0-3]):[0-5]\\d(:[0-5]\\d)?$"
           },
           "endsAtTime": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "pattern": "^([01]\\d|2[0-3]):[0-5]\\d(:[0-5]\\d)?$"
           },
           "location": {
@@ -4832,6 +4856,8 @@
           "startsAt",
           "weekday",
           "shift",
+          "startsAtTime",
+          "endsAtTime",
           "location",
           "capacity"
         ],
@@ -5575,17 +5601,11 @@
             ]
           },
           "startsAtTime": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "pattern": "^([01]\\d|2[0-3]):[0-5]\\d(:[0-5]\\d)?$"
           },
           "endsAtTime": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "pattern": "^([01]\\d|2[0-3]):[0-5]\\d(:[0-5]\\d)?$"
           },
           "location": {
@@ -17706,6 +17726,31 @@
           "totalParts",
           "parts",
           "uploaded"
+        ],
+        "additionalProperties": false
+      },
+      "StorefrontFaqsItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "position": {
+            "type": "number"
+          },
+          "question": {
+            "type": "string"
+          },
+          "answer": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "position",
+          "question",
+          "answer"
         ],
         "additionalProperties": false
       }

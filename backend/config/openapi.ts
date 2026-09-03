@@ -67,6 +67,16 @@ const tags: TagRule[] = [
     plural: 'cursos',
   },
   {
+    prefix: '/storefront/faqs',
+    name: 'Site · FAQ',
+    description:
+      'As perguntas frequentes da escola, sem autenticação. Só as de `courseId` nulo - as que ' +
+      'valem para a escola inteira. Pergunta de um curso sai junto do curso, em ' +
+      '`GET /storefront/courses/:slug`, e por isso não aparece aqui.',
+    singular: 'pergunta frequente',
+    plural: 'perguntas frequentes',
+  },
+  {
     prefix: '/storefront/enrollments',
     name: 'Site · Matrícula',
     description:
@@ -129,6 +139,17 @@ const tags: TagRule[] = [
       'família. É aqui também que se liga um dependente ao seu responsável.',
     singular: 'usuário',
     plural: 'usuários',
+  },
+  {
+    prefix: '/portal/enrollments',
+    name: 'Portal · Matrículas',
+    description:
+      'As matrículas de quem está autenticado - as suas e as de quem depende dele. Separado do ' +
+      'painel porque o recorte é outro: lá o papel decide o que se pode fazer, aqui decide o ' +
+      'que é seu. Fora do escopo a resposta é `404` e não `403`: `403` confirmaria que o ' +
+      'registro existe, que é justamente o que o recorte esconde.',
+    singular: 'matrícula',
+    plural: 'matrículas',
   },
 ]
 

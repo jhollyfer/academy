@@ -236,6 +236,27 @@ const StorefrontEnrollmentResponse = vine.create({
   ),
 })
 
+/**
+ * A pergunta frequente da home, como a listagem a devolve.
+ *
+ * Declarada em VineJS e não derivada do model de propósito. O use-case serializa
+ * com `pick: ['id', 'position', 'question', 'answer']` e deixa `courseId` de
+ * fora - ele é sempre nulo neste recorte, e mandá-lo convidaria a tela a filtrar
+ * de novo o que a consulta já filtrou. Apontar a feature para um `ModelResource`
+ * de `CourseFaq` faria o documento anunciar `courseId` e os timestamps, campos
+ * que a resposta não traz.
+ *
+ * As duas declarações precisam andar juntas: campo novo no `pick` sem campo novo
+ * aqui deixa o documento devendo; o contrário publica um campo que não existe.
+ */
+const StorefrontFaqResponse = vine.create({
+  id: identifier(),
+  /** A ordem é decisão de quem escreveu o FAQ, não alfabética nem por data. */
+  position: vine.number(),
+  question: vine.string(),
+  answer: vine.string(),
+})
+
 // ---------------------------------------------------------------------------
 // Registro
 // ---------------------------------------------------------------------------
@@ -257,6 +278,9 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'portal/enrollments': ENROLLMENT,
 
   'storefront/courses': COURSE,
+  // Projeção declarada pelo mesmo motivo da matrícula pública, mas por outro
+  // caminho: aqui não é sigilo, é um `pick` que enxuga a linha.
+  'storefront/faqs': StorefrontFaqResponse,
   // Projeção declarada, e não o `ENROLLMENT` do painel: estas rotas não têm
   // sessão, e devolvem só o que a tela de acompanhamento mostra.
   'storefront/enrollments': StorefrontEnrollmentResponse,
