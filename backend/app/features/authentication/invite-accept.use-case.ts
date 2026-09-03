@@ -27,18 +27,25 @@ type Response = Either<HTTPException, User>
 export default class AuthenticationInviteAcceptUseCase {
   async execute({ token, password }: Payload): Promise<Response> {
     try {
-      const resolved = await resolveInvite(token)
+      // A conferência entra na transação junto com a gravação, e não antes
+      // dela: `resolveInvite` com `trx` lê a linha com `FOR UPDATE`, e é o que
+      // faz o convite ser de uso único de verdade. Fora do lock, dois envios do
+      // mesmo link leem `consumed_at` nulo antes de qualquer um gravar - e os
+      // dois passam.
+      //
+      // Os dois lados também têm de valer juntos: senha gravada com convite
+      // ainda aberto deixa um link válido para trocá-la de novo; convite
+      // consumido sem senha tranca a pessoa para fora, sem link e sem
+      // credencial.
+      return await db.transaction(async function (trx) {
+        const resolved = await resolveInvite(token, trx)
 
-      if (resolved.isLeft()) return left(resolved.value)
+        // Nada foi escrito ainda, então sair por aqui não tem o que desfazer.
+        if (resolved.isLeft()) return left(resolved.value)
 
-      const invite = resolved.value
-      const user = invite.user
+        const invite = resolved.value
+        const user = invite.user
 
-      // Em transação: os dois lados têm de valer juntos. Senha gravada com
-      // convite ainda aberto deixa um link válido para trocá-la de novo;
-      // convite consumido sem senha gravada tranca a pessoa para fora, sem link
-      // e sem credencial.
-      await db.transaction(async function (trx) {
         user.useTransaction(trx)
         user.password = password
         user.emailVerifiedAt = DateTime.now()
@@ -47,9 +54,9 @@ export default class AuthenticationInviteAcceptUseCase {
         invite.useTransaction(trx)
         invite.consumedAt = DateTime.now()
         await invite.save()
-      })
 
-      return right(user)
+        return right(user)
+      })
     } catch (error) {
       logger.error({ err: error }, '[authentication > invite-accept][error]')
 

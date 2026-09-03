@@ -3,6 +3,7 @@ import { ActiveStatuses } from '#core/entity'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { hashInviteToken } from '#services/invite.service'
+import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
 /**
  * Resolver um token de convite no convite que ele representa.
@@ -19,12 +20,21 @@ import { hashInviteToken } from '#services/invite.service'
  *
  * A busca é direta pelo `token_hash` porque o hash é determinístico
  * (`hashInviteToken`) - ver o porquê no JSDoc daquela função.
+ *
+ * Com `trx`, a linha é lida com `FOR UPDATE`. Quem vai **gravar** precisa disso:
+ * sem o lock, dois envios do mesmo link leem `consumed_at` nulo antes de
+ * qualquer um dos dois gravar, e os dois seguem - o convite de uso único passa a
+ * valer duas vezes. Ler para só conferir (o `GET`) não precisa segurar nada.
  */
-export async function resolveInvite(token: string): Promise<Either<HTTPException, AccountInvite>> {
-  const invite = await AccountInvite.query()
-    .where('tokenHash', hashInviteToken(token))
-    .preload('user')
-    .first()
+export async function resolveInvite(
+  token: string,
+  trx?: TransactionClientContract
+): Promise<Either<HTTPException, AccountInvite>> {
+  const query = AccountInvite.query()
+
+  if (trx) query.useTransaction(trx).forUpdate()
+
+  const invite = await query.where('tokenHash', hashInviteToken(token)).preload('user').first()
 
   // Token que não existe e token de outro formato dão na mesma resposta: quem
   // chegou aqui com um link quebrado precisa pedir outro, e não saber por quê.

@@ -147,6 +147,31 @@ test.group('autenticação > convite', (group) => {
     assert.isNotNull(user.emailVerifiedAt)
   })
 
+  test('dois envios simultâneos do mesmo link consomem uma vez só', async ({ client, assert }) => {
+    const { user, token } = await issueInvite()
+
+    // Disparados juntos de propósito: sem o `FOR UPDATE` de `resolveInvite`, os
+    // dois leem `consumed_at` nulo antes de qualquer um gravar, e o convite de
+    // uso único passa a valer duas vezes.
+    const [first, second] = await Promise.all([
+      client
+        .post(`/authentication/invite/${token}`)
+        .json({ password: NEW_PASSWORD, passwordConfirmation: NEW_PASSWORD }),
+      client
+        .post(`/authentication/invite/${token}`)
+        .json({ password: 'OutraSenha1!', passwordConfirmation: 'OutraSenha1!' }),
+    ])
+
+    const statuses = [first.status(), second.status()].sort()
+
+    assert.deepEqual(statuses, [204, 409])
+
+    const invites = await AccountInvite.query().where('userId', user.id)
+
+    assert.lengthOf(invites, 1)
+    assert.isNotNull(invites[0].consumedAt)
+  })
+
   test('o mesmo link não serve duas vezes', async ({ client, assert }) => {
     const { token } = await issueInvite()
 
