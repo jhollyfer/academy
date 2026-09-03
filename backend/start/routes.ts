@@ -15,6 +15,7 @@ import { controllers } from '#generated/controllers'
 import { scalarPage } from '#core/openapi/scalar'
 import openapi from '#config/openapi'
 import { PORTAL_USER_ROLES, STAFF_USER_ROLES } from '#core/entity'
+import { enrollmentThrottle, inviteThrottle, signInThrottle, uploadThrottle } from '#start/limiter'
 
 router.get('/', function (context) {
   return context.response.redirect('/documentation')
@@ -77,7 +78,7 @@ router.get('/documentation', function (context) {
  */
 router
   .group(() => {
-    router.post('sign-in', [controllers.authentication.SignIn]).as('sign-in')
+    router.post('sign-in', [controllers.authentication.SignIn]).as('sign-in').use(signInThrottle)
     router
       .post('sign-out', [controllers.authentication.SignOut])
       .as('sign-out')
@@ -85,8 +86,14 @@ router
 
     router.post('refresh', [controllers.authentication.Refresh]).as('refresh')
 
-    router.get('invite/:token', [controllers.authentication.InviteShow]).as('invite.show')
-    router.post('invite/:token', [controllers.authentication.InviteAccept]).as('invite.accept')
+    router
+      .get('invite/:token', [controllers.authentication.InviteShow])
+      .as('invite.show')
+      .use(inviteThrottle)
+    router
+      .post('invite/:token', [controllers.authentication.InviteAccept])
+      .as('invite.accept')
+      .use(inviteThrottle)
   })
   .prefix('authentication')
   .as('authentication')
@@ -119,7 +126,7 @@ router
 
     router
       .group(() => {
-        router.post('/', [controllers.storefront.enrollments.Create])
+        router.post('/', [controllers.storefront.enrollments.Create]).use(enrollmentThrottle)
         router.get(':protocol', [controllers.storefront.enrollments.Show]).as('show')
         router
           .post(':protocol/attachments', [controllers.storefront.enrollments.Attach])
@@ -145,6 +152,7 @@ router
           .prefix(':protocol/uploads')
           .as('uploads')
           .use(middleware.enrollmentProtocol())
+          .use(uploadThrottle)
       })
       .prefix('enrollments')
       .as('enrollments')

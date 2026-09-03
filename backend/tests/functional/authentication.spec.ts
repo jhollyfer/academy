@@ -421,3 +421,38 @@ test.group('autenticação > refresh', (group) => {
     assert.equal(body(response).code, 'REFRESH_TOKEN_MISSING')
   })
 })
+
+/**
+ * O teto de tentativas.
+ *
+ * Nenhum dos projetos irmãos tem, e aqui ele faz falta por uma razão que só este
+ * contrato tem: a matrícula é escrita **anônima**, e o upload por protocolo
+ * entrega URL assinada de bucket. Sem teto, um laço de shell enche o banco de
+ * matrículas e a turma "lota" sem ninguém ter se inscrito.
+ */
+test.group('autenticação > teto de tentativas', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('a sexta tentativa de entrar no mesmo minuto é 429', async ({ client, assert }) => {
+    const errada = { email: OWNER.email, password: 'SenhaErrada1!' }
+
+    // Cinco por minuto: folgado para quem erra a senha, apertado para quem a
+    // adivinha. As cinco primeiras respondem 401 - o teto não esconde o motivo,
+    // só limita o volume.
+    for (let tentativa = 0; tentativa < 5; tentativa += 1) {
+      const response = await client.post('/authentication/sign-in').json(errada)
+
+      response.assertStatus(401)
+    }
+
+    const bloqueada = await client.post('/authentication/sign-in').json(errada)
+
+    bloqueada.assertStatus(429)
+
+    // E a senha certa também espera: se o teto liberasse quem acerta, ele não
+    // limitaria a adivinhação - que é exatamente tentar até acertar.
+    const comSenhaCerta = await client.post('/authentication/sign-in').json(OWNER)
+
+    assert.equal(comSenhaCerta.status(), 429)
+  })
+})
