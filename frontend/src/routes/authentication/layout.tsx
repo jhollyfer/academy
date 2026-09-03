@@ -10,13 +10,20 @@ import { validateRedirectSearch } from '#/lib/redirect-search'
  */
 export const Route = createFileRoute('/authentication')({
   validateSearch: validateRedirectSearch,
-  beforeLoad: async ({ context }) => {
+  beforeLoad: async ({ context, location }) => {
     try {
       await context.queryClient.ensureQueryData(accountQueryOptions())
     } catch {
       // Sem sessão é o caso normal desta área: segue para o formulário.
       return
     }
+
+    // O convite é a exceção do guard, e precisa ser: o link chega por e-mail e
+    // é aberto no navegador que a pessoa tem à mão - que pode muito bem ter
+    // sessão, a da secretaria que acabou de reenviá-lo ou a de outra conta da
+    // mesma família. Redirecionar ali engoliria o link em silêncio, e a pessoa
+    // não teria como definir a senha sem antes descobrir que precisa sair.
+    if (location.pathname.startsWith('/authentication/invite/')) return
 
     // Fora do `try`: um `redirect` é lançado, e lançado de dentro dele seria
     // capturado pelo próprio `catch` que existe para o caso oposto.
