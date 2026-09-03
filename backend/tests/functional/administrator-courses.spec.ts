@@ -3,6 +3,7 @@ import {
   authenticateAsOwner,
   body,
   coursePayload,
+  createClass,
   createCourse,
   resetDatabase,
 } from '../helpers.ts'
@@ -117,6 +118,32 @@ test.group('administrador > cursos', (group) => {
     assert.equal(page.meta.total, 1)
     assert.lengthOf(page.data, 1)
     assert.equal(page.data[0].classesCount, 0)
+  })
+
+  test('a ficha conta as turmas vivas, como a listagem', async ({ client, assert }) => {
+    // A ficha lia o mesmo `classesCount` da listagem, mas o `show` não agregava
+    // nada: o `@computed` devolvia `undefined`, o campo sumia do JSON e a tela
+    // mostrava "Turmas: -" para o curso que a lista ao lado dizia ter turma.
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+
+    await createClass(client, session, course.id)
+    const archived = await createClass(client, session, course.id)
+
+    const removed = await client
+      .patch(`/administrator/classes/${archived.id}/archive`)
+      .cookies(session)
+
+    removed.assertStatus(204)
+
+    const response = await client.get(`/administrator/courses/${course.id}`).cookies(session)
+
+    response.assertStatus(200)
+
+    // Uma, e não duas: turma arquivada não ocupa o curso. É o mesmo filtro da
+    // listagem, e discordar dele faria a ficha e a lista falarem números
+    // diferentes do mesmo curso.
+    assert.equal(body(response).classesCount, 1)
   })
 
   test('curso arquivado some da listagem e volta com ?trashed=only', async ({ client, assert }) => {

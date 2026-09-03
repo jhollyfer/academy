@@ -15,6 +15,13 @@ export default class CourseShowUseCase {
       const course = await Course.query()
         .where('id', payload.id)
         .whereNull('deletedAt')
+        // A mesma contagem da listagem, com o mesmo filtro de arquivadas. Tem de
+        // ser a mesma: sem ela o `@computed` do modelo devolve `undefined`, o
+        // campo some do JSON e a ficha mostrava "Turmas: -" para um curso que a
+        // lista ao lado dizia ter três.
+        .withCount('classes', function (classes) {
+          classes.whereNull('classes.deleted_at')
+        })
         // A grade e o FAQ vêm juntos porque a tela de edição mostra os três, e
         // uma segunda chamada para buscá-los seria um waterfall garantido.
         // Ordenados por `position`: a grade é uma sequência de sábados, e
