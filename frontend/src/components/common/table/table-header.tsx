@@ -42,7 +42,11 @@ function TableTitle({
   return (
     <h1
       data-slot="table-title"
-      className={cn('text-2xl font-bold', className)}
+      // `min-w-0` porque item de grade tem `min-width: auto`: sem isto um título
+      // longo empurra a coluna `1fr` em vez de quebrar dentro dela, e é a barra
+      // de ações ao lado que paga a conta. Não `truncate` - o título é o nome da
+      // tela, e cortá-lo com reticências é pior que quebrá-lo em duas linhas.
+      className={cn('min-w-0 text-2xl font-bold', className)}
       {...props}
     />
   )
@@ -70,6 +74,13 @@ function TableDescription({
 /**
  * As ações da direita: criar, exportar, o que a tela tiver - uma, três ou
  * nenhuma. `flex-wrap` porque três botões não cabem lado a lado no telefone.
+ *
+ * `col-start-2` é obrigatório, e a falta dele invertia o cabeçalho inteiro. No
+ * posicionamento automático da grade, um item com linha definida (`row-start-1`)
+ * é colocado **antes** dos itens sem posição nenhuma: sem dizer a coluna, estas
+ * ações tomavam a `1fr` e empurravam o título para a `auto`, que é estreita. O
+ * resultado era o botão à esquerda, o título espremido contra a borda direita, e
+ * a ação difícil de acertar com o dedo quando a tela apertava.
  */
 function TableActions({
   className,
@@ -82,7 +93,7 @@ function TableActions({
     <div
       data-slot="table-actions"
       className={cn(
-        'row-span-2 row-start-1 flex flex-wrap items-center justify-end gap-2 self-start justify-self-end',
+        'col-start-2 row-span-2 row-start-1 flex flex-wrap items-center justify-end gap-2 self-start justify-self-end',
         className,
       )}
       {...props}
