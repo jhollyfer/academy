@@ -69,7 +69,9 @@ export const PORTAL_USER_ROLES: Array<UserRole> = [UserRoles.RESPONSIBLE, UserRo
  * portal do painel e vice-versa. O convite levaria a uma porta que não abre.
  */
 export function homeForRole(role: UserRole): '/administrator' | '/portal' {
-  return PORTAL_USER_ROLES.includes(role) ? '/portal' : '/administrator'
+  if (PORTAL_USER_ROLES.includes(role)) return '/portal'
+
+  return '/administrator'
 }
 
 /**
