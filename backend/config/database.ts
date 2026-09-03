@@ -75,6 +75,20 @@ const dbConfig = defineConfig({
         naturalSort: true,
         paths: ['database/migrations'],
       },
+
+      schemaGeneration: {
+        /**
+         * `database/schema.ts` é regerado a cada `migration:run` a partir da
+         * conexão viva, e é dele que os models Lucid herdam as colunas.
+         *
+         * Sem isto o arquivo congela: models, `#core/response` e o `openapi.json`
+         * seguem descrevendo o banco de antes da migration, e a divergência não
+         * aparece em lugar nenhum até alguém ler uma coluna que não existe mais.
+         */
+        enabled: true,
+        rulesPaths: ['./database/schema_rules.js'],
+      },
+
       debug: app.inDev,
     },
 
