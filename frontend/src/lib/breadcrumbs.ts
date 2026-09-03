@@ -26,6 +26,7 @@ const SEGMENT_LABELS: Record<string, string | undefined> = {
   courses: 'Cursos',
   classes: 'Turmas',
   enrollments: 'Matrículas',
+  users: 'Usuários',
   new: 'Novo',
   edit: 'Editar',
 }

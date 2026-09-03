@@ -59,6 +59,21 @@ describe('buildBreadcrumbs', () => {
     ])
   })
 
+  it('usuários é rotulado como os outros recursos do painel', () => {
+    // A rota nasceu depois das três primeiras e o rótulo ficou para trás, então
+    // a trilha dizia "Painel > users". O teste abaixo é o que deixava isso
+    // passar sem quebrar nada - a falta de rótulo é silenciosa de propósito.
+    const crumbs = buildBreadcrumbs([
+      match('/administrator', '/administrator'),
+      match('/administrator/users', '/administrator/users'),
+    ])
+
+    expect(crumbs).toEqual([
+      { label: 'Painel', to: '/administrator' },
+      { label: 'Usuários' },
+    ])
+  })
+
   it('segmento sem rótulo aparece cru em vez de sumir', () => {
     const crumbs = buildBreadcrumbs([
       match('/administrator/relatorios', '/administrator/relatorios'),
