@@ -240,20 +240,28 @@ function resolveTagRule(path: string): TagRule | undefined {
  * substantivo do grupo: `create.controller.ts` sob `/administrator/companies`
  * vira "Criar empresa".
  *
- * Dezesseis pares de substantivos em `config/openapi.ts` cobrem as 52 operações.
- * A alternativa era 52 resumos escritos à mão, que é onde a documentação começa a
- * envelhecer.
+ * Os pares de substantivos em `config/openapi.ts` cobrem as operações de recurso.
+ * A alternativa era um resumo escrito à mão por operação, que é onde a
+ * documentação começa a envelhecer.
+ *
+ * As ações sem substantivo - as de sessão e as de upload - têm resumo fixo: o
+ * que elas fazem não é uma operação sobre o recurso do grupo, então flexionar o
+ * substantivo daria frase errada.
  */
 const ACTION_SUMMARY: Record<string, (rule: TagRule) => string> = {
   'create': (rule) => `Criar ${rule.singular}`,
   'paginate': (rule) => `Listar ${rule.plural}`,
   'show': (rule) => `Detalhar ${rule.singular}`,
   'update': (rule) => `Atualizar ${rule.singular}`,
+  'archive': (rule) => `Arquivar ${rule.singular}`,
+  'unarchive': (rule) => `Restaurar ${rule.singular}`,
   'delete': (rule) => `Remover ${rule.singular}`,
   'sign-in': () => 'Entrar',
-  'sign-up': () => 'Cadastrar empresa',
   'sign-out': () => 'Sair',
   'refresh': () => 'Renovar a sessão',
+  'complete': () => 'Confirmar o upload',
+  'parts': () => 'Retomar o upload',
+  'download': () => 'Baixar o arquivo',
 }
 
 function deriveSummary(action: string, rule: TagRule | undefined): string | undefined {

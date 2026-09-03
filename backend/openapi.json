@@ -732,7 +732,7 @@
     "/administrator/classes/{id}/archive": {
       "patch": {
         "operationId": "administratorLifecycleClassesArchive",
-        "summary": "PATCH /administrator/classes",
+        "summary": "Arquivar turma",
         "tags": [
           "Painel · Turmas"
         ],
@@ -813,7 +813,7 @@
     "/administrator/classes/{id}/unarchive": {
       "patch": {
         "operationId": "administratorLifecycleClassesUnarchive",
-        "summary": "PATCH /administrator/classes",
+        "summary": "Restaurar turma",
         "tags": [
           "Painel · Turmas"
         ],
@@ -1430,7 +1430,7 @@
     "/administrator/courses/{id}/archive": {
       "patch": {
         "operationId": "administratorLifecycleCoursesArchive",
-        "summary": "PATCH /administrator/courses",
+        "summary": "Arquivar curso",
         "tags": [
           "Painel · Cursos"
         ],
@@ -1511,7 +1511,7 @@
     "/administrator/courses/{id}/unarchive": {
       "patch": {
         "operationId": "administratorLifecycleCoursesUnarchive",
-        "summary": "PATCH /administrator/courses",
+        "summary": "Restaurar curso",
         "tags": [
           "Painel · Cursos"
         ],
@@ -2214,7 +2214,7 @@
     "/administrator/enrollments/{id}/archive": {
       "patch": {
         "operationId": "administratorLifecycleEnrollmentsArchive",
-        "summary": "PATCH /administrator/enrollments",
+        "summary": "Arquivar matrícula",
         "tags": [
           "Painel · Matrículas"
         ],
@@ -2295,7 +2295,7 @@
     "/administrator/enrollments/{id}/unarchive": {
       "patch": {
         "operationId": "administratorLifecycleEnrollmentsUnarchive",
-        "summary": "PATCH /administrator/enrollments",
+        "summary": "Restaurar matrícula",
         "tags": [
           "Painel · Matrículas"
         ],
@@ -2915,7 +2915,7 @@
     "/administrator/users/{id}/archive": {
       "patch": {
         "operationId": "administratorLifecycleUsersArchive",
-        "summary": "PATCH /administrator/users",
+        "summary": "Arquivar usuário",
         "tags": [
           "Painel · Usuários"
         ],
@@ -3191,7 +3191,7 @@
     "/administrator/users/{id}/unarchive": {
       "patch": {
         "operationId": "administratorLifecycleUsersUnarchive",
-        "summary": "PATCH /administrator/users",
+        "summary": "Restaurar usuário",
         "tags": [
           "Painel · Usuários"
         ],
