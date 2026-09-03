@@ -10,16 +10,24 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      # `-f` é o que faz o passo reprovar quando o Coolify responde erro. Sem
+      # ele o curl sai com código 0 mesmo em 401 ou 404, e um deploy que nunca
+      # aconteceu aparece verde no histórico.
+      #
+      # POST, e não GET: desde o Coolify v4.2 a rota GET /api/v1/deploy existe
+      # só para devolver 405. Voltar para GET quebra o deploy de novo.
       - name: Deploy API to Coolify
         run: |
-          curl -s -X GET \
-            "https://coolify.maiyu.com.br/api/v1/deploy?uuid=ojeyubw2upcdyh49dfxyxc9o&force=false" \
+          curl -fsS -X POST \
+            "https://coolify.maiyu.com.br/api/v1/deploy" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
-            -H "Content-Type: application/json"
+            -H "Content-Type: application/json" \
+            -d '{"uuid":"ojeyubw2upcdyh49dfxyxc9o","force":false}'
 
       - name: Deploy App to Coolify
         run: |
-          curl -s -X GET \
-            "https://coolify.maiyu.com.br/api/v1/deploy?uuid=jyi6az3eh6s7p9l742ids8q2&force=false" \
+          curl -fsS -X POST \
+            "https://coolify.maiyu.com.br/api/v1/deploy" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
-            -H "Content-Type: application/json"
+            -H "Content-Type: application/json" \
+            -d '{"uuid":"jyi6az3eh6s7p9l742ids8q2","force":false}'
