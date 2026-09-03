@@ -230,6 +230,18 @@ export type StorefrontEnrollmentResponse = {
   id: string
   protocol: string
   status: EnrollmentStatus
+  /**
+   * O "copia e cola" do Pix da inscrição, montado pelo servidor.
+   *
+   * Vem do backend, e não do bundle, porque quem sabe a chave da escola e o
+   * valor do curso é o servidor: montá-lo no cliente faria trocar a chave Pix
+   * exigir rebuild da imagem.
+   *
+   * `null` quando a matrícula não tem turma com curso, e portanto não tem valor
+   * de inscrição - o que a tela trata escondendo o bloco inteiro em vez de
+   * mostrar uma cobrança sem quantia.
+   */
+  pixCode: string | null
   studentFirstName: string
   class: {
     id: string

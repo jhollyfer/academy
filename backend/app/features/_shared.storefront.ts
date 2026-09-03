@@ -1,4 +1,5 @@
 import Class from '#models/class'
+import PixService from '#services/pix.service'
 import type Course from '#models/course'
 import type Enrollment from '#models/enrollment'
 import { withSeatsTaken } from '#features/_shared.seats'
@@ -122,7 +123,36 @@ export function publicEnrollmentView(enrollment: Enrollment) {
       kind: file.kind,
       createdAt: file.createdAt.toISO(),
     })),
+    /**
+     * O "copia e cola" do Pix da inscrição.
+     *
+     * Vem montado do servidor, e não da tela, porque é o servidor que sabe a
+     * chave da escola e o valor do curso. Montá-lo no navegador embutiria a
+     * chave no bundle, onde trocá-la passaria a exigir rebuild da imagem.
+     *
+     * `null` quando a turma não veio: sem curso não há valor, e um código de
+     * cobrança sem valor nesta tela seria pior que nenhum - a pessoa pagaria o
+     * que achasse.
+     */
+    pixCode: pixCodeFor(enrollment),
   }
+}
+
+/**
+ * O BR Code da inscrição desta matrícula.
+ *
+ * O `txid` é o protocolo: é o que faz o extrato da escola dizer de quem foi
+ * cada Pix, sem ninguém ter de cruzar valor com horário.
+ */
+function pixCodeFor(enrollment: Enrollment): string | null {
+  const fee = enrollment.class?.course?.enrollmentFeeInCents
+
+  if (!fee) return null
+
+  return new PixService().payload({
+    amountInCents: fee,
+    txid: enrollment.protocol,
+  })
 }
 
 /**

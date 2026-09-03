@@ -125,6 +125,11 @@ router
           .post(':protocol/attachments', [controllers.storefront.enrollments.Attach])
           .as('attach')
 
+        // O QR do Pix, gerado na hora. Não é arquivo em `storages` de propósito:
+        // é função pura da chave da escola e do valor do curso, e gravar um PNG
+        // por matrícula seria um cache que a troca da chave invalida em silêncio.
+        router.get(':protocol/pix', [controllers.storefront.enrollments.Pix]).as('pix')
+
         // O upload do comprovante, para quem não tem sessão.
         //
         // São os **mesmos** controllers de `/storages`, montados atrás do

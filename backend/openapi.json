@@ -4427,6 +4427,59 @@
         }
       }
     },
+    "/storefront/enrollments/{protocol}/pix": {
+      "get": {
+        "operationId": "storefrontEnrollmentsPix",
+        "summary": "QR do Pix da inscrição",
+        "tags": [
+          "Site · Matrícula"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontEnrollmentsPixResponse200"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            }
+          }
+        },
+        "description": "O PNG do QR de pagamento da inscrição, gerado na hora a partir do BR Code da matrícula.\n\nNão vira arquivo em `storages`: o QR é função pura da chave da escola e do valor do curso, e gravar um PNG por matrícula seria manter um cache que a troca da chave invalidaria em silêncio.\n\nPúblico como o resto do grupo, e escopado pelo protocolo - que é o que a pessoa recebeu ao se inscrever. O mesmo código em texto vem no `pixCode` da matrícula, para quem prefere copiar e colar.",
+        "parameters": [
+          {
+            "name": "protocol",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
     "/storefront/enrollments/{protocol}/uploads": {
       "post": {
         "operationId": "storefrontEnrollmentsUploadsCreate",
@@ -13821,6 +13874,37 @@
           "errors"
         ]
       },
+      "Error500": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha."
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error500AccountShowError": {
         "type": "object",
         "properties": {
@@ -17582,6 +17666,127 @@
         "additionalProperties": false
       },
       "StorefrontEnrollmentsCreateResponse201": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "protocol": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "enum": [
+              "PENDING",
+              "CONFIRMED",
+              "WAITLIST",
+              "CANCELLED"
+            ]
+          },
+          "studentFirstName": {
+            "type": "string"
+          },
+          "class": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "name": {
+                "type": "string"
+              },
+              "startsAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "location": {
+                "type": "string"
+              },
+              "course": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "slug": {
+                    "type": "string"
+                  },
+                  "enrollmentFeeInCents": {
+                    "type": "number"
+                  },
+                  "monthlyFeeInCents": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "slug",
+                  "enrollmentFeeInCents",
+                  "monthlyFeeInCents"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "startsAt",
+              "location",
+              "course"
+            ],
+            "additionalProperties": false
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "kind": {
+                  "enum": [
+                    "PAYMENT_RECEIPT",
+                    "DOCUMENT"
+                  ]
+                },
+                "createdAt": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "id",
+                "kind"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "id",
+          "protocol",
+          "status",
+          "studentFirstName",
+          "files"
+        ],
+        "additionalProperties": false
+      },
+      "StorefrontEnrollmentsPixResponse200": {
         "type": "object",
         "properties": {
           "id": {

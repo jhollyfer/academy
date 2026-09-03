@@ -76,6 +76,7 @@ export const controllers = {
     enrollments: {
       Attach: () => import('#features/storefront/enrollments/attach.controller'),
       Create: () => import('#features/storefront/enrollments/create.controller'),
+      Pix: () => import('#features/storefront/enrollments/pix.controller'),
       Show: () => import('#features/storefront/enrollments/show.controller'),
     },
     faqs: {
