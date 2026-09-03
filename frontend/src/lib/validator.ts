@@ -456,6 +456,36 @@ export type AuthenticationSignInPayload = Infer<
 >
 
 /**
+ * A própria conta, editada por quem a usa.
+ *
+ * Cópia do schema do backend, como todo validator deste arquivo: as duas pontas
+ * recusam o mesmo payload, e a de cá recusa sem ida ao servidor.
+ *
+ * `role` e `status` não entram - quem muda o próprio papel deixa de ser gerido
+ * por quem o concedeu. Papel e situação são do módulo de usuários, sobre a conta
+ * de outro.
+ */
+export const AccountUpdateValidator = vine.create({
+  name: vine.string().trim().minLength(2).maxLength(120).optional(),
+  email: email().optional(),
+  password: password().optional(),
+  /**
+   * A senha atual, exigida **só** quando `password` vem no payload. É prova de
+   * identidade, e não de força: quem sequestra uma sessão tem o cookie, mas não
+   * sabe a senha.
+   */
+  currentPassword: vine
+    .string()
+    .maxLength(32)
+    .optional()
+    .requiredIfExists('password'),
+  phone: phone().nullable().optional(),
+  avatarId: vine.string().uuid().nullable().optional(),
+})
+
+export type AccountUpdatePayload = Infer<typeof AccountUpdateValidator>
+
+/**
  * Definir a senha pelo convite.
  *
  * Aqui a força **é** exigida, ao contrário do `sign-in`: esta é a única vez em

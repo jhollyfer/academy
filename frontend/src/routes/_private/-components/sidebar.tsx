@@ -42,8 +42,8 @@ import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
 import { useAuthenticationSignOut } from '#/integrations/tanstack-query/mutations'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { initials } from '#/lib/labels'
-import { homeForRole, UserRoles  } from '#/lib/entity'
-import type {UserRole} from '#/lib/entity';
+import { homeForRole, UserRoles } from '#/lib/entity'
+import type { UserRole } from '#/lib/entity'
 
 /**
  * Os destinos do painel, tipados contra a árvore de rotas.
@@ -81,8 +81,7 @@ const PORTAL_NAVIGATION = linkOptions([
 ])
 
 type NavigationItemType =
-  | (typeof STAFF_NAVIGATION)[number]
-  | (typeof PORTAL_NAVIGATION)[number]
+  (typeof STAFF_NAVIGATION)[number] | (typeof PORTAL_NAVIGATION)[number]
 
 /**
  * Qual menu cada papel vê, e sob que rótulo.
@@ -113,9 +112,10 @@ const EMPTY_NAVIGATION: {
   items: ReadonlyArray<NavigationItemType>
 } = { label: '', items: [] }
 
-function navigationOf(
-  role: UserRole | undefined,
-): { label: string; items: ReadonlyArray<NavigationItemType> } {
+function navigationOf(role: UserRole | undefined): {
+  label: string
+  items: ReadonlyArray<NavigationItemType>
+} {
   if (role === undefined) return EMPTY_NAVIGATION
 
   return NAVIGATION[role]
@@ -258,13 +258,17 @@ export function Sidebar(): React.JSX.Element {
       <SidebarFooter>
         <SidebarMenu>
           {/*
-            O bloco de quem entrou não é gatilho de nada. No simple-hub ele abre
-            um menu, e o menu tem para onde ir - lá existe tela de perfil. Aqui
-            não existe, e um `DropdownMenu` de um item só é um clique a mais
-            para chegar no mesmo "Sair" que já está logo abaixo.
+            O bloco de quem entrou leva ao perfil. Um `DropdownMenu` continua
+            sendo um clique a mais para chegar ao "Sair" que já está logo
+            abaixo - mas o bloco em si tem para onde ir desde que a tela de
+            perfil existe, e é o lugar onde se troca a própria senha.
           */}
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" render={<div />}>
+            <SidebarMenuButton
+              size="lg"
+              tooltip="Meu perfil"
+              render={<Link to="/profile" />}
+            >
               <Avatar className="size-8 rounded-lg">
                 <AvatarImage src={account?.avatar?.url} alt={account?.name} />
                 {/* `text-foreground` e nao o `--muted-foreground` do registry: a

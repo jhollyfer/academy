@@ -22,6 +22,8 @@ import { Route as PublicPrivacyRouteImport } from './routes/_public/privacy'
 import { Route as PublicTermsRouteImport } from './routes/_public/terms'
 import { Route as PrivateAdministratorIndexRouteImport } from './routes/_private/administrator/index'
 import { Route as PrivatePortalIndexRouteImport } from './routes/_private/portal/index'
+import { Route as PrivateProfileIndexRouteImport } from './routes/_private/profile/index'
+import { Route as PrivateProfileEditRouteImport } from './routes/_private/profile/edit'
 import { Route as PublicCoursesSlugRouteImport } from './routes/_public/courses/$slug'
 import { Route as PublicEnrollmentIndexRouteImport } from './routes/_public/enrollment/index'
 import { Route as PublicEnrollmentProtocolRouteImport } from './routes/_public/enrollment/$protocol'
@@ -106,6 +108,20 @@ const PrivatePortalIndexRoute = PrivatePortalIndexRouteImport.update({
   getParentRoute: () => PrivateLayoutRoute,
 } as any).lazy(() =>
   import('./routes/_private/portal/index.lazy').then((d) => d.Route),
+)
+const PrivateProfileIndexRoute = PrivateProfileIndexRouteImport.update({
+  id: '/profile/',
+  path: '/profile/',
+  getParentRoute: () => PrivateLayoutRoute,
+} as any).lazy(() =>
+  import('./routes/_private/profile/index.lazy').then((d) => d.Route),
+)
+const PrivateProfileEditRoute = PrivateProfileEditRouteImport.update({
+  id: '/profile/edit',
+  path: '/profile/edit',
+  getParentRoute: () => PrivateLayoutRoute,
+} as any).lazy(() =>
+  import('./routes/_private/profile/edit.lazy').then((d) => d.Route),
 )
 const PublicCoursesSlugRoute = PublicCoursesSlugRouteImport.update({
   id: '/courses/$slug',
@@ -296,10 +312,12 @@ export interface FileRoutesByFullPath {
   '/about': typeof PublicAboutRoute
   '/privacy': typeof PublicPrivacyRoute
   '/terms': typeof PublicTermsRoute
+  '/profile/edit': typeof PrivateProfileEditRoute
   '/courses/$slug': typeof PublicCoursesSlugRoute
   '/enrollment/$protocol': typeof PublicEnrollmentProtocolRoute
   '/administrator/': typeof PrivateAdministratorIndexRoute
   '/portal/': typeof PrivatePortalIndexRoute
+  '/profile/': typeof PrivateProfileIndexRoute
   '/enrollment/': typeof PublicEnrollmentIndexRoute
   '/authentication/': typeof AuthenticationSignInIndexRoute
   '/administrator/classes/new': typeof PrivateAdministratorClassesNewRoute
@@ -325,10 +343,12 @@ export interface FileRoutesByTo {
   '/about': typeof PublicAboutRoute
   '/privacy': typeof PublicPrivacyRoute
   '/terms': typeof PublicTermsRoute
+  '/profile/edit': typeof PrivateProfileEditRoute
   '/courses/$slug': typeof PublicCoursesSlugRoute
   '/enrollment/$protocol': typeof PublicEnrollmentProtocolRoute
   '/administrator': typeof PrivateAdministratorIndexRoute
   '/portal': typeof PrivatePortalIndexRoute
+  '/profile': typeof PrivateProfileIndexRoute
   '/enrollment': typeof PublicEnrollmentIndexRoute
   '/authentication': typeof AuthenticationSignInIndexRoute
   '/administrator/classes/new': typeof PrivateAdministratorClassesNewRoute
@@ -358,10 +378,12 @@ export interface FileRoutesById {
   '/_public/privacy': typeof PublicPrivacyRoute
   '/_public/terms': typeof PublicTermsRoute
   '/_public/': typeof PublicIndexRoute
+  '/_private/profile/edit': typeof PrivateProfileEditRoute
   '/_public/courses/$slug': typeof PublicCoursesSlugRoute
   '/_public/enrollment/$protocol': typeof PublicEnrollmentProtocolRoute
   '/_private/administrator/': typeof PrivateAdministratorIndexRoute
   '/_private/portal/': typeof PrivatePortalIndexRoute
+  '/_private/profile/': typeof PrivateProfileIndexRoute
   '/_public/enrollment/': typeof PublicEnrollmentIndexRoute
   '/authentication/_sign-in/': typeof AuthenticationSignInIndexRoute
   '/_private/administrator/classes/new': typeof PrivateAdministratorClassesNewRoute
@@ -390,10 +412,12 @@ export interface FileRouteTypes {
     | '/about'
     | '/privacy'
     | '/terms'
+    | '/profile/edit'
     | '/courses/$slug'
     | '/enrollment/$protocol'
     | '/administrator/'
     | '/portal/'
+    | '/profile/'
     | '/enrollment/'
     | '/authentication/'
     | '/administrator/classes/new'
@@ -419,10 +443,12 @@ export interface FileRouteTypes {
     | '/about'
     | '/privacy'
     | '/terms'
+    | '/profile/edit'
     | '/courses/$slug'
     | '/enrollment/$protocol'
     | '/administrator'
     | '/portal'
+    | '/profile'
     | '/enrollment'
     | '/authentication'
     | '/administrator/classes/new'
@@ -451,10 +477,12 @@ export interface FileRouteTypes {
     | '/_public/privacy'
     | '/_public/terms'
     | '/_public/'
+    | '/_private/profile/edit'
     | '/_public/courses/$slug'
     | '/_public/enrollment/$protocol'
     | '/_private/administrator/'
     | '/_private/portal/'
+    | '/_private/profile/'
     | '/_public/enrollment/'
     | '/authentication/_sign-in/'
     | '/_private/administrator/classes/new'
@@ -558,6 +586,20 @@ declare module '@tanstack/react-router' {
       path: '/portal'
       fullPath: '/portal/'
       preLoaderRoute: typeof PrivatePortalIndexRouteImport
+      parentRoute: typeof PrivateLayoutRoute
+    }
+    '/_private/profile/': {
+      id: '/_private/profile/'
+      path: '/profile'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof PrivateProfileIndexRouteImport
+      parentRoute: typeof PrivateLayoutRoute
+    }
+    '/_private/profile/edit': {
+      id: '/_private/profile/edit'
+      path: '/profile/edit'
+      fullPath: '/profile/edit'
+      preLoaderRoute: typeof PrivateProfileEditRouteImport
       parentRoute: typeof PrivateLayoutRoute
     }
     '/_public/courses/$slug': {
@@ -697,8 +739,10 @@ declare module '@tanstack/react-router' {
 }
 
 interface PrivateLayoutRouteChildren {
+  PrivateProfileEditRoute: typeof PrivateProfileEditRoute
   PrivateAdministratorIndexRoute: typeof PrivateAdministratorIndexRoute
   PrivatePortalIndexRoute: typeof PrivatePortalIndexRoute
+  PrivateProfileIndexRoute: typeof PrivateProfileIndexRoute
   PrivateAdministratorClassesNewRoute: typeof PrivateAdministratorClassesNewRoute
   PrivateAdministratorCoursesNewLazyRoute: typeof PrivateAdministratorCoursesNewLazyRoute
   PrivateAdministratorUsersNewLazyRoute: typeof PrivateAdministratorUsersNewLazyRoute
@@ -716,8 +760,10 @@ interface PrivateLayoutRouteChildren {
 }
 
 const PrivateLayoutRouteChildren: PrivateLayoutRouteChildren = {
+  PrivateProfileEditRoute: PrivateProfileEditRoute,
   PrivateAdministratorIndexRoute: PrivateAdministratorIndexRoute,
   PrivatePortalIndexRoute: PrivatePortalIndexRoute,
+  PrivateProfileIndexRoute: PrivateProfileIndexRoute,
   PrivateAdministratorClassesNewRoute: PrivateAdministratorClassesNewRoute,
   PrivateAdministratorCoursesNewLazyRoute:
     PrivateAdministratorCoursesNewLazyRoute,
