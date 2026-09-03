@@ -113,8 +113,8 @@ export function ClassFormFields({
                 muda de cara em cada navegador e não tem como ser estilizado,
                 e o formato que ele mostra segue a configuração do sistema -
                 num painel em pt-BR isso vira mm/dd/aaaa para quem tem o
-                sistema em inglês. Os dois falam `YYYY-MM-DD`, que é o que o
-                payload carrega.
+                sistema em inglês. O do kit também aceita digitação, em
+                `dd/mm/aaaa` fixo, e os dois falam `YYYY-MM-DD` no payload.
               */}
               <DatePicker
                 id={`${idPrefix}-startsAt`}

@@ -743,14 +743,21 @@ function RouteComponent(): React.JSX.Element {
 
                         `startMonth`/`endMonth` cercam a lista de anos no que o
                         campo aceita: de 1920 até hoje. Data de nascimento no
-                        futuro não existe.
+                        futuro não existe, e os dois limites valem também para o
+                        que se digita.
+
+                        Um clique para o ano ainda era um clique a mais do que o
+                        necessário: aqui a pessoa sabe a própria data de cor, e
+                        digitá-la é mais rápido que procurá-la. O componente
+                        ganhou o campo de texto por causa desta tela; o
+                        calendário continua no botão ao lado.
                       */}
                       <DatePicker
                         id="studentBirthDate"
                         value={field.value}
                         onValueChange={field.onChange}
                         onBlur={field.onBlur}
-                        placeholder="Escolha a data"
+                        autoComplete="bday"
                         startMonth={BIRTH_RANGE.start}
                         endMonth={BIRTH_RANGE.end}
                         {...invalidProps(
