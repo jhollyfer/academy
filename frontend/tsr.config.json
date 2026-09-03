@@ -1,4 +1,3 @@
 {
-  "target": "react",
-  "routeToken": "layout"
+  "target": "react"
 }

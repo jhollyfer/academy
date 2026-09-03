@@ -2,7 +2,7 @@
   "projectName": "frontend",
   "mode": "file-router",
   "typescript": true,
-  "packageManager": "npm",
+  "packageManager": "pnpm",
   "includeExamples": false,
   "tailwind": true,
   "projectPreset": "default",
@@ -18,9 +18,7 @@
     "nitro",
     "paraglide",
     "shadcn",
-    "t3env",
     "table",
-    "store",
     "tanstack-query"
   ]
 }

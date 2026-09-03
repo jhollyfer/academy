@@ -6,3 +6,7 @@ yarn.lock
 # `prettier --check` contava os oito arquivos como pendência que ninguém
 # podia fechar - reescrevê-los só adiava o próximo `vite dev`.
 src/paraglide
+
+# Cache do inlang: gerado, e o próprio `project.inlang/.gitignore` já o mantém
+# fora do versionamento. Formatá-lo é trabalho que a próxima compilação desfaz.
+project.inlang/cache

@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import { devtools } from '@tanstack/devtools-vite'
+import { paraglideVitePlugin } from '@inlang/paraglide-js'
 
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 
@@ -12,10 +13,11 @@ const config = defineConfig({
   resolve: { tsconfigPaths: true },
   plugins: [
     devtools(),
-    // Sem paraglide, ao contrário da referência: lá ele ficou instalado e não
-    // usado, com o `getLocale()` devolvendo `'en'` num site inteiro em
-    // português. Aqui a UI é pt-BR literal no JSX desde o começo, e uma
-    // dependência que não faz nada é só uma dependência a mais para manter.
+    paraglideVitePlugin({
+      project: './project.inlang',
+      outdir: './src/paraglide',
+      strategy: ['url', 'baseLocale'],
+    }),
     // As opções vão direto no plugin, que é a forma que o tipo declara:
     // `nitro(pluginConfig?: NitroPluginConfig)` com `NitroPluginConfig extends
     // NitroConfig` (nitro/dist/vite.d.mts).
@@ -49,10 +51,10 @@ const config = defineConfig({
       // páginas de curso e para a matrícula - as três que leem a API. Sem
       // desligar, a lista de três vira o site inteiro e o build quebra.
       pages: [
-        { path: '/sobre', prerender: { enabled: true, crawlLinks: false } },
-        { path: '/termos', prerender: { enabled: true, crawlLinks: false } },
+        { path: '/about', prerender: { enabled: true, crawlLinks: false } },
+        { path: '/terms', prerender: { enabled: true, crawlLinks: false } },
         {
-          path: '/privacidade',
+          path: '/privacy',
           prerender: { enabled: true, crawlLinks: false },
         },
       ],

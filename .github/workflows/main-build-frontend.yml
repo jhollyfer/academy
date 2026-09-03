@@ -42,6 +42,10 @@ jobs:
       # que é versionado. Valor com prefixo `VITE_` é embutido no bundle, ou
       # seja, público por definição - e tê-lo no arquivo evita que trocar de
       # endereço vire uma edição de workflow.
+      #
+      # Sobe antes da conferência, e não depois: quando o guarda abaixo reprova,
+      # o `.output/` é justamente o que se precisa abrir para achar a leitura
+      # culpada. Reprovar sem artifact deixa a investigação sem material.
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -50,3 +54,14 @@ jobs:
           include-hidden-files: true
           path: |
             frontend/.output/
+
+      # O job falha aqui, então o artifact existe mas nenhuma imagem sai dele:
+      # `docker-frontend` depende deste job, e não do artifact.
+      #
+      # O que se recusa não é o ciclo — o router do TanStack sai em dois chunks
+      # que se reexportam, e isso é inerte —, é a **leitura antecipada** de um
+      # binding que vem de um chunk em ciclo. Essa passa o build verde e só
+      # quebra no primeiro SSR em produção.
+      - name: Check chunk cycles
+        working-directory: ./frontend
+        run: pnpm check-cycles
