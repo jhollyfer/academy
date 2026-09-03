@@ -61,6 +61,18 @@ export const STAFF_USER_ROLES: Array<UserRole> = [UserRoles.OWNER, UserRoles.ADM
 export const PORTAL_USER_ROLES: Array<UserRole> = [UserRoles.RESPONSIBLE, UserRoles.STUDENT]
 
 /**
+ * Onde cada papel entra depois do login.
+ *
+ * Existe como função e não como literal no `redirect` porque agora há **duas**
+ * áreas: mandar todo mundo para `/administrator` faria o responsável convidado
+ * por e-mail definir a senha, entrar, e cair num 403 - o servidor barra o
+ * portal do painel e vice-versa. O convite levaria a uma porta que não abre.
+ */
+export function homeForRole(role: UserRole): '/administrator' | '/portal' {
+  return PORTAL_USER_ROLES.includes(role) ? '/portal' : '/administrator'
+}
+
+/**
  * Os papéis que um endpoint pode atribuir. `OWNER` fica de fora pelo motivo
  * acima.
  */

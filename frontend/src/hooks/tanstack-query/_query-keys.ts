@@ -25,6 +25,17 @@ export const queryKeys = {
    * ausência de sessão de um segundo atrás - e o sintoma é login que "não
    * funciona" sem erro nenhum.
    */
+  /**
+   * O portal de quem é atendido pela escola. Chave própria, e não a de
+   * `enrollments`: as duas listas vêm de endpoints diferentes e com recortes
+   * diferentes, e compartilhar a chave faria uma invalidar o cache da outra com
+   * dados que ela não tem permissão de ver.
+   */
+  portal: {
+    all: ['portal'] as const,
+    enrollments: () => ['portal', 'enrollments'] as const,
+  },
+
   account: {
     all: ['account'] as const,
   },

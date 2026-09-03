@@ -152,6 +152,24 @@ export const enrollmentsQueryOptions = (params: EnrollmentListSearch) =>
     placeholderData: keepPreviousData,
   })
 
+// ---------------------------------------------------------------------------
+// portal
+// ---------------------------------------------------------------------------
+
+/**
+ * As matrículas de quem está logado.
+ *
+ * Sem parâmetro de busca nem de página: quem abre esta tela tem uma ou duas
+ * matrículas, e o recorte de quais linhas aparecem é do servidor - o cliente
+ * não escolhe, e não teria como.
+ */
+export const portalEnrollmentsQueryOptions = () =>
+  queryOptions({
+    queryKey: queryKeys.portal.enrollments(),
+    queryFn: ({ signal }) =>
+      request<Paginated<EnrollmentResponse>>('/portal/enrollments', { signal }),
+  })
+
 export const enrollmentQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.enrollments.detail(id),

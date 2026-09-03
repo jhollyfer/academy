@@ -2,6 +2,7 @@ import type * as React from 'react'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
 import { validateRedirectSearch } from '#/lib/redirect-search'
+import { homeForRole } from '#/lib/entity'
 
 /**
  * O guard inverso: quem já tem sessão não vê o formulário de login. Fica no
@@ -11,8 +12,10 @@ import { validateRedirectSearch } from '#/lib/redirect-search'
 export const Route = createFileRoute('/authentication')({
   validateSearch: validateRedirectSearch,
   beforeLoad: async ({ context, location }) => {
+    let account
+
     try {
-      await context.queryClient.ensureQueryData(accountQueryOptions())
+      account = await context.queryClient.ensureQueryData(accountQueryOptions())
     } catch {
       // Sem sessão é o caso normal desta área: segue para o formulário.
       return
@@ -28,10 +31,10 @@ export const Route = createFileRoute('/authentication')({
     // Fora do `try`: um `redirect` é lançado, e lançado de dentro dele seria
     // capturado pelo próprio `catch` que existe para o caso oposto.
     //
-    // Destino fixo, e não derivado do papel como na referência: aqui há um
-    // painel só. `OWNER` e `ADMINISTRATOR` diferem no que podem apagar, não em
-    // onde entram.
-    throw redirect({ to: '/administrator' })
+    // Destino derivado do papel, e não fixo: são duas áreas, e o servidor barra
+    // uma da outra. Um responsável mandado para `/administrator` receberia 403
+    // logo depois de definir a senha pelo convite.
+    throw redirect({ to: homeForRole(account.role) })
   },
   component: RouteComponent,
 })
