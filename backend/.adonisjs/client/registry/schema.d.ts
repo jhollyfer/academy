@@ -31,6 +31,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/authentication/sign-out.controller').default['handle']>>>
     }
   }
+  'authentication.refresh': {
+    methods: ["POST"]
+    pattern: '/authentication/refresh'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#features/authentication/refresh.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/authentication/refresh.controller').default['handle']>>>
+    }
+  }
   'authentication.invite.show': {
     methods: ["GET","HEAD"]
     pattern: '/authentication/invite/:token'
@@ -235,6 +247,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/account/show.controller').default['handle']>>>
     }
   }
+  'portal.enrollments.paginate': {
+    methods: ["GET","HEAD"]
+    pattern: '/portal/enrollments'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#core/validator').PaginationValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/portal/enrollments/paginate.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/portal/enrollments/paginate.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'portal.enrollments.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/portal/enrollments/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQueryForGet<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/portal/enrollments/show.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/portal/enrollments/show.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'administrator.courses.paginate': {
     methods: ["GET","HEAD"]
     pattern: '/administrator/courses'
@@ -419,10 +455,10 @@ export interface Registry {
     methods: ["PUT"]
     pattern: '/administrator/users/:id'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#core/validator').AdministratorUserUpdateValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#core/validator').AdministratorUserUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#core/validator').AdministratorUserUpdateValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').AdministratorUserUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/users/update.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/users/update.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -431,10 +467,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/administrator/users/:id/dependents'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#core/validator').AdministratorGuardianshipValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#core/validator').AdministratorGuardianshipValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#core/validator').AdministratorGuardianshipValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').AdministratorGuardianshipValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/users/attach-dependent.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/users/attach-dependent.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -443,10 +479,10 @@ export interface Registry {
     methods: ["DELETE"]
     pattern: '/administrator/users/:id/dependents/:studentId'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#core/validator').AdministratorGuardianshipValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#core/validator').AdministratorGuardianshipParamsValidator)>>
       paramsTuple: [ParamValue, ParamValue]
       params: { id: ParamValue; studentId: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#core/validator').AdministratorGuardianshipValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').AdministratorGuardianshipParamsValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/users/detach-dependent.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/users/detach-dependent.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }

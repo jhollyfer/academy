@@ -50,6 +50,7 @@ export const controllers = {
   authentication: {
     InviteAccept: () => import('#features/authentication/invite-accept.controller'),
     InviteShow: () => import('#features/authentication/invite-show.controller'),
+    Refresh: () => import('#features/authentication/refresh.controller'),
     SignIn: () => import('#features/authentication/sign-in.controller'),
     SignOut: () => import('#features/authentication/sign-out.controller'),
   },

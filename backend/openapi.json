@@ -3292,6 +3292,41 @@
         }
       }
     },
+    "/authentication/refresh": {
+      "post": {
+        "operationId": "authenticationRefresh",
+        "summary": "Renovar a sessão",
+        "tags": [
+          "Autenticação"
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucesso, sem corpo"
+          },
+          "401": {
+            "description": "Sessão expirada · Sessão expirada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401RefreshTokenInvalidRefreshTokenMissing"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500RefreshError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Renova a sessão a partir do cookie de refresh, e responde `204` **sem corpo**: o que importa é o `Set-Cookie` com o par novo.\n\nFica **fora** do grupo autenticado de propósito. É justamente o token de acesso vencido que traz alguém até aqui, então exigir sessão válida tornaria a rota inalcançável. Quem autoriza é o cookie de refresh, e nada mais.\n\n**Rotaciona**: o refresh usado é apagado ao emitir o novo. Duas renovações simultâneas com o mesmo token gastam-no duas vezes, e a segunda cai - o cliente deduplica para que isso não aconteça no caminho comum.\n\nA falha é **indistinguível por causa**: cookie ausente, ilegível, que não seja de refresh ou de conta desativada devolvem o mesmo `401`."
+      }
+    },
     "/authentication/sign-in": {
       "post": {
         "operationId": "authenticationSignIn",
@@ -12561,6 +12596,41 @@
           "code"
         ]
       },
+      "Error401RefreshTokenInvalidRefreshTokenMissing": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              401
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "REFRESH_TOKEN_INVALID",
+              "REFRESH_TOKEN_MISSING"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error401Unauthorized": {
         "type": "object",
         "properties": {
@@ -14331,6 +14401,40 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "INVITE_SHOW_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500RefreshError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "REFRESH_ERROR"
             ]
           },
           "errors": {

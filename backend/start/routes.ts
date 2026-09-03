@@ -66,6 +66,11 @@ router.get('/documentation', function (context) {
  * `sign-in` é público - é a porta. `sign-out` exige sessão, porque apagar o
  * token da sessão atual pressupõe saber qual é.
  *
+ * `refresh` é público pelo motivo oposto ao do `sign-out`: é o token de acesso
+ * vencido que traz alguém até ele. Exigir sessão válida tornaria a rota
+ * inalcançável justamente quando ela é necessária. Quem autoriza ali é o cookie
+ * de refresh.
+ *
  * O par `invite` também é público, e tem de ser: quem chega por ele ainda não
  * tem senha, e é justamente isso que veio resolver. O que faz o papel da sessão
  * ali é o token do link - 64 caracteres sorteados, de uso único e com prazo.
@@ -77,6 +82,8 @@ router
       .post('sign-out', [controllers.authentication.SignOut])
       .as('sign-out')
       .use(middleware.auth())
+
+    router.post('refresh', [controllers.authentication.Refresh]).as('refresh')
 
     router.get('invite/:token', [controllers.authentication.InviteShow]).as('invite.show')
     router.post('invite/:token', [controllers.authentication.InviteAccept]).as('invite.accept')
