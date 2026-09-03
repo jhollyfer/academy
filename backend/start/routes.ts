@@ -199,6 +199,11 @@ router.get('storages/:id/download', [controllers.storages.Download]).as('storage
 router
   .group(() => {
     router.get('profile', [controllers.account.Show]).as('profile')
+    // `PUT /account` e não `/account/profile`: o recurso é a conta, e `profile`
+    // é a leitura dela. É por aqui que se troca a própria senha - o update de
+    // usuários recusa `password` de propósito, para a secretaria não assumir a
+    // conta de uma família sem deixar rastro.
+    router.put('/', [controllers.account.Update]).as('update')
   })
   .prefix('account')
   .as('account')

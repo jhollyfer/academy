@@ -6,6 +6,7 @@
 export const controllers = {
   account: {
     Show: () => import('#features/account/show.controller'),
+    Update: () => import('#features/account/update.controller'),
   },
   administrator: {
     classes: {

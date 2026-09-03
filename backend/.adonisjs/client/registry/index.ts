@@ -126,6 +126,12 @@ const routes = {
     tokens: [{"old":"/account/profile","type":0,"val":"account","end":""},{"old":"/account/profile","type":0,"val":"profile","end":""}],
     types: placeholder as Registry['account.profile']['types'],
   },
+  'account.update': {
+    methods: ["PUT"],
+    pattern: '/account',
+    tokens: [{"old":"/account","type":0,"val":"account","end":""}],
+    types: placeholder as Registry['account.update']['types'],
+  },
   'portal.enrollments.paginate': {
     methods: ["GET","HEAD"],
     pattern: '/portal/enrollments',

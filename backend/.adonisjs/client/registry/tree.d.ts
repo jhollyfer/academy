@@ -37,6 +37,7 @@ export interface ApiDefinition {
   }
   account: {
     profile: typeof routes['account.profile']
+    update: typeof routes['account.update']
   }
   portal: {
     enrollments: {

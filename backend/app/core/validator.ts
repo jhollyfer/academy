@@ -396,6 +396,46 @@ export const AuthenticationSignInValidator = vine.create({
 export type AuthenticationSignInPayload = Infer<typeof AuthenticationSignInValidator>
 
 /**
+ * A própria conta, editada por quem a usa.
+ *
+ * É o outro lado do `AdministratorUserUpdateValidator`, que recusa `password` de
+ * propósito: redefinir a senha de outra pessoa é emitir convite, e trocar a
+ * própria é aqui. Sem este schema a secretaria não tinha por onde mudar o
+ * próprio nome nem a própria senha.
+ *
+ * `role` e `status` não entram: quem muda o próprio papel deixa de ser gerido
+ * por quem o concedeu.
+ */
+export const AccountUpdateValidator = vine.create({
+  name: vine.string().trim().minLength(2).maxLength(120).optional(),
+  email: email().optional(),
+  password: password().optional(),
+  /**
+   * A senha atual, exigida **só** quando `password` vem no payload.
+   *
+   * É prova de identidade, e não de força: quem sequestra uma sessão tem o
+   * cookie, mas não sabe a senha. `PASSWORD_SAME_AS_CURRENT` não serve para
+   * isso - ele compara a nova com o hash, e passar por ele é justamente não
+   * saber a atual.
+   *
+   * `requiredIfExists` e não uma checagem no use-case: a obrigatoriedade
+   * condicional é forma do payload, e aqui ela vira `422` apontando o campo.
+   *
+   * Sem as regras de força de `password()`: o valor é conferido contra o hash,
+   * não gravado. O teto de 32 é o mesmo da política, porque é o maior valor que
+   * a aplicação já pode ter gravado.
+   */
+  currentPassword: vine.string().maxLength(32).optional().requiredIfExists('password'),
+  phone: phone().nullable().optional(),
+  // `nullable` é o que permite tirar a foto sem trocá-la. O uuid só garante o
+  // formato; que o arquivo exista é checado no use-case, senão a violação da
+  // chave estrangeira estouraria como 500 em vez de 422.
+  avatarId: vine.string().uuid().nullable().optional(),
+})
+
+export type AccountUpdatePayload = Infer<typeof AccountUpdateValidator>
+
+/**
  * O token do convite, como ele chega pelo parâmetro da rota.
  *
  * O comprimento espelha o `string.random(64)` do `invite.service.ts`. Recusar

@@ -247,6 +247,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/account/show.controller').default['handle']>>>
     }
   }
+  'account.update': {
+    methods: ["PUT"]
+    pattern: '/account'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').AccountUpdateValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').AccountUpdateValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/account/update.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/account/update.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'portal.enrollments.paginate': {
     methods: ["GET","HEAD"]
     pattern: '/portal/enrollments'
