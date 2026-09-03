@@ -31,6 +31,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/authentication/sign-out.controller').default['handle']>>>
     }
   }
+  'authentication.invite.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/authentication/invite/:token'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: ExtractQueryForGet<InferInput<(typeof import('#core/validator').AuthenticationInviteShowValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/authentication/invite-show.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/authentication/invite-show.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'authentication.invite.accept': {
+    methods: ["POST"]
+    pattern: '/authentication/invite/:token'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').AuthenticationInviteAcceptValidator)>>
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').AuthenticationInviteAcceptValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/authentication/invite-accept.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/authentication/invite-accept.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'storefront.courses.paginate': {
     methods: ["GET","HEAD"]
     pattern: '/storefront/courses'
@@ -355,6 +379,78 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/enrollments/update.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'administrator.users.paginate': {
+    methods: ["GET","HEAD"]
+    pattern: '/administrator/users'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#core/validator').AdministratorUserPaginationValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/users/paginate.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/users/paginate.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'administrator.users.create': {
+    methods: ["POST"]
+    pattern: '/administrator/users'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').AdministratorUserCreateValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').AdministratorUserCreateValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/users/create.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/users/create.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'administrator.users.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/administrator/users/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQueryForGet<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/users/show.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/users/show.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'administrator.users.update': {
+    methods: ["PUT"]
+    pattern: '/administrator/users/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').AdministratorUserUpdateValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').AdministratorUserUpdateValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/users/update.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/users/update.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'administrator.users.dependents.attach': {
+    methods: ["POST"]
+    pattern: '/administrator/users/:id/dependents'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').AdministratorGuardianshipValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').AdministratorGuardianshipValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/users/attach-dependent.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/users/attach-dependent.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'administrator.users.dependents.detach': {
+    methods: ["DELETE"]
+    pattern: '/administrator/users/:id/dependents/:studentId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').AdministratorGuardianshipValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { id: ParamValue; studentId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').AdministratorGuardianshipValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/users/detach-dependent.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/users/detach-dependent.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'administrator.lifecycle.courses.archive': {
     methods: ["PATCH"]
     pattern: '/administrator/courses/:id/archive'
@@ -461,6 +557,42 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/enrollments/delete.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/enrollments/delete.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'administrator.lifecycle.users.archive': {
+    methods: ["PATCH"]
+    pattern: '/administrator/users/:id/archive'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/users/archive.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/users/archive.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'administrator.lifecycle.users.unarchive': {
+    methods: ["PATCH"]
+    pattern: '/administrator/users/:id/unarchive'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/users/unarchive.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/users/unarchive.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'administrator.lifecycle.users.purge': {
+    methods: ["DELETE"]
+    pattern: '/administrator/users/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/users/delete.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/users/delete.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
 }

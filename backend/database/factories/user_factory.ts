@@ -15,9 +15,9 @@ import factory from '@adonisjs/lucid/factories'
 export const FACTORY_PASSWORD = 'Demo1234!'
 
 /**
- * Usuário do painel.
+ * Usuário, em qualquer um dos quatro papéis.
  *
- * O papel default é `ADMINISTRATOR`, o menos privilegiado dos dois: um teste que
+ * O papel default é `ADMINISTRATOR`, o menos privilegiado dos que operam: um teste que
  * precisa do dono pede o estado em voz alta, e nenhum ganha o direito de apagar
  * por esquecimento.
  *
@@ -35,5 +35,10 @@ export const UserFactory = factory
     status: ActiveStatuses.ACTIVE,
   }))
   .state('owner', (user) => (user.role = UserRoles.OWNER))
+  // Os dois papéis do portal. Existem pelo mesmo motivo do `owner`: sem uma
+  // conta de cada lado, a matriz de permissão fica sem a metade que precisa
+  // receber 403 - e um `role([...])` alargado por engano passaria no verde.
+  .state('responsible', (user) => (user.role = UserRoles.RESPONSIBLE))
+  .state('student', (user) => (user.role = UserRoles.STUDENT))
   .state('inactive', (user) => (user.status = ActiveStatuses.INACTIVE))
   .build()

@@ -15,6 +15,12 @@ export default class extends BaseSchema {
       // deixaria um caminho de criação esquecido gravar em silêncio.
       table.enum('role', USER_ROLES).notNullable()
       table.enum('status', ACTIVE_STATUSES).notNullable().defaultTo(ActiveStatuses.ACTIVE)
+      // Conta nascida de convite entra sem senha utilizável e sem e-mail
+      // conferido: quem define a senha é o titular, pelo link. As duas colunas
+      // são nulas para o dono e para quem a secretaria cadastra já pronto -
+      // nulo aqui significa "não veio por convite", não "pendente".
+      table.timestamp('invited_at').nullable()
+      table.timestamp('email_verified_at').nullable()
       // Avatar: quem anexa guarda a referência, nunca o contrário - é o que
       // permite uma tabela de arquivos só, sem coluna de "tipo de dono".
       // `SET NULL` porque perder o binário não pode levar o usuário junto; ele

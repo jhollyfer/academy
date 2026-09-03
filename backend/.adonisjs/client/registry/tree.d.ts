@@ -5,6 +5,10 @@ export interface ApiDefinition {
   authentication: {
     signIn: typeof routes['authentication.sign-in']
     signOut: typeof routes['authentication.sign-out']
+    invite: {
+      show: typeof routes['authentication.invite.show']
+      accept: typeof routes['authentication.invite.accept']
+    }
   }
   storefront: {
     courses: {
@@ -52,6 +56,16 @@ export interface ApiDefinition {
       show: typeof routes['administrator.enrollments.show']
       update: typeof routes['administrator.enrollments.update']
     }
+    users: {
+      paginate: typeof routes['administrator.users.paginate']
+      create: typeof routes['administrator.users.create']
+      show: typeof routes['administrator.users.show']
+      update: typeof routes['administrator.users.update']
+      dependents: {
+        attach: typeof routes['administrator.users.dependents.attach']
+        detach: typeof routes['administrator.users.dependents.detach']
+      }
+    }
     lifecycle: {
       courses: {
         archive: typeof routes['administrator.lifecycle.courses.archive']
@@ -67,6 +81,11 @@ export interface ApiDefinition {
         archive: typeof routes['administrator.lifecycle.enrollments.archive']
         unarchive: typeof routes['administrator.lifecycle.enrollments.unarchive']
         purge: typeof routes['administrator.lifecycle.enrollments.purge']
+      }
+      users: {
+        archive: typeof routes['administrator.lifecycle.users.archive']
+        unarchive: typeof routes['administrator.lifecycle.users.unarchive']
+        purge: typeof routes['administrator.lifecycle.users.purge']
       }
     }
   }

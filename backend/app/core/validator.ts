@@ -8,9 +8,11 @@ import {
   COURSE_ACCENTS,
   ENROLLMENT_FILE_KINDS,
   ENROLLMENT_STATUSES,
+  MANAGEABLE_USER_ROLES,
   SHIFTS,
   SORT_DIRECTIONS,
   TRASHED_MODES,
+  USER_ROLES,
   WEEKDAYS,
 } from '#core/entity'
 
@@ -393,6 +395,37 @@ export const AuthenticationSignInValidator = vine.create({
 
 export type AuthenticationSignInPayload = Infer<typeof AuthenticationSignInValidator>
 
+/**
+ * O token do convite, como ele chega pelo parâmetro da rota.
+ *
+ * O comprimento espelha o `string.random(64)` do `invite.service.ts`. Recusar
+ * pelo formato antes de ir ao banco não é otimização: é o que impede que o
+ * endpoint público vire uma sonda barata de consulta por token arbitrário.
+ */
+function inviteToken() {
+  return vine.string().trim().fixedLength(64)
+}
+
+export const AuthenticationInviteShowValidator = vine.create({
+  token: inviteToken(),
+})
+
+export type AuthenticationInviteShowPayload = Infer<typeof AuthenticationInviteShowValidator>
+
+/**
+ * Definir a senha pelo convite.
+ *
+ * Aqui a força **é** exigida, ao contrário do `sign-in`: esta é a única vez em
+ * que a senha é escolhida, e é o momento certo de cobrar o formato. `password()`
+ * já pede a confirmação num segundo campo.
+ */
+export const AuthenticationInviteAcceptValidator = vine.create({
+  token: inviteToken(),
+  password: password(),
+})
+
+export type AuthenticationInviteAcceptPayload = Infer<typeof AuthenticationInviteAcceptValidator>
+
 // ---------------------------------------------------------------------------
 // administrator/classes
 // ---------------------------------------------------------------------------
@@ -637,3 +670,97 @@ export const StorageCompleteValidator = vine.create({
 })
 
 export type StorageCompletePayload = Infer<typeof StorageCompleteValidator>
+
+// ---------------------------------------------------------------------------
+// administrator/users
+// ---------------------------------------------------------------------------
+
+/**
+ * `name` e `email` porque é o que a tela mostra e por onde a secretaria procura.
+ * `role` entra para agrupar dono, operador, responsável e aluno numa listagem só.
+ */
+export const USER_SORT_COLUMNS = ['name', 'email', 'role', 'createdAt'] as const
+
+/**
+ * O papel que um endpoint aceita atribuir.
+ *
+ * `MANAGEABLE_USER_ROLES` e não `USER_ROLES`: `OWNER` fora da lista é o que
+ * impede alguém de se promover a dono por um POST. Isto é metade da regra - a
+ * outra é a `UserPolicy`, que recusa alguém editando o próprio cadastro. O
+ * validator sozinho não resolve, porque ele não sabe quem está chamando.
+ */
+export function manageableRole() {
+  return vine.enum(MANAGEABLE_USER_ROLES)
+}
+
+export const AdministratorUserPaginationValidator = vine.create({
+  ...paginationFields(),
+  ...trashedField(),
+  ...sortFields(USER_SORT_COLUMNS),
+  // Filtrar por papel é o que separa "a equipe" de "as famílias" numa base em
+  // que os quatro convivem. Aceita a lista inteira, `OWNER` incluso: filtrar não
+  // é atribuir, e quem não pode vê-lo já é barrado pela policy.
+  role: vine.enum(USER_ROLES).optional(),
+  status: activeStatus().optional(),
+})
+
+/**
+ * A senha é opcional na criação, e é aí que os dois caminhos se separam: com
+ * senha, a conta nasce pronta e a secretaria informa a credencial; sem senha,
+ * nasce um convite e quem define é o titular, pelo link do e-mail.
+ *
+ * O segundo caminho é o único aceitável para responsável e aluno - a secretaria
+ * não deve escolher, conhecer nem digitar a senha de uma família.
+ */
+export const AdministratorUserCreateValidator = vine.create({
+  name: vine.string().trim().minLength(2).maxLength(120),
+  email: email(),
+  password: password().optional(),
+  phone: phone().nullable().optional(),
+  role: manageableRole(),
+  status: activeStatus().optional(),
+  avatarId: vine.string().uuid().nullable().optional(),
+})
+
+/**
+ * Atualização não aceita senha: trocar a própria é `/account`, e redefinir a de
+ * outro é emitir convite. Um `PUT` que aceitasse `password` deixaria a secretaria
+ * assumir a conta de uma família sem deixar rastro.
+ */
+export const AdministratorUserUpdateValidator = vine.create({
+  name: vine.string().trim().minLength(2).maxLength(120).optional(),
+  email: email().optional(),
+  phone: phone().nullable().optional(),
+  role: manageableRole().optional(),
+  status: activeStatus().optional(),
+  avatarId: vine.string().uuid().nullable().optional(),
+})
+
+/**
+ * O dependente que entra num vínculo. Só o corpo: o responsável é o `:id` da
+ * URL, e sai do `IdentifierValidator` como em todo update deste repo - misturar
+ * os dois num schema só faz o cliente tipado exigir no corpo um valor que já
+ * está no caminho.
+ *
+ * Os papéis das duas pontas são conferidos no use-case: o schema garante
+ * formato, não semântica.
+ */
+export const AdministratorGuardianshipValidator = vine.create({
+  studentId: vine.string().uuid(),
+})
+
+/**
+ * O par que o `DELETE` carrega, os dois na URL - a requisição não tem corpo.
+ */
+export const AdministratorGuardianshipParamsValidator = vine.create({
+  id: vine.string().uuid(),
+  studentId: vine.string().uuid(),
+})
+
+export type AdministratorUserPaginationPayload = Infer<typeof AdministratorUserPaginationValidator>
+export type AdministratorUserCreatePayload = Infer<typeof AdministratorUserCreateValidator>
+export type AdministratorUserUpdatePayload = Infer<typeof AdministratorUserUpdateValidator>
+export type AdministratorGuardianshipPayload = Infer<typeof AdministratorGuardianshipValidator>
+export type AdministratorGuardianshipParamsPayload = Infer<
+  typeof AdministratorGuardianshipParamsValidator
+>

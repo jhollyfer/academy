@@ -1,6 +1,7 @@
 import { indexEntities } from '@adonisjs/core'
 import { defineConfig } from '@adonisjs/core/app'
 import { generateRegistry } from '@tuyau/core/hooks'
+import { indexPolicies } from '@adonisjs/bouncer'
 
 export default defineConfig({
   /*
@@ -28,6 +29,8 @@ export default defineConfig({
     () => import('@adonisjs/core/commands'),
     () => import('@adonisjs/lucid/commands'),
     () => import('@adonisjs/session/commands'),
+    () => import('@adonisjs/bouncer/commands'),
+    () => import('@adonisjs/queue/commands'),
   ],
 
   /*
@@ -56,6 +59,9 @@ export default defineConfig({
     () => import('#providers/api_provider'),
     () => import('@adonisjs/mail/mail_provider'),
     () => import('#providers/storage_provider'),
+    () => import('@adonisjs/bouncer/bouncer_provider'),
+    () => import('@adonisjs/redis/redis_provider'),
+    () => import('@adonisjs/queue/queue_provider'),
   ],
 
   /*
@@ -70,6 +76,14 @@ export default defineConfig({
     () => import('#start/routes'),
     () => import('#start/kernel'),
     () => import('#start/validator'),
+    // Precisa valer no worker também, e não só no `web`: é ele que consome a
+    // fila, e sem o messenger instalado um `sendLater` disparado de dentro de um
+    // job voltaria para a fila de memória do processo do worker.
+    () => import('#start/mail'),
+    {
+      file: () => import('#start/scheduler'),
+      environment: ['web'],
+    },
   ],
 
   /*
@@ -119,6 +133,7 @@ export default defineConfig({
         },
       }),
       generateRegistry(),
+      indexPolicies(),
     ],
   },
 

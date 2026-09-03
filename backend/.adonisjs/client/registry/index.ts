@@ -18,6 +18,18 @@ const routes = {
     tokens: [{"old":"/authentication/sign-out","type":0,"val":"authentication","end":""},{"old":"/authentication/sign-out","type":0,"val":"sign-out","end":""}],
     types: placeholder as Registry['authentication.sign-out']['types'],
   },
+  'authentication.invite.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/authentication/invite/:token',
+    tokens: [{"old":"/authentication/invite/:token","type":0,"val":"authentication","end":""},{"old":"/authentication/invite/:token","type":0,"val":"invite","end":""},{"old":"/authentication/invite/:token","type":1,"val":"token","end":""}],
+    types: placeholder as Registry['authentication.invite.show']['types'],
+  },
+  'authentication.invite.accept': {
+    methods: ["POST"],
+    pattern: '/authentication/invite/:token',
+    tokens: [{"old":"/authentication/invite/:token","type":0,"val":"authentication","end":""},{"old":"/authentication/invite/:token","type":0,"val":"invite","end":""},{"old":"/authentication/invite/:token","type":1,"val":"token","end":""}],
+    types: placeholder as Registry['authentication.invite.accept']['types'],
+  },
   'storefront.courses.paginate': {
     methods: ["GET","HEAD"],
     pattern: '/storefront/courses',
@@ -180,6 +192,42 @@ const routes = {
     tokens: [{"old":"/administrator/enrollments/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/enrollments/:id","type":0,"val":"enrollments","end":""},{"old":"/administrator/enrollments/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['administrator.enrollments.update']['types'],
   },
+  'administrator.users.paginate': {
+    methods: ["GET","HEAD"],
+    pattern: '/administrator/users',
+    tokens: [{"old":"/administrator/users","type":0,"val":"administrator","end":""},{"old":"/administrator/users","type":0,"val":"users","end":""}],
+    types: placeholder as Registry['administrator.users.paginate']['types'],
+  },
+  'administrator.users.create': {
+    methods: ["POST"],
+    pattern: '/administrator/users',
+    tokens: [{"old":"/administrator/users","type":0,"val":"administrator","end":""},{"old":"/administrator/users","type":0,"val":"users","end":""}],
+    types: placeholder as Registry['administrator.users.create']['types'],
+  },
+  'administrator.users.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/administrator/users/:id',
+    tokens: [{"old":"/administrator/users/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/users/:id","type":0,"val":"users","end":""},{"old":"/administrator/users/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['administrator.users.show']['types'],
+  },
+  'administrator.users.update': {
+    methods: ["PUT"],
+    pattern: '/administrator/users/:id',
+    tokens: [{"old":"/administrator/users/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/users/:id","type":0,"val":"users","end":""},{"old":"/administrator/users/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['administrator.users.update']['types'],
+  },
+  'administrator.users.dependents.attach': {
+    methods: ["POST"],
+    pattern: '/administrator/users/:id/dependents',
+    tokens: [{"old":"/administrator/users/:id/dependents","type":0,"val":"administrator","end":""},{"old":"/administrator/users/:id/dependents","type":0,"val":"users","end":""},{"old":"/administrator/users/:id/dependents","type":1,"val":"id","end":""},{"old":"/administrator/users/:id/dependents","type":0,"val":"dependents","end":""}],
+    types: placeholder as Registry['administrator.users.dependents.attach']['types'],
+  },
+  'administrator.users.dependents.detach': {
+    methods: ["DELETE"],
+    pattern: '/administrator/users/:id/dependents/:studentId',
+    tokens: [{"old":"/administrator/users/:id/dependents/:studentId","type":0,"val":"administrator","end":""},{"old":"/administrator/users/:id/dependents/:studentId","type":0,"val":"users","end":""},{"old":"/administrator/users/:id/dependents/:studentId","type":1,"val":"id","end":""},{"old":"/administrator/users/:id/dependents/:studentId","type":0,"val":"dependents","end":""},{"old":"/administrator/users/:id/dependents/:studentId","type":1,"val":"studentId","end":""}],
+    types: placeholder as Registry['administrator.users.dependents.detach']['types'],
+  },
   'administrator.lifecycle.courses.archive': {
     methods: ["PATCH"],
     pattern: '/administrator/courses/:id/archive',
@@ -233,6 +281,24 @@ const routes = {
     pattern: '/administrator/enrollments/:id',
     tokens: [{"old":"/administrator/enrollments/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/enrollments/:id","type":0,"val":"enrollments","end":""},{"old":"/administrator/enrollments/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['administrator.lifecycle.enrollments.purge']['types'],
+  },
+  'administrator.lifecycle.users.archive': {
+    methods: ["PATCH"],
+    pattern: '/administrator/users/:id/archive',
+    tokens: [{"old":"/administrator/users/:id/archive","type":0,"val":"administrator","end":""},{"old":"/administrator/users/:id/archive","type":0,"val":"users","end":""},{"old":"/administrator/users/:id/archive","type":1,"val":"id","end":""},{"old":"/administrator/users/:id/archive","type":0,"val":"archive","end":""}],
+    types: placeholder as Registry['administrator.lifecycle.users.archive']['types'],
+  },
+  'administrator.lifecycle.users.unarchive': {
+    methods: ["PATCH"],
+    pattern: '/administrator/users/:id/unarchive',
+    tokens: [{"old":"/administrator/users/:id/unarchive","type":0,"val":"administrator","end":""},{"old":"/administrator/users/:id/unarchive","type":0,"val":"users","end":""},{"old":"/administrator/users/:id/unarchive","type":1,"val":"id","end":""},{"old":"/administrator/users/:id/unarchive","type":0,"val":"unarchive","end":""}],
+    types: placeholder as Registry['administrator.lifecycle.users.unarchive']['types'],
+  },
+  'administrator.lifecycle.users.purge': {
+    methods: ["DELETE"],
+    pattern: '/administrator/users/:id',
+    tokens: [{"old":"/administrator/users/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/users/:id","type":0,"val":"users","end":""},{"old":"/administrator/users/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['administrator.lifecycle.users.purge']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 

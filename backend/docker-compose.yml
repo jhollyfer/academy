@@ -80,6 +80,34 @@ services:
       MINIO_ROOT_PASSWORD: ${STORAGE_SECRET:-academy-secret}
       STORAGE_BUCKET: ${STORAGE_BUCKET:-academy}
 
+  # A fila de e-mail. Existe porque `mail.sendLater()` usava a fila em memória
+  # do próprio pacote, e a doc do AdonisJS avisa o custo: "queued emails are
+  # lost if your process terminates before sending them". Um convite de acesso
+  # perdido num deploy é uma família sem senha esperando um link que não vem.
+  #
+  # Opcional em desenvolvimento: sem `REDIS_HOST` o `start/mail.ts` não instala
+  # o messenger e o comportamento volta a ser o de antes.
+  redis:
+    image: redis:7-alpine
+    container_name: academy-backend-redis
+    restart: unless-stopped
+    # `appendonly` porque a fila é a razão de o Redis existir aqui: sem
+    # persistência, reiniciar o container perde os jobs pendentes - que é
+    # exatamente o problema que ele veio resolver.
+    command: ['redis-server', '--appendonly', 'yes']
+    # 6382 por default, pelo mesmo motivo do 5434 e do 9004 acima (AD-013):
+    # 6379 é do `simple-hub`. Preso ao loopback: sem senha configurada, expor na
+    # rede seria entregar a fila a quem alcançar a máquina.
+    ports:
+      - '127.0.0.1:${REDIS_PORT:-6382}:6379'
+    volumes:
+      - academy-backend-redis-volume:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 # networks:
 #   academy-backend-network:
 #     driver: bridge
@@ -88,4 +116,6 @@ volumes:
   academy-backend-database-volume:
     driver: local
   academy-backend-storage-volume:
+    driver: local
+  academy-backend-redis-volume:
     driver: local

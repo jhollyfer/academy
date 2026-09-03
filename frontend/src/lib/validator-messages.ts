@@ -41,6 +41,8 @@ export const RULE_MESSAGES = {
     'A senha precisa de letra minúscula, maiúscula, número e caractere especial',
   'password.minLength': 'A senha deve ter ao menos {{ min }} caracteres',
   'password.maxLength': 'A senha deve ter no máximo {{ max }} caracteres',
+  // `confirmed` roda em `password` mas reporta em `passwordConfirmation`.
+  'passwordConfirmation.confirmed': 'As senhas não são iguais',
 
   // ── Documentos e endereço ──────────────────────────────────────────
   // Estas contam DÍGITOS, e não caracteres: `cpf()`, `cnpj()` e `cep()` fazem
@@ -84,6 +86,7 @@ export const FIELD_LABELS = {
   name: 'o nome',
   email: 'o e-mail',
   password: 'a senha',
+  passwordConfirmation: 'a confirmação da senha',
   phone: 'o telefone',
   status: 'a situação',
   notes: 'as observações',

@@ -17,7 +17,7 @@ import type { NextFn } from '@adonisjs/core/types/http'
  * para não confirmar a existência do recurso (RN-17).
  */
 export default class RoleMiddleware {
-  async handle(context: HttpContext, next: NextFn, roles: UserRole[]) {
+  async handle(context: HttpContext, next: NextFn, roles: ReadonlyArray<UserRole>) {
     const user = context.auth.user
 
     // `schema.ts` é gerado do banco e tipa `role` como `string`. Alargar a lista

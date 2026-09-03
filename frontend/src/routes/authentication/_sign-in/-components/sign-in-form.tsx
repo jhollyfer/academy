@@ -16,7 +16,7 @@ import {
   AuthShellDescription,
 } from '../../-components/auth-shell'
 import { Input } from '#/components/ui/input'
-import { InputPassword } from './input-password'
+import { InputPassword } from '../../-components/input-password'
 import {
   Field,
   FieldError,
@@ -118,8 +118,8 @@ export function SignInForm(): React.JSX.Element {
                 <FieldLabel htmlFor="password">Senha</FieldLabel>
                 {/* `InputPassword` e não `<Input type="password">`: o olho
                       que revela a senha é o que evita a terceira tentativa de
-                      quem errou uma letra, e ele vem do kit para não ser
-                      redesenhado em cada tela que pede senha. */}
+                      quem errou uma letra. Mora em `-components/` do grupo, e
+                      não aqui, porque a tela de convite pede senha também. */}
                 <InputPassword
                   {...field}
                   id="password"

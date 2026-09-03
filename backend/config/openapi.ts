@@ -120,6 +120,16 @@ const tags: TagRule[] = [
     singular: 'matrícula',
     plural: 'matrículas',
   },
+  {
+    prefix: '/administrator/users',
+    name: 'Painel · Usuários',
+    description:
+      'Quem tem acesso, nos quatro papéis. A equipe da escola nasce com senha; responsável e ' +
+      'aluno nascem por convite, porque a secretaria não deve escolher a senha de uma ' +
+      'família. É aqui também que se liga um dependente ao seu responsável.',
+    singular: 'usuário',
+    plural: 'usuários',
+  },
 ]
 
 const openapi = {

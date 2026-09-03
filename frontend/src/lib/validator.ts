@@ -454,6 +454,27 @@ export type AuthenticationSignInPayload = Infer<
   typeof AuthenticationSignInValidator
 >
 
+/**
+ * Definir a senha pelo convite.
+ *
+ * Aqui a força **é** exigida, ao contrário do `sign-in`: esta é a única vez em
+ * que a senha é escolhida, e é o momento certo de cobrar o formato. `password()`
+ * já pede a confirmação num segundo campo, e é a mesma função que o backend usa
+ * - as duas pontas recusam a mesma senha, e a de cá recusa sem ida ao servidor.
+ *
+ * O token não entra: ele vem do caminho da URL, e não de um campo do formulário.
+ */
+export const AuthenticationInviteAcceptValidator = vine.create({
+  password: password(),
+  // O mesmo teto de `password()`: sem ele o valor grande atravessa a validação
+  // e vai estourar mais adiante, e a regra vale para todo campo de texto.
+  passwordConfirmation: vine.string().maxLength(32),
+})
+
+export type AuthenticationInviteAcceptPayload = Infer<
+  typeof AuthenticationInviteAcceptValidator
+>
+
 // ---------------------------------------------------------------------------
 // administrator/classes
 // ---------------------------------------------------------------------------

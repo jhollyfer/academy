@@ -8,3 +8,5 @@ allowBuilds:
   # Não é usado: a conexão é PostgreSQL (T6). Compilar o binding do SQLite seria
   # minutos de build a cada install para um driver que ninguém abre.
   better-sqlite3: false
+minimumReleaseAgeExclude:
+  - '@adonisjs/redis@10.0.2'

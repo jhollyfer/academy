@@ -1,6 +1,7 @@
 import { EnrollmentSchema } from '#database/schema'
 import Class from '#models/class'
 import EnrollmentFile from '#models/enrollment_file'
+import User from '#models/user'
 import { belongsTo, column, computed, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
@@ -21,6 +22,17 @@ export default class Enrollment extends EnrollmentSchema {
 
   @hasMany(() => EnrollmentFile)
   declare files: HasMany<typeof EnrollmentFile>
+
+  /**
+   * A conta do aluno, quando já existir.
+   *
+   * Nula até a secretaria confirmar: os campos `student*` abaixo continuam sendo
+   * a declaração feita no ato, e não uma leitura do cadastro. Os dois divergem
+   * legitimamente - o nome cadastrado pode ser corrigido depois sem reescrever o
+   * que foi enviado no formulário.
+   */
+  @belongsTo(() => User, { foreignKey: 'studentId' })
+  declare student: BelongsTo<typeof User>
 
   /**
    * Redeclarada como `@column.date()`: a coluna é `date` no banco, e sem isto o

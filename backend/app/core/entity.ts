@@ -35,14 +35,23 @@ export type Merge<A, B> = { [K in keyof (A & B)]: (A & B)[K] }
  * `string`, então sem este tipo um typo (`'ADMNISTRATOR'`) compilaria e só
  * apareceria quando o Postgres recusasse o insert.
  *
- * São dois papéis e não um porque o painel tem dono e tem operador: `OWNER` não
- * é gerenciável por endpoint nenhum, nasce só pelo seeder, e é quem cadastra os
- * `ADMINISTRATOR` da secretaria. Quem valida payload usa `manageableRole()`,
- * que exclui o valor - assim ninguém se promove a dono por um POST.
+ * São quatro papéis, em dois grupos que não se misturam:
+ *
+ * - **Quem opera** a escola: `OWNER` e `ADMINISTRATOR`. O dono não é gerenciável
+ *   por endpoint nenhum, nasce só pelo seeder, e é quem cadastra o resto.
+ * - **Quem é atendido** por ela: `RESPONSIBLE` e `STUDENT`. Nascem pelo painel
+ *   ou pelo convite que sai na confirmação da matrícula.
+ *
+ * `OWNER` fica fora de `MANAGEABLE_USER_ROLES` para que ninguém se promova a
+ * dono por um POST. Isso é metade da regra: a outra metade é a policy, que
+ * recusa alguém alterando o próprio papel - o validator sozinho não vê quem
+ * está chamando.
  */
 export const UserRoles = {
   OWNER: 'OWNER',
   ADMINISTRATOR: 'ADMINISTRATOR',
+  RESPONSIBLE: 'RESPONSIBLE',
+  STUDENT: 'STUDENT',
 } as const
 
 export type UserRole = (typeof UserRoles)[keyof typeof UserRoles]
@@ -56,6 +65,17 @@ export const USER_ROLES = Object.values(UserRoles)
 export const MANAGEABLE_USER_ROLES = USER_ROLES.filter(function (role) {
   return role !== UserRoles.OWNER
 })
+
+/**
+ * Quem opera o painel da secretaria, e quem é atendido por ele.
+ *
+ * Os dois grupos existem como constante e não como literal na rota porque é
+ * `middleware.role(...)` que os consome, e um papel novo precisa entrar em um
+ * dos dois - esquecer disso é abrir ou fechar um módulo inteiro sem perceber.
+ */
+export const STAFF_USER_ROLES: ReadonlyArray<UserRole> = [UserRoles.OWNER, UserRoles.ADMINISTRATOR]
+
+export const PORTAL_USER_ROLES: ReadonlyArray<UserRole> = [UserRoles.RESPONSIBLE, UserRoles.STUDENT]
 
 // ---------------------------------------------------------------------------
 // Status

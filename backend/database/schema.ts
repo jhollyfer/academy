@@ -7,6 +7,25 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class AccountInviteSchema extends BaseModel {
+  static $columns = ['consumedAt', 'createdAt', 'expiresAt', 'id', 'tokenHash', 'updatedAt', 'userId'] as const
+  $columns = AccountInviteSchema.$columns
+  @column.dateTime()
+  declare consumedAt: DateTime | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime()
+  declare expiresAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare tokenHash: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: string
+}
+
 export class AuthAccessTokenSchema extends BaseModel {
   static $columns = ['abilities', 'createdAt', 'expiresAt', 'hash', 'id', 'lastUsedAt', 'name', 'tokenableId', 'type', 'updatedAt'] as const
   $columns = AuthAccessTokenSchema.$columns
@@ -166,7 +185,7 @@ export class EnrollmentFileSchema extends BaseModel {
 }
 
 export class EnrollmentSchema extends BaseModel {
-  static $columns = ['classId', 'createdAt', 'deletedAt', 'email', 'guardianDocument', 'guardianName', 'guardianPhone', 'id', 'lgpdConsentAt', 'notes', 'phone', 'protocol', 'status', 'studentBirthDate', 'studentDocument', 'studentName', 'termsAcceptedAt', 'updatedAt'] as const
+  static $columns = ['classId', 'createdAt', 'deletedAt', 'email', 'guardianDocument', 'guardianName', 'guardianPhone', 'id', 'lgpdConsentAt', 'notes', 'phone', 'protocol', 'responsibleId', 'status', 'studentBirthDate', 'studentDocument', 'studentId', 'studentName', 'termsAcceptedAt', 'updatedAt'] as const
   $columns = EnrollmentSchema.$columns
   @column()
   declare classId: string
@@ -193,17 +212,34 @@ export class EnrollmentSchema extends BaseModel {
   @column()
   declare protocol: string
   @column()
+  declare responsibleId: string | null
+  @column()
   declare status: string
   @column.date()
   declare studentBirthDate: DateTime
   @column()
   declare studentDocument: string | null
   @column()
+  declare studentId: string | null
+  @column()
   declare studentName: string
   @column.dateTime()
   declare termsAcceptedAt: DateTime
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+}
+
+export class GuardianshipSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'responsibleId', 'studentId'] as const
+  $columns = GuardianshipSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare responsibleId: string
+  @column()
+  declare studentId: string
 }
 
 export class StorageSchema extends BaseModel {
@@ -236,7 +272,7 @@ export class StorageSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['avatarId', 'createdAt', 'deletedAt', 'email', 'id', 'name', 'password', 'phone', 'role', 'status', 'updatedAt'] as const
+  static $columns = ['avatarId', 'createdAt', 'deletedAt', 'email', 'emailVerifiedAt', 'id', 'invitedAt', 'name', 'password', 'phone', 'role', 'status', 'updatedAt'] as const
   $columns = UserSchema.$columns
   @column()
   declare avatarId: string | null
@@ -246,8 +282,12 @@ export class UserSchema extends BaseModel {
   declare deletedAt: DateTime | null
   @column()
   declare email: string
+  @column.dateTime()
+  declare emailVerifiedAt: DateTime | null
   @column({ isPrimary: true })
   declare id: string
+  @column.dateTime()
+  declare invitedAt: DateTime | null
   @column()
   declare name: string
   @column({ serializeAs: null })

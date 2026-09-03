@@ -1,5 +1,6 @@
 import Class from '#models/class'
 import Enrollment from '#models/enrollment'
+import EnrollmentAccountService from '#services/enrollment-account.service'
 import { syncClassStatus } from '#features/_shared.seats'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
@@ -18,6 +19,8 @@ type Response = Either<HTTPException, Enrollment>
 
 @inject()
 export default class EnrollmentUpdateUseCase {
+  constructor(private readonly accounts: EnrollmentAccountService) {}
+
   async execute({ id, ...payload }: Payload): Promise<Response> {
     try {
       const enrollment = await Enrollment.query()
@@ -58,8 +61,18 @@ export default class EnrollmentUpdateUseCase {
         }
       }
 
+      const confirming =
+        payload.status === EnrollmentStatuses.CONFIRMED &&
+        enrollment.status !== EnrollmentStatuses.CONFIRMED
+
       enrollment.merge(payload)
       await enrollment.save()
+
+      // A confirmação é o momento em que o candidato vira aluno da escola, e é
+      // por isso que o acesso nasce aqui e não na inscrição: antes do Pix
+      // conferido não há vínculo, e criar conta para todo formulário enviado
+      // encheria a base de gente que nunca se matriculou.
+      if (confirming) await this.accounts.ensureFor(enrollment)
 
       // Cancelar devolve a vaga, e promover da fila ocupa uma. Nos dois casos a
       // lotação da turma mudou sem que ninguém tenha editado a turma - `FULL` é

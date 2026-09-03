@@ -70,6 +70,26 @@ export async function authenticateAsAdministrator(client: ApiClient): Promise<Se
 }
 
 /**
+ * Sessões dos dois papéis do portal.
+ *
+ * São o outro lado das asserções que o `authenticateAsAdministrator` não cobre:
+ * ele prova "operador não apaga", e estes provam "quem é atendido não entra no
+ * painel". Sem eles, alargar um `role([...])` para incluir aluno passaria em
+ * todos os testes.
+ */
+export async function authenticateAsResponsible(client: ApiClient): Promise<Session> {
+  const responsible = await UserFactory.apply('responsible').create()
+
+  return authenticate(client, responsible.email, FACTORY_PASSWORD)
+}
+
+export async function authenticateAsStudent(client: ApiClient): Promise<Session> {
+  const student = await UserFactory.apply('student').create()
+
+  return authenticate(client, student.email, FACTORY_PASSWORD)
+}
+
+/**
  * Esvazia o banco e recria o dono.
  *
  * O `truncate` apaga o dono junto, e ele é o único usuário que nenhum endpoint

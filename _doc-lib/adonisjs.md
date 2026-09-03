@@ -1259,7 +1259,7 @@ export default class GerarMiniaturas extends Job {
     await processar(payload.postId)
   }
 }
-// o worker roda em outro processo: `node ace queue:listen`
+// o worker roda em outro processo: `node ace queue:work`
 ```
 
 #### guides/digging-deeper/server-sent-events

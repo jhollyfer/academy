@@ -17,6 +17,7 @@ import type {
   AdministratorCourseCreatePayload,
   AdministratorCourseUpdatePayload,
   AdministratorEnrollmentUpdatePayload,
+  AuthenticationInviteAcceptPayload,
   AuthenticationSignInPayload,
   StorefrontEnrollmentAttachmentPayload,
   StorefrontEnrollmentCreatePayload,
@@ -132,6 +133,35 @@ export function useAuthenticationSignIn(
         method: 'POST',
         body: JSON.stringify(payload),
       })
+    },
+  })
+}
+
+/**
+ * Define a senha pelo convite e abre a sessão na mesma resposta.
+ *
+ * Devolve `void` pelo mesmo motivo do sign-in: o corpo é `204` e o que importa
+ * vem no `Set-Cookie`. E, como o sign-in, quem chama tem de invalidar
+ * `queryKeys.account.all` antes de navegar.
+ *
+ * O token vai no caminho, e não no corpo: é ele que faz o papel da sessão nesta
+ * requisição, que é pública por necessidade - quem chega aqui ainda não tem
+ * senha.
+ */
+export function useAuthenticationInviteAccept(
+  token: string,
+  options?: MutationProps<void, AuthenticationInviteAcceptPayload>,
+) {
+  return useMutation<void, HTTPError, AuthenticationInviteAcceptPayload>({
+    ...options,
+    mutationFn: function (payload) {
+      return request<void>(
+        `/authentication/invite/${encodeURIComponent(token)}`,
+        {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        },
+      )
     },
   })
 }

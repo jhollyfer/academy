@@ -6,6 +6,8 @@ export type ScannedRoutes = {
   ALL: {
     'authentication.sign-in': { paramsTuple?: []; params?: {} }
     'authentication.sign-out': { paramsTuple?: []; params?: {} }
+    'authentication.invite.show': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'authentication.invite.accept': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'storefront.courses.paginate': { paramsTuple?: []; params?: {} }
     'storefront.courses.show': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
     'storefront.faqs': { paramsTuple?: []; params?: {} }
@@ -33,6 +35,12 @@ export type ScannedRoutes = {
     'administrator.enrollments.export': { paramsTuple?: []; params?: {} }
     'administrator.enrollments.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.enrollments.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.users.paginate': { paramsTuple?: []; params?: {} }
+    'administrator.users.create': { paramsTuple?: []; params?: {} }
+    'administrator.users.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.users.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.users.dependents.attach': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.users.dependents.detach': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'studentId': ParamValue} }
     'administrator.lifecycle.courses.archive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.courses.unarchive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.courses.purge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -42,8 +50,12 @@ export type ScannedRoutes = {
     'administrator.lifecycle.enrollments.archive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.enrollments.unarchive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.enrollments.purge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.lifecycle.users.archive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.lifecycle.users.unarchive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.lifecycle.users.purge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
+    'authentication.invite.show': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'storefront.courses.paginate': { paramsTuple?: []; params?: {} }
     'storefront.courses.show': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
     'storefront.faqs': { paramsTuple?: []; params?: {} }
@@ -59,8 +71,11 @@ export type ScannedRoutes = {
     'administrator.enrollments.paginate': { paramsTuple?: []; params?: {} }
     'administrator.enrollments.export': { paramsTuple?: []; params?: {} }
     'administrator.enrollments.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.users.paginate': { paramsTuple?: []; params?: {} }
+    'administrator.users.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
+    'authentication.invite.show': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'storefront.courses.paginate': { paramsTuple?: []; params?: {} }
     'storefront.courses.show': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
     'storefront.faqs': { paramsTuple?: []; params?: {} }
@@ -76,10 +91,13 @@ export type ScannedRoutes = {
     'administrator.enrollments.paginate': { paramsTuple?: []; params?: {} }
     'administrator.enrollments.export': { paramsTuple?: []; params?: {} }
     'administrator.enrollments.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.users.paginate': { paramsTuple?: []; params?: {} }
+    'administrator.users.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
     'authentication.sign-in': { paramsTuple?: []; params?: {} }
     'authentication.sign-out': { paramsTuple?: []; params?: {} }
+    'authentication.invite.accept': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'storefront.enrollments.create': { paramsTuple?: []; params?: {} }
     'storefront.enrollments.attach': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
     'storefront.enrollments.uploads.create': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
@@ -88,17 +106,22 @@ export type ScannedRoutes = {
     'storages.complete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.courses.create': { paramsTuple?: []; params?: {} }
     'administrator.classes.create': { paramsTuple?: []; params?: {} }
+    'administrator.users.create': { paramsTuple?: []; params?: {} }
+    'administrator.users.dependents.attach': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
     'storages.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.users.dependents.detach': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'studentId': ParamValue} }
     'administrator.lifecycle.courses.purge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.classes.purge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.enrollments.purge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.lifecycle.users.purge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
     'administrator.courses.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.classes.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.enrollments.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.users.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'administrator.lifecycle.courses.archive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -107,6 +130,8 @@ export type ScannedRoutes = {
     'administrator.lifecycle.classes.unarchive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.enrollments.archive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.enrollments.unarchive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.lifecycle.users.archive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.lifecycle.users.unarchive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

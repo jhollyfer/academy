@@ -14,6 +14,7 @@ import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
 import { scalarPage } from '#core/openapi/scalar'
 import openapi from '#config/openapi'
+import { STAFF_USER_ROLES } from '#core/entity'
 
 router.get('/', function (context) {
   return context.response.redirect('/documentation')
@@ -64,6 +65,10 @@ router.get('/documentation', function (context) {
  *
  * `sign-in` é público - é a porta. `sign-out` exige sessão, porque apagar o
  * token da sessão atual pressupõe saber qual é.
+ *
+ * O par `invite` também é público, e tem de ser: quem chega por ele ainda não
+ * tem senha, e é justamente isso que veio resolver. O que faz o papel da sessão
+ * ali é o token do link - 64 caracteres sorteados, de uso único e com prazo.
  */
 router
   .group(() => {
@@ -72,6 +77,9 @@ router
       .post('sign-out', [controllers.authentication.SignOut])
       .as('sign-out')
       .use(middleware.auth())
+
+    router.get('invite/:token', [controllers.authentication.InviteShow]).as('invite.show')
+    router.post('invite/:token', [controllers.authentication.InviteAccept]).as('invite.accept')
   })
   .prefix('authentication')
   .as('authentication')
@@ -231,6 +239,24 @@ router
       .prefix('enrollments')
       .as('enrollments')
 
+    router
+      .group(() => {
+        router.get('/', [controllers.administrator.users.Paginate])
+        router.post('/', [controllers.administrator.users.Create])
+        router.get(':id', [controllers.administrator.users.Show])
+        router.put(':id', [controllers.administrator.users.Update])
+        // O vínculo de guarda. `:id` é o responsável; o dependente vai no corpo
+        // no POST e no parâmetro no DELETE, que não tem corpo.
+        router
+          .post(':id/dependents', [controllers.administrator.users.AttachDependent])
+          .as('dependents.attach')
+        router
+          .delete(':id/dependents/:studentId', [controllers.administrator.users.DetachDependent])
+          .as('dependents.detach')
+      })
+      .prefix('users')
+      .as('users')
+
     // O ciclo de vida do registro é privilégio do dono. As três operações são
     // distintas de propósito: `archive` manda para a lixeira (grava
     // `deletedAt`), `unarchive` traz de volta, e só o `DELETE` apaga a linha -
@@ -290,10 +316,24 @@ router
           })
           .prefix('enrollments')
           .as('enrollments')
+
+        router
+          .group(() => {
+            router.patch(':id/archive', [controllers.administrator.users.Archive]).as('archive')
+            router
+              .patch(':id/unarchive', [controllers.administrator.users.Unarchive])
+              .as('unarchive')
+            router
+              .delete(':id', [controllers.administrator.users.Delete])
+              .as('purge')
+              .use(middleware.role(['OWNER']))
+          })
+          .prefix('users')
+          .as('users')
       })
       .as('lifecycle')
   })
   .prefix('administrator')
   .as('administrator')
   .use(middleware.auth())
-  .use(middleware.role(['OWNER', 'ADMINISTRATOR']))
+  .use(middleware.role(STAFF_USER_ROLES))

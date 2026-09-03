@@ -65,6 +65,7 @@ export const FIELD_LABELS = {
   'email': 'o e-mail',
   'password': 'a senha',
   'passwordConfirmation': 'a confirmação da senha',
+  'token': 'o link do convite',
   'phone': 'o telefone',
   'cpf': 'o CPF',
   'cnpj': 'o CNPJ',
@@ -296,6 +297,13 @@ export const RULE_MESSAGES = {
   'password.maxLength': 'A senha deve ter no máximo {{ max }} caracteres',
   // `confirmed` roda em `password` mas reporta em `passwordConfirmation`.
   'passwordConfirmation.confirmed': 'As senhas não são iguais',
+
+  // ── Convite ──────────────────────────────────────────────────────────
+  // O token vem da URL, e não de um campo que alguém preencheu. "Informe 64
+  // caracteres" não diria nada a quem clicou num link truncado pelo cliente de
+  // e-mail - o que a pessoa precisa saber é que o caminho é pedir outro.
+  'token.fixedLength': 'Link de convite inválido. Peça um novo à secretaria',
+  'token.string': 'Link de convite inválido. Peça um novo à secretaria',
 
   // ── Documentos e endereço ────────────────────────────────────────────
   // Estas contam DÍGITOS, e não caracteres: `cpf()`, `cnpj()` e `cep()` fazem

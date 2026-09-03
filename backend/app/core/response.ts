@@ -53,6 +53,23 @@ const USER: ModelResource = {
   relations: { avatar: STORAGE },
 }
 
+/**
+ * O usuário como o painel de gestão o devolve: com os dois lados do vínculo de
+ * guarda aninhados.
+ *
+ * Separado do `USER` acima porque `/account/profile` não carrega essas relações
+ * - declará-las lá prometeria no OpenAPI um campo que a rota não devolve.
+ *
+ * As relações apontam para `USER`, e não para si mesmas: um dependente traz o
+ * cadastro, não a lista de dependentes dele. Auto-referência aqui viraria
+ * recursão infinita na geração do documento.
+ */
+const MANAGED_USER: ModelResource = {
+  model: User,
+  enums: { role: USER_ROLES, status: ACTIVE_STATUSES },
+  relations: { avatar: STORAGE, dependents: USER, responsibles: USER },
+}
+
 const COURSE_MODULE: ModelResource = { model: CourseModule }
 
 const COURSE_FAQ: ModelResource = { model: CourseFaq }
@@ -232,6 +249,7 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'administrator/courses': COURSE,
   'administrator/classes': CLASS,
   'administrator/enrollments': ENROLLMENT,
+  'administrator/users': MANAGED_USER,
 
   'storefront/courses': COURSE,
   // Projeção declarada, e não o `ENROLLMENT` do painel: estas rotas não têm

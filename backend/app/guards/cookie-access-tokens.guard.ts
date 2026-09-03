@@ -6,6 +6,7 @@ import type { AuthClientResponse, GuardContract } from '@adonisjs/auth/types'
 
 import User from '#models/user'
 import { COOKIE_TOKEN, issueSessionTokens } from '#services/cookie.service'
+import { ActiveStatuses } from '#core/entity'
 
 /**
  * O usuário já autenticado, onde `currentAccessToken` deixou de ser opcional.
@@ -62,7 +63,20 @@ export class CookieAccessTokensGuard implements GuardContract<GuardUser> {
 
     if (!accessToken || accessToken.name !== COOKIE_TOKEN.ACCESS) throw this.#authenticationFailed()
 
-    const user = await User.find(accessToken.tokenableId)
+    // Conta removida ou desativada não autentica, mesmo com token válido.
+    //
+    // O filtro estava só no sign-in, e o token vive um dia: desativar alguém não
+    // o expulsava, apenas o impedia de entrar de novo. Com dono e secretaria isso
+    // passava, porque desativação era rara e combinada. Com aluno e responsável
+    // deixa de passar - é o caminho normal de encerrar um vínculo, e precisa ter
+    // efeito imediato.
+    const user = await User.query()
+      // `tokenableId` é tipado como `string | number | BigInt` pelo pacote de
+      // auth, e o query builder não aceita `BigInt`. Aqui a chave é sempre uuid.
+      .where('id', String(accessToken.tokenableId))
+      .whereNull('deletedAt')
+      .where('status', ActiveStatuses.ACTIVE)
+      .first()
 
     if (!user) throw this.#authenticationFailed()
 

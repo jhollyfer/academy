@@ -43,6 +43,10 @@
     {
       "name": "Painel · Matrículas",
       "description": "A fila da secretaria. A confirmação é humana por definição: não há gateway no v1, então alguém confere o comprovante do Pix e move o estado. Exporta CSV."
+    },
+    {
+      "name": "Painel · Usuários",
+      "description": "Quem tem acesso, nos quatro papéis. A equipe da escola nasce com senha; responsável e aluno nascem por convite, porque a secretaria não deve escolher a senha de uma família. É aqui também que se liga um dependente ao seu responsável."
     }
   ],
   "paths": {
@@ -2274,6 +2278,1012 @@
         ]
       }
     },
+    "/administrator/users": {
+      "get": {
+        "operationId": "administratorUsersPaginate",
+        "summary": "Listar usuários",
+        "tags": [
+          "Painel · Usuários"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMeta"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AdministratorUsersPaginateItem"
+                      }
+                    }
+                  },
+                  "required": [
+                    "meta",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: OWNER, ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500UserListError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Listagem paginada. `?search` filtra por nome e e-mail, `?role` recorta por papel e `?trashed` alcança os arquivados. `?sort` aceita name, email, role, createdAt e `?direction` aceita asc ou desc. O dono não aparece para quem não é dono.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "trashed",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "only",
+                "with"
+              ]
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "name",
+                "email",
+                "role",
+                "createdAt"
+              ]
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "OWNER",
+                "ADMINISTRATOR",
+                "RESPONSIBLE",
+                "STUDENT"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ACTIVE",
+                "INACTIVE"
+              ]
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "administratorUsersCreate",
+        "summary": "Criar usuário",
+        "tags": [
+          "Painel · Usuários"
+        ],
+        "responses": {
+          "201": {
+            "description": "Recurso criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdministratorUsersCreateResponse201"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: OWNER, ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Usuário já existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error409UserAlreadyExists"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500UserCreateError"
+                }
+              }
+            }
+          }
+        },
+        "description": "A senha é opcional, e é ela que decide o caminho: **com senha** a conta nasce pronta; **sem senha** sai um convite por e-mail e quem define a credencial é o titular. Use o segundo para responsável e aluno. `role` não aceita `OWNER`.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdministratorUsersCreateBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/administrator/users/{id}": {
+      "get": {
+        "operationId": "administratorUsersShow",
+        "summary": "Detalhar usuário",
+        "tags": [
+          "Painel · Usuários"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdministratorUsersShowResponse200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: OWNER, ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404UserNotFound"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500UserShowError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Devolve o objeto nu, com o avatar e os dois lados do vínculo de guarda aninhados. Usuário arquivado não é encontrado aqui, e o dono responde 404 para quem não é dono - não 403, para não confirmar que o id existe.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "put": {
+        "operationId": "administratorUsersUpdate",
+        "summary": "Atualizar usuário",
+        "tags": [
+          "Painel · Usuários"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdministratorUsersUpdateResponse200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: OWNER, ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404UserNotFound"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Usuário já existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error409UserAlreadyExists"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500UserUpdateError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Não aceita `password`: trocar a própria senha é `/account`, e redefinir a de outra pessoa é emitir convite. `role` não aceita `OWNER`, e ninguém edita o próprio cadastro por aqui - as duas coisas juntas são o que fecha a auto-promoção.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdministratorUsersUpdateBody"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "administratorLifecycleUsersPurge",
+        "summary": "Apagar usuário",
+        "tags": [
+          "Painel · Usuários"
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucesso, sem corpo"
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: OWNER.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404UserNotFound"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Usuário não está arquivado · Usuário possui matrículas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error409UserHasEnrollmentsUserNotArchived"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500UserDeleteError"
+                }
+              }
+            }
+          }
+        },
+        "description": "**Irreversível**: apaga a linha, e o vínculo de guarda e os tokens vão junto por cascata. As matrículas ficam, sem dono. Só aceita usuário já arquivado, recusa quando há matrícula vinculada, e ninguém apaga a si mesmo. Privilégio exclusivo do dono.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/administrator/users/{id}/archive": {
+      "patch": {
+        "operationId": "administratorLifecycleUsersArchive",
+        "summary": "PATCH /administrator/users",
+        "tags": [
+          "Painel · Usuários"
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucesso, sem corpo"
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: OWNER, ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404UserNotFound"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500UserArchiveError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Manda para a lixeira, de onde `PATCH /:id/unarchive` traz de volta. O acesso cai na hora: o token já emitido deixa de valer na requisição seguinte. Ninguém arquiva a si mesmo.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/administrator/users/{id}/dependents": {
+      "post": {
+        "operationId": "administratorUsersDependentsAttach",
+        "summary": "Vincular dependente",
+        "tags": [
+          "Painel · Usuários"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdministratorUsersDependentsAttachResponse200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: OWNER, ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404UserNotFound"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos · Papel inválido · Dependente inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422InvalidDependentInvalidRoleValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500GuardianshipAttachError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Liga um aluno a um responsável. O `:id` da URL precisa ser um `RESPONSIBLE` e o `studentId` do corpo um `STUDENT` - vincular é conceder leitura sobre os dados de outra pessoa, então os dois papéis são conferidos. Repetir o vínculo é idempotente.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdministratorUsersDependentsAttachBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/administrator/users/{id}/dependents/{studentId}": {
+      "delete": {
+        "operationId": "administratorUsersDependentsDetach",
+        "summary": "Desvincular dependente",
+        "tags": [
+          "Painel · Usuários"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdministratorUsersDependentsDetachResponse200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: OWNER, ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404UserNotFound"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500GuardianshipDetachError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Desfaz o vínculo. Idempotente: desvincular quem não estava vinculado devolve 200 com a lista atual, e não erro.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "studentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/administrator/users/{id}/unarchive": {
+      "patch": {
+        "operationId": "administratorLifecycleUsersUnarchive",
+        "summary": "PATCH /administrator/users",
+        "tags": [
+          "Painel · Usuários"
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucesso, sem corpo"
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: OWNER, ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404UserNotFound"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Usuário não está arquivado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error409UserNotArchived"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500UserUnarchiveError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Tira da lixeira e devolve o acesso. Recusa quando o usuário já está ativo.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/authentication/invite/{token}": {
+      "get": {
+        "operationId": "authenticationInviteShow",
+        "summary": "Confere um convite",
+        "tags": [
+          "Autenticação"
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucesso, sem corpo"
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500InviteShowError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Diz se o link de convite ainda serve, para a tela não pedir uma senha que será recusada no envio. Responde `204` **sem corpo**: quem tem o token é quem pergunta, e devolver a conta aqui entregaria o e-mail do titular a qualquer um com o link.\n\nA recusa é que carrega a informação, no `code`: `INVITE_NOT_FOUND`, `INVITE_ALREADY_USED` (a conta já foi ativada, o caminho é entrar), `INVITE_EXPIRED` e `INVITE_ACCOUNT_UNAVAILABLE`.",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "authenticationInviteAccept",
+        "summary": "Define a senha pelo convite",
+        "tags": [
+          "Autenticação"
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucesso, sem corpo"
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500InviteAcceptError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Fecha o convite: grava a senha escolhida pelo titular, marca o link como usado e **abre a sessão na mesma resposta**, com o mesmo par de cookies `httpOnly` do `sign-in`. Quem acabou de definir a senha não é mandado para a tela de login digitá-la de novo.\n\nResponde `204` sem corpo. O link vale uma vez só: repetir devolve `INVITE_ALREADY_USED`.",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthenticationInviteAcceptBody"
+              }
+            }
+          }
+        }
+      }
+    },
     "/authentication/sign-in": {
       "post": {
         "operationId": "authenticationSignIn",
@@ -2418,7 +3428,7 @@
             }
           }
         },
-        "description": "Abre um upload e devolve por onde subi-lo. **Não recebe bytes** - só os metadados do arquivo (RF-59).\n\nO binário vai do navegador direto ao bucket, por URL assinada, e nunca atravessa esta aplicação: um arquivo grande num corpo HTTP esbarra no limite do proxy, ocupa a aplicação pelo tempo do upload, e não tem como ser retomado quando a conexão cai.\n\nAceita image/jpeg, image/png, image/webp, image/gif, image/svg+xml, application/pdf, até 1073741824 bytes, recusados **antes** de qualquer assinatura (RN-47): arquivo proibido não ganha URL, então não chega ao bucket. Que o tamanho declarado seja verdade é o que `POST /storages/:id/complete` confere, contra o objeto real.\n\nO arquivo é fatiado em partes de 10485760 bytes. Quando cabe numa parte só, `uploadId` vem nulo e a única URL aceita um `PUT` com o arquivo inteiro. Quando não cabe, cada URL aceita a sua parte, o cliente guarda o `ETag` que cada `PUT` devolve, e `parts` pode trazer só o primeiro lote - o resto sai em `GET /storages/:id/parts`, que é o mesmo endpoint da retomada.\n\nA linha nasce `PENDING` e não pode ser anexada a nada até ser confirmada. O arquivo nasce sem dono: quem anexa guarda a referência (RF-60), informando o `id` em `avatarId`, `logoId` ou `imageIds`.",
+        "description": "Abre um upload e devolve por onde subi-lo. **Não recebe bytes** - só os metadados do arquivo (RF-59).\n\nO binário vai do navegador direto ao bucket, por URL assinada, e nunca atravessa esta aplicação: um arquivo grande num corpo HTTP esbarra no limite do proxy, ocupa a aplicação pelo tempo do upload, e não tem como ser retomado quando a conexão cai.\n\nAceita image/jpeg, image/png, image/webp, image/gif, application/pdf, até 1073741824 bytes, recusados **antes** de qualquer assinatura (RN-47): arquivo proibido não ganha URL, então não chega ao bucket. Que o tamanho declarado seja verdade é o que `POST /storages/:id/complete` confere, contra o objeto real.\n\nO arquivo é fatiado em partes de 10485760 bytes. Quando cabe numa parte só, `uploadId` vem nulo e a única URL aceita um `PUT` com o arquivo inteiro. Quando não cabe, cada URL aceita a sua parte, o cliente guarda o `ETag` que cada `PUT` devolve, e `parts` pode trazer só o primeiro lote - o resto sai em `GET /storages/:id/parts`, que é o mesmo endpoint da retomada.\n\nA linha nasce `PENDING` e não pode ser anexada a nada até ser confirmada. O arquivo nasce sem dono: quem anexa guarda a referência (RF-60), informando o `id` em `avatarId`, `logoId` ou `imageIds`.",
         "security": [
           {
             "cookieAuth": []
@@ -3126,7 +4136,7 @@
             }
           }
         },
-        "description": "Abre um upload e devolve por onde subi-lo. **Não recebe bytes** - só os metadados do arquivo (RF-59).\n\nO binário vai do navegador direto ao bucket, por URL assinada, e nunca atravessa esta aplicação: um arquivo grande num corpo HTTP esbarra no limite do proxy, ocupa a aplicação pelo tempo do upload, e não tem como ser retomado quando a conexão cai.\n\nAceita image/jpeg, image/png, image/webp, image/gif, image/svg+xml, application/pdf, até 1073741824 bytes, recusados **antes** de qualquer assinatura (RN-47): arquivo proibido não ganha URL, então não chega ao bucket. Que o tamanho declarado seja verdade é o que `POST /storages/:id/complete` confere, contra o objeto real.\n\nO arquivo é fatiado em partes de 10485760 bytes. Quando cabe numa parte só, `uploadId` vem nulo e a única URL aceita um `PUT` com o arquivo inteiro. Quando não cabe, cada URL aceita a sua parte, o cliente guarda o `ETag` que cada `PUT` devolve, e `parts` pode trazer só o primeiro lote - o resto sai em `GET /storages/:id/parts`, que é o mesmo endpoint da retomada.\n\nA linha nasce `PENDING` e não pode ser anexada a nada até ser confirmada. O arquivo nasce sem dono: quem anexa guarda a referência (RF-60), informando o `id` em `avatarId`, `logoId` ou `imageIds`.",
+        "description": "Abre um upload e devolve por onde subi-lo. **Não recebe bytes** - só os metadados do arquivo (RF-59).\n\nO binário vai do navegador direto ao bucket, por URL assinada, e nunca atravessa esta aplicação: um arquivo grande num corpo HTTP esbarra no limite do proxy, ocupa a aplicação pelo tempo do upload, e não tem como ser retomado quando a conexão cai.\n\nAceita image/jpeg, image/png, image/webp, image/gif, application/pdf, até 1073741824 bytes, recusados **antes** de qualquer assinatura (RN-47): arquivo proibido não ganha URL, então não chega ao bucket. Que o tamanho declarado seja verdade é o que `POST /storages/:id/complete` confere, contra o objeto real.\n\nO arquivo é fatiado em partes de 10485760 bytes. Quando cabe numa parte só, `uploadId` vem nulo e a única URL aceita um `PUT` com o arquivo inteiro. Quando não cabe, cada URL aceita a sua parte, o cliente guarda o `ETag` que cada `PUT` devolve, e `parts` pode trazer só o primeiro lote - o resto sai em `GET /storages/:id/parts`, que é o mesmo endpoint da retomada.\n\nA linha nasce `PENDING` e não pode ser anexada a nada até ser confirmada. O arquivo nasce sem dono: quem anexa guarda a referência (RF-60), informando o `id` em `avatarId`, `logoId` ou `imageIds`.",
         "parameters": [
           {
             "name": "protocol",
@@ -3399,8 +4409,22 @@
           "email": {
             "type": "string"
           },
+          "emailVerifiedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
           "id": {
             "type": "string"
+          },
+          "invitedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
           },
           "name": {
             "type": "string"
@@ -3415,7 +4439,9 @@
             "type": "string",
             "enum": [
               "OWNER",
-              "ADMINISTRATOR"
+              "ADMINISTRATOR",
+              "RESPONSIBLE",
+              "STUDENT"
             ]
           },
           "status": {
@@ -3518,7 +4544,9 @@
           "createdAt",
           "deletedAt",
           "email",
+          "emailVerifiedAt",
           "id",
+          "invitedAt",
           "name",
           "phone",
           "role",
@@ -6131,6 +7159,12 @@
           "protocol": {
             "type": "string"
           },
+          "responsibleId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "status": {
             "type": "string",
             "enum": [
@@ -6145,6 +7179,12 @@
             "format": "date-time"
           },
           "studentDocument": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "studentId": {
             "type": [
               "string",
               "null"
@@ -6539,9 +7579,11 @@
           "notes",
           "phone",
           "protocol",
+          "responsibleId",
           "status",
           "studentBirthDate",
           "studentDocument",
+          "studentId",
           "studentName",
           "termsAcceptedAt",
           "updatedAt"
@@ -6604,6 +7646,12 @@
           "protocol": {
             "type": "string"
           },
+          "responsibleId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "status": {
             "type": "string",
             "enum": [
@@ -6618,6 +7666,12 @@
             "format": "date-time"
           },
           "studentDocument": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "studentId": {
             "type": [
               "string",
               "null"
@@ -7012,9 +8066,11 @@
           "notes",
           "phone",
           "protocol",
+          "responsibleId",
           "status",
           "studentBirthDate",
           "studentDocument",
+          "studentId",
           "studentName",
           "termsAcceptedAt",
           "updatedAt"
@@ -7077,6 +8133,12 @@
           "protocol": {
             "type": "string"
           },
+          "responsibleId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "status": {
             "type": "string",
             "enum": [
@@ -7091,6 +8153,12 @@
             "format": "date-time"
           },
           "studentDocument": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "studentId": {
             "type": [
               "string",
               "null"
@@ -7485,9 +8553,11 @@
           "notes",
           "phone",
           "protocol",
+          "responsibleId",
           "status",
           "studentBirthDate",
           "studentDocument",
+          "studentId",
           "studentName",
           "termsAcceptedAt",
           "updatedAt"
@@ -7572,6 +8642,12 @@
           "protocol": {
             "type": "string"
           },
+          "responsibleId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "status": {
             "type": "string",
             "enum": [
@@ -7586,6 +8662,12 @@
             "format": "date-time"
           },
           "studentDocument": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "studentId": {
             "type": [
               "string",
               "null"
@@ -7980,13 +9062,3210 @@
           "notes",
           "phone",
           "protocol",
+          "responsibleId",
           "status",
           "studentBirthDate",
           "studentDocument",
+          "studentId",
           "studentName",
           "termsAcceptedAt",
           "updatedAt"
         ]
+      },
+      "AdministratorUsersCreateBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 32,
+            "description": "Exige ao menos uma minúscula, uma maiúscula, um dígito e um caractere especial.",
+            "allOf": [
+              {
+                "pattern": "[a-z]"
+              },
+              {
+                "pattern": "[A-Z]"
+              },
+              {
+                "pattern": "[0-9]"
+              },
+              {
+                "pattern": "[^a-zA-Z0-9]"
+              }
+            ]
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[1-9]{2}[0-9]{8,9}$",
+            "maxLength": 11
+          },
+          "role": {
+            "enum": [
+              "ADMINISTRATOR",
+              "RESPONSIBLE",
+              "STUDENT"
+            ]
+          },
+          "status": {
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "avatarId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "passwordConfirmation": {
+            "type": "string",
+            "description": "Repetição exata de `password`."
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "role"
+        ],
+        "additionalProperties": false
+      },
+      "AdministratorUsersCreateResponse201": {
+        "type": "object",
+        "properties": {
+          "avatarId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "email": {
+            "type": "string"
+          },
+          "emailVerifiedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "invitedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "ADMINISTRATOR",
+              "RESPONSIBLE",
+              "STUDENT"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "avatar": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "mimetype": {
+                "type": "string"
+              },
+              "originalName": {
+                "type": "string"
+              },
+              "partSize": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "path": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "UPLOADED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "uploadId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "createdAt",
+              "deletedAt",
+              "filename",
+              "id",
+              "mimetype",
+              "originalName",
+              "partSize",
+              "path",
+              "size",
+              "status",
+              "updatedAt",
+              "uploadId"
+            ]
+          },
+          "dependents": {
+            "type": "object",
+            "properties": {
+              "avatarId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "email": {
+                "type": "string"
+              },
+              "emailVerifiedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "invitedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "name": {
+                "type": "string"
+              },
+              "phone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "OWNER",
+                  "ADMINISTRATOR",
+                  "RESPONSIBLE",
+                  "STUDENT"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ACTIVE",
+                  "INACTIVE"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "avatar": {
+                "type": "object",
+                "properties": {
+                  "createdAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "deletedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "filename": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "mimetype": {
+                    "type": "string"
+                  },
+                  "originalName": {
+                    "type": "string"
+                  },
+                  "partSize": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "number"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "PENDING",
+                      "UPLOADED"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "uploadId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "createdAt",
+                  "deletedAt",
+                  "filename",
+                  "id",
+                  "mimetype",
+                  "originalName",
+                  "partSize",
+                  "path",
+                  "size",
+                  "status",
+                  "updatedAt",
+                  "uploadId"
+                ]
+              }
+            },
+            "required": [
+              "avatarId",
+              "createdAt",
+              "deletedAt",
+              "email",
+              "emailVerifiedAt",
+              "id",
+              "invitedAt",
+              "name",
+              "phone",
+              "role",
+              "status",
+              "updatedAt"
+            ]
+          },
+          "responsibles": {
+            "type": "object",
+            "properties": {
+              "avatarId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "email": {
+                "type": "string"
+              },
+              "emailVerifiedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "invitedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "name": {
+                "type": "string"
+              },
+              "phone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "OWNER",
+                  "ADMINISTRATOR",
+                  "RESPONSIBLE",
+                  "STUDENT"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ACTIVE",
+                  "INACTIVE"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "avatar": {
+                "type": "object",
+                "properties": {
+                  "createdAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "deletedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "filename": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "mimetype": {
+                    "type": "string"
+                  },
+                  "originalName": {
+                    "type": "string"
+                  },
+                  "partSize": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "number"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "PENDING",
+                      "UPLOADED"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "uploadId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "createdAt",
+                  "deletedAt",
+                  "filename",
+                  "id",
+                  "mimetype",
+                  "originalName",
+                  "partSize",
+                  "path",
+                  "size",
+                  "status",
+                  "updatedAt",
+                  "uploadId"
+                ]
+              }
+            },
+            "required": [
+              "avatarId",
+              "createdAt",
+              "deletedAt",
+              "email",
+              "emailVerifiedAt",
+              "id",
+              "invitedAt",
+              "name",
+              "phone",
+              "role",
+              "status",
+              "updatedAt"
+            ]
+          }
+        },
+        "required": [
+          "avatarId",
+          "createdAt",
+          "deletedAt",
+          "email",
+          "emailVerifiedAt",
+          "id",
+          "invitedAt",
+          "name",
+          "phone",
+          "role",
+          "status",
+          "updatedAt"
+        ]
+      },
+      "AdministratorUsersDependentsAttachBody": {
+        "type": "object",
+        "properties": {
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "studentId"
+        ],
+        "additionalProperties": false
+      },
+      "AdministratorUsersDependentsAttachResponse200": {
+        "type": "object",
+        "properties": {
+          "avatarId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "email": {
+            "type": "string"
+          },
+          "emailVerifiedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "invitedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "ADMINISTRATOR",
+              "RESPONSIBLE",
+              "STUDENT"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "avatar": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "mimetype": {
+                "type": "string"
+              },
+              "originalName": {
+                "type": "string"
+              },
+              "partSize": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "path": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "UPLOADED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "uploadId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "createdAt",
+              "deletedAt",
+              "filename",
+              "id",
+              "mimetype",
+              "originalName",
+              "partSize",
+              "path",
+              "size",
+              "status",
+              "updatedAt",
+              "uploadId"
+            ]
+          },
+          "dependents": {
+            "type": "object",
+            "properties": {
+              "avatarId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "email": {
+                "type": "string"
+              },
+              "emailVerifiedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "invitedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "name": {
+                "type": "string"
+              },
+              "phone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "OWNER",
+                  "ADMINISTRATOR",
+                  "RESPONSIBLE",
+                  "STUDENT"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ACTIVE",
+                  "INACTIVE"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "avatar": {
+                "type": "object",
+                "properties": {
+                  "createdAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "deletedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "filename": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "mimetype": {
+                    "type": "string"
+                  },
+                  "originalName": {
+                    "type": "string"
+                  },
+                  "partSize": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "number"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "PENDING",
+                      "UPLOADED"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "uploadId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "createdAt",
+                  "deletedAt",
+                  "filename",
+                  "id",
+                  "mimetype",
+                  "originalName",
+                  "partSize",
+                  "path",
+                  "size",
+                  "status",
+                  "updatedAt",
+                  "uploadId"
+                ]
+              }
+            },
+            "required": [
+              "avatarId",
+              "createdAt",
+              "deletedAt",
+              "email",
+              "emailVerifiedAt",
+              "id",
+              "invitedAt",
+              "name",
+              "phone",
+              "role",
+              "status",
+              "updatedAt"
+            ]
+          },
+          "responsibles": {
+            "type": "object",
+            "properties": {
+              "avatarId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "email": {
+                "type": "string"
+              },
+              "emailVerifiedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "invitedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "name": {
+                "type": "string"
+              },
+              "phone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "OWNER",
+                  "ADMINISTRATOR",
+                  "RESPONSIBLE",
+                  "STUDENT"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ACTIVE",
+                  "INACTIVE"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "avatar": {
+                "type": "object",
+                "properties": {
+                  "createdAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "deletedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "filename": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "mimetype": {
+                    "type": "string"
+                  },
+                  "originalName": {
+                    "type": "string"
+                  },
+                  "partSize": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "number"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "PENDING",
+                      "UPLOADED"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "uploadId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "createdAt",
+                  "deletedAt",
+                  "filename",
+                  "id",
+                  "mimetype",
+                  "originalName",
+                  "partSize",
+                  "path",
+                  "size",
+                  "status",
+                  "updatedAt",
+                  "uploadId"
+                ]
+              }
+            },
+            "required": [
+              "avatarId",
+              "createdAt",
+              "deletedAt",
+              "email",
+              "emailVerifiedAt",
+              "id",
+              "invitedAt",
+              "name",
+              "phone",
+              "role",
+              "status",
+              "updatedAt"
+            ]
+          }
+        },
+        "required": [
+          "avatarId",
+          "createdAt",
+          "deletedAt",
+          "email",
+          "emailVerifiedAt",
+          "id",
+          "invitedAt",
+          "name",
+          "phone",
+          "role",
+          "status",
+          "updatedAt"
+        ]
+      },
+      "AdministratorUsersDependentsDetachResponse200": {
+        "type": "object",
+        "properties": {
+          "avatarId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "email": {
+            "type": "string"
+          },
+          "emailVerifiedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "invitedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "ADMINISTRATOR",
+              "RESPONSIBLE",
+              "STUDENT"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "avatar": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "mimetype": {
+                "type": "string"
+              },
+              "originalName": {
+                "type": "string"
+              },
+              "partSize": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "path": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "UPLOADED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "uploadId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "createdAt",
+              "deletedAt",
+              "filename",
+              "id",
+              "mimetype",
+              "originalName",
+              "partSize",
+              "path",
+              "size",
+              "status",
+              "updatedAt",
+              "uploadId"
+            ]
+          },
+          "dependents": {
+            "type": "object",
+            "properties": {
+              "avatarId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "email": {
+                "type": "string"
+              },
+              "emailVerifiedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "invitedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "name": {
+                "type": "string"
+              },
+              "phone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "OWNER",
+                  "ADMINISTRATOR",
+                  "RESPONSIBLE",
+                  "STUDENT"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ACTIVE",
+                  "INACTIVE"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "avatar": {
+                "type": "object",
+                "properties": {
+                  "createdAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "deletedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "filename": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "mimetype": {
+                    "type": "string"
+                  },
+                  "originalName": {
+                    "type": "string"
+                  },
+                  "partSize": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "number"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "PENDING",
+                      "UPLOADED"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "uploadId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "createdAt",
+                  "deletedAt",
+                  "filename",
+                  "id",
+                  "mimetype",
+                  "originalName",
+                  "partSize",
+                  "path",
+                  "size",
+                  "status",
+                  "updatedAt",
+                  "uploadId"
+                ]
+              }
+            },
+            "required": [
+              "avatarId",
+              "createdAt",
+              "deletedAt",
+              "email",
+              "emailVerifiedAt",
+              "id",
+              "invitedAt",
+              "name",
+              "phone",
+              "role",
+              "status",
+              "updatedAt"
+            ]
+          },
+          "responsibles": {
+            "type": "object",
+            "properties": {
+              "avatarId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "email": {
+                "type": "string"
+              },
+              "emailVerifiedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "invitedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "name": {
+                "type": "string"
+              },
+              "phone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "OWNER",
+                  "ADMINISTRATOR",
+                  "RESPONSIBLE",
+                  "STUDENT"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ACTIVE",
+                  "INACTIVE"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "avatar": {
+                "type": "object",
+                "properties": {
+                  "createdAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "deletedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "filename": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "mimetype": {
+                    "type": "string"
+                  },
+                  "originalName": {
+                    "type": "string"
+                  },
+                  "partSize": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "number"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "PENDING",
+                      "UPLOADED"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "uploadId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "createdAt",
+                  "deletedAt",
+                  "filename",
+                  "id",
+                  "mimetype",
+                  "originalName",
+                  "partSize",
+                  "path",
+                  "size",
+                  "status",
+                  "updatedAt",
+                  "uploadId"
+                ]
+              }
+            },
+            "required": [
+              "avatarId",
+              "createdAt",
+              "deletedAt",
+              "email",
+              "emailVerifiedAt",
+              "id",
+              "invitedAt",
+              "name",
+              "phone",
+              "role",
+              "status",
+              "updatedAt"
+            ]
+          }
+        },
+        "required": [
+          "avatarId",
+          "createdAt",
+          "deletedAt",
+          "email",
+          "emailVerifiedAt",
+          "id",
+          "invitedAt",
+          "name",
+          "phone",
+          "role",
+          "status",
+          "updatedAt"
+        ]
+      },
+      "AdministratorUsersPaginateItem": {
+        "type": "object",
+        "properties": {
+          "avatarId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "email": {
+            "type": "string"
+          },
+          "emailVerifiedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "invitedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "ADMINISTRATOR",
+              "RESPONSIBLE",
+              "STUDENT"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "avatar": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "mimetype": {
+                "type": "string"
+              },
+              "originalName": {
+                "type": "string"
+              },
+              "partSize": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "path": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "UPLOADED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "uploadId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "createdAt",
+              "deletedAt",
+              "filename",
+              "id",
+              "mimetype",
+              "originalName",
+              "partSize",
+              "path",
+              "size",
+              "status",
+              "updatedAt",
+              "uploadId"
+            ]
+          },
+          "dependents": {
+            "type": "object",
+            "properties": {
+              "avatarId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "email": {
+                "type": "string"
+              },
+              "emailVerifiedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "invitedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "name": {
+                "type": "string"
+              },
+              "phone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "OWNER",
+                  "ADMINISTRATOR",
+                  "RESPONSIBLE",
+                  "STUDENT"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ACTIVE",
+                  "INACTIVE"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "avatar": {
+                "type": "object",
+                "properties": {
+                  "createdAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "deletedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "filename": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "mimetype": {
+                    "type": "string"
+                  },
+                  "originalName": {
+                    "type": "string"
+                  },
+                  "partSize": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "number"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "PENDING",
+                      "UPLOADED"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "uploadId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "createdAt",
+                  "deletedAt",
+                  "filename",
+                  "id",
+                  "mimetype",
+                  "originalName",
+                  "partSize",
+                  "path",
+                  "size",
+                  "status",
+                  "updatedAt",
+                  "uploadId"
+                ]
+              }
+            },
+            "required": [
+              "avatarId",
+              "createdAt",
+              "deletedAt",
+              "email",
+              "emailVerifiedAt",
+              "id",
+              "invitedAt",
+              "name",
+              "phone",
+              "role",
+              "status",
+              "updatedAt"
+            ]
+          },
+          "responsibles": {
+            "type": "object",
+            "properties": {
+              "avatarId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "email": {
+                "type": "string"
+              },
+              "emailVerifiedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "invitedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "name": {
+                "type": "string"
+              },
+              "phone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "OWNER",
+                  "ADMINISTRATOR",
+                  "RESPONSIBLE",
+                  "STUDENT"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ACTIVE",
+                  "INACTIVE"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "avatar": {
+                "type": "object",
+                "properties": {
+                  "createdAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "deletedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "filename": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "mimetype": {
+                    "type": "string"
+                  },
+                  "originalName": {
+                    "type": "string"
+                  },
+                  "partSize": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "number"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "PENDING",
+                      "UPLOADED"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "uploadId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "createdAt",
+                  "deletedAt",
+                  "filename",
+                  "id",
+                  "mimetype",
+                  "originalName",
+                  "partSize",
+                  "path",
+                  "size",
+                  "status",
+                  "updatedAt",
+                  "uploadId"
+                ]
+              }
+            },
+            "required": [
+              "avatarId",
+              "createdAt",
+              "deletedAt",
+              "email",
+              "emailVerifiedAt",
+              "id",
+              "invitedAt",
+              "name",
+              "phone",
+              "role",
+              "status",
+              "updatedAt"
+            ]
+          }
+        },
+        "required": [
+          "avatarId",
+          "createdAt",
+          "deletedAt",
+          "email",
+          "emailVerifiedAt",
+          "id",
+          "invitedAt",
+          "name",
+          "phone",
+          "role",
+          "status",
+          "updatedAt"
+        ]
+      },
+      "AdministratorUsersShowResponse200": {
+        "type": "object",
+        "properties": {
+          "avatarId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "email": {
+            "type": "string"
+          },
+          "emailVerifiedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "invitedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "ADMINISTRATOR",
+              "RESPONSIBLE",
+              "STUDENT"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "avatar": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "mimetype": {
+                "type": "string"
+              },
+              "originalName": {
+                "type": "string"
+              },
+              "partSize": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "path": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "UPLOADED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "uploadId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "createdAt",
+              "deletedAt",
+              "filename",
+              "id",
+              "mimetype",
+              "originalName",
+              "partSize",
+              "path",
+              "size",
+              "status",
+              "updatedAt",
+              "uploadId"
+            ]
+          },
+          "dependents": {
+            "type": "object",
+            "properties": {
+              "avatarId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "email": {
+                "type": "string"
+              },
+              "emailVerifiedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "invitedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "name": {
+                "type": "string"
+              },
+              "phone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "OWNER",
+                  "ADMINISTRATOR",
+                  "RESPONSIBLE",
+                  "STUDENT"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ACTIVE",
+                  "INACTIVE"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "avatar": {
+                "type": "object",
+                "properties": {
+                  "createdAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "deletedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "filename": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "mimetype": {
+                    "type": "string"
+                  },
+                  "originalName": {
+                    "type": "string"
+                  },
+                  "partSize": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "number"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "PENDING",
+                      "UPLOADED"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "uploadId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "createdAt",
+                  "deletedAt",
+                  "filename",
+                  "id",
+                  "mimetype",
+                  "originalName",
+                  "partSize",
+                  "path",
+                  "size",
+                  "status",
+                  "updatedAt",
+                  "uploadId"
+                ]
+              }
+            },
+            "required": [
+              "avatarId",
+              "createdAt",
+              "deletedAt",
+              "email",
+              "emailVerifiedAt",
+              "id",
+              "invitedAt",
+              "name",
+              "phone",
+              "role",
+              "status",
+              "updatedAt"
+            ]
+          },
+          "responsibles": {
+            "type": "object",
+            "properties": {
+              "avatarId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "email": {
+                "type": "string"
+              },
+              "emailVerifiedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "invitedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "name": {
+                "type": "string"
+              },
+              "phone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "OWNER",
+                  "ADMINISTRATOR",
+                  "RESPONSIBLE",
+                  "STUDENT"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ACTIVE",
+                  "INACTIVE"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "avatar": {
+                "type": "object",
+                "properties": {
+                  "createdAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "deletedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "filename": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "mimetype": {
+                    "type": "string"
+                  },
+                  "originalName": {
+                    "type": "string"
+                  },
+                  "partSize": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "number"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "PENDING",
+                      "UPLOADED"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "uploadId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "createdAt",
+                  "deletedAt",
+                  "filename",
+                  "id",
+                  "mimetype",
+                  "originalName",
+                  "partSize",
+                  "path",
+                  "size",
+                  "status",
+                  "updatedAt",
+                  "uploadId"
+                ]
+              }
+            },
+            "required": [
+              "avatarId",
+              "createdAt",
+              "deletedAt",
+              "email",
+              "emailVerifiedAt",
+              "id",
+              "invitedAt",
+              "name",
+              "phone",
+              "role",
+              "status",
+              "updatedAt"
+            ]
+          }
+        },
+        "required": [
+          "avatarId",
+          "createdAt",
+          "deletedAt",
+          "email",
+          "emailVerifiedAt",
+          "id",
+          "invitedAt",
+          "name",
+          "phone",
+          "role",
+          "status",
+          "updatedAt"
+        ]
+      },
+      "AdministratorUsersUpdateBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[1-9]{2}[0-9]{8,9}$",
+            "maxLength": 11
+          },
+          "role": {
+            "enum": [
+              "ADMINISTRATOR",
+              "RESPONSIBLE",
+              "STUDENT"
+            ]
+          },
+          "status": {
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "avatarId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "AdministratorUsersUpdateResponse200": {
+        "type": "object",
+        "properties": {
+          "avatarId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "email": {
+            "type": "string"
+          },
+          "emailVerifiedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "invitedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "ADMINISTRATOR",
+              "RESPONSIBLE",
+              "STUDENT"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "avatar": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "mimetype": {
+                "type": "string"
+              },
+              "originalName": {
+                "type": "string"
+              },
+              "partSize": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "path": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "UPLOADED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "uploadId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "createdAt",
+              "deletedAt",
+              "filename",
+              "id",
+              "mimetype",
+              "originalName",
+              "partSize",
+              "path",
+              "size",
+              "status",
+              "updatedAt",
+              "uploadId"
+            ]
+          },
+          "dependents": {
+            "type": "object",
+            "properties": {
+              "avatarId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "email": {
+                "type": "string"
+              },
+              "emailVerifiedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "invitedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "name": {
+                "type": "string"
+              },
+              "phone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "OWNER",
+                  "ADMINISTRATOR",
+                  "RESPONSIBLE",
+                  "STUDENT"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ACTIVE",
+                  "INACTIVE"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "avatar": {
+                "type": "object",
+                "properties": {
+                  "createdAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "deletedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "filename": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "mimetype": {
+                    "type": "string"
+                  },
+                  "originalName": {
+                    "type": "string"
+                  },
+                  "partSize": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "number"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "PENDING",
+                      "UPLOADED"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "uploadId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "createdAt",
+                  "deletedAt",
+                  "filename",
+                  "id",
+                  "mimetype",
+                  "originalName",
+                  "partSize",
+                  "path",
+                  "size",
+                  "status",
+                  "updatedAt",
+                  "uploadId"
+                ]
+              }
+            },
+            "required": [
+              "avatarId",
+              "createdAt",
+              "deletedAt",
+              "email",
+              "emailVerifiedAt",
+              "id",
+              "invitedAt",
+              "name",
+              "phone",
+              "role",
+              "status",
+              "updatedAt"
+            ]
+          },
+          "responsibles": {
+            "type": "object",
+            "properties": {
+              "avatarId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "email": {
+                "type": "string"
+              },
+              "emailVerifiedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "invitedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "name": {
+                "type": "string"
+              },
+              "phone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "OWNER",
+                  "ADMINISTRATOR",
+                  "RESPONSIBLE",
+                  "STUDENT"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ACTIVE",
+                  "INACTIVE"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "avatar": {
+                "type": "object",
+                "properties": {
+                  "createdAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "deletedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "filename": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "mimetype": {
+                    "type": "string"
+                  },
+                  "originalName": {
+                    "type": "string"
+                  },
+                  "partSize": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "number"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "PENDING",
+                      "UPLOADED"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "uploadId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "createdAt",
+                  "deletedAt",
+                  "filename",
+                  "id",
+                  "mimetype",
+                  "originalName",
+                  "partSize",
+                  "path",
+                  "size",
+                  "status",
+                  "updatedAt",
+                  "uploadId"
+                ]
+              }
+            },
+            "required": [
+              "avatarId",
+              "createdAt",
+              "deletedAt",
+              "email",
+              "emailVerifiedAt",
+              "id",
+              "invitedAt",
+              "name",
+              "phone",
+              "role",
+              "status",
+              "updatedAt"
+            ]
+          }
+        },
+        "required": [
+          "avatarId",
+          "createdAt",
+          "deletedAt",
+          "email",
+          "emailVerifiedAt",
+          "id",
+          "invitedAt",
+          "name",
+          "phone",
+          "role",
+          "status",
+          "updatedAt"
+        ]
+      },
+      "AuthenticationInviteAcceptBody": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 64,
+            "maxLength": 64
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 32,
+            "description": "Exige ao menos uma minúscula, uma maiúscula, um dígito e um caractere especial.",
+            "allOf": [
+              {
+                "pattern": "[a-z]"
+              },
+              {
+                "pattern": "[A-Z]"
+              },
+              {
+                "pattern": "[0-9]"
+              },
+              {
+                "pattern": "[^a-zA-Z0-9]"
+              }
+            ]
+          },
+          "passwordConfirmation": {
+            "type": "string",
+            "description": "Repetição exata de `password`."
+          }
+        },
+        "required": [
+          "token",
+          "password",
+          "passwordConfirmation"
+        ],
+        "additionalProperties": false
       },
       "AuthenticationSignInBody": {
         "type": "object",
@@ -8575,6 +12854,109 @@
           "code"
         ]
       },
+      "Error409UserAlreadyExists": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              409
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "USER_ALREADY_EXISTS"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error409UserHasEnrollmentsUserNotArchived": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              409
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "USER_HAS_ENROLLMENTS",
+              "USER_NOT_ARCHIVED"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error409UserNotArchived": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              409
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "USER_NOT_ARCHIVED"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error422ClassUnavailableGuardianRequiredValidationError": {
         "type": "object",
         "properties": {
@@ -8630,6 +13012,43 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "COURSE_NOT_FOUND",
+              "VALIDATION_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code",
+          "errors"
+        ]
+      },
+      "Error422InvalidDependentInvalidRoleValidationError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              422
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "INVALID_DEPENDENT",
+              "INVALID_ROLE",
               "VALIDATION_ERROR"
             ]
           },
@@ -9572,6 +13991,142 @@
           "code"
         ]
       },
+      "Error500GuardianshipAttachError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "GUARDIANSHIP_ATTACH_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500GuardianshipDetachError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "GUARDIANSHIP_DETACH_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500InviteAcceptError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "INVITE_ACCEPT_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500InviteShowError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "INVITE_SHOW_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error500SignInError": {
         "type": "object",
         "properties": {
@@ -9844,6 +14399,244 @@
           "code"
         ]
       },
+      "Error500UserArchiveError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "USER_ARCHIVE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500UserCreateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "USER_CREATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500UserDeleteError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "USER_DELETE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500UserListError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "USER_LIST_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500UserShowError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "USER_SHOW_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500UserUnarchiveError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "USER_UNARCHIVE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500UserUpdateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "USER_UPDATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "PaginationMeta": {
         "type": "object",
         "description": "Metadados da página, como o paginator do Lucid os devolve.",
@@ -10018,7 +14811,6 @@
               "image/png",
               "image/webp",
               "image/gif",
-              "image/svg+xml",
               "application/pdf"
             ]
           },
@@ -11467,7 +16259,6 @@
               "image/png",
               "image/webp",
               "image/gif",
-              "image/svg+xml",
               "application/pdf"
             ]
           },

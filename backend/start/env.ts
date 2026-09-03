@@ -112,6 +112,22 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   /*
   |----------------------------------------------------------------------------
+  | Endereço do site
+  |----------------------------------------------------------------------------
+  |
+  | A base dos links que a API manda por e-mail - hoje, o convite de acesso. É o
+  | endereço do **frontend**, e não o da API (`APP_URL`): quem clica precisa cair
+  | numa tela, não num JSON.
+  |
+  | Opcional pelo mesmo motivo do bloco acima: sem ela o convite vira uma linha
+  | de log e a conta continua criada, para ser convidada de novo quando o
+  | ambiente estiver configurado. Um link montado sobre um default errado seria
+  | pior que link nenhum - ele sai, chega, e não funciona.
+  */
+  FRONTEND_URL: Env.schema.string.optional(),
+
+  /*
+  |----------------------------------------------------------------------------
   | Semeadura do dono
   |----------------------------------------------------------------------------
   |
@@ -125,4 +141,41 @@ export default await Env.create(new URL('../', import.meta.url), {
   */
   SEED_OWNER_EMAIL: Env.schema.string.optional(),
   SEED_OWNER_PASSWORD: Env.schema.string.optional(),
+
+  /*
+  |----------------------------------------------------------------------------
+  | Redis
+  |----------------------------------------------------------------------------
+  |
+  | O armazenamento da fila, numa URL só - `redis://[:senha@]host:porta[/db]`.
+  | Uma variável e não quatro: é assim que todo provedor entrega a credencial, e
+  | é o que o compose sobrescreve com `redis://redis:6379`. Quem parseia é o
+  | `config/redis.ts`.
+  |
+  | Opcional, e não obrigatória como o instalador do pacote a escreve, pela mesma
+  | regra do bloco de e-mail: a aplicação sobe sem infraestrutura acessória. Sem
+  | ela o `config/queue.ts` cai no adaptador `sync` e o `start/mail.ts` não
+  | instala o messenger - o `sendLater` volta à fila em memória do pacote de
+  | mail, que é o comportamento anterior a esta mudança. Exigir a variável
+  | transformaria Redis fora do ar em site fora do ar.
+  */
+  // Sem `format: 'url'`: o validador do Adonis só reconhece esquemas web, e
+  // recusa `redis://` como URL inválida.
+  REDIS_URL: Env.schema.string.optional(),
+
+  /*
+  |----------------------------------------------------------------------------
+  | Fila
+  |----------------------------------------------------------------------------
+  |
+  | O adaptador da fila. Opcional: com `REDIS_URL` o default é `redis`, o único
+  | que sobrevive a um restart - e a fila existe justamente para o trabalho que
+  | não pode se perder quando o processo cai.
+  |
+  | `sync` executa o job na hora, dentro da requisição. É o default quando não há
+  | `REDIS_URL`, e o que a suíte usa: o adaptador `redis` abre conexão no boot e
+  | derrubaria toda rota que enfileira algo sem servidor de pé. Em produção ele
+  | desfaz o motivo de existir da fila, prendendo a resposta HTTP ao SMTP.
+  */
+  QUEUE_DRIVER: Env.schema.enum.optional(['redis', 'database', 'sync'] as const),
 })
