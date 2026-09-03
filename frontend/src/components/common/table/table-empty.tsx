@@ -130,9 +130,15 @@ export function TableEmptyTitle({
 /**
  * A descrição do vazio.
  *
- * A lixeira mantém a da tela - ela explica o recurso, e isso vale igual com a
- * lixeira vazia. Só o filtro troca, porque ali o texto tem de dizer o que fazer
- * a seguir.
+ * Só a lista vazia de verdade usa a descrição da tela. As outras duas escrevem a
+ * sua, como o título ao lado já fazia: o texto da tela explica o recurso, e
+ * explicar o recurso é a resposta errada nas duas.
+ *
+ * A lixeira mantinha o da tela até isto ser visto de perto na de matrículas: ali
+ * sobrava "quando alguém se inscrever pelo site, aparece nesta lista" numa
+ * lixeira vazia - a instrução certa para a tela errada. Quem abre a lixeira não
+ * quer saber como o recurso nasce; quer saber que ela está vazia e que o que
+ * for arquivado cai ali.
  */
 export function TableEmptyDescription({
   children,
@@ -144,6 +150,15 @@ export function TableEmptyDescription({
     return (
       <EmptyDescription data-slot="table-empty-description" {...props}>
         Nada bateu com o termo buscado. Limpe o filtro para ver a lista inteira.
+      </EmptyDescription>
+    )
+  }
+
+  if (variant === 'trash') {
+    return (
+      <EmptyDescription data-slot="table-empty-description" {...props}>
+        Nada foi arquivado ainda. O que você arquivar aparece aqui e pode voltar
+        a qualquer momento.
       </EmptyDescription>
     )
   }
