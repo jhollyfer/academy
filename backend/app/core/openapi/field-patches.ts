@@ -39,6 +39,35 @@ export type FieldPatch = {
  *    obrigatório na requisição.
  */
 export const FIELD_PATCHES: Record<string, FieldPatch> = {
+  /**
+   * `vine.date()` sai como `{}` vazio, e o fallback o completa com `date-time` -
+   * que é o certo para `createdAt` e errado no início e no fim de turma. Os dois
+   * são `@column.date()`, o Lucid os serializa por `toISODate()`, e a resposta
+   * já documenta `format: "date"` desde o `withDateFormat` do `model-schema`.
+   * Sem esta correção o mesmo campo sairia `date-time` na entrada e `date` na
+   * saída, e um cliente gerado do documento mandaria o instante completo que o
+   * `vine.date()` recusa.
+   *
+   * `studentBirthDate` fica **de fora** de propósito: é
+   * `vine.date({ formats: ['iso8601'] })`, que aceita as duas formas, então
+   * `date-time` na entrada dela não é mentira.
+   */
+  startsAt: {
+    schema: {
+      type: 'string',
+      format: 'date',
+      description: 'Data no formato `YYYY-MM-DD`.',
+    },
+  },
+  endsAt: {
+    schema: {
+      // `null` preservado: o fim é opcional, e trocar o schema inteiro sem ele
+      // transformaria turma sem data de término em payload inválido.
+      type: ['string', 'null'],
+      format: 'date',
+      description: 'Data no formato `YYYY-MM-DD`.',
+    },
+  },
   password: {
     schema: {
       type: 'string',

@@ -6,6 +6,7 @@
 export const controllers = {
   account: {
     Show: () => import('#features/account/show.controller'),
+    Update: () => import('#features/account/update.controller'),
   },
   administrator: {
     classes: {
@@ -50,6 +51,7 @@ export const controllers = {
   authentication: {
     InviteAccept: () => import('#features/authentication/invite-accept.controller'),
     InviteShow: () => import('#features/authentication/invite-show.controller'),
+    Refresh: () => import('#features/authentication/refresh.controller'),
     SignIn: () => import('#features/authentication/sign-in.controller'),
     SignOut: () => import('#features/authentication/sign-out.controller'),
   },
@@ -74,6 +76,7 @@ export const controllers = {
     enrollments: {
       Attach: () => import('#features/storefront/enrollments/attach.controller'),
       Create: () => import('#features/storefront/enrollments/create.controller'),
+      Pix: () => import('#features/storefront/enrollments/pix.controller'),
       Show: () => import('#features/storefront/enrollments/show.controller'),
     },
     faqs: {

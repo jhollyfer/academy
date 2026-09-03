@@ -179,6 +179,26 @@ export default await Env.create(new URL('../', import.meta.url), {
   */
   // Sem `format: 'url'`: o validador do Adonis só reconhece esquemas web, e
   // recusa `redis://` como URL inválida.
+  /*
+  |----------------------------------------------------------------------------
+  | Pix
+  |----------------------------------------------------------------------------
+  |
+  | A chave que recebe a inscrição, e o nome e a cidade que aparecem no
+  | aplicativo do banco de quem paga.
+  |
+  | Opcionais, com o valor em uso como default no `pix.service.ts`: trocar a
+  | chave Pix da escola é operação de secretaria, e exigir a variável faria o
+  | ambiente de desenvolvimento precisar de configuração para uma tela abrir.
+  |
+  | Nome e cidade não são enfeite: o manual do Bacen os exige no BR Code, com
+  | teto de 25 e 15 caracteres. Estourar o teto faz o aplicativo recusar o
+  | código inteiro, e o erro só aparece na hora de pagar.
+  */
+  PIX_KEY: Env.schema.string.optional(),
+  PIX_MERCHANT: Env.schema.string.optional(),
+  PIX_CITY: Env.schema.string.optional(),
+
   REDIS_URL: Env.schema.string.optional(),
 
   /*

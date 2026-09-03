@@ -78,8 +78,8 @@ export function getRouter() {
           <NotFoundPage code="403">
             <NotFoundPageTitle>Acesso negado</NotFoundPageTitle>
             <NotFoundPageDescription>
-              Sua conta não tem permissão para esta área. Se precisa dela, peça à
-              secretaria.
+              Sua conta não tem permissão para esta área. Se precisa dela, peça
+              à secretaria.
             </NotFoundPageDescription>
             <NotFoundPageActions>
               <NotFoundPageHomeButton />

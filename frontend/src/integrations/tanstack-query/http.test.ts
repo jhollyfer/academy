@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from 'vitest'
-import { HTTPError, HTTPErrorCode, HTTPStatus, request } from './http'
+import { HTTPError, HTTPErrorCode, HTTPStatus, download, request } from './http'
 import { runInRequestScope } from './http.server'
 
 /**
@@ -233,4 +233,71 @@ test('o signal sobrevive ao replay depois do refresh', async () => {
   controller.abort()
 
   for (const [, init] of replay) expect(init?.signal?.aborted).toBe(true)
+})
+
+/**
+ * O download, que é o caminho que só este projeto tem.
+ *
+ * Ele existe porque um `<a href download>` apontando para a API não passa pelo
+ * módulo, e por isso não renova a sessão: o navegador salvaria o JSON do 401 com
+ * o nome do arquivo pedido. Um teste que só afirmasse "devolve um blob" não
+ * cobriria nada disso.
+ */
+test('o download passa pelo mesmo caminho de renovação do resto', async () => {
+  const refreshes = respondExpired()
+
+  await rejection(download('/administrator/enrollments/export'))
+
+  // Uma renovação, e não zero: é isso que separa `download()` da âncora que ele
+  // veio substituir.
+  expect(refreshes).toHaveLength(1)
+})
+
+test('o download lê o nome do arquivo do Content-Disposition', async () => {
+  vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+    new Response('nome;email\n', {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/csv',
+        'Content-Disposition': 'attachment; filename="matriculas.csv"',
+      },
+    }),
+  )
+
+  const { blob, filename } = await download('/administrator/enrollments/export')
+
+  expect(filename).toBe('matriculas.csv')
+  expect(await blob.text()).toBe('nome;email\n')
+})
+
+test('o download sobrevive à ausência do header, para o chamador decidir o nome', async () => {
+  // O header some quando o CORS não o expõe. Sem esta tolerância, um deploy com
+  // `exposeHeaders` errado quebraria o download inteiro em vez de só perder o
+  // nome do arquivo.
+  vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+    new Response('conteudo', {
+      status: 200,
+      headers: { 'Content-Type': 'text/csv' },
+    }),
+  )
+
+  const { filename } = await download('/administrator/enrollments/export')
+
+  expect(filename).toBeUndefined()
+})
+
+test('erro no download vira HTTPError, e não um arquivo com o erro dentro', async () => {
+  // O defeito que `download()` veio corrigir: a âncora salvava o corpo do 403
+  // num arquivo chamado `matriculas.csv`, e a pessoa abria uma planilha com um
+  // JSON de erro.
+  respond(403, {
+    message: 'Acesso negado',
+    status: 403,
+    code: HTTPErrorCode.ACCESS_DENIED,
+  })
+
+  const error = await rejection(download('/administrator/enrollments/export'))
+
+  expect(error).toBeInstanceOf(HTTPError)
+  expect(error.status).toBe(HTTPStatus.FORBIDDEN)
 })

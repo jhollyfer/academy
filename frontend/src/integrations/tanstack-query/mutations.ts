@@ -5,6 +5,7 @@ import { useMultipartUpload } from '#/hooks/use-multipart-upload'
 import type { UseMutationOptions } from '@tanstack/react-query'
 import type { HTTPError } from './http'
 import type {
+  AccountResponse,
   ClassResponse,
   CourseResponse,
   EnrollmentResponse,
@@ -15,6 +16,7 @@ import type {
 import type {
   AdministratorClassCreatePayload,
   AdministratorClassUpdatePayload,
+  AccountUpdatePayload,
   AdministratorCourseCreatePayload,
   AdministratorCourseUpdatePayload,
   AdministratorEnrollmentUpdatePayload,
@@ -558,6 +560,35 @@ export function useEnrollmentAttach(
           body: JSON.stringify(payload),
         },
       )
+    },
+  })
+}
+
+/**
+ * Edita a própria conta.
+ *
+ * É o único caminho para trocar a própria senha: o update de usuários recusa
+ * `password` de propósito, para a secretaria não assumir a conta de uma família
+ * sem deixar rastro.
+ *
+ * Quem chama tem de invalidar `queryKeys.account.all` no sucesso - o nome e o
+ * e-mail aparecem na barra lateral, e sem a invalidação a tela segue mostrando
+ * os antigos até um recarregamento.
+ *
+ * Trocar e-mail ou senha **derruba a sessão desta aba junto**, porque o backend
+ * revoga todos os tokens. Quem chama precisa mandar a pessoa entrar de novo em
+ * vez de deixá-la clicando numa tela que responderá 401.
+ */
+export function useAccountUpdate(
+  options?: MutationProps<AccountResponse, AccountUpdatePayload>,
+) {
+  return useMutation<AccountResponse, HTTPError, AccountUpdatePayload>({
+    ...options,
+    mutationFn: function (payload) {
+      return request<AccountResponse>('/account', {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      })
     },
   })
 }

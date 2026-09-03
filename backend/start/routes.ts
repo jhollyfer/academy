@@ -15,6 +15,7 @@ import { controllers } from '#generated/controllers'
 import { scalarPage } from '#core/openapi/scalar'
 import openapi from '#config/openapi'
 import { PORTAL_USER_ROLES, STAFF_USER_ROLES } from '#core/entity'
+import { enrollmentThrottle, inviteThrottle, signInThrottle, uploadThrottle } from '#start/limiter'
 
 router.get('/', function (context) {
   return context.response.redirect('/documentation')
@@ -66,20 +67,33 @@ router.get('/documentation', function (context) {
  * `sign-in` é público - é a porta. `sign-out` exige sessão, porque apagar o
  * token da sessão atual pressupõe saber qual é.
  *
+ * `refresh` é público pelo motivo oposto ao do `sign-out`: é o token de acesso
+ * vencido que traz alguém até ele. Exigir sessão válida tornaria a rota
+ * inalcançável justamente quando ela é necessária. Quem autoriza ali é o cookie
+ * de refresh.
+ *
  * O par `invite` também é público, e tem de ser: quem chega por ele ainda não
  * tem senha, e é justamente isso que veio resolver. O que faz o papel da sessão
  * ali é o token do link - 64 caracteres sorteados, de uso único e com prazo.
  */
 router
   .group(() => {
-    router.post('sign-in', [controllers.authentication.SignIn]).as('sign-in')
+    router.post('sign-in', [controllers.authentication.SignIn]).as('sign-in').use(signInThrottle)
     router
       .post('sign-out', [controllers.authentication.SignOut])
       .as('sign-out')
       .use(middleware.auth())
 
-    router.get('invite/:token', [controllers.authentication.InviteShow]).as('invite.show')
-    router.post('invite/:token', [controllers.authentication.InviteAccept]).as('invite.accept')
+    router.post('refresh', [controllers.authentication.Refresh]).as('refresh')
+
+    router
+      .get('invite/:token', [controllers.authentication.InviteShow])
+      .as('invite.show')
+      .use(inviteThrottle)
+    router
+      .post('invite/:token', [controllers.authentication.InviteAccept])
+      .as('invite.accept')
+      .use(inviteThrottle)
   })
   .prefix('authentication')
   .as('authentication')
@@ -112,11 +126,16 @@ router
 
     router
       .group(() => {
-        router.post('/', [controllers.storefront.enrollments.Create])
+        router.post('/', [controllers.storefront.enrollments.Create]).use(enrollmentThrottle)
         router.get(':protocol', [controllers.storefront.enrollments.Show]).as('show')
         router
           .post(':protocol/attachments', [controllers.storefront.enrollments.Attach])
           .as('attach')
+
+        // O QR do Pix, gerado na hora. Não é arquivo em `storages` de propósito:
+        // é função pura da chave da escola e do valor do curso, e gravar um PNG
+        // por matrícula seria um cache que a troca da chave invalida em silêncio.
+        router.get(':protocol/pix', [controllers.storefront.enrollments.Pix]).as('pix')
 
         // O upload do comprovante, para quem não tem sessão.
         //
@@ -133,6 +152,7 @@ router
           .prefix(':protocol/uploads')
           .as('uploads')
           .use(middleware.enrollmentProtocol())
+          .use(uploadThrottle)
       })
       .prefix('enrollments')
       .as('enrollments')
@@ -192,6 +212,11 @@ router.get('storages/:id/download', [controllers.storages.Download]).as('storage
 router
   .group(() => {
     router.get('profile', [controllers.account.Show]).as('profile')
+    // `PUT /account` e não `/account/profile`: o recurso é a conta, e `profile`
+    // é a leitura dela. É por aqui que se troca a própria senha - o update de
+    // usuários recusa `password` de propósito, para a secretaria não assumir a
+    // conta de uma família sem deixar rastro.
+    router.put('/', [controllers.account.Update]).as('update')
   })
   .prefix('account')
   .as('account')

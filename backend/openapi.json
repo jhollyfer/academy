@@ -58,6 +58,93 @@
     }
   ],
   "paths": {
+    "/account": {
+      "put": {
+        "operationId": "accountUpdate",
+        "summary": "Atualizar a própria conta",
+        "tags": [
+          "Conta"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountUpdateResponse200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404UserNotFound"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Usuário já existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error409UserAlreadyExists"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos · Senha atual inválida · A nova senha deve ser diferente da atual",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422CurrentPasswordInvalidPasswordSameAsCurrentValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500AccountUpdateError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Edita a conta de quem está autenticado. O usuário vem sempre da sessão: não há identificador no caminho, e não teria como haver.\n\nTrocar a senha exige a **senha atual**, e não só a sessão. O cookie prova posse do navegador; a senha prova identidade, e sem ela um cookie sequestrado trocaria a senha sem que o dono da conta tivesse dito nada.\n\nTrocar e-mail ou senha **derruba todas as sessões**, inclusive a que fez a chamada: um token anterior à troca sobreviveria à mudança que existe para revogá-lo.\n\n`role` e `status` não entram: quem muda o próprio papel deixa de ser gerido por quem o concedeu. Para isso existe o painel de usuários.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountUpdateBody"
+              }
+            }
+          }
+        }
+      }
+    },
     "/account/profile": {
       "get": {
         "operationId": "accountProfile",
@@ -645,7 +732,7 @@
     "/administrator/classes/{id}/archive": {
       "patch": {
         "operationId": "administratorLifecycleClassesArchive",
-        "summary": "PATCH /administrator/classes",
+        "summary": "Arquivar turma",
         "tags": [
           "Painel · Turmas"
         ],
@@ -726,7 +813,7 @@
     "/administrator/classes/{id}/unarchive": {
       "patch": {
         "operationId": "administratorLifecycleClassesUnarchive",
-        "summary": "PATCH /administrator/classes",
+        "summary": "Restaurar turma",
         "tags": [
           "Painel · Turmas"
         ],
@@ -1343,7 +1430,7 @@
     "/administrator/courses/{id}/archive": {
       "patch": {
         "operationId": "administratorLifecycleCoursesArchive",
-        "summary": "PATCH /administrator/courses",
+        "summary": "Arquivar curso",
         "tags": [
           "Painel · Cursos"
         ],
@@ -1424,7 +1511,7 @@
     "/administrator/courses/{id}/unarchive": {
       "patch": {
         "operationId": "administratorLifecycleCoursesUnarchive",
-        "summary": "PATCH /administrator/courses",
+        "summary": "Restaurar curso",
         "tags": [
           "Painel · Cursos"
         ],
@@ -2127,7 +2214,7 @@
     "/administrator/enrollments/{id}/archive": {
       "patch": {
         "operationId": "administratorLifecycleEnrollmentsArchive",
-        "summary": "PATCH /administrator/enrollments",
+        "summary": "Arquivar matrícula",
         "tags": [
           "Painel · Matrículas"
         ],
@@ -2208,7 +2295,7 @@
     "/administrator/enrollments/{id}/unarchive": {
       "patch": {
         "operationId": "administratorLifecycleEnrollmentsUnarchive",
-        "summary": "PATCH /administrator/enrollments",
+        "summary": "Restaurar matrícula",
         "tags": [
           "Painel · Matrículas"
         ],
@@ -2828,7 +2915,7 @@
     "/administrator/users/{id}/archive": {
       "patch": {
         "operationId": "administratorLifecycleUsersArchive",
-        "summary": "PATCH /administrator/users",
+        "summary": "Arquivar usuário",
         "tags": [
           "Painel · Usuários"
         ],
@@ -3104,7 +3191,7 @@
     "/administrator/users/{id}/unarchive": {
       "patch": {
         "operationId": "administratorLifecycleUsersUnarchive",
-        "summary": "PATCH /administrator/users",
+        "summary": "Restaurar usuário",
         "tags": [
           "Painel · Usuários"
         ],
@@ -3290,6 +3377,41 @@
             }
           }
         }
+      }
+    },
+    "/authentication/refresh": {
+      "post": {
+        "operationId": "authenticationRefresh",
+        "summary": "Renovar a sessão",
+        "tags": [
+          "Autenticação"
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucesso, sem corpo"
+          },
+          "401": {
+            "description": "Sessão expirada · Sessão expirada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401RefreshTokenInvalidRefreshTokenMissing"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500RefreshError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Renova a sessão a partir do cookie de refresh, e responde `204` **sem corpo**: o que importa é o `Set-Cookie` com o par novo.\n\nFica **fora** do grupo autenticado de propósito. É justamente o token de acesso vencido que traz alguém até aqui, então exigir sessão válida tornaria a rota inalcançável. Quem autoriza é o cookie de refresh, e nada mais.\n\n**Rotaciona**: o refresh usado é apagado ao emitir o novo. Duas renovações simultâneas com o mesmo token gastam-no duas vezes, e a segunda cai - o cliente deduplica para que isso não aconteça no caminho comum.\n\nA falha é **indistinguível por causa**: cookie ausente, ilegível, que não seja de refresh ou de conta desativada devolvem o mesmo `401`."
       }
     },
     "/authentication/sign-in": {
@@ -4305,6 +4427,59 @@
         }
       }
     },
+    "/storefront/enrollments/{protocol}/pix": {
+      "get": {
+        "operationId": "storefrontEnrollmentsPix",
+        "summary": "QR do Pix da inscrição",
+        "tags": [
+          "Site · Matrícula"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontEnrollmentsPixResponse200"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            }
+          }
+        },
+        "description": "O PNG do QR de pagamento da inscrição, gerado na hora a partir do BR Code da matrícula.\n\nNão vira arquivo em `storages`: o QR é função pura da chave da escola e do valor do curso, e gravar um PNG por matrícula seria manter um cache que a troca da chave invalidaria em silêncio.\n\nPúblico como o resto do grupo, e escopado pelo protocolo - que é o que a pessoa recebeu ao se inscrever. O mesmo código em texto vem no `pixCode` da matrícula, para quem prefere copiar e colar.",
+        "parameters": [
+          {
+            "name": "protocol",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
     "/storefront/enrollments/{protocol}/uploads": {
       "post": {
         "operationId": "storefrontEnrollmentsUploadsCreate",
@@ -4784,6 +4959,234 @@
           "updatedAt"
         ]
       },
+      "AccountUpdateBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 32,
+            "description": "Exige ao menos uma minúscula, uma maiúscula, um dígito e um caractere especial.",
+            "allOf": [
+              {
+                "pattern": "[a-z]"
+              },
+              {
+                "pattern": "[A-Z]"
+              },
+              {
+                "pattern": "[0-9]"
+              },
+              {
+                "pattern": "[^a-zA-Z0-9]"
+              }
+            ]
+          },
+          "currentPassword": {
+            "type": "string",
+            "maxLength": 32
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[1-9]{2}[0-9]{8,9}$",
+            "maxLength": 11
+          },
+          "avatarId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "passwordConfirmation": {
+            "type": "string",
+            "description": "Repetição exata de `password`."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "AccountUpdateResponse200": {
+        "type": "object",
+        "properties": {
+          "avatarId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "email": {
+            "type": "string"
+          },
+          "emailVerifiedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "invitedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "ADMINISTRATOR",
+              "RESPONSIBLE",
+              "STUDENT"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "avatar": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "mimetype": {
+                "type": "string"
+              },
+              "originalName": {
+                "type": "string"
+              },
+              "partSize": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "path": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "UPLOADED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "uploadId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "createdAt",
+              "deletedAt",
+              "filename",
+              "id",
+              "mimetype",
+              "originalName",
+              "partSize",
+              "path",
+              "size",
+              "status",
+              "updatedAt",
+              "uploadId"
+            ]
+          }
+        },
+        "required": [
+          "avatarId",
+          "createdAt",
+          "deletedAt",
+          "email",
+          "emailVerifiedAt",
+          "id",
+          "invitedAt",
+          "name",
+          "phone",
+          "role",
+          "status",
+          "updatedAt"
+        ]
+      },
       "AdministratorClassesCreateBody": {
         "type": "object",
         "properties": {
@@ -4798,14 +5201,16 @@
           },
           "startsAt": {
             "type": "string",
-            "format": "date-time"
+            "format": "date",
+            "description": "Data no formato `YYYY-MM-DD`."
           },
           "endsAt": {
             "type": [
               "string",
               "null"
             ],
-            "format": "date-time"
+            "format": "date",
+            "description": "Data no formato `YYYY-MM-DD`."
           },
           "weekday": {
             "enum": [
@@ -4888,7 +5293,7 @@
               "string",
               "null"
             ],
-            "format": "date-time"
+            "format": "date"
           },
           "endsAtTime": {
             "type": [
@@ -4915,7 +5320,7 @@
           },
           "startsAt": {
             "type": "string",
-            "format": "date-time"
+            "format": "date"
           },
           "startsAtTime": {
             "type": [
@@ -5120,7 +5525,7 @@
               "string",
               "null"
             ],
-            "format": "date-time"
+            "format": "date"
           },
           "endsAtTime": {
             "type": [
@@ -5147,7 +5552,7 @@
           },
           "startsAt": {
             "type": "string",
-            "format": "date-time"
+            "format": "date"
           },
           "startsAtTime": {
             "type": [
@@ -5352,7 +5757,7 @@
               "string",
               "null"
             ],
-            "format": "date-time"
+            "format": "date"
           },
           "endsAtTime": {
             "type": [
@@ -5379,7 +5784,7 @@
           },
           "startsAt": {
             "type": "string",
-            "format": "date-time"
+            "format": "date"
           },
           "startsAtTime": {
             "type": [
@@ -5573,14 +5978,16 @@
           },
           "startsAt": {
             "type": "string",
-            "format": "date-time"
+            "format": "date",
+            "description": "Data no formato `YYYY-MM-DD`."
           },
           "endsAt": {
             "type": [
               "string",
               "null"
             ],
-            "format": "date-time"
+            "format": "date",
+            "description": "Data no formato `YYYY-MM-DD`."
           },
           "weekday": {
             "enum": [
@@ -5653,7 +6060,7 @@
               "string",
               "null"
             ],
-            "format": "date-time"
+            "format": "date"
           },
           "endsAtTime": {
             "type": [
@@ -5680,7 +6087,7 @@
           },
           "startsAt": {
             "type": "string",
-            "format": "date-time"
+            "format": "date"
           },
           "startsAtTime": {
             "type": [
@@ -7396,7 +7803,7 @@
           },
           "studentBirthDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date"
           },
           "studentDocument": {
             "type": [
@@ -7455,7 +7862,7 @@
                   "string",
                   "null"
                 ],
-                "format": "date-time"
+                "format": "date"
               },
               "endsAtTime": {
                 "type": [
@@ -7482,7 +7889,7 @@
               },
               "startsAt": {
                 "type": "string",
-                "format": "date-time"
+                "format": "date"
               },
               "startsAtTime": {
                 "type": [
@@ -7883,7 +8290,7 @@
           },
           "studentBirthDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date"
           },
           "studentDocument": {
             "type": [
@@ -7942,7 +8349,7 @@
                   "string",
                   "null"
                 ],
-                "format": "date-time"
+                "format": "date"
               },
               "endsAtTime": {
                 "type": [
@@ -7969,7 +8376,7 @@
               },
               "startsAt": {
                 "type": "string",
-                "format": "date-time"
+                "format": "date"
               },
               "startsAtTime": {
                 "type": [
@@ -8370,7 +8777,7 @@
           },
           "studentBirthDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date"
           },
           "studentDocument": {
             "type": [
@@ -8429,7 +8836,7 @@
                   "string",
                   "null"
                 ],
-                "format": "date-time"
+                "format": "date"
               },
               "endsAtTime": {
                 "type": [
@@ -8456,7 +8863,7 @@
               },
               "startsAt": {
                 "type": "string",
-                "format": "date-time"
+                "format": "date"
               },
               "startsAtTime": {
                 "type": [
@@ -8879,7 +9286,7 @@
           },
           "studentBirthDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date"
           },
           "studentDocument": {
             "type": [
@@ -8938,7 +9345,7 @@
                   "string",
                   "null"
                 ],
-                "format": "date-time"
+                "format": "date"
               },
               "endsAtTime": {
                 "type": [
@@ -8965,7 +9372,7 @@
               },
               "startsAt": {
                 "type": "string",
-                "format": "date-time"
+                "format": "date"
               },
               "startsAtTime": {
                 "type": [
@@ -12561,6 +12968,41 @@
           "code"
         ]
       },
+      "Error401RefreshTokenInvalidRefreshTokenMissing": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              401
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "REFRESH_TOKEN_INVALID",
+              "REFRESH_TOKEN_MISSING"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error401Unauthorized": {
         "type": "object",
         "properties": {
@@ -13250,6 +13692,43 @@
           "errors"
         ]
       },
+      "Error422CurrentPasswordInvalidPasswordSameAsCurrentValidationError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              422
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "CURRENT_PASSWORD_INVALID",
+              "PASSWORD_SAME_AS_CURRENT",
+              "VALIDATION_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code",
+          "errors"
+        ]
+      },
       "Error422InvalidDependentInvalidRoleValidationError": {
         "type": "object",
         "properties": {
@@ -13395,6 +13874,37 @@
           "errors"
         ]
       },
+      "Error500": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha."
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error500AccountShowError": {
         "type": "object",
         "properties": {
@@ -13413,6 +13923,40 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "ACCOUNT_SHOW_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AccountUpdateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ACCOUNT_UPDATE_ERROR"
             ]
           },
           "errors": {
@@ -14347,6 +14891,40 @@
           "code"
         ]
       },
+      "Error500RefreshError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "REFRESH_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error500SignInError": {
         "type": "object",
         "properties": {
@@ -14981,7 +15559,7 @@
           },
           "studentBirthDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date"
           },
           "studentDocument": {
             "type": [
@@ -15040,7 +15618,7 @@
                   "string",
                   "null"
                 ],
-                "format": "date-time"
+                "format": "date"
               },
               "endsAtTime": {
                 "type": [
@@ -15067,7 +15645,7 @@
               },
               "startsAt": {
                 "type": "string",
-                "format": "date-time"
+                "format": "date"
               },
               "startsAtTime": {
                 "type": [
@@ -15468,7 +16046,7 @@
           },
           "studentBirthDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date"
           },
           "studentDocument": {
             "type": [
@@ -15527,7 +16105,7 @@
                   "string",
                   "null"
                 ],
-                "format": "date-time"
+                "format": "date"
               },
               "endsAtTime": {
                 "type": [
@@ -15554,7 +16132,7 @@
               },
               "startsAt": {
                 "type": "string",
-                "format": "date-time"
+                "format": "date"
               },
               "startsAtTime": {
                 "type": [
@@ -17088,6 +17666,127 @@
         "additionalProperties": false
       },
       "StorefrontEnrollmentsCreateResponse201": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "protocol": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "enum": [
+              "PENDING",
+              "CONFIRMED",
+              "WAITLIST",
+              "CANCELLED"
+            ]
+          },
+          "studentFirstName": {
+            "type": "string"
+          },
+          "class": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "name": {
+                "type": "string"
+              },
+              "startsAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "location": {
+                "type": "string"
+              },
+              "course": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "slug": {
+                    "type": "string"
+                  },
+                  "enrollmentFeeInCents": {
+                    "type": "number"
+                  },
+                  "monthlyFeeInCents": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "slug",
+                  "enrollmentFeeInCents",
+                  "monthlyFeeInCents"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "startsAt",
+              "location",
+              "course"
+            ],
+            "additionalProperties": false
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "kind": {
+                  "enum": [
+                    "PAYMENT_RECEIPT",
+                    "DOCUMENT"
+                  ]
+                },
+                "createdAt": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "id",
+                "kind"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "id",
+          "protocol",
+          "status",
+          "studentFirstName",
+          "files"
+        ],
+        "additionalProperties": false
+      },
+      "StorefrontEnrollmentsPixResponse200": {
         "type": "object",
         "properties": {
           "id": {

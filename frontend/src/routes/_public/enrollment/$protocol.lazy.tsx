@@ -16,6 +16,7 @@ import { Alert, AlertTitle } from '#/components/ui/alert'
 import { Card, CardContent } from '#/components/ui/card'
 import { PillButton } from '#/components/common/pill-button'
 import { whatsappUrl } from '#/lib/site'
+import { getEnrollmentPixQrUrl } from '#/lib/storage-url'
 import { formatDate, formatMoney } from '#/lib/format'
 import { EnrollmentStatuses } from '#/lib/entity'
 import { ReceiptUpload } from './-components/receipt-upload'
@@ -136,14 +137,6 @@ const STATUS_VIEW: Record<
 }
 
 /**
- * A chave Pix da escola.
- *
- * TODO: trocar pela chave real antes de publicar. Enquanto for este valor, o
- * pagamento não chega em lugar nenhum.
- */
-const PIX_KEY = '00.000.000/0001-00'
-
-/**
  * Quanto tempo o botão fica em "Copiado!" antes de voltar a "Copiar".
  *
  * Dois segundos: tempo de a confirmação ser lida sem que o botão fique
@@ -183,8 +176,14 @@ function RouteComponent(): React.JSX.Element {
 
   async function copyPix() {
     try {
-      await navigator.clipboard.writeText(PIX_KEY)
-      toast.success('Chave Pix copiada')
+      // Copia o BR Code, e não a chave crua: colado no aplicativo do banco, o
+      // primeiro já vem com o valor e com o protocolo no identificador da
+      // transação. A chave sozinha obrigaria a pessoa a digitar o valor - e a
+      // errá-lo.
+      if (!enrollment.pixCode) return
+
+      await navigator.clipboard.writeText(enrollment.pixCode)
+      toast.success('Código Pix copiado')
 
       setCopied(true)
       if (copiedTimer.current) clearTimeout(copiedTimer.current)
@@ -273,25 +272,63 @@ function RouteComponent(): React.JSX.Element {
                   Pague por Pix e anexe o comprovante aqui embaixo.
                 </p>
 
-                <Card className="rounded-card mt-6 [--card-spacing:--spacing(5)]">
-                  <CardContent className="flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Chave Pix</p>
-                      <p className="mt-1 font-mono text-sm">{PIX_KEY}</p>
+                {/*
+                  Sem código não há bloco: uma cobrança sem quantia faria a
+                  pessoa pagar o que achasse. Só acontece se a matrícula perder
+                  a turma, o que a secretaria resolve pelo painel.
+                */}
+                {enrollment.pixCode && (
+                  <>
+                    {/*
+                    O QR vem da API, e não de um desenho no cliente: o código que
+                    ele carrega é montado no servidor, que é quem sabe a chave da
+                    escola. Desenhá-lo aqui embutiria a chave no bundle.
+
+                    `loading="eager"` contra o default do navegador: é o conteúdo
+                    pelo qual a pessoa abriu a página, e adiá-lo faria o card
+                    aparecer vazio no primeiro instante.
+                  */}
+                    <div className="mt-6 flex justify-center">
+                      <img
+                        src={getEnrollmentPixQrUrl(enrollment.protocol)}
+                        alt="QR do Pix da inscrição"
+                        width={220}
+                        height={220}
+                        loading="eager"
+                        className="rounded-card size-[220px] bg-white p-3"
+                      />
                     </div>
-                    <Button variant="outline" size="sm" onClick={copyPix}>
-                      {copied && <Check />}
-                      {!copied && <Copy />}
-                      {/*
-                        O rótulo é a região viva, e não o botão inteiro: o
-                        leitor de tela anuncia a troca do texto sem reler o
-                        ícone a cada render. O toast do sonner sozinho não
-                        cobre isso em todo navegador.
-                      */}
-                      <span aria-live="polite">{copyLabel}</span>
-                    </Button>
-                  </CardContent>
-                </Card>
+
+                    <Card className="rounded-card mt-6 [--card-spacing:--spacing(5)]">
+                      <CardContent className="flex flex-wrap items-center justify-between gap-4">
+                        <div className="min-w-0">
+                          <p className="text-sm text-muted-foreground">
+                            Código Pix copia e cola
+                          </p>
+                          {/*
+                          `break-all` porque o BR Code é uma linha só de mais de
+                          cem caracteres: sem ele o card estica além da tela no
+                          celular, que é onde quase todo mundo abre esta página.
+                        */}
+                          <p className="mt-1 max-w-[46ch] font-mono text-xs break-all text-muted-foreground">
+                            {enrollment.pixCode}
+                          </p>
+                        </div>
+                        <Button variant="outline" size="sm" onClick={copyPix}>
+                          {copied && <Check />}
+                          {!copied && <Copy />}
+                          {/*
+                          O rótulo é a região viva, e não o botão inteiro: o
+                          leitor de tela anuncia a troca do texto sem reler o
+                          ícone a cada render. O toast do sonner sozinho não
+                          cobre isso em todo navegador.
+                        */}
+                          <span aria-live="polite">{copyLabel}</span>
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </>
+                )}
 
                 <div className="mt-8">
                   {hasReceipt && (

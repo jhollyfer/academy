@@ -5,6 +5,7 @@ export interface ApiDefinition {
   authentication: {
     signIn: typeof routes['authentication.sign-in']
     signOut: typeof routes['authentication.sign-out']
+    refresh: typeof routes['authentication.refresh']
     invite: {
       show: typeof routes['authentication.invite.show']
       accept: typeof routes['authentication.invite.accept']
@@ -36,6 +37,13 @@ export interface ApiDefinition {
   }
   account: {
     profile: typeof routes['account.profile']
+    update: typeof routes['account.update']
+  }
+  portal: {
+    enrollments: {
+      paginate: typeof routes['portal.enrollments.paginate']
+      show: typeof routes['portal.enrollments.show']
+    }
   }
   administrator: {
     courses: {

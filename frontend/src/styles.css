@@ -508,7 +508,7 @@
    * eram a mesma família e só o tamanho os separava.
    *
    * Archivo tem eixo de largura (62% a 125%), e é dele que sai o título
-   * condensado - a `@utility display-title` lá embaixo é quem aciona.
+   * condensado - a `@utility brand-title` lá embaixo é quem aciona.
    */
   --font-display: 'Archivo Variable', Archivo, system-ui, sans-serif;
   --font-sans: 'Outfit Variable', system-ui, sans-serif;
@@ -708,20 +708,26 @@
 }
 
 /*
- * A voz de display, num utilitário só.
+ * O anel de foco que sobrevive ao fundo escuro da marca.
  *
- * `font-stretch` não cabe nos sub-tokens de `--text-*` do Tailwind, então a
- * largura condensada precisa de um lugar próprio - e o lugar já tinha nome: a
- * classe `display-title` é usada em `common/not-found-page.tsx` desde sempre e
- * **nunca existiu**, nem aqui nem no registry do shadcn. Os títulos que a
- * pediam vinham renderizando em Outfit normal.
+ * O anel do shadcn é `--ring`, que é o verde da marca - e sobre `--brand-ink`,
+ * o preto esverdeado dos blocos de assinatura, ele praticamente desaparece.
+ * Quem navega por teclado perde a única pista de onde está, justamente no hero,
+ * no banner final e no rodapé, que são os blocos que usam esse fundo.
  *
- * Sem `font-weight`: quem chama já decide o peso pelo degrau da escala, e
- * cravar um aqui brigaria com o `font-bold` que esses mesmos títulos usam.
+ * Branco com deslocamento, e não uma cor a mais: a paleta tem três cores e o
+ * `--brand-ink` é o único fundo em que isto é aplicado, então o branco é o
+ * contraste máximo disponível sem inventar uma quarta.
+ *
+ * Trazido do kit de `@layer components` do `simple-hub`, que usa a mesma classe
+ * inclusive no link de pular conteúdo. Só esta veio: o resto daquele kit é
+ * layout de marketplace, e classe sem consumidor é depósito.
  */
-@utility display-title {
-  font-family: var(--font-display);
-  font-stretch: 87.5%;
+@layer components {
+  .focus-ring:focus-visible {
+    outline: 2px solid var(--color-white);
+    outline-offset: 2px;
+  }
 }
 
 @layer base {
@@ -841,7 +847,7 @@
 /*
  * O título das artes de divulgação: condensado, bold, itálico, caixa alta.
  *
- * `font-stretch: 75%` e não os 87,5% do `display-title`: aquele é o título de
+ * `font-stretch: 75%`, e não os 87,5% de um display genérico: este é o título de
  * seção do site, este é o da marca, e a diferença entre os dois é o quanto a
  * letra aperta. O eixo `wdth` do Archivo vai de 62% a 125%, então 75% é
  * condensado de verdade sem chegar no extremo, onde o "M" começa a fechar.

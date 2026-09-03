@@ -2,7 +2,10 @@ import type * as React from 'react'
 import { createLazyFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { portalEnrollmentsQueryOptions } from '#/integrations/tanstack-query/queries'
-import { ENROLLMENT_STATUS_LABELS, ENROLLMENT_STATUS_VARIANTS } from '#/lib/labels'
+import {
+  ENROLLMENT_STATUS_LABELS,
+  ENROLLMENT_STATUS_VARIANTS,
+} from '#/lib/labels'
 import { Badge } from '#/components/ui/badge'
 
 export const Route = createLazyFileRoute('/_private/portal/')({
@@ -16,7 +19,9 @@ function RouteComponent(): React.JSX.Element {
   return (
     <div className="flex flex-col gap-6 p-6">
       <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Minhas matrículas</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Minhas matrículas
+        </h1>
         <p className="text-muted-foreground text-sm">
           O acompanhamento das matrículas ligadas à sua conta.
         </p>

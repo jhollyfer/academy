@@ -1,0 +1,35 @@
+# Atualização de dependência, aberta como PR para passar pela mesma CI de
+# sempre. Nenhum dos três projetos irmãos tem isto; é a lacuna de segurança com
+# a melhor relação entre o que custa e o que evita.
+#
+# Semanal e com teto de PRs abertos: diário afoga a revisão, e é a revisão que
+# faz a atualização valer alguma coisa.
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /backend
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    # Um PR só para tudo que for correção de patch. São as atualizações que
+    # quase nunca pedem leitura, e abrir uma por pacote enche a fila.
+    groups:
+      patches:
+        update-types: [patch]
+
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      patches:
+        update-types: [patch]
+
+  # As actions são pinadas por tag móvel (`@v4`), que muda de conteúdo sem
+  # mudar de nome. Este bloco é o que dá visibilidade a essa troca.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

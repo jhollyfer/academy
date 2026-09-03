@@ -10,16 +10,44 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      # `-f` é o que faz o passo reprovar quando o Coolify responde erro. Sem
+      # ele o curl sai com código 0 mesmo em 401 ou 404, e um deploy que nunca
+      # aconteceu aparece verde no histórico.
+      #
+      # POST, e não GET: desde o Coolify v4.2 a rota GET /api/v1/deploy existe
+      # só para devolver 405. Voltar para GET quebra o deploy de novo.
       - name: Deploy API to Coolify
         run: |
-          curl -s -X GET \
-            "https://coolify.maiyu.com.br/api/v1/deploy?uuid=ojeyubw2upcdyh49dfxyxc9o&force=false" \
+          curl -fsS -X POST \
+            "https://coolify.maiyu.com.br/api/v1/deploy" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
-            -H "Content-Type: application/json"
+            -H "Content-Type: application/json" \
+            -d '{"uuid":"ojeyubw2upcdyh49dfxyxc9o","force":false}'
 
       - name: Deploy App to Coolify
         run: |
-          curl -s -X GET \
-            "https://coolify.maiyu.com.br/api/v1/deploy?uuid=jyi6az3eh6s7p9l742ids8q2&force=false" \
+          curl -fsS -X POST \
+            "https://coolify.maiyu.com.br/api/v1/deploy" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
-            -H "Content-Type: application/json"
+            -H "Content-Type: application/json" \
+            -d '{"uuid":"jyi6az3eh6s7p9l742ids8q2","force":false}'
+
+      # O disparo acima é assíncrono: o Coolify responde assim que aceita o
+      # pedido, não quando o container novo sobe. Sem esta espera o passo
+      # terminaria verde antes de existir o que verificar.
+      #
+      # Só a API é checada: ela é quem tem `/health` (`backend/start/routes.ts`),
+      # e é o mesmo endereço que o `HEALTHCHECK` do Dockerfile usa. Um front no
+      # ar contra uma API fora é o modo de falha que dói, e é este o que pega.
+      - name: Smoke test da API
+        run: |
+          for tentativa in $(seq 1 20); do
+            if curl -fsS --max-time 10 https://api-academy.maiyu.com.br/health; then
+              echo "API respondeu na tentativa $tentativa."
+              exit 0
+            fi
+            echo "Ainda subindo (tentativa $tentativa)..."
+            sleep 15
+          done
+          echo "A API não respondeu em cinco minutos."
+          exit 1

@@ -4,6 +4,13 @@ on:
   pull_request:
     branches: [main]
 
+# Um push de cada vez. Sem isto, dois pushes seguidos em `main` disparam dois
+# deploys que correm juntos, e o segundo a terminar publica a imagem que
+# terminou por ultimo - que nao e necessariamente a do commit mais novo.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # Mesma definição que o push em main usa, para o PR não passar por uma régua
   # diferente da do deploy.
@@ -48,8 +55,20 @@ jobs:
         working-directory: ./frontend
         run: pnpm test
 
+      - name: Format
+        working-directory: ./frontend
+        run: pnpm check
+
       - name: Build
         working-directory: ./frontend
         env:
           NODE_OPTIONS: "--max-old-space-size=8192"
         run: pnpm build
+
+      # Depois do build, e não antes: o verificador lê o `.output/`, que só
+      # existe a partir dali. Rodava só no push para `main`, depois do merge - e
+      # um ciclo de chunk devolve `undefined` no primeiro SSR em produção, não no
+      # build. O lugar de reprovar isso é o PR.
+      - name: Chunk cycles
+        working-directory: ./frontend
+        run: pnpm check-cycles

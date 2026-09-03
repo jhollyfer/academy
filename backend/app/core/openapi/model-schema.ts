@@ -199,6 +199,22 @@ function propertySchema(index: TypeIndex, model: LucidModel, property: string): 
  * quatro valores. A lista vem de `#core/entity`, declarada no registro - é a
  * mesma constante que o validator de entrada usa.
  */
+/**
+ * O `format` volta a ser `date` na coluna que só guarda o dia.
+ *
+ * O AST vê `DateTime` e conclui `date-time` para `@column.date()` e
+ * `@column.dateTime()` igualmente - mas o `@column.date()` serializa por
+ * `toISODate()`, e o JSON sai `2026-09-10`. Quem gerasse cliente pelo documento
+ * esperaria `2026-09-10T00:00:00.000-03:00` e trataria o valor como instante,
+ * deslocando o dia conforme o fuso. Quem sabe a diferença é o Lucid, em
+ * `meta.type`.
+ */
+function withDateFormat(schema: SchemaObject, isDateColumn: boolean): SchemaObject {
+  if (!isDateColumn || schema.format !== 'date-time') return schema
+
+  return { ...schema, format: 'date' }
+}
+
 function withEnum(schema: SchemaObject, values: readonly string[] | undefined): SchemaObject {
   if (!values) return schema
 
@@ -227,7 +243,10 @@ export function modelSchema(index: TypeIndex, resource: ModelResource): SchemaOb
     // `password` fora de toda resposta. O documento respeita a mesma marca.
     if (column.serializeAs === null) continue
 
-    properties[column.serializeAs] = withEnum(propertySchema(index, model, name), enums?.[name])
+    properties[column.serializeAs] = withEnum(
+      withDateFormat(propertySchema(index, model, name), column.meta?.type === 'date'),
+      enums?.[name]
+    )
     required.push(column.serializeAs)
   }
 

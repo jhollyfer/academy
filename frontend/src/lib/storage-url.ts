@@ -25,3 +25,19 @@ export function getStorageDownloadUrl(
 ): string {
   return BASE_URL.concat('/storages/').concat(storage.id).concat('/download')
 }
+
+/**
+ * A URL do QR do Pix de uma matrícula.
+ *
+ * `BASE_URL` e não `SERVER_API_URL`: isto vira `src` de uma `<img>`, e quem
+ * segue esse endereço é o navegador de quem abriu a página, não o servidor de
+ * SSR. É a mesma razão pela qual `getStorageDownloadUrl` usa a base pública.
+ *
+ * Imagem servida pela API em vez de desenhada no cliente porque o código que ela
+ * carrega é montado no servidor - a chave Pix da escola não entra no bundle.
+ */
+export function getEnrollmentPixQrUrl(protocol: string): string {
+  return BASE_URL.concat('/storefront/enrollments/')
+    .concat(protocol)
+    .concat('/pix')
+}

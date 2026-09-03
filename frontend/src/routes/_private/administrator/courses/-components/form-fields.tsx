@@ -3,6 +3,7 @@ import { Controller, useFieldArray } from 'react-hook-form'
 import { Plus, Trash } from '@phosphor-icons/react'
 import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
+import { errorId, invalidProps } from '#/lib/form-a11y'
 import { Textarea } from '#/components/ui/textarea'
 import {
   InputGroup,
@@ -99,10 +100,12 @@ export function CourseFormFields({
               <Input
                 {...field}
                 id={`${idPrefix}-name`}
-                aria-invalid={fieldState.invalid}
+                {...invalidProps(fieldState.invalid, 'name')}
               />
               {fieldState.error && (
-                <FieldError>{fieldState.error.message}</FieldError>
+                <FieldError id={errorId('name')}>
+                  {fieldState.error.message}
+                </FieldError>
               )}
             </Field>
           )}
@@ -121,10 +124,12 @@ export function CourseFormFields({
                 value={field.value ?? ''}
                 id={`${idPrefix}-slug`}
                 placeholder="Deixe em branco para sair do nome"
-                aria-invalid={fieldState.invalid}
+                {...invalidProps(fieldState.invalid, 'slug')}
               />
               {fieldState.error && (
-                <FieldError>{fieldState.error.message}</FieldError>
+                <FieldError id={errorId('slug')}>
+                  {fieldState.error.message}
+                </FieldError>
               )}
             </Field>
           )}
@@ -141,10 +146,12 @@ export function CourseFormFields({
                 value={field.value ?? ''}
                 id={`${idPrefix}-tagline`}
                 placeholder="A linha que aparece embaixo do nome no card"
-                aria-invalid={fieldState.invalid}
+                {...invalidProps(fieldState.invalid, 'tagline')}
               />
               {fieldState.error && (
-                <FieldError>{fieldState.error.message}</FieldError>
+                <FieldError id={errorId('tagline')}>
+                  {fieldState.error.message}
+                </FieldError>
               )}
             </Field>
           )}
@@ -162,6 +169,7 @@ export function CourseFormFields({
           render={({ field, fieldState }) => (
             <ImageField
               id={`${idPrefix}-coverId`}
+              {...invalidProps(fieldState.invalid, 'coverId')}
               value={field.value ?? null}
               onValueChange={field.onChange}
               previewUrl={previewUrl}
@@ -183,7 +191,9 @@ export function CourseFormFields({
                 WebP.
               </ImageFieldDescription>
               {fieldState.error && (
-                <FieldError>{fieldState.error.message}</FieldError>
+                <FieldError id={errorId('coverId')}>
+                  {fieldState.error.message}
+                </FieldError>
               )}
             </ImageField>
           )}
@@ -201,10 +211,12 @@ export function CourseFormFields({
                 {...field}
                 id={`${idPrefix}-description`}
                 rows={5}
-                aria-invalid={fieldState.invalid}
+                {...invalidProps(fieldState.invalid, 'description')}
               />
               {fieldState.error && (
-                <FieldError>{fieldState.error.message}</FieldError>
+                <FieldError id={errorId('description')}>
+                  {fieldState.error.message}
+                </FieldError>
               )}
             </Field>
           )}
@@ -232,7 +244,7 @@ export function CourseFormFields({
                 >
                   <SelectTrigger
                     id={`${idPrefix}-accent`}
-                    aria-invalid={fieldState.invalid}
+                    {...invalidProps(fieldState.invalid, 'accent')}
                   >
                     <SelectValue placeholder="Escolha" />
                   </SelectTrigger>
@@ -245,7 +257,9 @@ export function CourseFormFields({
                   </SelectContent>
                 </Select>
                 {fieldState.error && (
-                  <FieldError>{fieldState.error.message}</FieldError>
+                  <FieldError id={errorId('accent')}>
+                    {fieldState.error.message}
+                  </FieldError>
                 )}
               </Field>
             )}
@@ -262,7 +276,10 @@ export function CourseFormFields({
                   value={field.value ?? 'ACTIVE'}
                   onValueChange={field.onChange}
                 >
-                  <SelectTrigger id={`${idPrefix}-status`}>
+                  <SelectTrigger
+                    id={`${idPrefix}-status`}
+                    {...invalidProps(fieldState.invalid, 'status')}
+                  >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -274,7 +291,9 @@ export function CourseFormFields({
                   </SelectContent>
                 </Select>
                 {fieldState.error && (
-                  <FieldError>{fieldState.error.message}</FieldError>
+                  <FieldError id={errorId('status')}>
+                    {fieldState.error.message}
+                  </FieldError>
                 )}
               </Field>
             )}
@@ -328,10 +347,13 @@ export function CourseFormFields({
                 {...field}
                 value={field.value ?? ''}
                 id={`${idPrefix}-requirements`}
+                {...invalidProps(fieldState.invalid, 'requirements')}
                 rows={3}
               />
               {fieldState.error && (
-                <FieldError>{fieldState.error.message}</FieldError>
+                <FieldError id={errorId('requirements')}>
+                  {fieldState.error.message}
+                </FieldError>
               )}
             </Field>
           )}
@@ -349,10 +371,13 @@ export function CourseFormFields({
                 {...field}
                 value={field.value ?? ''}
                 id={`${idPrefix}-projectOutcome`}
+                {...invalidProps(fieldState.invalid, 'projectOutcome')}
                 rows={3}
               />
               {fieldState.error && (
-                <FieldError>{fieldState.error.message}</FieldError>
+                <FieldError id={errorId('projectOutcome')}>
+                  {fieldState.error.message}
+                </FieldError>
               )}
             </Field>
           )}
@@ -377,9 +402,18 @@ export function CourseFormFields({
                     <FieldLabel htmlFor={`modules.${index}.title`}>
                       Encontro {index + 1}
                     </FieldLabel>
-                    <Input {...field} id={`modules.${index}.title`} />
+                    <Input
+                      {...field}
+                      id={`modules.${index}.title`}
+                      {...invalidProps(
+                        fieldState.invalid,
+                        `modules.${index}.title`,
+                      )}
+                    />
                     {fieldState.error && (
-                      <FieldError>{fieldState.error.message}</FieldError>
+                      <FieldError id={errorId(`modules.${index}.title`)}>
+                        {fieldState.error.message}
+                      </FieldError>
                     )}
                   </Field>
                 )}
@@ -441,9 +475,18 @@ export function CourseFormFields({
                     <FieldLabel htmlFor={`faqs.${index}.question`}>
                       Pergunta
                     </FieldLabel>
-                    <Input {...field} id={`faqs.${index}.question`} />
+                    <Input
+                      {...field}
+                      id={`faqs.${index}.question`}
+                      {...invalidProps(
+                        fieldState.invalid,
+                        `faqs.${index}.question`,
+                      )}
+                    />
                     {fieldState.error && (
-                      <FieldError>{fieldState.error.message}</FieldError>
+                      <FieldError id={errorId(`faqs.${index}.question`)}>
+                        {fieldState.error.message}
+                      </FieldError>
                     )}
                   </Field>
                 )}
@@ -468,9 +511,19 @@ export function CourseFormFields({
                   <FieldLabel htmlFor={`faqs.${index}.answer`}>
                     Resposta
                   </FieldLabel>
-                  <Textarea {...field} id={`faqs.${index}.answer`} rows={2} />
+                  <Textarea
+                    {...field}
+                    id={`faqs.${index}.answer`}
+                    rows={2}
+                    {...invalidProps(
+                      fieldState.invalid,
+                      `faqs.${index}.answer`,
+                    )}
+                  />
                   {fieldState.error && (
-                    <FieldError>{fieldState.error.message}</FieldError>
+                    <FieldError id={errorId(`faqs.${index}.answer`)}>
+                      {fieldState.error.message}
+                    </FieldError>
                   )}
                 </Field>
               )}
@@ -525,6 +578,7 @@ function NumberField({
           <FieldLabel htmlFor={name}>{label}</FieldLabel>
           <Input
             id={name}
+            {...invalidProps(fieldState.invalid, name)}
             type="number"
             inputMode="numeric"
             value={field.value ?? ''}
@@ -547,7 +601,9 @@ function NumberField({
             <p className="text-xs text-muted-foreground">{hint}</p>
           )}
           {fieldState.error && (
-            <FieldError>{fieldState.error.message}</FieldError>
+            <FieldError id={errorId(name)}>
+              {fieldState.error.message}
+            </FieldError>
           )}
         </Field>
       )}
@@ -587,7 +643,10 @@ function MoneyField({
       render={({ field, fieldState }) => (
         <Field data-invalid={fieldState.invalid}>
           <FieldLabel htmlFor={name}>{label}</FieldLabel>
-          <InputGroup data-invalid={fieldState.invalid}>
+          <InputGroup
+            data-invalid={fieldState.invalid}
+            {...invalidProps(fieldState.invalid, name)}
+          >
             {/* O `R$` fica fora do texto editável: dentro, o cursor teria de
                 desviar do prefixo a cada tecla. */}
             <InputGroupAddon>
@@ -608,7 +667,9 @@ function MoneyField({
             />
           </InputGroup>
           {fieldState.error && (
-            <FieldError>{fieldState.error.message}</FieldError>
+            <FieldError id={errorId(name)}>
+              {fieldState.error.message}
+            </FieldError>
           )}
         </Field>
       )}

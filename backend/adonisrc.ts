@@ -62,6 +62,7 @@ export default defineConfig({
     () => import('@adonisjs/bouncer/bouncer_provider'),
     () => import('@adonisjs/redis/redis_provider'),
     () => import('@adonisjs/queue/queue_provider'),
+    () => import('@adonisjs/limiter/limiter_provider'),
   ],
 
   /*
@@ -73,6 +74,9 @@ export default defineConfig({
   |
   */
   preloads: [
+    // Antes das rotas: elas referenciam os throttles pelo nome, e um `define`
+    // que rodasse depois deixaria a rota apontando para nada.
+    () => import('#start/limiter'),
     () => import('#start/routes'),
     () => import('#start/kernel'),
     () => import('#start/validator'),

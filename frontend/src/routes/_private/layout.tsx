@@ -9,6 +9,8 @@ import {
 
 import { Sidebar } from './-components/sidebar'
 import { ThemeToggle } from '#/components/common/theme-toggle'
+import { UploadingProvider } from '#/components/common/uploading-context'
+import { HTTPError, HTTPStatus } from '#/integrations/tanstack-query/http'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -41,9 +43,22 @@ export const Route = createFileRoute('/_private')({
       )
 
       return { account }
-    } catch {
-      // Qualquer falha aqui é ausência de sessão utilizável: o `request` já
-      // tentou renovar com o refresh token antes de deixar o erro subir.
+    } catch (error) {
+      // Só 401 e 403 significam ausência de sessão utilizável - e para chegar
+      // ao 401 o `request` já tentou renovar com o refresh token antes de
+      // deixar o erro subir.
+      //
+      // Um `catch` cego mandava para o login também o 500, o timeout de 15s e a
+      // queda de rede: a API fora do ar virava "você foi deslogado", e a pessoa
+      // reentrava para cair no mesmo lugar. Erro de infraestrutura sobe para o
+      // `defaultErrorComponent`, que sabe desenhá-lo.
+      const semSessao =
+        error instanceof HTTPError &&
+        (error.status === HTTPStatus.UNAUTHORIZED ||
+          error.status === HTTPStatus.FORBIDDEN)
+
+      if (!semSessao) throw error
+
       throw redirect({
         to: '/authentication',
         search: { redirect: location.href },
@@ -70,7 +85,7 @@ function RouteComponent(): React.JSX.Element {
       */}
       <a
         href={'#'.concat(MAIN_ID)}
-        className="sr-only rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50"
+        className="focus-ring sr-only rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50"
       >
         Pular para o conteúdo
       </a>
@@ -80,7 +95,16 @@ function RouteComponent(): React.JSX.Element {
       {/* `tabIndex={-1}` para o alvo do salto poder receber o foco: sem ele o
           navegador rola até aqui e deixa o foco no link, e a tabulação seguinte
           volta para o topo da sidebar. */}
-      <SidebarInset id={MAIN_ID} tabIndex={-1} className="min-h-0">
+      {/*
+        `min-w-0` é o par horizontal do `min-h-0`, e faz falta pelo mesmo
+        motivo: o `SidebarInset` é item de um flex em linha, e item de flex não
+        encolhe abaixo do próprio conteúdo por default. Uma tabela larga
+        empurrava a área inteira para além da tela - e como o `SidebarProvider`
+        acima é `overflow-hidden`, o que passava do fim era **recortado**, não
+        rolável. A última coluna da tabela, que é a do menu de ações, é
+        exatamente a que mora nessa borda.
+      */}
+      <SidebarInset id={MAIN_ID} tabIndex={-1} className="min-h-0 min-w-0">
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear motion-reduce:transition-none group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
@@ -96,14 +120,24 @@ function RouteComponent(): React.JSX.Element {
         </header>
 
         {/*
-          `min-h-0` com `overflow-auto` é o par da altura fixa lá em cima: sem
-          ele um filho flex não encolhe abaixo do próprio conteúdo, a área de
-          rolagem interna nunca recebe altura limitada, e o scroll vaza para a
-          página inteira.
+          O provider fica aqui, e não em cada formulário: o upload acontece na
+          escolha do arquivo e o formulário só conhece o `id` depois que ele
+          existe, então **todo** botão de salvar do painel precisa saber se há
+          arquivo em voo. Um por tela seriam tantas chances de esquecer quantas
+          são as telas - e a falha é silenciosa, porque `useRegisterUpload` fora
+          do provider não faz nada e o registro nasce sem imagem, sem erro.
         */}
-        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-auto p-4 pt-0">
-          <Outlet />
-        </div>
+        <UploadingProvider>
+          {/*
+            `min-h-0` com `overflow-auto` é o par da altura fixa lá em cima: sem
+            ele um filho flex não encolhe abaixo do próprio conteúdo, a área de
+            rolagem interna nunca recebe altura limitada, e o scroll vaza para a
+            página inteira.
+          */}
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-auto p-4 pt-0">
+            <Outlet />
+          </div>
+        </UploadingProvider>
       </SidebarInset>
     </SidebarProvider>
   )

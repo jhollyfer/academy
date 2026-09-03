@@ -242,6 +242,17 @@ export class GuardianshipSchema extends BaseModel {
   declare studentId: string
 }
 
+export class RateLimitSchema extends BaseModel {
+  static $columns = ['expire', 'key', 'points'] as const
+  $columns = RateLimitSchema.$columns
+  @column()
+  declare expire: bigint | number | null
+  @column({ isPrimary: true })
+  declare key: string
+  @column()
+  declare points: number
+}
+
 export class StorageSchema extends BaseModel {
   static $columns = ['createdAt', 'deletedAt', 'filename', 'id', 'mimetype', 'originalName', 'partSize', 'path', 'size', 'status', 'updatedAt', 'uploadId'] as const
   $columns = StorageSchema.$columns

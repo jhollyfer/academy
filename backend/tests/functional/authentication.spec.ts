@@ -3,9 +3,10 @@ import mail from '@adonisjs/mail/services/main'
 import { DateTime } from 'luxon'
 import AccountInvite from '#models/account_invite'
 import InviteService from '#services/invite.service'
-import { UserFactory } from '#database/factories/user_factory'
+import { FACTORY_PASSWORD, UserFactory } from '#database/factories/user_factory'
+import { ActiveStatuses } from '#core/entity'
 import { COOKIE_TOKEN } from '#services/cookie.service'
-import { authenticateAsOwner, body, OWNER, resetDatabase } from '../helpers.ts'
+import { authenticate, authenticateAsOwner, body, OWNER, resetDatabase } from '../helpers.ts'
 
 /**
  * A porta do painel, e a própria conta atrás dela.
@@ -258,5 +259,200 @@ test.group('autenticação > convite', (group) => {
 
     response.assertStatus(409)
     assert.equal(body(response).code, 'INVITE_ACCOUNT_UNAVAILABLE')
+  })
+})
+
+/**
+ * A renovação da sessão.
+ *
+ * É o que faz o cookie de refresh de 7 dias valer alguma coisa: sem esta rota o
+ * par nasce, ocupa linha em `auth_access_tokens` e nunca é gasto, e a sessão
+ * morre junto com o token de acesso, em 1 dia.
+ *
+ * Rotaciona: o refresh usado é apagado ao emitir o novo. Os testes que provam
+ * isso são os que mais importam aqui - um endpoint que só reemitisse o par sem
+ * apagar o antigo passaria em todos os outros.
+ */
+test.group('autenticação > refresh', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('renova a sessão com 204 e um par de cookies novo', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+
+    const response = await client.post('/authentication/refresh').cookies(session)
+
+    response.assertStatus(204)
+    assert.isEmpty(response.text())
+
+    const access = response.cookie(COOKIE_TOKEN.ACCESS)
+    const refresh = response.cookie(COOKIE_TOKEN.REFRESH)
+
+    assert.isDefined(access)
+    assert.isDefined(refresh)
+    assert.isTrue(access!.httpOnly)
+    assert.isTrue(refresh!.httpOnly)
+
+    // O par tem de ser **outro**. Sem esta asserção, um endpoint que só
+    // reecoasse os cookies recebidos passaria no teste.
+    assert.notEqual(access!.value, session[COOKIE_TOKEN.ACCESS])
+    assert.notEqual(refresh!.value, session[COOKIE_TOKEN.REFRESH])
+  })
+
+  test('o access token novo autentica', async ({ client }) => {
+    const session = await authenticateAsOwner(client)
+
+    const renewed = await client.post('/authentication/refresh').cookies(session)
+
+    const response = await client.get('/account/profile').cookies({
+      [COOKIE_TOKEN.ACCESS]: renewed.cookie(COOKIE_TOKEN.ACCESS)!.value,
+      [COOKIE_TOKEN.REFRESH]: renewed.cookie(COOKIE_TOKEN.REFRESH)!.value,
+    })
+
+    response.assertStatus(200)
+  })
+
+  test('o refresh usado não serve duas vezes', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+
+    await client.post('/authentication/refresh').cookies(session)
+
+    // O mesmo cookie de novo: se a rotação não apagou a linha, este 204 volta e
+    // o token de 7 dias vira um portador permanente.
+    const response = await client.post('/authentication/refresh').cookies(session)
+
+    response.assertStatus(401)
+    assert.equal(body(response).code, 'REFRESH_TOKEN_INVALID')
+  })
+
+  test('sem cookie de refresh é 401', async ({ client, assert }) => {
+    const response = await client.post('/authentication/refresh')
+
+    response.assertStatus(401)
+    assert.equal(body(response).code, 'REFRESH_TOKEN_MISSING')
+  })
+
+  test('cookie de acesso no lugar do de refresh é 401', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+
+    // O refresh é um access token do Adonis que se distingue só pela coluna
+    // `name`. Sem a checagem desse nome, o cookie de acesso renovaria a sessão e
+    // o par deixaria de ter dois papéis.
+    const response = await client
+      .post('/authentication/refresh')
+      .cookies({ [COOKIE_TOKEN.REFRESH]: session[COOKIE_TOKEN.ACCESS] })
+
+    response.assertStatus(401)
+    assert.equal(body(response).code, 'REFRESH_TOKEN_INVALID')
+  })
+
+  test('token de formato inválido é 401, e não 500', async ({ client }) => {
+    const response = await client
+      .post('/authentication/refresh')
+      .cookies({ [COOKIE_TOKEN.REFRESH]: 'lixo' })
+
+    // `verify` lança para token indecodificável. Deixar a exceção subir daria
+    // 500 num caminho que é só sessão inválida.
+    response.assertStatus(401)
+  })
+
+  test('refresh depois do sign-out é 401', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+
+    await client.post('/authentication/sign-out').cookies(session)
+
+    const response = await client.post('/authentication/refresh').cookies(session)
+
+    response.assertStatus(401)
+    assert.equal(body(response).code, 'REFRESH_TOKEN_INVALID')
+  })
+
+  test('conta desativada não renova', async ({ client, assert }) => {
+    const user = await UserFactory.apply('responsible').create()
+    const session = await authenticate(client, user.email, FACTORY_PASSWORD)
+
+    user.status = ActiveStatuses.INACTIVE
+    await user.save()
+
+    // Renovar sem o filtro de conta prorrogaria por escrito uma sessão que a
+    // escola já encerrou - o guard recusaria o par novo em seguida, mas ele
+    // teria sido emitido.
+    const response = await client.post('/authentication/refresh').cookies(session)
+
+    response.assertStatus(401)
+    assert.equal(body(response).code, 'REFRESH_TOKEN_INVALID')
+  })
+
+  test('conta removida não renova', async ({ client, assert }) => {
+    const user = await UserFactory.apply('responsible').create()
+    const session = await authenticate(client, user.email, FACTORY_PASSWORD)
+
+    user.deletedAt = DateTime.now()
+    await user.save()
+
+    const response = await client.post('/authentication/refresh').cookies(session)
+
+    response.assertStatus(401)
+    assert.equal(body(response).code, 'REFRESH_TOKEN_INVALID')
+  })
+
+  test('duas renovações simultâneas emitem um par só', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+
+    // Disparadas juntas de propósito: sem contar as linhas apagadas pelo
+    // `delete`, as duas leem o mesmo token válido e emitem dois pares a partir
+    // dele - rotação que não rotaciona.
+    const [first, second] = await Promise.all([
+      client.post('/authentication/refresh').cookies(session),
+      client.post('/authentication/refresh').cookies(session),
+    ])
+
+    const statuses = [first.status(), second.status()].sort()
+
+    assert.deepEqual(statuses, [204, 401])
+  })
+
+  test('a rota não exige sessão', async ({ client, assert }) => {
+    const response = await client.post('/authentication/refresh')
+
+    // Se alguém colar `middleware.auth()` na rota, o guard responde antes do
+    // use-case e o código passa a ser `UNAUTHORIZED` - o que tornaria a
+    // renovação inalcançável justamente com o token vencido que a motiva.
+    response.assertStatus(401)
+    assert.equal(body(response).code, 'REFRESH_TOKEN_MISSING')
+  })
+})
+
+/**
+ * O teto de tentativas.
+ *
+ * Nenhum dos projetos irmãos tem, e aqui ele faz falta por uma razão que só este
+ * contrato tem: a matrícula é escrita **anônima**, e o upload por protocolo
+ * entrega URL assinada de bucket. Sem teto, um laço de shell enche o banco de
+ * matrículas e a turma "lota" sem ninguém ter se inscrito.
+ */
+test.group('autenticação > teto de tentativas', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('a sexta tentativa de entrar no mesmo minuto é 429', async ({ client, assert }) => {
+    const errada = { email: OWNER.email, password: 'SenhaErrada1!' }
+
+    // Cinco por minuto: folgado para quem erra a senha, apertado para quem a
+    // adivinha. As cinco primeiras respondem 401 - o teto não esconde o motivo,
+    // só limita o volume.
+    for (let tentativa = 0; tentativa < 5; tentativa += 1) {
+      const response = await client.post('/authentication/sign-in').json(errada)
+
+      response.assertStatus(401)
+    }
+
+    const bloqueada = await client.post('/authentication/sign-in').json(errada)
+
+    bloqueada.assertStatus(429)
+
+    // E a senha certa também espera: se o teto liberasse quem acerta, ele não
+    // limitaria a adivinhação - que é exatamente tentar até acertar.
+    const comSenhaCerta = await client.post('/authentication/sign-in').json(OWNER)
+
+    assert.equal(comSenhaCerta.status(), 429)
   })
 })

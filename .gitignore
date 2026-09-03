@@ -1,4 +1,15 @@
+# Segredos: `.env.example` é o que fica versionado, com valores de exemplo. Os
+# dois projetos têm o próprio `.gitignore`, mas a raiz não cobria nada - e um
+# `.env` criado aqui por engano entraria no commit sem ninguém notar.
+.env
+.env.local
 
 # IDE da JetBrains. O `backend/.gitignore` já a ignorava; a raiz não, e dois
 # arquivos de módulo chegaram a ser rastreados por isso.
+#
+# `.vscode/` fica de fora de propósito, ao contrário do que o `adacaibs` faz:
+# aqui o `settings.json` é versionado nos dois projetos, e ignorá-lo diria uma
+# coisa que o repositório não cumpre.
 .idea/
+
+node_modules/

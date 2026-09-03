@@ -20,7 +20,9 @@ para quem precisar recuperar alguma coisa.
 
 O backend precisa de Postgres e MinIO. Os dois vêm do compose, nas portas 5434 e
 9004/9005 - `simple-hub` e `adacaibs` rodam na mesma máquina e já ocupam as
-anteriores.
+anteriores. O compose sobe também um Redis, na 6382, que só é usado se você
+definir `REDIS_URL`: sem ela a fila roda em modo `sync` e o e-mail sai na
+própria requisição.
 
 ```bash
 cd backend
@@ -66,3 +68,23 @@ Push em `main` dispara o `main.yml`: confere o backend, builda o frontend,
 publica as duas imagens no Docker Hub e chama o deploy no Coolify. O endereço da
 API vive em `frontend/.env.production` e é embutido no build - trocar de
 endereço exige rebuild da imagem.
+
+As imagens saem com duas tags, `:latest` e `:<sha>`. A segunda existe para haver
+a que voltar: com `:latest` sozinha, um rollback não tem alvo.
+
+### O que a plataforma precisa fazer, e o repositório não faz
+
+Três coisas moram no painel do Coolify e não no código. Nenhuma delas falha
+barulhento - as três falham em silêncio.
+
+- **`COOKIE_DOMAIN=.maiyu.com.br` no serviço da API.** Sem ela o cookie de
+  sessão nasce host-only de `api-academy.maiyu.com.br`, e o SSR do frontend -
+  que roda em `academy.maiyu.com.br` e é quem chama a API na primeira navegação
+  - nunca o recebe. O sintoma é todo F5 em rota privada voltar para o login.
+- **A migration, antes de subir o container novo.** O `Dockerfile-production`
+  não tem `ENTRYPOINT` de propósito: quem migra é o comando de pré-deploy da
+  plataforma, `node ace migration:run --force`.
+- **Um segundo serviço rodando o worker**, com o mesmo `.env` da API e o comando
+  `node ace queue:work`. Ele só é necessário quando `REDIS_URL` está definida -
+  e aí é obrigatório: `mail.sendLater()` enfileira, e sem ninguém consumindo o
+  convite de acesso nunca sai. Uma família fica esperando um link que não vem.

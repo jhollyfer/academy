@@ -19,13 +19,6 @@ export const queryKeys = {
   // Sessão
 
   /**
-   * A sessão. Fica aqui, e não solta em `queries.ts`, porque tem dois donos: o
-   * `beforeLoad` que enche o cache e o `onSuccess` do sign-in que o invalida.
-   * Escrita literal nos dois, renomear um sem o outro faz o guard reusar a
-   * ausência de sessão de um segundo atrás - e o sintoma é login que "não
-   * funciona" sem erro nenhum.
-   */
-  /**
    * O portal de quem é atendido pela escola. Chave própria, e não a de
    * `enrollments`: as duas listas vêm de endpoints diferentes e com recortes
    * diferentes, e compartilhar a chave faria uma invalidar o cache da outra com
@@ -38,10 +31,17 @@ export const queryKeys = {
 
   users: {
     all: ['users'] as const,
-    list: (params: Record<string, unknown>) => ['users', 'list', params] as const,
+    list: (params: ListSearch) => ['users', 'list', params] as const,
     detail: (id: string) => ['users', 'detail', id] as const,
   },
 
+  /**
+   * A sessão. Fica aqui, e não solta em `queries.ts`, porque tem dois donos: o
+   * `beforeLoad` que enche o cache e o `onSuccess` do sign-in que o invalida.
+   * Escrita literal nos dois, renomear um sem o outro faz o guard reusar a
+   * ausência de sessão de um segundo atrás - e o sintoma é login que "não
+   * funciona" sem erro nenhum.
+   */
   account: {
     all: ['account'] as const,
   },

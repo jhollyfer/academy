@@ -1,6 +1,7 @@
 import type * as React from 'react'
 import { Controller } from 'react-hook-form'
 import { Input } from '#/components/ui/input'
+import { errorId, invalidProps } from '#/lib/form-a11y'
 import { DatePicker } from '#/components/common/date-picker'
 import {
   Field,
@@ -62,7 +63,7 @@ export function ClassFormFields({
             >
               <SelectTrigger
                 id={`${idPrefix}-courseId`}
-                aria-invalid={fieldState.invalid}
+                {...invalidProps(fieldState.invalid, 'courseId')}
               >
                 <SelectValue placeholder="Escolha o curso" />
               </SelectTrigger>
@@ -75,7 +76,9 @@ export function ClassFormFields({
               </SelectContent>
             </Select>
             {fieldState.error && (
-              <FieldError>{fieldState.error.message}</FieldError>
+              <FieldError id={errorId('courseId')}>
+                {fieldState.error.message}
+              </FieldError>
             )}
           </Field>
         )}
@@ -90,10 +93,13 @@ export function ClassFormFields({
             <Input
               {...field}
               id={`${idPrefix}-name`}
+              {...invalidProps(fieldState.invalid, 'name')}
               placeholder="Turma 1 / 2026"
             />
             {fieldState.error && (
-              <FieldError>{fieldState.error.message}</FieldError>
+              <FieldError id={errorId('name')}>
+                {fieldState.error.message}
+              </FieldError>
             )}
           </Field>
         )}
@@ -121,10 +127,12 @@ export function ClassFormFields({
                 value={field.value}
                 onValueChange={field.onChange}
                 onBlur={field.onBlur}
-                aria-invalid={fieldState.invalid}
+                {...invalidProps(fieldState.invalid, 'startsAt')}
               />
               {fieldState.error && (
-                <FieldError>{fieldState.error.message}</FieldError>
+                <FieldError id={errorId('startsAt')}>
+                  {fieldState.error.message}
+                </FieldError>
               )}
             </Field>
           )}
@@ -146,10 +154,12 @@ export function ClassFormFields({
                 onValueChange={(value) => field.onChange(value || null)}
                 onBlur={field.onBlur}
                 placeholder="Em aberto"
-                aria-invalid={fieldState.invalid}
+                {...invalidProps(fieldState.invalid, 'endsAt')}
               />
               {fieldState.error && (
-                <FieldError>{fieldState.error.message}</FieldError>
+                <FieldError id={errorId('endsAt')}>
+                  {fieldState.error.message}
+                </FieldError>
               )}
             </Field>
           )}
@@ -176,7 +186,10 @@ export function ClassFormFields({
                 value={field.value}
                 onValueChange={field.onChange}
               >
-                <SelectTrigger id={`${idPrefix}-weekday`}>
+                <SelectTrigger
+                  id={`${idPrefix}-weekday`}
+                  {...invalidProps(fieldState.invalid, 'weekday')}
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -188,7 +201,9 @@ export function ClassFormFields({
                 </SelectContent>
               </Select>
               {fieldState.error && (
-                <FieldError>{fieldState.error.message}</FieldError>
+                <FieldError id={errorId('weekday')}>
+                  {fieldState.error.message}
+                </FieldError>
               )}
             </Field>
           )}
@@ -205,7 +220,10 @@ export function ClassFormFields({
                 value={field.value}
                 onValueChange={field.onChange}
               >
-                <SelectTrigger id={`${idPrefix}-shift`}>
+                <SelectTrigger
+                  id={`${idPrefix}-shift`}
+                  {...invalidProps(fieldState.invalid, 'shift')}
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -217,7 +235,9 @@ export function ClassFormFields({
                 </SelectContent>
               </Select>
               {fieldState.error && (
-                <FieldError>{fieldState.error.message}</FieldError>
+                <FieldError id={errorId('shift')}>
+                  {fieldState.error.message}
+                </FieldError>
               )}
             </Field>
           )}
@@ -239,9 +259,16 @@ export function ClassFormFields({
               <FieldLabel htmlFor={`${idPrefix}-startsAtTime`}>
                 Começa às
               </FieldLabel>
-              <Input {...field} id={`${idPrefix}-startsAtTime`} type="time" />
+              <Input
+                {...field}
+                id={`${idPrefix}-startsAtTime`}
+                type="time"
+                {...invalidProps(fieldState.invalid, 'startsAtTime')}
+              />
               {fieldState.error && (
-                <FieldError>{fieldState.error.message}</FieldError>
+                <FieldError id={errorId('startsAtTime')}>
+                  {fieldState.error.message}
+                </FieldError>
               )}
             </Field>
           )}
@@ -255,9 +282,16 @@ export function ClassFormFields({
               <FieldLabel htmlFor={`${idPrefix}-endsAtTime`}>
                 Termina às
               </FieldLabel>
-              <Input {...field} id={`${idPrefix}-endsAtTime`} type="time" />
+              <Input
+                {...field}
+                id={`${idPrefix}-endsAtTime`}
+                type="time"
+                {...invalidProps(fieldState.invalid, 'endsAtTime')}
+              />
               {fieldState.error && (
-                <FieldError>{fieldState.error.message}</FieldError>
+                <FieldError id={errorId('endsAtTime')}>
+                  {fieldState.error.message}
+                </FieldError>
               )}
             </Field>
           )}
@@ -272,9 +306,15 @@ export function ClassFormFields({
             <FieldLabel htmlFor={`${idPrefix}-location`}>
               Onde acontece
             </FieldLabel>
-            <Input {...field} id={`${idPrefix}-location`} />
+            <Input
+              {...field}
+              id={`${idPrefix}-location`}
+              {...invalidProps(fieldState.invalid, 'location')}
+            />
             {fieldState.error && (
-              <FieldError>{fieldState.error.message}</FieldError>
+              <FieldError id={errorId('location')}>
+                {fieldState.error.message}
+              </FieldError>
             )}
           </Field>
         )}
@@ -302,7 +342,7 @@ export function ClassFormFields({
 
                 field.onChange(Number(raw))
               }}
-              aria-invalid={fieldState.invalid}
+              {...invalidProps(fieldState.invalid, 'capacity')}
             />
             {/*
               Reduzir abaixo do que já saiu é 409 do servidor, e a mensagem dele
@@ -310,7 +350,9 @@ export function ClassFormFields({
               exigiria a contagem no formulário, que é dado que ele não tem.
             */}
             {fieldState.error && (
-              <FieldError>{fieldState.error.message}</FieldError>
+              <FieldError id={errorId('capacity')}>
+                {fieldState.error.message}
+              </FieldError>
             )}
           </Field>
         )}

@@ -92,6 +92,7 @@ export const FIELD_LABELS = {
   email: 'o e-mail',
   password: 'a senha',
   passwordConfirmation: 'a confirmação da senha',
+  currentPassword: 'a senha atual',
   phone: 'o telefone',
   status: 'a situação',
   role: 'o papel',

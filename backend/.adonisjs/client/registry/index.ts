@@ -18,6 +18,12 @@ const routes = {
     tokens: [{"old":"/authentication/sign-out","type":0,"val":"authentication","end":""},{"old":"/authentication/sign-out","type":0,"val":"sign-out","end":""}],
     types: placeholder as Registry['authentication.sign-out']['types'],
   },
+  'authentication.refresh': {
+    methods: ["POST"],
+    pattern: '/authentication/refresh',
+    tokens: [{"old":"/authentication/refresh","type":0,"val":"authentication","end":""},{"old":"/authentication/refresh","type":0,"val":"refresh","end":""}],
+    types: placeholder as Registry['authentication.refresh']['types'],
+  },
   'authentication.invite.show': {
     methods: ["GET","HEAD"],
     pattern: '/authentication/invite/:token',
@@ -119,6 +125,24 @@ const routes = {
     pattern: '/account/profile',
     tokens: [{"old":"/account/profile","type":0,"val":"account","end":""},{"old":"/account/profile","type":0,"val":"profile","end":""}],
     types: placeholder as Registry['account.profile']['types'],
+  },
+  'account.update': {
+    methods: ["PUT"],
+    pattern: '/account',
+    tokens: [{"old":"/account","type":0,"val":"account","end":""}],
+    types: placeholder as Registry['account.update']['types'],
+  },
+  'portal.enrollments.paginate': {
+    methods: ["GET","HEAD"],
+    pattern: '/portal/enrollments',
+    tokens: [{"old":"/portal/enrollments","type":0,"val":"portal","end":""},{"old":"/portal/enrollments","type":0,"val":"enrollments","end":""}],
+    types: placeholder as Registry['portal.enrollments.paginate']['types'],
+  },
+  'portal.enrollments.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/portal/enrollments/:id',
+    tokens: [{"old":"/portal/enrollments/:id","type":0,"val":"portal","end":""},{"old":"/portal/enrollments/:id","type":0,"val":"enrollments","end":""},{"old":"/portal/enrollments/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['portal.enrollments.show']['types'],
   },
   'administrator.courses.paginate': {
     methods: ["GET","HEAD"],

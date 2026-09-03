@@ -1,11 +1,12 @@
 import type * as React from 'react'
-import { createLazyFileRoute, getRouteApi } from '@tanstack/react-router'
+import { Link, createLazyFileRoute, getRouteApi } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { CalendarBlank, Clock, MapPin, Users } from '@phosphor-icons/react'
 
 import { Badge } from '#/components/ui/badge'
 import { CardContent } from '#/components/ui/card'
 import { SectionCard } from '#/components/common/section-card'
+import { PillButton } from '#/components/common/pill-button'
 import { Separator } from '#/components/ui/separator'
 import { CircuitTrails, Leaf } from '#/components/common/marks'
 import { SectionTitle } from '../-components/section-title'
@@ -26,6 +27,7 @@ const route = getRouteApi('/_public/courses/$slug')
 
 export const Route = createLazyFileRoute('/_public/courses/$slug')({
   component: RouteComponent,
+  notFoundComponent: CourseNotFound,
 })
 
 /**
@@ -38,6 +40,37 @@ const ILLUSTRATIONS: Record<string, string> = {
 }
 
 const FALLBACK_ILLUSTRATION = '/ilustracoes/bancada-arduino.svg'
+
+/**
+ * O curso que não existe.
+ *
+ * Separado do 404 genérico do site porque a pergunta é outra: quem chega aqui
+ * quase sempre veio de um link antigo para um curso que saiu do ar, e o que ele
+ * precisa saber é que **há** outros cursos - não que errou o endereço. Mandá-lo
+ * à home o faria procurar de novo o que esta página já pode oferecer.
+ */
+function CourseNotFound(): React.JSX.Element {
+  return (
+    <div className="mx-auto max-w-2xl px-4 py-24 text-center">
+      <h1 className="text-3xl leading-[1.05] font-semibold tracking-tight text-foreground sm:text-4xl">
+        Curso não encontrado
+      </h1>
+
+      <p className="mx-auto mt-5 max-w-[52ch] leading-relaxed text-muted-foreground">
+        Este endereço não corresponde a nenhum curso no ar. Ele pode ter saído
+        do site, ou o link pode ter vindo cortado.
+      </p>
+
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <PillButton
+          tone="ink"
+          scale="lg"
+          render={<Link to="/">Ver os cursos abertos</Link>}
+        />
+      </div>
+    </div>
+  )
+}
 
 function RouteComponent(): React.JSX.Element {
   const { slug } = route.useParams()
@@ -235,8 +268,9 @@ function RouteComponent(): React.JSX.Element {
             <Separator className="my-10 bg-border" />
 
             <p className="max-w-[60ch] text-body-md text-muted-foreground">
-              O pagamento é por Pix. Você envia o comprovante junto com a
-              matrícula e a secretaria confirma.
+              O pagamento é por Pix. Assim que enviar a matrícula, você recebe o
+              código de pagamento e anexa o comprovante na mesma página - a
+              secretaria confere e confirma.
             </p>
 
             <EnrollmentCta
