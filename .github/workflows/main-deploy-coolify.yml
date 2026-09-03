@@ -31,3 +31,23 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
             -H "Content-Type: application/json" \
             -d '{"uuid":"jyi6az3eh6s7p9l742ids8q2","force":false}'
+
+      # O disparo acima é assíncrono: o Coolify responde assim que aceita o
+      # pedido, não quando o container novo sobe. Sem esta espera o passo
+      # terminaria verde antes de existir o que verificar.
+      #
+      # Só a API é checada: ela é quem tem `/health` (`backend/start/routes.ts`),
+      # e é o mesmo endereço que o `HEALTHCHECK` do Dockerfile usa. Um front no
+      # ar contra uma API fora é o modo de falha que dói, e é este o que pega.
+      - name: Smoke test da API
+        run: |
+          for tentativa in $(seq 1 20); do
+            if curl -fsS --max-time 10 https://api-academy.maiyu.com.br/health; then
+              echo "API respondeu na tentativa $tentativa."
+              exit 0
+            fi
+            echo "Ainda subindo (tentativa $tentativa)..."
+            sleep 15
+          done
+          echo "A API não respondeu em cinco minutos."
+          exit 1
