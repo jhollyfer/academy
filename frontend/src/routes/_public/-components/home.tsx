@@ -11,7 +11,6 @@ import { FinalBanner } from './final-banner'
 import { Hero } from './hero'
 import { Mission } from './mission'
 import { HowToEnroll } from './how-to-enroll'
-import { Market } from './market'
 import { School } from './school'
 import { StatsBar } from './stats-bar'
 import { Team } from './team'
@@ -32,7 +31,7 @@ import { WhoItsFor } from './who-its-for'
  * ela. Antes da equipe seria promessa sem quem a sustente.
  *
  * `useQuery` e não `useSuspenseQuery`: a API fora do ar não pode derrubar a
- * página inteira. Onze das treze seções não dependem de consulta nenhuma - hero,
+ * página inteira. Dez das doze seções não dependem de consulta nenhuma - hero,
  * escola, o que você recebe, matrícula, equipe, para quem é, onde e quando e o
  * banner continuam de pé, e as duas que dependem somem em vez de levar o resto
  * junto.
@@ -52,7 +51,6 @@ export function Home(): React.JSX.Element {
       {courses.data && courses.data.data.length > 0 && (
         <CourseCards courses={courses.data.data} />
       )}
-      <Market />
       <HowToEnroll />
       <Team />
       <Mission />

@@ -37,8 +37,12 @@ import type { CourseResponse } from '#/integrations/response'
  * com pouco mais de 1:1 de separação, e o bloco inteiro empapuçava. O
  * `--muted-foreground` do texto vinha do mesmo lugar e tinha o mesmo defeito.
  *
- * O tratamento é o dos cards da seção de mercado: borda fina neon, fundo
+ * O tratamento é o card sobre faixa escura da identidade: borda fina neon, fundo
  * `--brand-ink-soft`, brilho só na borda, texto branco em duas opacidades.
+ *
+ * Ele veio da seção de salários, que não existe mais - e é por isso que a
+ * descrição está aqui por extenso em vez de apontar para outro arquivo. Esta
+ * seção passou a ser a única que usa o tratamento, então ela é quem o define.
  */
 export function CourseCards({
   courses,
