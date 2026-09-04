@@ -9,6 +9,7 @@ import {
   body,
   createClass,
   createCourse,
+  cpfFrom,
   enrollmentPayload,
   resetDatabase,
   type Session,
@@ -86,8 +87,14 @@ test.group('portal > escopo do aluno', (group) => {
     const owner = await authenticateAsOwner(client)
 
     const classId = await openClass(client, owner)
-    const mine = await confirmedEnrollment(client, classId, { email: 'meu@exemplo.com' })
-    const other = await confirmedEnrollment(client, classId, { email: 'outro@exemplo.com' })
+    const mine = await confirmedEnrollment(client, classId, {
+      email: 'meu@exemplo.com',
+      studentDocument: cpfFrom('529982247'),
+    })
+    const other = await confirmedEnrollment(client, classId, {
+      email: 'outro@exemplo.com',
+      studentDocument: cpfFrom('390533447'),
+    })
 
     // As contas nascem na confirmação, pelo `EnrollmentAccountService`. Aqui o
     // vínculo é feito à mão porque a confirmação acima foi direta no model.
@@ -136,9 +143,11 @@ test.group('portal > escopo do responsável', (group) => {
     const classId = await openClass(client, owner)
     const dependentEnrollment = await confirmedEnrollment(client, classId, {
       email: 'a@exemplo.com',
+      studentDocument: cpfFrom('529982247'),
     })
     const strangerEnrollment = await confirmedEnrollment(client, classId, {
       email: 'b@exemplo.com',
+      studentDocument: cpfFrom('390533447'),
     })
 
     const responsible = await UserFactory.apply('responsible').create()
@@ -245,7 +254,7 @@ test.group('portal > a conta nasce da confirmação', (group) => {
     const classId = await openClass(client, owner)
     const enrollment = await confirmedEnrollment(client, classId, {
       email: 'responsavel@exemplo.com',
-      studentBirthDate: '2015-04-12',
+      studentBirthDate: '2010-04-12',
       guardianName: 'Maria de Souza',
       guardianDocument: '39053344705',
       guardianPhone: '97984600872',

@@ -14,7 +14,7 @@ import { useEnrollmentCreate } from '#/integrations/tanstack-query/mutations'
 import { StorefrontEnrollmentCreateValidator } from '#/lib/validator'
 import type { StorefrontEnrollmentCreatePayload } from '#/lib/validator'
 import type { Merge } from '#/lib/interfaces'
-import { LEGAL_AGE } from '#/lib/entity'
+import { LEGAL_AGE, MINIMUM_ENROLLMENT_AGE } from '#/lib/entity'
 import { applyMutationError } from '#/lib/form-errors'
 import { errorDescribedBy, errorId, invalidProps } from '#/lib/form-a11y'
 import { DatePicker } from '#/components/common/date-picker'
@@ -90,22 +90,6 @@ type FormValues = Merge<
  * e o total de passos muda junto. Mostrar um passo que vai ser pulado é prometer
  * um trabalho que não existe.
  */
-/**
- * A faixa de anos que o seletor de nascimento oferece.
- *
- * Fim é hoje: nascer no futuro não acontece, e deixar o dropdown listar 2030
- * convida ao erro de digitação que o validator só reprova depois do envio.
- * Início em 1920 porque é folgado o bastante para qualquer responsável legal e
- * curto o bastante para a lista de anos caber num rolar.
- *
- * Fora do componente: são dois `new Date()` que não dependem de nada da tela, e
- * dentro dele nasceriam a cada tecla digitada no formulário.
- */
-const BIRTH_RANGE = {
-  start: new Date(1920, 0, 1),
-  end: new Date(),
-} as const
-
 const STEPS = ['curso', 'aluno', 'responsavel', 'revisao'] as const
 
 /**
@@ -146,6 +130,20 @@ const STEP_FIELDS = {
   revisao: ['termsAccepted', 'lgpdConsent'],
 } as const satisfies Record<Step, ReadonlyArray<keyof FormValues>>
 
+/**
+ * O que dizer sobre cada campo do responsável que ficou vazio.
+ *
+ * Espelha `GUARDIAN_FIELDS` de `create.use-case.ts`, palavra por palavra: os
+ * dois lados barram a mesma falta, e ler duas frases diferentes para o mesmo
+ * campo - uma ao clicar em "Continuar", outra ao enviar - faria parecer que são
+ * dois problemas.
+ */
+const GUARDIAN_MESSAGES = {
+  guardianName: 'Informe o nome do responsável legal',
+  guardianDocument: 'Informe o CPF do responsável legal',
+  guardianPhone: 'Informe o telefone do responsável legal',
+} as const
+
 /** Todos os campos que o servidor pode marcar num 422. */
 const FIELDS = [
   ...STEP_FIELDS.curso,
@@ -176,6 +174,33 @@ function ageFrom(birthDate: string): number | null {
   if (beforeBirthday) age -= 1
 
   return age
+}
+
+/**
+ * O dia mais antigo e o mais recente que o campo de nascimento aceita, para a
+ * idade que este curso exige.
+ *
+ * O teto é o aniversário de quem completa a idade exigida **hoje**: nascer
+ * depois dele é ter menos anos do que o curso pede, e nascer amanhã não
+ * acontece. Era só "hoje", e a precisão de mês do campo deixava 30 de setembro
+ * passar em 3 de setembro - foi o que o teste de aceitação encontrou.
+ *
+ * O piso é cem anos atrás, e não 1920: um ano fixo envelhece sozinho, e a lista
+ * de anos do seletor foi ficando mais longa a cada janeiro sem que ninguém
+ * mexesse nela.
+ *
+ * Fecha o calendário, e só. Quem recusa a matrícula é o servidor, que refaz a
+ * conta com o `minimumAge` da turma que chegou no envio.
+ */
+function birthBoundsFor(requiredAge: number): { min: Date; max: Date } {
+  const today = new Date()
+  const month = today.getMonth()
+  const day = today.getDate()
+
+  return {
+    min: new Date(today.getFullYear() - 100, month, day),
+    max: new Date(today.getFullYear() - requiredAge, month, day),
+  }
 }
 
 /**
@@ -294,7 +319,11 @@ function RouteComponent(): React.JSX.Element {
       classId: '',
       studentName: '',
       studentBirthDate: '',
-      studentDocument: null,
+      // `''` e não `null`: o campo é obrigatório desde que o CPF passou a
+      // identificar a matrícula, e `convertEmptyStringsToNull` faz o vazio
+      // virar a falta que o `required` acusa - "Informe o CPF do aluno", e não
+      // "Informe 11 caracteres".
+      studentDocument: '',
       email: '',
       phone: '',
       guardianName: null,
@@ -386,6 +415,20 @@ function RouteComponent(): React.JSX.Element {
     (course) => course.id === courseId,
   )
 
+  /*
+   * A idade que este curso exige, e os limites do calendário que saem dela.
+   *
+   * `minimumAge` é opcional no cadastro do curso, e curso sem ela cai no piso -
+   * nunca em "sem exigência". A mesma conta roda no servidor, com a turma que
+   * chegou no envio; esta existe para o campo não oferecer o que vai ser
+   * recusado.
+   */
+  const requiredAge = Math.max(
+    MINIMUM_ENROLLMENT_AGE,
+    selectedCourse?.minimumAge ?? 0,
+  )
+  const birthBounds = birthBoundsFor(requiredAge)
+
   // Os horários que a barra desenha. Vazio enquanto não há curso escolhido, e
   // aí a barra não aparece.
   let scheduleOptions: Array<ClassResponse> = []
@@ -467,6 +510,39 @@ function RouteComponent(): React.JSX.Element {
       courseGroup.current?.focus()
 
       return
+    }
+
+    /*
+     * O responsável legal, cobrado à parte pelo mesmo motivo que o curso: a
+     * exigência não está no schema.
+     *
+     * Os três campos são `optional()` no VineJS porque a condição depende da
+     * data de nascimento, e regra de objeto reportaria em `meta` sem marcar
+     * input nenhum - a exigência mora no use-case. Só que `form.trigger`
+     * pergunta ao schema, o schema diz que está tudo bem, e o passo deixava
+     * avançar até a revisão para o 422 do servidor devolver a pessoa para cá.
+     * Era a viagem de ida e volta que o teste de aceitação relatou.
+     *
+     * As mensagens são as mesmas de `create.use-case.ts`, e é isso que faz
+     * cliente e servidor dizerem a mesma frase para a mesma falta.
+     */
+    if (step === 'responsavel' && isMinor) {
+      const missing = STEP_FIELDS.responsavel.filter(
+        (name) => !form.getValues(name),
+      )
+
+      for (const [position, name] of missing.entries()) {
+        form.setError(
+          name,
+          { message: GUARDIAN_MESSAGES[name] },
+          // O foco vai para o primeiro que falta, e não para o último: sem o
+          // `shouldFocus` a pessoa fica no botão, e com ele em todos o foco
+          // termina no fim do passo.
+          { shouldFocus: position === 0 },
+        )
+      }
+
+      if (missing.length > 0) return
     }
 
     // `shouldFocus` porque reprovar sem mover o foco deixa a pessoa parada no
@@ -786,10 +862,13 @@ function RouteComponent(): React.JSX.Element {
                         quem tem o sistema em inglês via `mm/dd/aaaa` num
                         formulário em português, e digitava a data trocada.
 
-                        `startMonth`/`endMonth` cercam a lista de anos no que o
-                        campo aceita: de 1920 até hoje. Data de nascimento no
-                        futuro não existe, e os dois limites valem também para o
-                        que se digita.
+                        `minDate`/`maxDate` cercam o que o campo aceita: de cem
+                        anos atrás até o aniversário de quem completa hoje a
+                        idade que o curso exige. Nascer no futuro não existe, e
+                        ter menos anos do que o curso pede seria uma matrícula
+                        que o servidor recusa depois - o campo não oferece
+                        nenhum dos dois, e os limites valem também para o que se
+                        digita.
 
                         Um clique para o ano ainda era um clique a mais do que o
                         necessário: aqui a pessoa sabe a própria data de cor, e
@@ -803,8 +882,8 @@ function RouteComponent(): React.JSX.Element {
                         onValueChange={field.onChange}
                         onBlur={field.onBlur}
                         autoComplete="bday"
-                        startMonth={BIRTH_RANGE.start}
-                        endMonth={BIRTH_RANGE.end}
+                        minDate={birthBounds.min}
+                        maxDate={birthBounds.max}
                         {...invalidProps(
                           fieldState.invalid,
                           'studentBirthDate',
@@ -820,9 +899,13 @@ function RouteComponent(): React.JSX.Element {
                 />
 
                 <Field data-invalid={Boolean(errors.studentDocument)}>
-                  <FieldLabel htmlFor="studentDocument">
-                    CPF (opcional)
-                  </FieldLabel>
+                  {/*
+                    Sem o "(opcional)" que estava aqui: o CPF passou a ser o
+                    que distingue duas matrículas da mesma pessoa na mesma
+                    turma, e um rótulo que promete o contrário faria a pessoa
+                    pular o campo para ser barrada no envio.
+                  */}
+                  <FieldLabel htmlFor="studentDocument">CPF</FieldLabel>
                   <Input
                     {...registerWithMask('studentDocument', 'cpf', {
                       autoUnmask: true,

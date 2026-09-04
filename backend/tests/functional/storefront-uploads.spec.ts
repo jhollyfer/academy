@@ -7,6 +7,7 @@ import {
   body,
   createClass,
   createCourse,
+  cpfFrom,
   enrollmentPayload,
   resetDatabase,
 } from '../helpers.ts'
@@ -161,6 +162,7 @@ test.group('storefront > upload do comprovante', (group) => {
       enrollmentPayload(body(await client.get(`/storefront/enrollments/${primeiro}`)).class.id, {
         email: 'outra@exemplo.com',
         studentName: 'Maria Souza',
+        studentDocument: cpfFrom('390533447'),
       })
     )
 

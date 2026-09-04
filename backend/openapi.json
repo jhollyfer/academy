@@ -4248,11 +4248,11 @@
             }
           },
           "422": {
-            "description": "Dados inválidos · Turma indisponível · Responsável legal obrigatório",
+            "description": "Dados inválidos · Turma indisponível · Idade abaixo da mínima · Matrícula duplicada · Responsável legal obrigatório · Responsável legal inválido",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422ClassUnavailableGuardianRequiredValidationError"
+                  "$ref": "#/components/schemas/Error422AgeBelowMinimumClassUnavailableDuplicateEnrollmentGuardianRequiredGuardianSameDocumentValidationError"
                 }
               }
             }
@@ -7806,10 +7806,7 @@
             "format": "date"
           },
           "studentDocument": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "studentId": {
             "type": [
@@ -8293,10 +8290,7 @@
             "format": "date"
           },
           "studentDocument": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "studentId": {
             "type": [
@@ -8780,10 +8774,7 @@
             "format": "date"
           },
           "studentDocument": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "studentId": {
             "type": [
@@ -9289,10 +9280,7 @@
             "format": "date"
           },
           "studentDocument": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "studentId": {
             "type": [
@@ -13619,7 +13607,7 @@
           "code"
         ]
       },
-      "Error422ClassUnavailableGuardianRequiredValidationError": {
+      "Error422AgeBelowMinimumClassUnavailableDuplicateEnrollmentGuardianRequiredGuardianSameDocumentValidationError": {
         "type": "object",
         "properties": {
           "message": {
@@ -13636,8 +13624,11 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
+              "AGE_BELOW_MINIMUM",
               "CLASS_UNAVAILABLE",
+              "DUPLICATE_ENROLLMENT",
               "GUARDIAN_REQUIRED",
+              "GUARDIAN_SAME_DOCUMENT",
               "VALIDATION_ERROR"
             ]
           },
@@ -15562,10 +15553,7 @@
             "format": "date"
           },
           "studentDocument": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "studentId": {
             "type": [
@@ -16049,10 +16037,7 @@
             "format": "date"
           },
           "studentDocument": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "studentId": {
             "type": [
@@ -17600,10 +17585,7 @@
             "format": "date-time"
           },
           "studentDocument": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "minLength": 11,
             "maxLength": 11
           },
@@ -17658,6 +17640,7 @@
           "classId",
           "studentName",
           "studentBirthDate",
+          "studentDocument",
           "email",
           "phone",
           "termsAccepted",

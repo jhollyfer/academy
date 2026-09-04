@@ -2,6 +2,7 @@ import type * as React from 'react'
 import { useState } from 'react'
 import { CalendarBlankIcon } from '@phosphor-icons/react'
 import { ptBR } from 'date-fns/locale'
+import type { Matcher } from 'react-day-picker'
 import { useMaskInput } from 'use-mask-input'
 
 import { Button } from '#/components/ui/button'
@@ -38,7 +39,7 @@ type DatePickerProps = {
   /** Repassado ao input, para o navegador oferecer o preenchimento certo. */
   autoComplete?: string
   /**
-   * O primeiro e o último mês que o campo aceita.
+   * O primeiro e o último **dia** que o campo aceita.
    *
    * Existem por causa da data de nascimento: sem limite o `dropdown` do
    * `react-day-picker` lista uma faixa arbitrária em volta do ano corrente, e
@@ -48,11 +49,16 @@ type DatePickerProps = {
    * Valem também para o que se digita: um limite que o clique respeita e o
    * teclado ignora seriam duas regras no mesmo campo.
    *
+   * Eram `startMonth`/`endMonth`, e a precisão de mês deixou passar o defeito
+   * que o teste de aceitação encontrou: com o teto em "hoje", 30 de setembro
+   * era aceito em 3 de setembro, porque o mês batia. O nome mudou junto com a
+   * semântica de propósito - `startMonth` era o que convidava ao engano.
+   *
    * A turma não passa nenhum dos dois: a data da primeira aula é sempre perto
    * de hoje, e limitar ali seria inventar uma regra que o backend não tem.
    */
-  startMonth?: Date
-  endMonth?: Date
+  minDate?: Date
+  maxDate?: Date
 }
 
 /**
@@ -92,8 +98,8 @@ export function DatePicker({
   'aria-invalid': invalid,
   className,
   autoComplete,
-  startMonth,
-  endMonth,
+  minDate,
+  maxDate,
 }: DatePickerProps): React.JSX.Element {
   const [open, setOpen] = useState(false)
   const [text, setText] = useState(() => toDisplay(value))
@@ -107,6 +113,21 @@ export function DatePicker({
   }
 
   const selected = fromWire(value)
+
+  /**
+   * Os dias que o calendário recusa: os anteriores ao mínimo e os posteriores
+   * ao máximo.
+   *
+   * Dois matchers numa lista, e **não** `{ before, after }` no mesmo objeto:
+   * essa forma é o `DateInterval` do `react-day-picker`, que casa o miolo do
+   * intervalo. Escrita assim, ela desabilitaria exatamente as datas que o campo
+   * quer aceitar - e o engano passa despercebido, porque o calendário abre sem
+   * erro nenhum.
+   */
+  const outside: Array<Matcher> = []
+
+  if (minDate) outside.push({ before: minDate })
+  if (maxDate) outside.push({ after: maxDate })
 
   /**
    * A máscara `dd/mm/aaaa`. `date-br` é alias pronto do Inputmask, com o
@@ -143,7 +164,7 @@ export function DatePicker({
             // tecla faria o campo piscar de preenchido para vazio no meio da
             // digitação, e um `31/02` viraria 3 de março sem avisar.
             if (!parsed) return
-            if (!withinRange(parsed, startMonth, endMonth)) return
+            if (!withinRange(parsed, minDate, maxDate)) return
 
             onValueChange(toWire(parsed))
           }}
@@ -183,10 +204,15 @@ export function DatePicker({
           locale={ptBR}
           captionLayout="dropdown"
           autoFocus
-          startMonth={startMonth}
-          endMonth={endMonth}
+          // `startMonth`/`endMonth` alimentam o `dropdown` de ano - é a lista
+          // que ele oferece. Quem barra o dia é o `disabled`: sem ele o mês
+          // limite entra inteiro, e o último dia do mês corrente vira data de
+          // nascimento válida.
+          startMonth={minDate}
+          endMonth={maxDate}
+          disabled={outside}
           selected={selected}
-          defaultMonth={selected ?? endMonth}
+          defaultMonth={selected ?? maxDate}
           onSelect={(day) => {
             // Dia nenhum escolhido é limpar o campo, e o vazio é `''` porque é
             // o que o resto dos formulários guarda - `null` faria o React

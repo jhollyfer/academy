@@ -188,10 +188,37 @@ export async function createClass(
  * assinatura - a chamada compilaria em nenhum lugar e o teste passaria só por
  * `node ace test` não checar tipo.
  */
+/**
+ * Um CPF válido a partir dos nove primeiros dígitos.
+ *
+ * Existe porque o CPF passou a ser único por turma: dois candidatos na mesma
+ * turma precisam de dois números, e inventá-los à mão dá em dígito verificador
+ * errado - o teste falharia por `checkDigits` e não pela regra que ele mede.
+ *
+ * Mesmo módulo 11 de `cpf()` em `app/core/validator.ts`, escrito de novo de
+ * propósito: um teste que importa a implementação que ele testa só prova que
+ * ela é igual a si mesma.
+ */
+export function cpfFrom(base: string): string {
+  let digits = base
+
+  for (const size of [9, 10]) {
+    let sum = 0
+
+    for (let i = 0; i < size; i += 1) sum += Number(digits[i]) * (size + 1 - i)
+
+    // `% 10` no lugar do "onze vira zero": resto 10 é o único caso, e o módulo
+    // resolve sem um `if` que o `no-ternary` recusaria escrever inline.
+    digits += String(((sum * 10) % 11) % 10)
+  }
+
+  return digits
+}
+
 type EnrollmentOverrides = {
   studentName?: string
   studentBirthDate?: string
-  studentDocument?: string | null
+  studentDocument?: string
   email?: string
   phone?: string
   guardianName?: string | null
@@ -208,6 +235,9 @@ export function enrollmentPayload(classId: string, overrides: EnrollmentOverride
     classId,
     studentName: 'João da Silva',
     studentBirthDate: '2000-04-12',
+    // Obrigatório e único por turma: quem matricula dois candidatos na mesma
+    // turma sobrescreve com outro `cpfFrom`, senão o segundo bate no índice.
+    studentDocument: cpfFrom('529982247'),
     email: 'joao@exemplo.com',
     phone: '97984600872',
     ...overrides,

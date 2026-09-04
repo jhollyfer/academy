@@ -48,6 +48,9 @@ test.group('mensagens > provider de validação', () => {
       'phone.regex',
       'token.fixedLength',
       'endsAtTime.afterTimeField',
+      // As da matrícula: nome sem dígito e data de nascimento que já aconteceu.
+      'personName',
+      'date.beforeOrEqual',
     ]
 
     const faltando = obrigatorias.filter((rule) => !(rule in RULE_MESSAGES))

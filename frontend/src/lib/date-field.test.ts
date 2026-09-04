@@ -85,22 +85,28 @@ describe('parseDisplay', () => {
 })
 
 describe('withinRange', () => {
-  const start = new Date(1920, 0, 1)
-  const end = new Date(2026, 8, 1)
+  const min = new Date(1920, 0, 1)
+  const max = new Date(2026, 8, 1)
 
   it('aceita a data entre os limites', () => {
-    expect(withinRange(new Date(1998, 2, 7), start, end)).toBe(true)
+    expect(withinRange(new Date(1998, 2, 7), min, max)).toBe(true)
   })
 
   it('recusa antes e depois', () => {
-    expect(withinRange(new Date(1919, 11, 31), start, end)).toBe(false)
-    expect(withinRange(new Date(2026, 9, 1), start, end)).toBe(false)
+    expect(withinRange(new Date(1919, 11, 31), min, max)).toBe(false)
+    expect(withinRange(new Date(2026, 9, 1), min, max)).toBe(false)
   })
 
-  it('o mês do limite entra inteiro', () => {
-    // A comparação é por mês porque é o que `startMonth`/`endMonth` declaram;
-    // cobrar o dia recusaria uma data legítima do próprio mês limite.
-    expect(withinRange(new Date(2026, 8, 30), start, end)).toBe(true)
+  it('o dia do limite entra, e o seguinte não', () => {
+    expect(withinRange(new Date(2026, 8, 1), min, max)).toBe(true)
+    expect(withinRange(new Date(2026, 8, 2), min, max)).toBe(false)
+  })
+
+  it('o resto do mês do limite fica de fora', () => {
+    // O defeito que a comparação por mês escondia: com o teto em 1º de
+    // setembro, o dia 30 do mesmo mês passava - e era assim que uma data de
+    // nascimento no futuro entrava no formulário de matrícula.
+    expect(withinRange(new Date(2026, 8, 30), min, max)).toBe(false)
   })
 
   it('sem limites, qualquer data serve', () => {

@@ -70,23 +70,24 @@ export function parseDisplay(text: string): Date | undefined {
 /**
  * A data está dentro dos limites que o campo oferece?
  *
- * Os mesmos `startMonth`/`endMonth` que fecham o calendário valem para o que se
+ * Os mesmos `minDate`/`maxDate` que fecham o calendário valem para o que se
  * digita: sem isto, a data de nascimento aceitaria 1890 pelo teclado e recusaria
  * pelo clique, e o campo teria duas regras.
  *
- * A comparação é por mês, e não por dia, porque é o que as duas props declaram -
- * `endMonth` é "até este mês", e cobrar o dia recusaria uma data legítima do
- * próprio mês limite.
+ * A comparação é por **dia**. Já foi por mês, e o defeito que isso escondia
+ * chegou à produção: com o limite em `new Date()`, todo dia do mês corrente
+ * passava, e em 3 de setembro o campo aceitava nascer em 30 de setembro. "Até
+ * hoje" é uma data, não um mês.
  */
 export function withinRange(
   date: Date,
-  startMonth?: Date,
-  endMonth?: Date,
+  minDate?: Date,
+  maxDate?: Date,
 ): boolean {
-  const month = format(date, 'yyyy-MM')
+  const day = format(date, 'yyyy-MM-dd')
 
-  if (startMonth && month < format(startMonth, 'yyyy-MM')) return false
-  if (endMonth && month > format(endMonth, 'yyyy-MM')) return false
+  if (minDate && day < format(minDate, 'yyyy-MM-dd')) return false
+  if (maxDate && day > format(maxDate, 'yyyy-MM-dd')) return false
 
   return true
 }

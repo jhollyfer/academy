@@ -8,6 +8,7 @@ import {
   ClassStatuses,
   EnrollmentStatuses,
   LEGAL_AGE,
+  MINIMUM_ENROLLMENT_AGE,
   type EnrollmentStatus,
 } from '#core/entity'
 import { inject } from '@adonisjs/core'
@@ -30,6 +31,18 @@ const GUARDIAN_FIELDS = {
   guardianDocument: 'Informe o CPF do responsável legal',
   guardianPhone: 'Informe o telefone do responsável legal',
 } as const
+
+/**
+ * A violação de unicidade do Postgres.
+ *
+ * Existe além da consulta que roda antes do INSERT porque as duas respondem a
+ * coisas diferentes: a consulta dá o erro no campo certo para quem preencheu o
+ * formulário, e esta cobre os milissegundos entre a consulta e a gravação -
+ * dois envios simultâneos com o mesmo CPF passam os dois pela consulta.
+ */
+function isUniqueViolation(error: unknown): boolean {
+  return typeof error === 'object' && error !== null && 'code' in error && error.code === '23505'
+}
 
 @inject()
 export default class StorefrontEnrollmentCreateUseCase {
@@ -66,6 +79,37 @@ export default class StorefrontEnrollmentCreateUseCase {
       const now = DateTime.now()
       const age = Math.floor(now.diff(payload.studentBirthDate, 'years').years)
 
+      // A idade que este curso exige. `minimumAge` é `nullable` - curso
+      // cadastrado sem o campo cai no piso, e nunca em "sem exigência".
+      const required = Math.max(MINIMUM_ENROLLMENT_AGE, turma.course.minimumAge ?? 0)
+
+      if (age < required)
+        return left(
+          HTTPException.UnprocessableEntity('Idade abaixo da mínima', 'AGE_BELOW_MINIMUM', {
+            studentBirthDate: `Este curso é a partir de ${required} anos`,
+          })
+        )
+
+      // Só depois da idade: um CPF já matriculado nesta turma é o mesmo
+      // candidato entrando duas vezes, e é o que o índice único cobra.
+      //
+      // A rota é escrita anônima, então esta resposta confirma a um visitante
+      // que aquele CPF está nesta turma. É o preço do índice, e a defesa é o
+      // teto de `enrollmentThrottle` - dez por hora por IP, em `start/limiter`
+      // -, que inviabiliza varredura mas não a consulta pontual de quem já
+      // suspeita do número.
+      const duplicate = await Enrollment.query()
+        .where('classId', payload.classId)
+        .where('studentDocument', payload.studentDocument)
+        .first()
+
+      if (duplicate)
+        return left(
+          HTTPException.UnprocessableEntity('Matrícula duplicada', 'DUPLICATE_ENROLLMENT', {
+            studentDocument: 'Este CPF já tem matrícula nesta turma',
+          })
+        )
+
       if (age < LEGAL_AGE) {
         // Vem para cá e não para o validator porque a condição depende de outro
         // campo, e uma regra de objeto do VineJS reporta no caminho do objeto -
@@ -84,6 +128,19 @@ export default class StorefrontEnrollmentCreateUseCase {
               'Responsável legal obrigatório',
               'GUARDIAN_REQUIRED',
               missing
+            )
+          )
+
+        // Responsável legal e aluno são duas pessoas, e o mesmo CPF nos dois
+        // campos é o formulário preenchido no automático - não um caso de
+        // família. Comparação direta porque o `parse()` do `cpf()` já tirou a
+        // máscara dos dois: `529.982.247-25` e `52998224725` chegam iguais.
+        if (payload.guardianDocument === payload.studentDocument)
+          return left(
+            HTTPException.UnprocessableEntity(
+              'Responsável legal inválido',
+              'GUARDIAN_SAME_DOCUMENT',
+              { guardianDocument: 'O CPF do responsável deve ser diferente do CPF do aluno' }
             )
           )
       }
@@ -125,6 +182,17 @@ export default class StorefrontEnrollmentCreateUseCase {
 
       return right(enrollment)
     } catch (error) {
+      // A corrida que a consulta acima não pega. Vira o mesmo 422 no mesmo
+      // campo: para quem enviou, "chegou junto com outro" e "já existia" são a
+      // mesma coisa, e um 500 aqui mandaria tentar de novo o que nunca vai dar
+      // certo.
+      if (isUniqueViolation(error))
+        return left(
+          HTTPException.UnprocessableEntity('Matrícula duplicada', 'DUPLICATE_ENROLLMENT', {
+            studentDocument: 'Este CPF já tem matrícula nesta turma',
+          })
+        )
+
       logger.error({ err: error }, '[storefront > enrollments > create][error]')
       return left(
         HTTPException.InternalServerError('Erro interno do servidor', 'ENROLLMENT_CREATE_ERROR')

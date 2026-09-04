@@ -49,6 +49,12 @@ export const RULE_MESSAGES = {
   // `.parse()` tirando a máscara antes da regra de tamanho. A genérica
   // `fixedLength` diria "Informe 11 caracteres" para um CPF, o que é falso para
   // quem digitou "123.456.789-0" e contou treze.
+  // A regra própria de `personName()`. Chave sem prefixo de campo de propósito:
+  // vale para o nome do aluno e o do responsável, e para o próximo que vier.
+  'personName': 'Informe um nome sem números',
+  // A data de nascimento. A genérica falaria em "valor", e o que a pessoa
+  // precisa ler é que a data que ela escolheu ainda não aconteceu.
+  'date.beforeOrEqual': 'A data de nascimento não pode estar no futuro',
   'cpf.fixedLength': 'CPF deve ter 11 dígitos',
   // O `regex` de `phone()` roda sobre os dígitos já sem máscara, então a
   // mensagem fala de DDD e não de formato.

@@ -4,12 +4,31 @@ import { StorefrontEnrollmentCreateValidator } from '#core/validator'
 import {
   authenticateAsOwner,
   body,
+  cpfFrom,
   createClass,
   createCourse,
   enrollmentPayload,
   resetDatabase,
 } from '../helpers.ts'
 import type { FakeMailer } from '@adonisjs/mail'
+
+/**
+ * A data de nascimento de quem faz `age` anos hoje.
+ *
+ * Calculada e não escrita à mão: uma data fixa envelhece, e o teste da idade
+ * mínima passaria a medir outra idade a cada aniversário do repositório - até
+ * parar de medir coisa nenhuma.
+ *
+ * Montada campo a campo em vez de `toISOString()`: aquele converte para UTC, e
+ * num fuso a oeste de Greenwich a data volta um dia.
+ */
+function birthDateForAge(age: number): string {
+  const today = new Date()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+
+  return `${today.getFullYear() - age}-${month}-${day}`
+}
 
 test.group('vitrine > matrículas', (group) => {
   group.each.setup(() => resetDatabase())
@@ -59,7 +78,7 @@ test.group('vitrine > matrículas', (group) => {
 
     const response = await client
       .post('/storefront/enrollments')
-      .json(enrollmentPayload(turma.id, { studentBirthDate: '2015-05-10' }))
+      .json(enrollmentPayload(turma.id, { studentBirthDate: '2010-05-10' }))
 
     response.assertStatus(422)
 
@@ -78,7 +97,7 @@ test.group('vitrine > matrículas', (group) => {
 
     const response = await client.post('/storefront/enrollments').json(
       enrollmentPayload(turma.id, {
-        studentBirthDate: '2015-05-10',
+        studentBirthDate: '2010-05-10',
         guardianName: 'Maria Souza',
         guardianDocument: '39053344705',
         guardianPhone: '97984600872',
@@ -86,6 +105,153 @@ test.group('vitrine > matrículas', (group) => {
     )
 
     response.assertStatus(201)
+  })
+
+  test('data de nascimento no futuro é recusada', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+    const turma = await createClass(client, session, course.id)
+
+    const response = await client
+      .post('/storefront/enrollments')
+      .json(enrollmentPayload(turma.id, { studentBirthDate: '2099-01-01' }))
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'studentBirthDate')
+  })
+
+  test('idade abaixo do piso é recusada mesmo sem idade mínima no curso', async ({
+    client,
+    assert,
+  }) => {
+    const session = await authenticateAsOwner(client)
+    // Sem `minimumAge`: é o curso cadastrado às pressas, e o caso que o piso
+    // existe para cobrir.
+    const course = await createCourse(client, session)
+    const turma = await createClass(client, session, course.id)
+
+    const response = await client
+      .post('/storefront/enrollments')
+      .json(enrollmentPayload(turma.id, { studentBirthDate: birthDateForAge(13) }))
+
+    response.assertStatus(422)
+    assert.equal(body(response).code, 'AGE_BELOW_MINIMUM')
+    // No campo, e não no root: é o input da data que a tela precisa marcar.
+    assert.property(body(response).errors, 'studentBirthDate')
+  })
+
+  test('a idade mínima do curso vence o piso quando é maior', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session, { minimumAge: 16 })
+    const turma = await createClass(client, session, course.id)
+
+    // Quinze anos passa do piso de 14 e não chega aos 16 deste curso.
+    const recusado = await client
+      .post('/storefront/enrollments')
+      .json(enrollmentPayload(turma.id, { studentBirthDate: birthDateForAge(15) }))
+
+    recusado.assertStatus(422)
+    assert.equal(body(recusado).code, 'AGE_BELOW_MINIMUM')
+
+    const aceito = await client.post('/storefront/enrollments').json(
+      enrollmentPayload(turma.id, {
+        studentBirthDate: birthDateForAge(16),
+        guardianName: 'Maria Souza',
+        guardianDocument: '39053344705',
+        guardianPhone: '97984600872',
+      })
+    )
+
+    // Dezesseis em ponto entra: o limite é "a partir de", e quem faz aniversário
+    // hoje já tem a idade.
+    aceito.assertStatus(201)
+  })
+
+  test('nome com número é recusado', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+    const turma = await createClass(client, session, course.id)
+
+    const response = await client
+      .post('/storefront/enrollments')
+      .json(enrollmentPayload(turma.id, { studentName: 'Maria 12345' }))
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'studentName')
+  })
+
+  test('nome de uma palavra só é aceito', async ({ client }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+    const turma = await createClass(client, session, course.id)
+
+    // A escola atende o Alto Solimões: nome indígena sem sobrenome é aluno
+    // real, e exigir duas palavras o barraria na porta.
+    const response = await client
+      .post('/storefront/enrollments')
+      .json(enrollmentPayload(turma.id, { studentName: 'Tarinu' }))
+
+    response.assertStatus(201)
+  })
+
+  test('o mesmo CPF não entra duas vezes na mesma turma', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+    const turma = await createClass(client, session, course.id)
+
+    const first = await client.post('/storefront/enrollments').json(enrollmentPayload(turma.id))
+    first.assertStatus(201)
+
+    // Mesmo CPF, outro e-mail e outro nome: é a mesma pessoa reenviando o
+    // formulário, que é o que o índice existe para pegar.
+    const second = await client.post('/storefront/enrollments').json(
+      enrollmentPayload(turma.id, {
+        studentName: 'Joao da Silva Filho',
+        email: 'outro@exemplo.com',
+      })
+    )
+
+    second.assertStatus(422)
+    assert.equal(body(second).code, 'DUPLICATE_ENROLLMENT')
+    assert.property(body(second).errors, 'studentDocument')
+  })
+
+  test('o mesmo CPF entra em turmas diferentes', async ({ client }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+    const primeira = await createClass(client, session, course.id)
+    const segunda = await createClass(client, session, course.id, { name: 'Turma da tarde' })
+
+    const first = await client.post('/storefront/enrollments').json(enrollmentPayload(primeira.id))
+    first.assertStatus(201)
+
+    // O índice é por turma de propósito: a mesma pessoa cursa robótica e
+    // desenvolvimento web, e repete no semestre seguinte.
+    const second = await client.post('/storefront/enrollments').json(enrollmentPayload(segunda.id))
+
+    second.assertStatus(201)
+  })
+
+  test('o responsável não pode usar o CPF do próprio aluno', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+    const course = await createCourse(client, session)
+    const turma = await createClass(client, session, course.id)
+
+    const documento = cpfFrom('529982247')
+
+    const response = await client.post('/storefront/enrollments').json(
+      enrollmentPayload(turma.id, {
+        studentBirthDate: birthDateForAge(15),
+        studentDocument: documento,
+        guardianName: 'Maria Souza',
+        guardianDocument: documento,
+        guardianPhone: '97984600872',
+      })
+    )
+
+    response.assertStatus(422)
+    assert.equal(body(response).code, 'GUARDIAN_SAME_DOCUMENT')
+    assert.property(body(response).errors, 'guardianDocument')
   })
 
   test('turma lotada entra como WAITLIST em vez de recusar', async ({ client, assert }) => {
@@ -97,9 +263,12 @@ test.group('vitrine > matrículas', (group) => {
     first.assertStatus(201)
     assert.equal(body(first).status, 'PENDING')
 
-    const second = await client
-      .post('/storefront/enrollments')
-      .json(enrollmentPayload(turma.id, { email: 'segundo@exemplo.com' }))
+    const second = await client.post('/storefront/enrollments').json(
+      enrollmentPayload(turma.id, {
+        email: 'segundo@exemplo.com',
+        studentDocument: cpfFrom('390533447'),
+      })
+    )
 
     // A vaga não estoura e o candidato não é mandado embora.
     second.assertStatus(201)
@@ -224,6 +393,7 @@ test.group('vitrine > matrículas > consentimento', () => {
     classId: '00000000-0000-4000-8000-000000000000',
     studentName: 'João da Silva',
     studentBirthDate: '2000-04-12',
+    studentDocument: '52998224725',
     email: 'joao@exemplo.com',
     phone: '97984600872',
     termsAccepted: true,
@@ -234,6 +404,15 @@ test.group('vitrine > matrículas > consentimento', () => {
     const payload = await StorefrontEnrollmentCreateValidator.validate(base)
 
     assert.equal(payload.email, 'joao@exemplo.com')
+  })
+
+  test('recusa o envio sem CPF do aluno', async ({ assert }) => {
+    // Aqui e não pela rota pelo mesmo motivo dos aceites: o registro de rotas
+    // tipa `studentDocument` como obrigatório, e o corpo sem ele não compila do
+    // lado do cliente do Japa.
+    const { studentDocument: _cpf, ...semCpf } = base
+
+    await assert.rejects(() => StorefrontEnrollmentCreateValidator.validate(semCpf))
   })
 
   test('recusa sem o consentimento da LGPD', async ({ assert }) => {
@@ -319,9 +498,13 @@ test.group('vitrine > matrículas > aviso para a secretaria', (group) => {
 
     await client.post('/storefront/enrollments').json(enrollmentPayload(turma.id))
 
-    const response = await client
-      .post('/storefront/enrollments')
-      .json(enrollmentPayload(turma.id, { studentName: 'Ana Ribeiro', email: 'ana@exemplo.com' }))
+    const response = await client.post('/storefront/enrollments').json(
+      enrollmentPayload(turma.id, {
+        studentName: 'Ana Ribeiro',
+        email: 'ana@exemplo.com',
+        studentDocument: cpfFrom('390533447'),
+      })
+    )
 
     response.assertStatus(201)
     assert.equal(response.body().status, 'WAITLIST')

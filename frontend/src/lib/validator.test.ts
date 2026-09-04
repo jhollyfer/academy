@@ -55,6 +55,9 @@ const ENROLLMENT = {
   classId: '3f6c1a7e-9b2d-4f8a-8c1e-2d5b7a9c0e11',
   studentName: 'Maria Souza',
   studentBirthDate: '2008-05-14',
+  // Obrigatório: é o CPF que distingue duas matrículas da mesma pessoa na mesma
+  // turma, e o índice que cobra isso não funciona sobre nulo.
+  studentDocument: '52998224725',
   email: 'maria@mail.com',
   phone: '97984317149',
   termsAccepted: true,
@@ -203,6 +206,42 @@ describe('matrícula', () => {
       ...ENROLLMENT,
       studentDocument: '111.111.111-11',
     })
+
+    expect(fieldsOf(error)).toContain('studentDocument')
+  })
+
+  it('recusa número no nome, e aceita nome de uma palavra só', async () => {
+    const [comNumero] = await StorefrontEnrollmentCreateValidator.tryValidate({
+      ...ENROLLMENT,
+      studentName: 'Maria 12345',
+    })
+
+    expect(fieldsOf(comNumero)).toContain('studentName')
+
+    // Uma palavra passa de propósito: a escola atende o Alto Solimões, e nome
+    // indígena sem sobrenome é aluno real, não dado malformado.
+    const [umaPalavra] = await StorefrontEnrollmentCreateValidator.tryValidate({
+      ...ENROLLMENT,
+      studentName: 'Tarinu',
+    })
+
+    expect(fieldsOf(umaPalavra)).toEqual([])
+  })
+
+  it('recusa data de nascimento no futuro', async () => {
+    const [error] = await StorefrontEnrollmentCreateValidator.tryValidate({
+      ...ENROLLMENT,
+      studentBirthDate: '2099-01-01',
+    })
+
+    expect(fieldsOf(error)).toContain('studentBirthDate')
+  })
+
+  it('recusa o envio sem CPF do aluno', async () => {
+    const { studentDocument: _cpf, ...semCpf } = ENROLLMENT
+
+    const [error] =
+      await StorefrontEnrollmentCreateValidator.tryValidate(semCpf)
 
     expect(fieldsOf(error)).toContain('studentDocument')
   })

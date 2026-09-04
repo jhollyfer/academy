@@ -194,6 +194,42 @@ export function phone() {
 }
 
 /**
+ * O que pode aparecer num nome de pessoa: letra (com acento), espaço,
+ * apóstrofo, hífen e ponto.
+ *
+ * O que a regra existe para barrar é o dígito - "Maria 12345" passou pelo
+ * formulário de matrícula e chegou ao painel, e nome com número quebra busca,
+ * relatório e a emissão de certificado mais adiante.
+ */
+const PERSON_NAME = /^[\p{L}][\p{L}\p{M} '’.-]*$/u
+
+const personNameChars = vine.createRule(
+  (value: unknown, _options, field: FieldContext) => {
+    if (typeof value !== 'string') return
+    if (PERSON_NAME.test(value)) return
+
+    field.report('Informe um nome sem números', 'personName', field)
+  },
+)
+
+/**
+ * Nome de pessoa - do candidato ou do responsável legal.
+ *
+ * **Não exige duas palavras**, e isso é decisão e não esquecimento. A escola
+ * atende o Alto Solimões, onde nome indígena de palavra única é comum; cobrar
+ * sobrenome barraria aluno real para resolver um problema que ninguém tem. O
+ * defeito relatado era número no meio do nome, e é só isso que a regra barra.
+ *
+ * A regra é nomeada (`personName`) em vez de um `.regex()` cru porque o
+ * `SimpleMessagesProvider` procura `campo.regra` e depois `regra`: com `regex`
+ * seriam duas chaves - `studentName.regex` e `guardianName.regex` - e um campo
+ * novo nasceria sem mensagem. Com o nome próprio há uma chave só.
+ */
+export function personName() {
+  return vine.string().trim().minLength(2).maxLength(160).use(personNameChars())
+}
+
+/**
  * Os três campos que toda listagem aceita. Espalhados (`...paginationFields()`)
  * pelos validators que ainda somam um filtro próprio, para que o teto de
  * `perPage` viva num lugar só.
@@ -672,19 +708,19 @@ export type AdministratorEnrollmentUpdatePayload = Infer<
 export const StorefrontEnrollmentCreateValidator = vine.create(
   vine.object({
     classId: vine.string().uuid(),
-    studentName: vine.string().trim().minLength(2).maxLength(160),
-    studentBirthDate: vine.date({ formats: ['iso8601'] }),
-    studentDocument: cpf().nullable().optional(),
+    studentName: personName(),
+    // `beforeOrEqual('today')` aqui e idade mínima no use-case: nascer no
+    // futuro é impossível olhando só para este campo, e idade mínima depende da
+    // turma escolhida. A que cabe no validator fica no validator.
+    studentBirthDate: vine.date({ formats: ['iso8601'] }).beforeOrEqual('today'),
+    // Obrigatório desde que o CPF passou a identificar a matrícula: é ele que
+    // impede a mesma pessoa entrar duas vezes na mesma turma, e o índice que
+    // cobra isso não funciona sobre nulo.
+    studentDocument: cpf(),
     email: email(),
     phone: phone(),
 
-    guardianName: vine
-      .string()
-      .trim()
-      .minLength(2)
-      .maxLength(160)
-      .nullable()
-      .optional(),
+    guardianName: personName().nullable().optional(),
     guardianDocument: cpf().nullable().optional(),
     guardianPhone: phone().nullable().optional(),
 

@@ -218,7 +218,7 @@ export class EnrollmentSchema extends BaseModel {
   @column.date()
   declare studentBirthDate: DateTime
   @column()
-  declare studentDocument: string | null
+  declare studentDocument: string
   @column()
   declare studentId: string | null
   @column()

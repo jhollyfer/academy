@@ -246,6 +246,18 @@ export const ENROLLMENT_TRANSITIONS: Record<EnrollmentStatus, ReadonlyArray<Enro
 export const LEGAL_AGE = 18
 
 /**
+ * A idade abaixo da qual nenhum curso aceita matrícula, valha o que valer o
+ * `minimumAge` do curso.
+ *
+ * É piso e não regra: a idade que decide é a do curso, e esta só entra quando o
+ * curso não tem uma - `minimumAge` é `nullable`, e curso cadastrado às pressas
+ * pelo painel nasce sem ela. Sem o piso, esse curso aceitaria matrícula de
+ * criança de sete anos, e o defeito não apareceria em teste nenhum: o campo
+ * vazio é o caso normal, não o excepcional.
+ */
+export const MINIMUM_ENROLLMENT_AGE = 14
+
+/**
  * O que um arquivo anexado a uma matrícula é.
  *
  * `PAYMENT_RECEIPT` é o comprovante do Pix da inscrição, o único obrigatório no

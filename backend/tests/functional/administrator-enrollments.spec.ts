@@ -6,6 +6,7 @@ import {
   body,
   createClass,
   createCourse,
+  cpfFrom,
   enrollmentPayload,
   resetDatabase,
 } from '../helpers.ts'
@@ -77,17 +78,21 @@ test.group('administrador > matrículas > exportação', (group) => {
   test('escapa o campo que contém o separador', async ({ client, assert }) => {
     const session = await authenticateAsOwner(client)
     const course = await createCourse(client, session)
-    const turma = await createClass(client, session, course.id)
+    // O `;` entra pelo nome da turma, e não pelo do aluno: nome de pessoa não
+    // aceita mais pontuação de separador desde que `personName()` passou a
+    // recusar o que não é nome. A coluna "Turma" é texto livre da secretaria, e
+    // é por ela que o separador ainda chega ao CSV.
+    const turma = await createClass(client, session, course.id, {
+      name: 'Sábado; manhã',
+    })
 
-    await client
-      .post('/storefront/enrollments')
-      .json(enrollmentPayload(turma.id, { studentName: 'Silva; Souza' }))
+    await client.post('/storefront/enrollments').json(enrollmentPayload(turma.id))
 
     const response = await client.get('/administrator/enrollments/export').cookies(session)
 
-    // Entre aspas, senão o `;` do nome deslocaria todas as colunas seguintes e o
-    // arquivo abriria torto sem nenhum erro visível.
-    assert.include(response.text(), '"Silva; Souza"')
+    // Entre aspas, senão o `;` deslocaria todas as colunas seguintes e o arquivo
+    // abriria torto sem nenhum erro visível.
+    assert.include(response.text(), '"Sábado; manhã"')
   })
 
   test('aplica o filtro de situação da listagem', async ({ client, assert }) => {
@@ -96,9 +101,13 @@ test.group('administrador > matrículas > exportação', (group) => {
     const turma = await createClass(client, session, course.id, { capacity: 1 })
 
     await client.post('/storefront/enrollments').json(enrollmentPayload(turma.id))
-    await client
-      .post('/storefront/enrollments')
-      .json(enrollmentPayload(turma.id, { studentName: 'Ana Ribeiro', email: 'ana@exemplo.com' }))
+    await client.post('/storefront/enrollments').json(
+      enrollmentPayload(turma.id, {
+        studentName: 'Ana Ribeiro',
+        email: 'ana@exemplo.com',
+        studentDocument: cpfFrom('390533447'),
+      })
+    )
 
     const response = await client
       .get('/administrator/enrollments/export')
