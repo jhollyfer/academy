@@ -74,7 +74,7 @@ export function WhereAndWhen(): React.JSX.Element {
       */}
       <div className="relative px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-20">
-          <SectionTitle className={REVEAL} eyebrow="Endereço e horário" lead="Onde e" accent="quando" />
+          <SectionTitle className={REVEAL} lead="Onde e" accent="quando" />
 
           <div className={cn(REVEAL, 'delay-100')}>
             <dl className="grid gap-5">

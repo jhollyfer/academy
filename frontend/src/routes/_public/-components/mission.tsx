@@ -77,7 +77,7 @@ export function Mission(): React.JSX.Element {
         <div className="relative mx-auto max-w-7xl">
           <SectionTitle
             className={REVEAL}
-            eyebrow="Missão" lead="Por que esta"
+            lead="Por que esta"
             accent="escola existe"
           />
 

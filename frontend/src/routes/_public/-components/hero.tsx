@@ -149,15 +149,19 @@ export function Hero(): React.JSX.Element {
               ribeirinha, indígena e cabocla, de toda a comunidade amazônica.
             </p>
 
-            <p className="mt-3 max-w-[46ch] text-body-md text-white/80 sm:text-body-lg">
-              {schedule}
-            </p>
+            {/*
+              Horário e vagas num parágrafo só, e não em dois empilhados.
 
-            {seats && (
-              <p className="mt-2 text-body-md text-white/80 sm:text-body-lg">
-                {seats}
-              </p>
-            )}
+              São a mesma resposta - "quando é, e ainda cabe alguém" -, e o hero
+              é um momento, não uma ficha. Três blocos de texto sob o título
+              faziam a primeira dobra virar lista, e empurravam o CTA para
+              baixo da linha do celular, que é onde quase todo mundo abre a
+              página.
+            */}
+            <p className="mt-3 max-w-[52ch] text-body-md text-white/80 sm:text-body-lg">
+              {schedule}
+              {seats && ` ${seats}`}
+            </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <EnrollmentCta tone="neon" scale="lg" />

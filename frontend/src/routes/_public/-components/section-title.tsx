@@ -48,10 +48,16 @@ type SectionTitleProps = {
   /**
    * O rótulo em caixa alta acima do título.
    *
-   * Diz de que seção se trata antes de o título dizer o que ela afirma, e é o
-   * que dá à página a cadência de documento em vez de sequência de blocos. Fica
-   * opcional porque a faixa de abertura de uma página não precisa dele: ali o
-   * `h1` já é o começo de tudo.
+   * **Raro de propósito: no máximo um a cada três seções da página.**
+   *
+   * A home levou os dez de uma vez e todos saíram. O título daqui é `lead` +
+   * `accent`, ou seja já descreve a seção: "PROFESSORES" acima de "Quem vai
+   * ensinar você" não orienta ninguém, só produz o mesmo ritmo em todo bloco -
+   * e ritmo repetido é o que faz uma página parecer gerada, não desenhada.
+   *
+   * Só vale onde o título sozinho não situa: na página de curso, onde a ementa,
+   * o resultado e o investimento são etapas de um argumento e o rótulo marca
+   * onde cada uma começa.
    */
   eyebrow?: React.ReactNode
   /** A primeira linha, na cor do texto. */

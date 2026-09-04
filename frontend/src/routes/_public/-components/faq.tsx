@@ -54,7 +54,7 @@ export function Faq({
       */}
       <div className="relative px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-20">
-          <SectionTitle className={REVEAL} eyebrow="Dúvidas" lead={title} accent={highlight} />
+          <SectionTitle className={REVEAL} lead={title} accent={highlight} />
 
           {/*
             `keepMounted` porque o `aria-controls` abaixo é escrito à mão. Por

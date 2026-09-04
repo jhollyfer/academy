@@ -115,7 +115,7 @@ export function WhatYouGet(): React.JSX.Element {
           <SectionTitle
             tone="ink"
             className="lg:text-display-md"
-            eyebrow="O curso" lead="O que você"
+            lead="O que você"
             accent="leva daqui"
           />
 

@@ -90,7 +90,7 @@ export function Team(): React.JSX.Element {
         <div className="mx-auto max-w-7xl">
           <SectionTitle
             className={REVEAL}
-            eyebrow="Professores" lead="Quem vai"
+            lead="Quem vai"
             accent="ensinar você"
           />
 

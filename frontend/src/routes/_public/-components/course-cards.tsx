@@ -59,7 +59,7 @@ export function CourseCards({
         <SectionTitle
           tone="ink"
           className={REVEAL}
-          eyebrow="Os cursos" lead="Dois cursos,"
+          lead="Dois cursos,"
           accent="uma turma só"
         />
 
