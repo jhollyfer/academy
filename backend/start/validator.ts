@@ -111,6 +111,8 @@ export const FIELD_LABELS = {
   // quanto ao que a instituição faz pela escola.
   'url': 'o site',
   'logoId': 'a logomarca',
+  'imageId': 'a imagem',
+  'caption': 'a legenda',
 
   // ── Cursos ───────────────────────────────────────────────────────────
   'accent': 'o tema',

@@ -203,6 +203,19 @@ export type PartnerResponse = {
   deletedAt: string | null
 }
 
+/** Uma foto da escola. A imagem é o conteúdo, então nunca vem sem ela. */
+export type PhotoResponse = {
+  id: string
+  imageId: string
+  image?: StorageResponse | null
+  caption: string
+  position: number
+  status: ActiveStatus
+  createdAt: string
+  updatedAt: string | null
+  deletedAt: string | null
+}
+
 export type CourseResponse = {
   id: string
   slug: string

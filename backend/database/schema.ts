@@ -273,6 +273,27 @@ export class PartnerSchema extends BaseModel {
   declare url: string | null
 }
 
+export class PhotoSchema extends BaseModel {
+  static $columns = ['caption', 'createdAt', 'deletedAt', 'id', 'imageId', 'position', 'status', 'updatedAt'] as const
+  $columns = PhotoSchema.$columns
+  @column()
+  declare caption: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime()
+  declare deletedAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare imageId: string
+  @column()
+  declare position: number
+  @column()
+  declare status: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class RateLimitSchema extends BaseModel {
   static $columns = ['expire', 'key', 'points'] as const
   $columns = RateLimitSchema.$columns

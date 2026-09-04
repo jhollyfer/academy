@@ -11,6 +11,7 @@ import {
   CheckerboardIcon,
   GraduationCapIcon,
   HandshakeIcon,
+  ImagesIcon,
   SignOutIcon,
   UserGearIcon,
   UsersThreeIcon,
@@ -67,6 +68,7 @@ const STAFF_NAVIGATION = linkOptions([
     icon: UsersThreeIcon,
   },
   { to: '/administrator/partners', label: 'Parceiros', icon: HandshakeIcon },
+  { to: '/administrator/photos', label: 'Galeria', icon: ImagesIcon },
   { to: '/administrator/users', label: 'Usuários', icon: UserGearIcon },
 ])
 

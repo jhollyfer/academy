@@ -33,16 +33,28 @@ export function Partners({
   return (
     <section
       data-slot="home-partners"
-      className="relative overflow-hidden bg-background"
+      className="relative overflow-hidden bg-brand-ink"
     >
       {/*
-        Sangria total, como as demais seções: sem raio, sem borda e sem respiro
-        lateral no invólucro. O recuo que sobra é o do conteúdo, no
+        Faixa escura, e não clara como as vizinhas.
+
+        Duas razões. A primeira é ritmo: equipe, missão e "para quem é" já são
+        claras, e com esta seção clara no meio a home passava a ter quatro
+        blocos iguais em sequência - o olho para de perceber onde uma acaba e a
+        outra começa.
+
+        A segunda é peso. O bloco escuro é a área de marca da escola, e é onde
+        ela fala por si: hero, números e convite final. Quem responde
+        institucionalmente pela escola pertence a esse grupo, e não à sequência
+        de seções explicativas.
+
+        Sangria total, como as demais: o recuo que sobra é o do conteúdo, no
         `mx-auto max-w-7xl` de dentro.
       */}
       <div className="relative px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         <div className="relative mx-auto max-w-7xl">
           <SectionTitle
+            tone="ink"
             className={REVEAL}
             lead="Quem sustenta"
             accent="esta escola"
@@ -51,7 +63,7 @@ export function Partners({
           <p
             className={cn(
               REVEAL,
-              'delay-100 mt-6 max-w-[64ch] text-body-md text-muted-foreground sm:text-body-lg',
+              'delay-100 mt-6 max-w-[64ch] text-body-md text-white/80 sm:text-body-lg',
             )}
           >
             A escola não funciona sozinha. Estas são as instituições que cedem
@@ -68,7 +80,13 @@ export function Partners({
             {partners.map((partner, index) => (
               <SectionCard
                 key={partner.id}
-                className={cn(REVEAL, 'h-full')}
+                className={cn(
+                  REVEAL,
+                  // Superfície e fio de cabelo da rampa escura, e não o cartão
+                  // claro do tema: sobre `brand-ink` ele viraria um retângulo
+                  // branco flutuando, que é o oposto do que a faixa quer dizer.
+                  'h-full border-ink-hairline bg-ink-surface',
+                )}
                 style={{ animationDelay: `${index * STAGGER}ms` }}
               >
                 <CardContent className="flex flex-col gap-4">
@@ -91,10 +109,10 @@ export function Partners({
                   )}
 
                   <div>
-                    <CardTitle className="text-heading-sm text-foreground">
+                    <CardTitle className="text-heading-sm text-white">
                       {partner.name}
                     </CardTitle>
-                    <CardDescription className="mt-2 text-body-sm text-muted-foreground">
+                    <CardDescription className="mt-2 text-body-sm text-white/70">
                       {partner.role}
                     </CardDescription>
                   </div>
@@ -104,7 +122,7 @@ export function Partners({
                       href={partner.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-body-sm text-neon-ink underline underline-offset-4 dark:text-neon"
+                      className="text-body-sm text-neon underline underline-offset-4"
                     >
                       Site da instituição
                     </a>

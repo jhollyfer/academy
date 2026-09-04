@@ -60,6 +60,12 @@ export const queryKeys = {
     detail: (id: string) => ['partners', 'detail', id] as const,
   },
 
+  photos: {
+    all: ['photos'] as const,
+    list: (params: ListSearch) => ['photos', 'list', params] as const,
+    detail: (id: string) => ['photos', 'detail', id] as const,
+  },
+
   classes: {
     all: ['classes'] as const,
     list: (params: ListSearch) => ['classes', 'list', params] as const,
@@ -95,6 +101,7 @@ export const queryKeys = {
      * lixeira, o site só o que está no ar.
      */
     partners: () => ['storefront', 'partners'] as const,
+    photos: () => ['storefront', 'photos'] as const,
     /**
      * O acompanhamento por protocolo. Não é `enrollments.detail`: a chave lá é
      * o `id`, que o candidato não tem - e o corpo é outro, sem as anotações da

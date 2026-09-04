@@ -95,6 +95,7 @@ export default class StorageService {
       db.from('courses').where('cover_id', storageId).count('* as total'),
       db.from('enrollment_files').where('storage_id', storageId).count('* as total'),
       db.from('partners').where('logo_id', storageId).count('* as total'),
+      db.from('photos').where('image_id', storageId).count('* as total'),
     ])
 
     const labels = ['avatar de usuário', 'capa de curso', 'anexo de matrícula', 'logo de parceiro']

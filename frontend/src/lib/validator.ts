@@ -517,6 +517,35 @@ export type AdministratorPartnerUpdatePayload = Infer<
 >
 
 // ---------------------------------------------------------------------------
+// administrator/photos
+// ---------------------------------------------------------------------------
+
+/**
+ * Uma foto da escola. `imageId` é obrigatório porque a imagem é o conteúdo, e
+ * `caption` porque foto sem legenda é banco de imagens.
+ */
+export const AdministratorPhotoCreateValidator = vine.create({
+  imageId: vine.string().uuid(),
+  caption: vine.string().trim().minLength(4).maxLength(200),
+  position: vine.number().min(0).max(999).optional(),
+  status: activeStatus().optional(),
+})
+
+export const AdministratorPhotoUpdateValidator = vine.create({
+  imageId: vine.string().uuid().optional(),
+  caption: vine.string().trim().minLength(4).maxLength(200).optional(),
+  position: vine.number().min(0).max(999).optional(),
+  status: activeStatus().optional(),
+})
+
+export type AdministratorPhotoCreatePayload = Infer<
+  typeof AdministratorPhotoCreateValidator
+>
+export type AdministratorPhotoUpdatePayload = Infer<
+  typeof AdministratorPhotoUpdateValidator
+>
+
+// ---------------------------------------------------------------------------
 // authentication
 // ---------------------------------------------------------------------------
 

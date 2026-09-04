@@ -96,6 +96,14 @@ const tags: TagRule[] = [
     plural: 'parceiros',
   },
   {
+    prefix: '/storefront/photos',
+    name: 'Site · Galeria',
+    description:
+      'As fotos da escola, como a vitrine as mostra. Leitura pública, só o que está no ar.',
+    singular: 'foto',
+    plural: 'fotos',
+  },
+  {
     prefix: '/storages',
     name: 'Arquivos',
     description:
@@ -129,6 +137,15 @@ const tags: TagRule[] = [
       'ordem aparecem na vitrine.',
     singular: 'parceiro',
     plural: 'parceiros',
+  },
+  {
+    prefix: '/administrator/photos',
+    name: 'Painel · Galeria',
+    description:
+      'O acervo de fotos da escola: o espaço, os equipamentos e as turmas, com a legenda que ' +
+      'diz o que se está vendo.',
+    singular: 'foto',
+    plural: 'fotos',
   },
   {
     prefix: '/administrator/classes',

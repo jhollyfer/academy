@@ -9,6 +9,7 @@ import type {
   EnrollmentResponse,
   ManagedUserResponse,
   PartnerResponse,
+  PhotoResponse,
   StorefrontEnrollmentResponse,
   Paginated,
 } from '../response'
@@ -65,6 +66,8 @@ export type CourseListSearch = Merge<
 >
 
 export type PartnerListSearch = Merge<ListSearch, { status?: string }>
+
+export type PhotoListSearch = Merge<ListSearch, { status?: string }>
 
 export type ClassListSearch = Merge<
   ListSearch,
@@ -139,6 +142,28 @@ export const partnerQueryOptions = (id: string) =>
       request<PartnerResponse>('/administrator/partners/'.concat(id), {
         signal,
       }),
+  })
+
+// ---------------------------------------------------------------------------
+// administrator/photos
+// ---------------------------------------------------------------------------
+
+export const photosQueryOptions = (params: PhotoListSearch) =>
+  queryOptions({
+    queryKey: queryKeys.photos.list(params),
+    queryFn: ({ signal }) =>
+      request<Paginated<PhotoResponse>>(
+        '/administrator/photos'.concat(search(params)),
+        { signal },
+      ),
+    placeholderData: keepPreviousData,
+  })
+
+export const photoQueryOptions = (id: string) =>
+  queryOptions({
+    queryKey: queryKeys.photos.detail(id),
+    queryFn: ({ signal }) =>
+      request<PhotoResponse>('/administrator/photos/'.concat(id), { signal }),
   })
 
 // ---------------------------------------------------------------------------
@@ -268,6 +293,14 @@ export const storefrontPartnersQueryOptions = () =>
     queryKey: queryKeys.storefront.partners(),
     queryFn: ({ signal }) =>
       request<Paginated<PartnerResponse>>('/storefront/partners', { signal }),
+  })
+
+/** A galeria da escola. Vazia enquanto não há acervo, e a seção some. */
+export const storefrontPhotosQueryOptions = () =>
+  queryOptions({
+    queryKey: queryKeys.storefront.photos(),
+    queryFn: ({ signal }) =>
+      request<Paginated<PhotoResponse>>('/storefront/photos', { signal }),
   })
 
 export const storefrontCourseQueryOptions = (slug: string) =>

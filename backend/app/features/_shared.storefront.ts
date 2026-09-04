@@ -2,6 +2,7 @@ import Class from '#models/class'
 import PixService from '#services/pix.service'
 import type Course from '#models/course'
 import type Partner from '#models/partner'
+import type Photo from '#models/photo'
 import type Enrollment from '#models/enrollment'
 import { withSeatsTaken } from '#features/_shared.seats'
 import { ActiveStatuses, ClassStatuses } from '#core/entity'
@@ -36,6 +37,17 @@ export function visibleCourses<TQuery extends ModelQueryBuilderContract<typeof C
  * enquanto isso durar.
  */
 export function visiblePartners<TQuery extends ModelQueryBuilderContract<typeof Partner, Partner>>(
+  query: TQuery
+): TQuery {
+  query.whereNull('deletedAt').where('status', ActiveStatuses.ACTIVE)
+
+  return query
+}
+
+/**
+ * A condição de visibilidade da galeria, pela mesma regra dos parceiros.
+ */
+export function visiblePhotos<TQuery extends ModelQueryBuilderContract<typeof Photo, Photo>>(
   query: TQuery
 ): TQuery {
   query.whereNull('deletedAt').where('status', ActiveStatuses.ACTIVE)

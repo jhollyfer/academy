@@ -34,6 +34,7 @@ import { Route as PrivateAdministratorClassesNewRouteImport } from './routes/_pr
 import { Route as PrivateAdministratorCoursesIndexRouteImport } from './routes/_private/administrator/courses/index'
 import { Route as PrivateAdministratorEnrollmentsIndexRouteImport } from './routes/_private/administrator/enrollments/index'
 import { Route as PrivateAdministratorPartnersIndexRouteImport } from './routes/_private/administrator/partners/index'
+import { Route as PrivateAdministratorPhotosIndexRouteImport } from './routes/_private/administrator/photos/index'
 import { Route as PrivateAdministratorUsersIndexRouteImport } from './routes/_private/administrator/users/index'
 import { Route as AuthenticationInviteTokenIndexRouteImport } from './routes/authentication/invite/$token/index'
 import { Route as PrivateAdministratorClassesIdIndexRouteImport } from './routes/_private/administrator/classes/$id/index'
@@ -43,6 +44,7 @@ import { Route as PrivateAdministratorCoursesIdEditRouteImport } from './routes/
 import { Route as PrivateAdministratorEnrollmentsIdIndexRouteImport } from './routes/_private/administrator/enrollments/$id/index'
 import { Route as PrivateAdministratorPartnersIdIndexRouteImport } from './routes/_private/administrator/partners/$id/index'
 import { Route as PrivateAdministratorPartnersIdEditRouteImport } from './routes/_private/administrator/partners/$id/edit'
+import { Route as PrivateAdministratorPhotosIdEditRouteImport } from './routes/_private/administrator/photos/$id/edit'
 import { Route as PrivateAdministratorUsersIdIndexRouteImport } from './routes/_private/administrator/users/$id/index'
 import { Route as PrivateAdministratorUsersIdEditRouteImport } from './routes/_private/administrator/users/$id/edit'
 
@@ -51,6 +53,9 @@ const PrivateAdministratorCoursesNewLazyRouteImport = createFileRoute(
 )()
 const PrivateAdministratorPartnersNewLazyRouteImport = createFileRoute(
   '/_private/administrator/partners/new',
+)()
+const PrivateAdministratorPhotosNewLazyRouteImport = createFileRoute(
+  '/_private/administrator/photos/new',
 )()
 const PrivateAdministratorUsersNewLazyRouteImport = createFileRoute(
   '/_private/administrator/users/new',
@@ -237,6 +242,26 @@ const PrivateAdministratorPartnersNewLazyRoute =
       (d) => d.Route,
     ),
   )
+const PrivateAdministratorPhotosIndexRoute =
+  PrivateAdministratorPhotosIndexRouteImport.update({
+    id: '/administrator/photos/',
+    path: '/administrator/photos/',
+    getParentRoute: () => PrivateLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/_private/administrator/photos/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+const PrivateAdministratorPhotosNewLazyRoute =
+  PrivateAdministratorPhotosNewLazyRouteImport.update({
+    id: '/administrator/photos/new',
+    path: '/administrator/photos/new',
+    getParentRoute: () => PrivateLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/_private/administrator/photos/new.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 const PrivateAdministratorUsersIndexRoute =
   PrivateAdministratorUsersIndexRouteImport.update({
     id: '/administrator/users/',
@@ -337,6 +362,16 @@ const PrivateAdministratorPartnersIdEditRoute =
       (d) => d.Route,
     ),
   )
+const PrivateAdministratorPhotosIdEditRoute =
+  PrivateAdministratorPhotosIdEditRouteImport.update({
+    id: '/administrator/photos/$id/edit',
+    path: '/administrator/photos/$id/edit',
+    getParentRoute: () => PrivateLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/_private/administrator/photos/$id/edit.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 const PrivateAdministratorUsersIdIndexRoute =
   PrivateAdministratorUsersIdIndexRouteImport.update({
     id: '/administrator/users/$id/',
@@ -378,16 +413,19 @@ export interface FileRoutesByFullPath {
   '/administrator/classes/new': typeof PrivateAdministratorClassesNewRoute
   '/administrator/courses/new': typeof PrivateAdministratorCoursesNewLazyRoute
   '/administrator/partners/new': typeof PrivateAdministratorPartnersNewLazyRoute
+  '/administrator/photos/new': typeof PrivateAdministratorPhotosNewLazyRoute
   '/administrator/users/new': typeof PrivateAdministratorUsersNewLazyRoute
   '/administrator/classes/': typeof PrivateAdministratorClassesIndexRoute
   '/administrator/courses/': typeof PrivateAdministratorCoursesIndexRoute
   '/administrator/enrollments/': typeof PrivateAdministratorEnrollmentsIndexRoute
   '/administrator/partners/': typeof PrivateAdministratorPartnersIndexRoute
+  '/administrator/photos/': typeof PrivateAdministratorPhotosIndexRoute
   '/administrator/users/': typeof PrivateAdministratorUsersIndexRoute
   '/authentication/invite/$token/': typeof AuthenticationInviteTokenIndexRoute
   '/administrator/classes/$id/edit': typeof PrivateAdministratorClassesIdEditRoute
   '/administrator/courses/$id/edit': typeof PrivateAdministratorCoursesIdEditRoute
   '/administrator/partners/$id/edit': typeof PrivateAdministratorPartnersIdEditRoute
+  '/administrator/photos/$id/edit': typeof PrivateAdministratorPhotosIdEditRoute
   '/administrator/users/$id/edit': typeof PrivateAdministratorUsersIdEditRoute
   '/administrator/classes/$id/': typeof PrivateAdministratorClassesIdIndexRoute
   '/administrator/courses/$id/': typeof PrivateAdministratorCoursesIdIndexRoute
@@ -414,16 +452,19 @@ export interface FileRoutesByTo {
   '/administrator/classes/new': typeof PrivateAdministratorClassesNewRoute
   '/administrator/courses/new': typeof PrivateAdministratorCoursesNewLazyRoute
   '/administrator/partners/new': typeof PrivateAdministratorPartnersNewLazyRoute
+  '/administrator/photos/new': typeof PrivateAdministratorPhotosNewLazyRoute
   '/administrator/users/new': typeof PrivateAdministratorUsersNewLazyRoute
   '/administrator/classes': typeof PrivateAdministratorClassesIndexRoute
   '/administrator/courses': typeof PrivateAdministratorCoursesIndexRoute
   '/administrator/enrollments': typeof PrivateAdministratorEnrollmentsIndexRoute
   '/administrator/partners': typeof PrivateAdministratorPartnersIndexRoute
+  '/administrator/photos': typeof PrivateAdministratorPhotosIndexRoute
   '/administrator/users': typeof PrivateAdministratorUsersIndexRoute
   '/authentication/invite/$token': typeof AuthenticationInviteTokenIndexRoute
   '/administrator/classes/$id/edit': typeof PrivateAdministratorClassesIdEditRoute
   '/administrator/courses/$id/edit': typeof PrivateAdministratorCoursesIdEditRoute
   '/administrator/partners/$id/edit': typeof PrivateAdministratorPartnersIdEditRoute
+  '/administrator/photos/$id/edit': typeof PrivateAdministratorPhotosIdEditRoute
   '/administrator/users/$id/edit': typeof PrivateAdministratorUsersIdEditRoute
   '/administrator/classes/$id': typeof PrivateAdministratorClassesIdIndexRoute
   '/administrator/courses/$id': typeof PrivateAdministratorCoursesIdIndexRoute
@@ -454,16 +495,19 @@ export interface FileRoutesById {
   '/_private/administrator/classes/new': typeof PrivateAdministratorClassesNewRoute
   '/_private/administrator/courses/new': typeof PrivateAdministratorCoursesNewLazyRoute
   '/_private/administrator/partners/new': typeof PrivateAdministratorPartnersNewLazyRoute
+  '/_private/administrator/photos/new': typeof PrivateAdministratorPhotosNewLazyRoute
   '/_private/administrator/users/new': typeof PrivateAdministratorUsersNewLazyRoute
   '/_private/administrator/classes/': typeof PrivateAdministratorClassesIndexRoute
   '/_private/administrator/courses/': typeof PrivateAdministratorCoursesIndexRoute
   '/_private/administrator/enrollments/': typeof PrivateAdministratorEnrollmentsIndexRoute
   '/_private/administrator/partners/': typeof PrivateAdministratorPartnersIndexRoute
+  '/_private/administrator/photos/': typeof PrivateAdministratorPhotosIndexRoute
   '/_private/administrator/users/': typeof PrivateAdministratorUsersIndexRoute
   '/authentication/invite/$token/': typeof AuthenticationInviteTokenIndexRoute
   '/_private/administrator/classes/$id/edit': typeof PrivateAdministratorClassesIdEditRoute
   '/_private/administrator/courses/$id/edit': typeof PrivateAdministratorCoursesIdEditRoute
   '/_private/administrator/partners/$id/edit': typeof PrivateAdministratorPartnersIdEditRoute
+  '/_private/administrator/photos/$id/edit': typeof PrivateAdministratorPhotosIdEditRoute
   '/_private/administrator/users/$id/edit': typeof PrivateAdministratorUsersIdEditRoute
   '/_private/administrator/classes/$id/': typeof PrivateAdministratorClassesIdIndexRoute
   '/_private/administrator/courses/$id/': typeof PrivateAdministratorCoursesIdIndexRoute
@@ -493,16 +537,19 @@ export interface FileRouteTypes {
     | '/administrator/classes/new'
     | '/administrator/courses/new'
     | '/administrator/partners/new'
+    | '/administrator/photos/new'
     | '/administrator/users/new'
     | '/administrator/classes/'
     | '/administrator/courses/'
     | '/administrator/enrollments/'
     | '/administrator/partners/'
+    | '/administrator/photos/'
     | '/administrator/users/'
     | '/authentication/invite/$token/'
     | '/administrator/classes/$id/edit'
     | '/administrator/courses/$id/edit'
     | '/administrator/partners/$id/edit'
+    | '/administrator/photos/$id/edit'
     | '/administrator/users/$id/edit'
     | '/administrator/classes/$id/'
     | '/administrator/courses/$id/'
@@ -529,16 +576,19 @@ export interface FileRouteTypes {
     | '/administrator/classes/new'
     | '/administrator/courses/new'
     | '/administrator/partners/new'
+    | '/administrator/photos/new'
     | '/administrator/users/new'
     | '/administrator/classes'
     | '/administrator/courses'
     | '/administrator/enrollments'
     | '/administrator/partners'
+    | '/administrator/photos'
     | '/administrator/users'
     | '/authentication/invite/$token'
     | '/administrator/classes/$id/edit'
     | '/administrator/courses/$id/edit'
     | '/administrator/partners/$id/edit'
+    | '/administrator/photos/$id/edit'
     | '/administrator/users/$id/edit'
     | '/administrator/classes/$id'
     | '/administrator/courses/$id'
@@ -568,16 +618,19 @@ export interface FileRouteTypes {
     | '/_private/administrator/classes/new'
     | '/_private/administrator/courses/new'
     | '/_private/administrator/partners/new'
+    | '/_private/administrator/photos/new'
     | '/_private/administrator/users/new'
     | '/_private/administrator/classes/'
     | '/_private/administrator/courses/'
     | '/_private/administrator/enrollments/'
     | '/_private/administrator/partners/'
+    | '/_private/administrator/photos/'
     | '/_private/administrator/users/'
     | '/authentication/invite/$token/'
     | '/_private/administrator/classes/$id/edit'
     | '/_private/administrator/courses/$id/edit'
     | '/_private/administrator/partners/$id/edit'
+    | '/_private/administrator/photos/$id/edit'
     | '/_private/administrator/users/$id/edit'
     | '/_private/administrator/classes/$id/'
     | '/_private/administrator/courses/$id/'
@@ -770,6 +823,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateAdministratorPartnersNewLazyRouteImport
       parentRoute: typeof PrivateLayoutRoute
     }
+    '/_private/administrator/photos/': {
+      id: '/_private/administrator/photos/'
+      path: '/administrator/photos'
+      fullPath: '/administrator/photos/'
+      preLoaderRoute: typeof PrivateAdministratorPhotosIndexRouteImport
+      parentRoute: typeof PrivateLayoutRoute
+    }
+    '/_private/administrator/photos/new': {
+      id: '/_private/administrator/photos/new'
+      path: '/administrator/photos/new'
+      fullPath: '/administrator/photos/new'
+      preLoaderRoute: typeof PrivateAdministratorPhotosNewLazyRouteImport
+      parentRoute: typeof PrivateLayoutRoute
+    }
     '/_private/administrator/users/': {
       id: '/_private/administrator/users/'
       path: '/administrator/users'
@@ -840,6 +907,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateAdministratorPartnersIdEditRouteImport
       parentRoute: typeof PrivateLayoutRoute
     }
+    '/_private/administrator/photos/$id/edit': {
+      id: '/_private/administrator/photos/$id/edit'
+      path: '/administrator/photos/$id/edit'
+      fullPath: '/administrator/photos/$id/edit'
+      preLoaderRoute: typeof PrivateAdministratorPhotosIdEditRouteImport
+      parentRoute: typeof PrivateLayoutRoute
+    }
     '/_private/administrator/users/$id/': {
       id: '/_private/administrator/users/$id/'
       path: '/administrator/users/$id'
@@ -865,15 +939,18 @@ interface PrivateLayoutRouteChildren {
   PrivateAdministratorClassesNewRoute: typeof PrivateAdministratorClassesNewRoute
   PrivateAdministratorCoursesNewLazyRoute: typeof PrivateAdministratorCoursesNewLazyRoute
   PrivateAdministratorPartnersNewLazyRoute: typeof PrivateAdministratorPartnersNewLazyRoute
+  PrivateAdministratorPhotosNewLazyRoute: typeof PrivateAdministratorPhotosNewLazyRoute
   PrivateAdministratorUsersNewLazyRoute: typeof PrivateAdministratorUsersNewLazyRoute
   PrivateAdministratorClassesIndexRoute: typeof PrivateAdministratorClassesIndexRoute
   PrivateAdministratorCoursesIndexRoute: typeof PrivateAdministratorCoursesIndexRoute
   PrivateAdministratorEnrollmentsIndexRoute: typeof PrivateAdministratorEnrollmentsIndexRoute
   PrivateAdministratorPartnersIndexRoute: typeof PrivateAdministratorPartnersIndexRoute
+  PrivateAdministratorPhotosIndexRoute: typeof PrivateAdministratorPhotosIndexRoute
   PrivateAdministratorUsersIndexRoute: typeof PrivateAdministratorUsersIndexRoute
   PrivateAdministratorClassesIdEditRoute: typeof PrivateAdministratorClassesIdEditRoute
   PrivateAdministratorCoursesIdEditRoute: typeof PrivateAdministratorCoursesIdEditRoute
   PrivateAdministratorPartnersIdEditRoute: typeof PrivateAdministratorPartnersIdEditRoute
+  PrivateAdministratorPhotosIdEditRoute: typeof PrivateAdministratorPhotosIdEditRoute
   PrivateAdministratorUsersIdEditRoute: typeof PrivateAdministratorUsersIdEditRoute
   PrivateAdministratorClassesIdIndexRoute: typeof PrivateAdministratorClassesIdIndexRoute
   PrivateAdministratorCoursesIdIndexRoute: typeof PrivateAdministratorCoursesIdIndexRoute
@@ -892,6 +969,8 @@ const PrivateLayoutRouteChildren: PrivateLayoutRouteChildren = {
     PrivateAdministratorCoursesNewLazyRoute,
   PrivateAdministratorPartnersNewLazyRoute:
     PrivateAdministratorPartnersNewLazyRoute,
+  PrivateAdministratorPhotosNewLazyRoute:
+    PrivateAdministratorPhotosNewLazyRoute,
   PrivateAdministratorUsersNewLazyRoute: PrivateAdministratorUsersNewLazyRoute,
   PrivateAdministratorClassesIndexRoute: PrivateAdministratorClassesIndexRoute,
   PrivateAdministratorCoursesIndexRoute: PrivateAdministratorCoursesIndexRoute,
@@ -899,6 +978,7 @@ const PrivateLayoutRouteChildren: PrivateLayoutRouteChildren = {
     PrivateAdministratorEnrollmentsIndexRoute,
   PrivateAdministratorPartnersIndexRoute:
     PrivateAdministratorPartnersIndexRoute,
+  PrivateAdministratorPhotosIndexRoute: PrivateAdministratorPhotosIndexRoute,
   PrivateAdministratorUsersIndexRoute: PrivateAdministratorUsersIndexRoute,
   PrivateAdministratorClassesIdEditRoute:
     PrivateAdministratorClassesIdEditRoute,
@@ -906,6 +986,7 @@ const PrivateLayoutRouteChildren: PrivateLayoutRouteChildren = {
     PrivateAdministratorCoursesIdEditRoute,
   PrivateAdministratorPartnersIdEditRoute:
     PrivateAdministratorPartnersIdEditRoute,
+  PrivateAdministratorPhotosIdEditRoute: PrivateAdministratorPhotosIdEditRoute,
   PrivateAdministratorUsersIdEditRoute: PrivateAdministratorUsersIdEditRoute,
   PrivateAdministratorClassesIdIndexRoute:
     PrivateAdministratorClassesIdIndexRoute,

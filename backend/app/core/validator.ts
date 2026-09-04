@@ -241,6 +241,7 @@ export const COURSE_SORT_COLUMNS = ['name', 'position', 'createdAt'] as const
 export const CLASS_SORT_COLUMNS = ['name', 'startsAt', 'capacity', 'status', 'createdAt'] as const
 export const ENROLLMENT_SORT_COLUMNS = ['studentName', 'status', 'createdAt'] as const
 export const PARTNER_SORT_COLUMNS = ['name', 'position', 'createdAt'] as const
+export const PHOTO_SORT_COLUMNS = ['position', 'createdAt'] as const
 /**
  * `position` é a ordem na grade e no FAQ - o que a tela mostra. Não há por que
  * ordenar por título: a sequência dos sábados é o conteúdo.
@@ -476,6 +477,42 @@ export type AdministratorPartnerCreatePayload = Infer<typeof AdministratorPartne
 export type AdministratorPartnerUpdatePayload = Infer<typeof AdministratorPartnerUpdateValidator>
 export type AdministratorPartnerPaginationPayload = Infer<
   typeof AdministratorPartnerPaginationValidator
+>
+
+// ---------------------------------------------------------------------------
+// administrator/photos
+// ---------------------------------------------------------------------------
+
+/**
+ * Uma foto da escola. `imageId` é obrigatório porque a imagem é o conteúdo, e
+ * `caption` porque foto sem legenda é banco de imagens - o que faz a galeria
+ * provar algo é dizer o que se vê e onde.
+ */
+export const AdministratorPhotoCreateValidator = vine.create({
+  imageId: vine.string().uuid(),
+  caption: vine.string().trim().minLength(4).maxLength(200),
+  position: vine.number().min(0).max(999).optional(),
+  status: activeStatus().optional(),
+})
+
+export const AdministratorPhotoUpdateValidator = vine.create({
+  imageId: vine.string().uuid().optional(),
+  caption: vine.string().trim().minLength(4).maxLength(200).optional(),
+  position: vine.number().min(0).max(999).optional(),
+  status: activeStatus().optional(),
+})
+
+export const AdministratorPhotoPaginationValidator = vine.create({
+  ...paginationFields(),
+  ...trashedField(),
+  ...sortFields(PHOTO_SORT_COLUMNS),
+  status: activeStatus().optional(),
+})
+
+export type AdministratorPhotoCreatePayload = Infer<typeof AdministratorPhotoCreateValidator>
+export type AdministratorPhotoUpdatePayload = Infer<typeof AdministratorPhotoUpdateValidator>
+export type AdministratorPhotoPaginationPayload = Infer<
+  typeof AdministratorPhotoPaginationValidator
 >
 
 // ---------------------------------------------------------------------------

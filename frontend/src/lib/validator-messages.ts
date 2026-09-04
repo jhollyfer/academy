@@ -134,6 +134,8 @@ export const FIELD_LABELS = {
   // nenhum.
   url: 'o site',
   logoId: 'a logomarca',
+  imageId: 'a imagem',
+  caption: 'a legenda',
 
   // ── Turma ──────────────────────────────────────────────────────────
   courseId: 'o curso',

@@ -5,9 +5,11 @@ import {
   storefrontCoursesQueryOptions,
   storefrontFaqsQueryOptions,
   storefrontPartnersQueryOptions,
+  storefrontPhotosQueryOptions,
 } from '#/integrations/tanstack-query/queries'
 import { CourseCards } from './course-cards'
 import { Faq } from './faq'
+import { Gallery } from './gallery'
 import { FinalBanner } from './final-banner'
 import { Hero } from './hero'
 import { Mission } from './mission'
@@ -42,6 +44,7 @@ export function Home(): React.JSX.Element {
   const courses = useQuery(storefrontCoursesQueryOptions())
   const faqs = useQuery(storefrontFaqsQueryOptions())
   const partners = useQuery(storefrontPartnersQueryOptions())
+  const photos = useQuery(storefrontPhotosQueryOptions())
 
   return (
     <>
@@ -55,6 +58,13 @@ export function Home(): React.JSX.Element {
         <CourseCards courses={courses.data.data} />
       )}
       <HowToEnroll />
+      {/* Depois de "como se matricular" e antes da equipe: quem acabou de ler o
+          passo a passo quer ver o lugar onde vai entrar. Sem foto a seção some
+          inteira - o acervo ainda não existe, e uma grade vazia sob um título é
+          pior que a ausência do bloco. */}
+      {photos.data && photos.data.data.length > 0 && (
+        <Gallery photos={photos.data.data} />
+      )}
       <Team />
       {/* Logo depois da equipe, e antes da missão: "quem ensina" acabou de ser
           respondido, e "quem responde pela escola" é a pergunta seguinte. Sem

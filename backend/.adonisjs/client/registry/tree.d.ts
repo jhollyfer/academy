@@ -18,6 +18,7 @@ export interface ApiDefinition {
     }
     faqs: typeof routes['storefront.faqs']
     partners: typeof routes['storefront.partners']
+    photos: typeof routes['storefront.photos']
     enrollments: {
       create: typeof routes['storefront.enrollments.create']
       show: typeof routes['storefront.enrollments.show']
@@ -54,6 +55,12 @@ export interface ApiDefinition {
       show: typeof routes['administrator.courses.show']
       update: typeof routes['administrator.courses.update']
     }
+    photos: {
+      paginate: typeof routes['administrator.photos.paginate']
+      create: typeof routes['administrator.photos.create']
+      show: typeof routes['administrator.photos.show']
+      update: typeof routes['administrator.photos.update']
+    }
     partners: {
       paginate: typeof routes['administrator.partners.paginate']
       create: typeof routes['administrator.partners.create']
@@ -87,6 +94,11 @@ export interface ApiDefinition {
         archive: typeof routes['administrator.lifecycle.courses.archive']
         unarchive: typeof routes['administrator.lifecycle.courses.unarchive']
         purge: typeof routes['administrator.lifecycle.courses.purge']
+      }
+      photos: {
+        archive: typeof routes['administrator.lifecycle.photos.archive']
+        unarchive: typeof routes['administrator.lifecycle.photos.unarchive']
+        purge: typeof routes['administrator.lifecycle.photos.purge']
       }
       partners: {
         archive: typeof routes['administrator.lifecycle.partners.archive']

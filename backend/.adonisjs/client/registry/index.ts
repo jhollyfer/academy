@@ -60,6 +60,12 @@ const routes = {
     tokens: [{"old":"/storefront/partners","type":0,"val":"storefront","end":""},{"old":"/storefront/partners","type":0,"val":"partners","end":""}],
     types: placeholder as Registry['storefront.partners']['types'],
   },
+  'storefront.photos': {
+    methods: ["GET","HEAD"],
+    pattern: '/storefront/photos',
+    tokens: [{"old":"/storefront/photos","type":0,"val":"storefront","end":""},{"old":"/storefront/photos","type":0,"val":"photos","end":""}],
+    types: placeholder as Registry['storefront.photos']['types'],
+  },
   'storefront.enrollments.create': {
     methods: ["POST"],
     pattern: '/storefront/enrollments',
@@ -179,6 +185,30 @@ const routes = {
     pattern: '/administrator/courses/:id',
     tokens: [{"old":"/administrator/courses/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/courses/:id","type":0,"val":"courses","end":""},{"old":"/administrator/courses/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['administrator.courses.update']['types'],
+  },
+  'administrator.photos.paginate': {
+    methods: ["GET","HEAD"],
+    pattern: '/administrator/photos',
+    tokens: [{"old":"/administrator/photos","type":0,"val":"administrator","end":""},{"old":"/administrator/photos","type":0,"val":"photos","end":""}],
+    types: placeholder as Registry['administrator.photos.paginate']['types'],
+  },
+  'administrator.photos.create': {
+    methods: ["POST"],
+    pattern: '/administrator/photos',
+    tokens: [{"old":"/administrator/photos","type":0,"val":"administrator","end":""},{"old":"/administrator/photos","type":0,"val":"photos","end":""}],
+    types: placeholder as Registry['administrator.photos.create']['types'],
+  },
+  'administrator.photos.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/administrator/photos/:id',
+    tokens: [{"old":"/administrator/photos/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/photos/:id","type":0,"val":"photos","end":""},{"old":"/administrator/photos/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['administrator.photos.show']['types'],
+  },
+  'administrator.photos.update': {
+    methods: ["PUT"],
+    pattern: '/administrator/photos/:id',
+    tokens: [{"old":"/administrator/photos/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/photos/:id","type":0,"val":"photos","end":""},{"old":"/administrator/photos/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['administrator.photos.update']['types'],
   },
   'administrator.partners.paginate': {
     methods: ["GET","HEAD"],
@@ -305,6 +335,24 @@ const routes = {
     pattern: '/administrator/courses/:id',
     tokens: [{"old":"/administrator/courses/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/courses/:id","type":0,"val":"courses","end":""},{"old":"/administrator/courses/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['administrator.lifecycle.courses.purge']['types'],
+  },
+  'administrator.lifecycle.photos.archive': {
+    methods: ["PATCH"],
+    pattern: '/administrator/photos/:id/archive',
+    tokens: [{"old":"/administrator/photos/:id/archive","type":0,"val":"administrator","end":""},{"old":"/administrator/photos/:id/archive","type":0,"val":"photos","end":""},{"old":"/administrator/photos/:id/archive","type":1,"val":"id","end":""},{"old":"/administrator/photos/:id/archive","type":0,"val":"archive","end":""}],
+    types: placeholder as Registry['administrator.lifecycle.photos.archive']['types'],
+  },
+  'administrator.lifecycle.photos.unarchive': {
+    methods: ["PATCH"],
+    pattern: '/administrator/photos/:id/unarchive',
+    tokens: [{"old":"/administrator/photos/:id/unarchive","type":0,"val":"administrator","end":""},{"old":"/administrator/photos/:id/unarchive","type":0,"val":"photos","end":""},{"old":"/administrator/photos/:id/unarchive","type":1,"val":"id","end":""},{"old":"/administrator/photos/:id/unarchive","type":0,"val":"unarchive","end":""}],
+    types: placeholder as Registry['administrator.lifecycle.photos.unarchive']['types'],
+  },
+  'administrator.lifecycle.photos.purge': {
+    methods: ["DELETE"],
+    pattern: '/administrator/photos/:id',
+    tokens: [{"old":"/administrator/photos/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/photos/:id","type":0,"val":"photos","end":""},{"old":"/administrator/photos/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['administrator.lifecycle.photos.purge']['types'],
   },
   'administrator.lifecycle.partners.archive': {
     methods: ["PATCH"],

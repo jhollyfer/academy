@@ -13,6 +13,7 @@ export type ScannedRoutes = {
     'storefront.courses.show': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
     'storefront.faqs': { paramsTuple?: []; params?: {} }
     'storefront.partners': { paramsTuple?: []; params?: {} }
+    'storefront.photos': { paramsTuple?: []; params?: {} }
     'storefront.enrollments.create': { paramsTuple?: []; params?: {} }
     'storefront.enrollments.show': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
     'storefront.enrollments.attach': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
@@ -33,6 +34,10 @@ export type ScannedRoutes = {
     'administrator.courses.create': { paramsTuple?: []; params?: {} }
     'administrator.courses.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.courses.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.photos.paginate': { paramsTuple?: []; params?: {} }
+    'administrator.photos.create': { paramsTuple?: []; params?: {} }
+    'administrator.photos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.photos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.partners.paginate': { paramsTuple?: []; params?: {} }
     'administrator.partners.create': { paramsTuple?: []; params?: {} }
     'administrator.partners.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -54,6 +59,9 @@ export type ScannedRoutes = {
     'administrator.lifecycle.courses.archive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.courses.unarchive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.courses.purge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.lifecycle.photos.archive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.lifecycle.photos.unarchive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.lifecycle.photos.purge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.partners.archive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.partners.unarchive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.partners.purge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -73,6 +81,7 @@ export type ScannedRoutes = {
     'storefront.courses.show': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
     'storefront.faqs': { paramsTuple?: []; params?: {} }
     'storefront.partners': { paramsTuple?: []; params?: {} }
+    'storefront.photos': { paramsTuple?: []; params?: {} }
     'storefront.enrollments.show': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
     'storefront.enrollments.pix': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
     'storefront.enrollments.uploads.parts': { paramsTuple: [ParamValue,ParamValue]; params: {'protocol': ParamValue,'id': ParamValue} }
@@ -83,6 +92,8 @@ export type ScannedRoutes = {
     'portal.enrollments.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.courses.paginate': { paramsTuple?: []; params?: {} }
     'administrator.courses.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.photos.paginate': { paramsTuple?: []; params?: {} }
+    'administrator.photos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.partners.paginate': { paramsTuple?: []; params?: {} }
     'administrator.partners.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.classes.paginate': { paramsTuple?: []; params?: {} }
@@ -99,6 +110,7 @@ export type ScannedRoutes = {
     'storefront.courses.show': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
     'storefront.faqs': { paramsTuple?: []; params?: {} }
     'storefront.partners': { paramsTuple?: []; params?: {} }
+    'storefront.photos': { paramsTuple?: []; params?: {} }
     'storefront.enrollments.show': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
     'storefront.enrollments.pix': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
     'storefront.enrollments.uploads.parts': { paramsTuple: [ParamValue,ParamValue]; params: {'protocol': ParamValue,'id': ParamValue} }
@@ -109,6 +121,8 @@ export type ScannedRoutes = {
     'portal.enrollments.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.courses.paginate': { paramsTuple?: []; params?: {} }
     'administrator.courses.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.photos.paginate': { paramsTuple?: []; params?: {} }
+    'administrator.photos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.partners.paginate': { paramsTuple?: []; params?: {} }
     'administrator.partners.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.classes.paginate': { paramsTuple?: []; params?: {} }
@@ -131,6 +145,7 @@ export type ScannedRoutes = {
     'storages.create': { paramsTuple?: []; params?: {} }
     'storages.complete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.courses.create': { paramsTuple?: []; params?: {} }
+    'administrator.photos.create': { paramsTuple?: []; params?: {} }
     'administrator.partners.create': { paramsTuple?: []; params?: {} }
     'administrator.classes.create': { paramsTuple?: []; params?: {} }
     'administrator.users.create': { paramsTuple?: []; params?: {} }
@@ -140,6 +155,7 @@ export type ScannedRoutes = {
     'storages.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.users.dependents.detach': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'studentId': ParamValue} }
     'administrator.lifecycle.courses.purge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.lifecycle.photos.purge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.partners.purge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.classes.purge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.enrollments.purge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -148,6 +164,7 @@ export type ScannedRoutes = {
   PUT: {
     'account.update': { paramsTuple?: []; params?: {} }
     'administrator.courses.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.photos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.partners.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.classes.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.enrollments.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -156,6 +173,8 @@ export type ScannedRoutes = {
   PATCH: {
     'administrator.lifecycle.courses.archive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.courses.unarchive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.lifecycle.photos.archive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.lifecycle.photos.unarchive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.partners.archive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.partners.unarchive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.classes.archive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

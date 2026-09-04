@@ -3,6 +3,7 @@ import {
   storefrontCoursesQueryOptions,
   storefrontFaqsQueryOptions,
   storefrontPartnersQueryOptions,
+  storefrontPhotosQueryOptions,
 } from '#/integrations/tanstack-query/queries'
 import {
   ADDRESS,
@@ -92,6 +93,7 @@ export const Route = createFileRoute('/_public/')({
       context.queryClient.prefetchQuery(storefrontCoursesQueryOptions()),
       context.queryClient.prefetchQuery(storefrontFaqsQueryOptions()),
       context.queryClient.prefetchQuery(storefrontPartnersQueryOptions()),
+      context.queryClient.prefetchQuery(storefrontPhotosQueryOptions()),
     ]),
   head: () => ({
     meta: [

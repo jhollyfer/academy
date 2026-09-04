@@ -11,6 +11,7 @@ import type {
   EnrollmentResponse,
   ManagedUserResponse,
   PartnerResponse,
+  PhotoResponse,
   StorageResponse,
   StorefrontEnrollmentResponse,
 } from '../response'
@@ -23,6 +24,8 @@ import type {
   AdministratorEnrollmentUpdatePayload,
   AdministratorPartnerCreatePayload,
   AdministratorPartnerUpdatePayload,
+  AdministratorPhotoCreatePayload,
+  AdministratorPhotoUpdatePayload,
   AdministratorUserCreatePayload,
   AdministratorUserUpdatePayload,
   AuthenticationInviteAcceptPayload,
@@ -294,6 +297,77 @@ export function usePartnerDelete(options?: MutationProps<void, string>) {
     ...options,
     mutationFn: function (id) {
       return request<void>('/administrator/partners/'.concat(id), {
+        method: 'DELETE',
+      })
+    },
+  })
+}
+
+// ---------------------------------------------------------------------------
+// administrator/photos
+// ---------------------------------------------------------------------------
+
+export function usePhotoCreate(
+  options?: MutationProps<PhotoResponse, AdministratorPhotoCreatePayload>,
+) {
+  return useMutation<PhotoResponse, HTTPError, AdministratorPhotoCreatePayload>(
+    {
+      ...options,
+      mutationFn: function (payload) {
+        return request<PhotoResponse>('/administrator/photos', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        })
+      },
+    },
+  )
+}
+
+export function usePhotoUpdate(
+  id: string,
+  options?: MutationProps<PhotoResponse, AdministratorPhotoUpdatePayload>,
+) {
+  return useMutation<PhotoResponse, HTTPError, AdministratorPhotoUpdatePayload>(
+    {
+      ...options,
+      mutationFn: function (payload) {
+        return request<PhotoResponse>('/administrator/photos/'.concat(id), {
+          method: 'PUT',
+          body: JSON.stringify(payload),
+        })
+      },
+    },
+  )
+}
+
+export function usePhotoArchive(options?: MutationProps<void, string>) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return request<void>('/administrator/photos/'.concat(id, '/archive'), {
+        method: 'PATCH',
+      })
+    },
+  })
+}
+
+export function usePhotoUnarchive(options?: MutationProps<void, string>) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return request<void>('/administrator/photos/'.concat(id, '/unarchive'), {
+        method: 'PATCH',
+      })
+    },
+  })
+}
+
+/** Irreversível, e só o dono alcança. */
+export function usePhotoDelete(options?: MutationProps<void, string>) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return request<void>('/administrator/photos/'.concat(id), {
         method: 'DELETE',
       })
     },

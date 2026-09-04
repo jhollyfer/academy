@@ -1,6 +1,7 @@
 import Class from '#models/class'
 import Course from '#models/course'
 import Partner from '#models/partner'
+import Photo from '#models/photo'
 import CourseFaq from '#models/course_faq'
 import CourseModule from '#models/course_module'
 import Enrollment from '#models/enrollment'
@@ -105,6 +106,16 @@ const PARTNER: ModelResource = {
   model: Partner,
   enums: { status: ACTIVE_STATUSES },
   relations: { logo: STORAGE },
+}
+
+/**
+ * A foto com o arquivo aninhado. A imagem é o conteúdo, então nenhuma leitura
+ * de foto faz sentido sem ela.
+ */
+const PHOTO: ModelResource = {
+  model: Photo,
+  enums: { status: ACTIVE_STATUSES },
+  relations: { image: STORAGE },
 }
 
 const CLASS: ModelResource = {
@@ -286,6 +297,7 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'administrator/enrollments': ENROLLMENT,
   'administrator/users': MANAGED_USER,
   'administrator/partners': PARTNER,
+  'administrator/photos': PHOTO,
 
   // O mesmo recurso do painel: quem restringe o que a pessoa alcança é o escopo
   // da consulta, não uma projeção. Diferente do `storefront`, que é anônimo e
@@ -294,6 +306,7 @@ export const RESPONSES: Record<string, FeatureResponse> = {
 
   'storefront/courses': COURSE,
   'storefront/partners': PARTNER,
+  'storefront/photos': PHOTO,
   // Projeção declarada pelo mesmo motivo da matrícula pública, mas por outro
   // caminho: aqui não é sigilo, é um `pick` que enxuga a linha.
   'storefront/faqs': StorefrontFaqResponse,

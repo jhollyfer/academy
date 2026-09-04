@@ -129,6 +129,11 @@ router
     // `/parceiros`, que é uma página do site e não um recurso da API.
     router.get('partners', [controllers.storefront.partners.Paginate]).as('partners')
 
+    // A galeria da escola. Vazia enquanto não há acervo, e a seção some do site
+    // nesse caso - o recurso existe para as fotos poderem entrar pelo painel
+    // quando chegarem, sem deploy.
+    router.get('photos', [controllers.storefront.photos.Paginate]).as('photos')
+
     router
       .group(() => {
         router.post('/', [controllers.storefront.enrollments.Create]).use(enrollmentThrottle)
@@ -274,6 +279,16 @@ router
 
     router
       .group(() => {
+        router.get('/', [controllers.administrator.photos.Paginate])
+        router.post('/', [controllers.administrator.photos.Create])
+        router.get(':id', [controllers.administrator.photos.Show])
+        router.put(':id', [controllers.administrator.photos.Update])
+      })
+      .prefix('photos')
+      .as('photos')
+
+    router
+      .group(() => {
         router.get('/', [controllers.administrator.partners.Paginate])
         router.post('/', [controllers.administrator.partners.Create])
         router.get(':id', [controllers.administrator.partners.Show])
@@ -352,6 +367,20 @@ router
           })
           .prefix('courses')
           .as('courses')
+
+        router
+          .group(() => {
+            router.patch(':id/archive', [controllers.administrator.photos.Archive]).as('archive')
+            router
+              .patch(':id/unarchive', [controllers.administrator.photos.Unarchive])
+              .as('unarchive')
+            router
+              .delete(':id', [controllers.administrator.photos.Delete])
+              .as('purge')
+              .use(middleware.role(['OWNER']))
+          })
+          .prefix('photos')
+          .as('photos')
 
         router
           .group(() => {
