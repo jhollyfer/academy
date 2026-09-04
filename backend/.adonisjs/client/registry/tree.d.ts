@@ -21,6 +21,7 @@ export interface ApiDefinition {
       create: typeof routes['storefront.enrollments.create']
       show: typeof routes['storefront.enrollments.show']
       attach: typeof routes['storefront.enrollments.attach']
+      pix: typeof routes['storefront.enrollments.pix']
       uploads: {
         create: typeof routes['storefront.enrollments.uploads.create']
         complete: typeof routes['storefront.enrollments.uploads.complete']

@@ -72,6 +72,12 @@ const routes = {
     tokens: [{"old":"/storefront/enrollments/:protocol/attachments","type":0,"val":"storefront","end":""},{"old":"/storefront/enrollments/:protocol/attachments","type":0,"val":"enrollments","end":""},{"old":"/storefront/enrollments/:protocol/attachments","type":1,"val":"protocol","end":""},{"old":"/storefront/enrollments/:protocol/attachments","type":0,"val":"attachments","end":""}],
     types: placeholder as Registry['storefront.enrollments.attach']['types'],
   },
+  'storefront.enrollments.pix': {
+    methods: ["GET","HEAD"],
+    pattern: '/storefront/enrollments/:protocol/pix',
+    tokens: [{"old":"/storefront/enrollments/:protocol/pix","type":0,"val":"storefront","end":""},{"old":"/storefront/enrollments/:protocol/pix","type":0,"val":"enrollments","end":""},{"old":"/storefront/enrollments/:protocol/pix","type":1,"val":"protocol","end":""},{"old":"/storefront/enrollments/:protocol/pix","type":0,"val":"pix","end":""}],
+    types: placeholder as Registry['storefront.enrollments.pix']['types'],
+  },
   'storefront.enrollments.uploads.create': {
     methods: ["POST"],
     pattern: '/storefront/enrollments/:protocol/uploads',

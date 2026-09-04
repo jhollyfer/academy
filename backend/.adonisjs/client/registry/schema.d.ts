@@ -139,6 +139,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storefront/enrollments/attach.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'storefront.enrollments.pix': {
+    methods: ["GET","HEAD"]
+    pattern: '/storefront/enrollments/:protocol/pix'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { protocol: ParamValue }
+      query: ExtractQueryForGet<InferInput<(typeof import('#core/validator').ProtocolValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/storefront/enrollments/pix.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storefront/enrollments/pix.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'storefront.enrollments.uploads.create': {
     methods: ["POST"]
     pattern: '/storefront/enrollments/:protocol/uploads'

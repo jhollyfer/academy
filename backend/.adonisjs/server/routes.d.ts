@@ -15,6 +15,7 @@ export type ScannedRoutes = {
     'storefront.enrollments.create': { paramsTuple?: []; params?: {} }
     'storefront.enrollments.show': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
     'storefront.enrollments.attach': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
+    'storefront.enrollments.pix': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
     'storefront.enrollments.uploads.create': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
     'storefront.enrollments.uploads.complete': { paramsTuple: [ParamValue,ParamValue]; params: {'protocol': ParamValue,'id': ParamValue} }
     'storefront.enrollments.uploads.parts': { paramsTuple: [ParamValue,ParamValue]; params: {'protocol': ParamValue,'id': ParamValue} }
@@ -64,6 +65,7 @@ export type ScannedRoutes = {
     'storefront.courses.show': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
     'storefront.faqs': { paramsTuple?: []; params?: {} }
     'storefront.enrollments.show': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
+    'storefront.enrollments.pix': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
     'storefront.enrollments.uploads.parts': { paramsTuple: [ParamValue,ParamValue]; params: {'protocol': ParamValue,'id': ParamValue} }
     'storages.parts': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'storages.download': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -86,6 +88,7 @@ export type ScannedRoutes = {
     'storefront.courses.show': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
     'storefront.faqs': { paramsTuple?: []; params?: {} }
     'storefront.enrollments.show': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
+    'storefront.enrollments.pix': { paramsTuple: [ParamValue]; params: {'protocol': ParamValue} }
     'storefront.enrollments.uploads.parts': { paramsTuple: [ParamValue,ParamValue]; params: {'protocol': ParamValue,'id': ParamValue} }
     'storages.parts': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'storages.download': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
