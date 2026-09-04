@@ -70,7 +70,7 @@ export function HowToEnroll(): React.JSX.Element {
       <div className="relative px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2 lg:gap-20">
           <div className={cn(REVEAL)}>
-            <SectionTitle lead="A matrícula" accent="cabe no celular" />
+            <SectionTitle eyebrow="Como entrar" lead="A matrícula" accent="cabe no celular" />
 
             <ol className="mt-9 grid gap-4">
               {passos.map((step) => (

@@ -66,8 +66,12 @@ const WEB_MODULES = [
 ] as const
 
 /**
- * O que o aluno leva de cada encontro, onde a própria descrição do módulo já
- * diz.
+ * O que o aluno constrói em cada encontro, onde a própria descrição do módulo
+ * já diz.
+ *
+ * "Constrói", e não "leva": o kit de robótica e os computadores são da escola e
+ * ficam nela. O que sai com o aluno é o certificado, o código que escreveu e
+ * saber fazer - e a página de curso diz isso com todas as letras.
  *
  * Só os módulos em que a entrega é fato da grade, e não os dezesseis: um campo
  * "entrega" preenchido à força em todo sábado viraria texto de catálogo, e a
@@ -176,9 +180,19 @@ const GENERAL_FAQS = [
     'Menor de idade pode se matricular?',
     'Pode, a partir de 14 anos. Abaixo de 18 o formulário pede nome, documento e telefone do responsável legal.',
   ],
+  // Sem número na resposta, e de propósito.
+  //
+  // Esta resposta dizia "R$ 150 de inscrição" enquanto o mesmo seeder cadastrava
+  // R$ 50 - a home contradizia a página do curso, que lê o valor do banco. É o
+  // mesmo defeito que `how-to-enroll.tsx` já tinha corrigido do lado do
+  // frontend, e que sobreviveu aqui.
+  //
+  // Preço em texto de FAQ é a linha que envelhece primeiro: quem edita a taxa
+  // no painel não tem por que lembrar de uma pergunta frequente. A resposta
+  // manda para onde o valor é sempre o do banco.
   [
     'Como eu pago?',
-    'Por Pix. São R$ 150 de inscrição, uma vez, e R$ 150 por mês durante os quatro meses. O comprovante da inscrição você envia na própria página da matrícula.',
+    'Por Pix: uma taxa de inscrição, uma vez, e a mensalidade durante o curso. Os valores de cada curso estão na página dele, e o comprovante da inscrição você envia na própria página da matrícula.',
   ],
   [
     'E se a turma encher?',
