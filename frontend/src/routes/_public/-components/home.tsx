@@ -4,12 +4,14 @@ import { useQuery } from '@tanstack/react-query'
 import {
   storefrontCoursesQueryOptions,
   storefrontFaqsQueryOptions,
+  storefrontPartnersQueryOptions,
 } from '#/integrations/tanstack-query/queries'
 import { CourseCards } from './course-cards'
 import { Faq } from './faq'
 import { FinalBanner } from './final-banner'
 import { Hero } from './hero'
 import { Mission } from './mission'
+import { Partners } from './partners'
 import { HowToEnroll } from './how-to-enroll'
 import { School } from './school'
 import { StatsBar } from './stats-bar'
@@ -23,22 +25,23 @@ import { WhoItsFor } from './who-its-for'
  *
  * Só composição. A ordem aqui é a ordem na tela, e ela conta uma sequência: o
  * que é, quanto dura, por que presencial, o que se leva, quais são os cursos,
- * como se matricular, quem ensina, **por que a escola existe**, para quem é,
- * onde e quando, o que ficou em dúvida, e o convite.
+ * como se matricular, quem ensina, **quem responde pela escola**, por que ela
+ * existe, para quem é, onde e quando, o que ficou em dúvida, e o convite.
  *
  * A missão vem depois da equipe e antes de "para quem é": ela responde para que
  * a escola existe, e é essa resposta que a pessoa usa para decidir se é para
  * ela. Antes da equipe seria promessa sem quem a sustente.
  *
  * `useQuery` e não `useSuspenseQuery`: a API fora do ar não pode derrubar a
- * página inteira. Dez das doze seções não dependem de consulta nenhuma - hero,
- * escola, o que você recebe, matrícula, equipe, para quem é, onde e quando e o
- * banner continuam de pé, e as duas que dependem somem em vez de levar o resto
- * junto.
+ * página inteira. Dez das treze seções não dependem de consulta nenhuma - hero,
+ * escola, o que você recebe, matrícula, equipe, missão, para quem é, onde e
+ * quando e o banner continuam de pé, e as três que dependem somem em vez de
+ * levar o resto junto.
  */
 export function Home(): React.JSX.Element {
   const courses = useQuery(storefrontCoursesQueryOptions())
   const faqs = useQuery(storefrontFaqsQueryOptions())
+  const partners = useQuery(storefrontPartnersQueryOptions())
 
   return (
     <>
@@ -53,6 +56,13 @@ export function Home(): React.JSX.Element {
       )}
       <HowToEnroll />
       <Team />
+      {/* Logo depois da equipe, e antes da missão: "quem ensina" acabou de ser
+          respondido, e "quem responde pela escola" é a pergunta seguinte. Sem
+          parceiro cadastrado a seção some inteira - um título sobre uma grade
+          vazia é pior que a ausência do bloco, como nos cursos. */}
+      {partners.data && partners.data.data.length > 0 && (
+        <Partners partners={partners.data.data} />
+      )}
       <Mission />
       <WhoItsFor />
       <WhereAndWhen />

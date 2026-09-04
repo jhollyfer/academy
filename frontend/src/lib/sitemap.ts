@@ -86,6 +86,7 @@ export const STATIC_ENTRIES: Array<SitemapEntry> = [
   { path: '/', priority: 1 },
   { path: '/enrollment', priority: 0.9 },
   { path: '/about', priority: 0.5 },
+  { path: '/partners', priority: 0.5 },
   { path: '/terms', priority: 0.2 },
   { path: '/privacy', priority: 0.2 },
 ]

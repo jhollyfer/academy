@@ -18,6 +18,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as PublicSplatRouteImport } from './routes/_public/$'
 import { Route as PublicAboutRouteImport } from './routes/_public/about'
+import { Route as PublicPartnersRouteImport } from './routes/_public/partners'
 import { Route as PublicPrivacyRouteImport } from './routes/_public/privacy'
 import { Route as PublicTermsRouteImport } from './routes/_public/terms'
 import { Route as PrivateAdministratorIndexRouteImport } from './routes/_private/administrator/index'
@@ -88,6 +89,13 @@ const PublicAboutRoute = PublicAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => PublicLayoutRoute,
 } as any).lazy(() => import('./routes/_public/about.lazy').then((d) => d.Route))
+const PublicPartnersRoute = PublicPartnersRouteImport.update({
+  id: '/partners',
+  path: '/partners',
+  getParentRoute: () => PublicLayoutRoute,
+} as any).lazy(() =>
+  import('./routes/_public/partners.lazy').then((d) => d.Route),
+)
 const PublicPrivacyRoute = PublicPrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -356,6 +364,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$': typeof PublicSplatRoute
   '/about': typeof PublicAboutRoute
+  '/partners': typeof PublicPartnersRoute
   '/privacy': typeof PublicPrivacyRoute
   '/terms': typeof PublicTermsRoute
   '/profile/edit': typeof PrivateProfileEditRoute
@@ -391,6 +400,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$': typeof PublicSplatRoute
   '/about': typeof PublicAboutRoute
+  '/partners': typeof PublicPartnersRoute
   '/privacy': typeof PublicPrivacyRoute
   '/terms': typeof PublicTermsRoute
   '/profile/edit': typeof PrivateProfileEditRoute
@@ -429,6 +439,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_public/$': typeof PublicSplatRoute
   '/_public/about': typeof PublicAboutRoute
+  '/_public/partners': typeof PublicPartnersRoute
   '/_public/privacy': typeof PublicPrivacyRoute
   '/_public/terms': typeof PublicTermsRoute
   '/_public/': typeof PublicIndexRoute
@@ -468,6 +479,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/$'
     | '/about'
+    | '/partners'
     | '/privacy'
     | '/terms'
     | '/profile/edit'
@@ -503,6 +515,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/$'
     | '/about'
+    | '/partners'
     | '/privacy'
     | '/terms'
     | '/profile/edit'
@@ -540,6 +553,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/_public/$'
     | '/_public/about'
+    | '/_public/partners'
     | '/_public/privacy'
     | '/_public/terms'
     | '/_public/'
@@ -628,6 +642,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof PublicAboutRouteImport
+      parentRoute: typeof PublicLayoutRoute
+    }
+    '/_public/partners': {
+      id: '/_public/partners'
+      path: '/partners'
+      fullPath: '/partners'
+      preLoaderRoute: typeof PublicPartnersRouteImport
       parentRoute: typeof PublicLayoutRoute
     }
     '/_public/privacy': {
@@ -904,6 +925,7 @@ const PrivateLayoutRouteWithChildren = PrivateLayoutRoute._addFileChildren(
 interface PublicLayoutRouteChildren {
   PublicSplatRoute: typeof PublicSplatRoute
   PublicAboutRoute: typeof PublicAboutRoute
+  PublicPartnersRoute: typeof PublicPartnersRoute
   PublicPrivacyRoute: typeof PublicPrivacyRoute
   PublicTermsRoute: typeof PublicTermsRoute
   PublicIndexRoute: typeof PublicIndexRoute
@@ -915,6 +937,7 @@ interface PublicLayoutRouteChildren {
 const PublicLayoutRouteChildren: PublicLayoutRouteChildren = {
   PublicSplatRoute: PublicSplatRoute,
   PublicAboutRoute: PublicAboutRoute,
+  PublicPartnersRoute: PublicPartnersRoute,
   PublicPrivacyRoute: PublicPrivacyRoute,
   PublicTermsRoute: PublicTermsRoute,
   PublicIndexRoute: PublicIndexRoute,

@@ -45,9 +45,16 @@ describe('buildSitemap', () => {
     expect(xml).toContain('<priority>0.5</priority>')
   })
 
-  it('a lista estática cobre a home, a matrícula e as páginas legais', () => {
+  it('a lista estática cobre a home, a matrícula e as páginas institucionais', () => {
     const paths = STATIC_ENTRIES.map((entry) => entry.path)
 
-    expect(paths).toEqual(['/', '/enrollment', '/about', '/terms', '/privacy'])
+    expect(paths).toEqual([
+      '/',
+      '/enrollment',
+      '/about',
+      '/partners',
+      '/terms',
+      '/privacy',
+    ])
   })
 })

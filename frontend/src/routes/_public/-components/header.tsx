@@ -31,6 +31,15 @@ const LINKS = [
     label: 'Desenvolvimento web',
   },
   { to: '/about', params: undefined, label: 'Quem somos' },
+  /*
+   * A segunda porta do site.
+   *
+   * A navegação inteira falava com uma pessoa só - a família que matricula -, e
+   * quem chega por outro motivo (uma escola, uma secretaria, alguém avaliando
+   * apoiar) não tinha para onde ir. Este item é onde essa pessoa se reconhece,
+   * e a página do outro lado fala com ela.
+   */
+  { to: '/partners', params: undefined, label: 'Para instituições' },
 ] as const
 
 const HEADER_MESSAGE =
