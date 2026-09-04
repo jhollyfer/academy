@@ -322,6 +322,15 @@ function courseModuleFields() {
       vine.object({
         title: vine.string().trim().minLength(2).maxLength(200),
         description: vine.string().trim().maxLength(2000).nullable().optional(),
+        // Quantos sábados o módulo ocupa. O curso inteiro tem 16, e o teto
+        // acompanha: um módulo que dissesse ocupar 40 encontros descreveria um
+        // curso que não existe.
+        sessionCount: vine.number().min(1).max(16).nullable().optional(),
+        // Os tópicos do encontro, um por linha.
+        topics: vine.string().trim().maxLength(1000).nullable().optional(),
+        // O que o aluno entrega ao final. É o que a página mostra no lugar da
+        // faixa salarial da referência.
+        deliverable: vine.string().trim().maxLength(200).nullable().optional(),
       })
     )
     .maxLength(60)

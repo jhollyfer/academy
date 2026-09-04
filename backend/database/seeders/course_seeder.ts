@@ -66,6 +66,29 @@ const WEB_MODULES = [
 ] as const
 
 /**
+ * O que o aluno leva de cada encontro, onde a própria descrição do módulo já
+ * diz.
+ *
+ * Só os módulos em que a entrega é fato da grade, e não os dezesseis: um campo
+ * "entrega" preenchido à força em todo sábado viraria texto de catálogo, e a
+ * página perderia justamente o que o campo existe para dar - a prova concreta
+ * do que a pessoa sai tendo feito.
+ *
+ * É o que ocupa, nesta escola, o lugar da faixa salarial que a referência usa
+ * antes do preço: em vez de prometer o que o mercado paga, mostrar o que ficou
+ * pronto. Um é promessa sobre terceiros, o outro é o que a escola controla.
+ */
+const DELIVERABLES: Record<string, string> = {
+  'Protoboard e primeiro circuito': 'Um circuito montado e medido',
+  'Conhecendo o Arduino': 'O primeiro código gravado na placa',
+  'Robô seguidor de linha': 'Um robô que segue a linha sozinho',
+  'Robô desviador de obstáculo': 'Um robô que desvia do que aparece na frente',
+  'Projeto final: construção': 'O robô da dupla, montado',
+  'Primeiro site no ar': 'Um site publicado, com link para mandar a alguém',
+  'Projeto final: apresentação': 'O projeto publicado e apresentado à turma',
+}
+
+/**
  * As cinco turmas da oferta: duas de programação pela manhã e três de robótica
  * à tarde e à noite, todas aos sábados, todas com quarenta vagas.
  *
@@ -300,7 +323,21 @@ export default class extends BaseSeeder {
 
     await CourseModule.createMany(
       entries.map(function ([title, description], position) {
-        return { courseId, position, title, description }
+        return {
+          courseId,
+          position,
+          title,
+          description,
+          // Um encontro por módulo: são dezesseis módulos e dezesseis sábados,
+          // e a correspondência é um fato da grade, não um chute. Se a escola
+          // juntar dois temas num sábado só, ela ajusta pelo painel.
+          sessionCount: 1,
+          // `topics` fica nulo, e é de propósito: o detalhe do encontro é o
+          // plano de aula da escola, e semear texto inventado aqui poria no ar
+          // uma ementa que nenhum professor escreveu.
+          topics: null,
+          deliverable: DELIVERABLES[title] ?? null,
+        }
       })
     )
   }

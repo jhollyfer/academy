@@ -17,6 +17,9 @@ import type Course from '#models/course'
 export type CourseModuleInput = {
   title: string
   description?: string | null
+  sessionCount?: number | null
+  topics?: string | null
+  deliverable?: string | null
 }
 
 export type CourseFaqInput = {
@@ -35,6 +38,12 @@ export type CourseFaqInput = {
  *
  * Remoção **física**, e é por isso que a tabela não tem `deleted_at`: um módulo
  * reescrito é rascunho, não histórico.
+ *
+ * Os campos de detalhe - encontros, tópicos e entrega - entraram sem mudar este
+ * contrato, e de propósito: são escalares do próprio módulo, nada ganhou
+ * identidade estável do lado do cliente, e o apaga-e-recria continua valendo.
+ * Fazer diff aqui exigiria a tela inventar um id por rascunho, que é o problema
+ * que este desenho evita.
  */
 export async function syncCourseModules(
   courseId: string,
@@ -52,6 +61,9 @@ export async function syncCourseModules(
         position,
         title: entry.title,
         description: entry.description ?? null,
+        sessionCount: entry.sessionCount ?? null,
+        topics: entry.topics ?? null,
+        deliverable: entry.deliverable ?? null,
       }
     }),
     { client: trx }

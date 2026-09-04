@@ -7155,6 +7155,28 @@
                     "null"
                   ],
                   "maxLength": 2000
+                },
+                "sessionCount": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": 1,
+                  "maximum": 16
+                },
+                "topics": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 1000
+                },
+                "deliverable": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 200
                 }
               },
               "required": [
@@ -7389,6 +7411,12 @@
                   "type": "string",
                   "format": "date-time"
                 },
+                "deliverable": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "description": {
                   "type": [
                     "string",
@@ -7401,8 +7429,20 @@
                 "position": {
                   "type": "number"
                 },
+                "sessionCount": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
                 "title": {
                   "type": "string"
+                },
+                "topics": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "updatedAt": {
                   "type": [
@@ -7415,10 +7455,13 @@
               "required": [
                 "courseId",
                 "createdAt",
+                "deliverable",
                 "description",
                 "id",
                 "position",
+                "sessionCount",
                 "title",
+                "topics",
                 "updatedAt"
               ]
             }
@@ -7681,6 +7724,12 @@
                   "type": "string",
                   "format": "date-time"
                 },
+                "deliverable": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "description": {
                   "type": [
                     "string",
@@ -7693,8 +7742,20 @@
                 "position": {
                   "type": "number"
                 },
+                "sessionCount": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
                 "title": {
                   "type": "string"
+                },
+                "topics": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "updatedAt": {
                   "type": [
@@ -7707,10 +7768,13 @@
               "required": [
                 "courseId",
                 "createdAt",
+                "deliverable",
                 "description",
                 "id",
                 "position",
+                "sessionCount",
                 "title",
+                "topics",
                 "updatedAt"
               ]
             }
@@ -7973,6 +8037,12 @@
                   "type": "string",
                   "format": "date-time"
                 },
+                "deliverable": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "description": {
                   "type": [
                     "string",
@@ -7985,8 +8055,20 @@
                 "position": {
                   "type": "number"
                 },
+                "sessionCount": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
                 "title": {
                   "type": "string"
+                },
+                "topics": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "updatedAt": {
                   "type": [
@@ -7999,10 +8081,13 @@
               "required": [
                 "courseId",
                 "createdAt",
+                "deliverable",
                 "description",
                 "id",
                 "position",
+                "sessionCount",
                 "title",
+                "topics",
                 "updatedAt"
               ]
             }
@@ -8182,6 +8267,28 @@
                     "null"
                   ],
                   "maxLength": 2000
+                },
+                "sessionCount": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": 1,
+                  "maximum": 16
+                },
+                "topics": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 1000
+                },
+                "deliverable": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 200
                 }
               },
               "required": [
@@ -8408,6 +8515,12 @@
                   "type": "string",
                   "format": "date-time"
                 },
+                "deliverable": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "description": {
                   "type": [
                     "string",
@@ -8420,8 +8533,20 @@
                 "position": {
                   "type": "number"
                 },
+                "sessionCount": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
                 "title": {
                   "type": "string"
+                },
+                "topics": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "updatedAt": {
                   "type": [
@@ -8434,10 +8559,13 @@
               "required": [
                 "courseId",
                 "createdAt",
+                "deliverable",
                 "description",
                 "id",
                 "position",
+                "sessionCount",
                 "title",
+                "topics",
                 "updatedAt"
               ]
             }
@@ -18828,6 +18956,12 @@
                   "type": "string",
                   "format": "date-time"
                 },
+                "deliverable": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "description": {
                   "type": [
                     "string",
@@ -18840,8 +18974,20 @@
                 "position": {
                   "type": "number"
                 },
+                "sessionCount": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
                 "title": {
                   "type": "string"
+                },
+                "topics": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "updatedAt": {
                   "type": [
@@ -18854,10 +19000,13 @@
               "required": [
                 "courseId",
                 "createdAt",
+                "deliverable",
                 "description",
                 "id",
                 "position",
+                "sessionCount",
                 "title",
+                "topics",
                 "updatedAt"
               ]
             }
@@ -19120,6 +19269,12 @@
                   "type": "string",
                   "format": "date-time"
                 },
+                "deliverable": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "description": {
                   "type": [
                     "string",
@@ -19132,8 +19287,20 @@
                 "position": {
                   "type": "number"
                 },
+                "sessionCount": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
                 "title": {
                   "type": "string"
+                },
+                "topics": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "updatedAt": {
                   "type": [
@@ -19146,10 +19313,13 @@
               "required": [
                 "courseId",
                 "createdAt",
+                "deliverable",
                 "description",
                 "id",
                 "position",
+                "sessionCount",
                 "title",
+                "topics",
                 "updatedAt"
               ]
             }

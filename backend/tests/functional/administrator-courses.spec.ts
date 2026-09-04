@@ -268,6 +268,50 @@ test.group('administrador > cursos > grade e FAQ', (group) => {
     assert.lengthOf(course.faqs, 1)
   })
 
+  /**
+   * Trava o detalhe do encontro. Os três campos entraram depois, e o
+   * `syncCourseModules` os grava no mesmo apaga-e-recria - um `?? null`
+   * esquecido ali faria a página de curso perder encontros, tópicos e entrega
+   * sem erro nenhum, só com a ementa voltando a ser título e descrição.
+   */
+  test('grava encontros, tópicos e entrega de cada módulo', async ({ client, assert }) => {
+    const session = await authenticateAsOwner(client)
+
+    const course = await createCourse(client, session, {
+      modules: [
+        {
+          title: 'Sábado 1 · Eletrônica básica',
+          sessionCount: 2,
+          topics: 'Tensão e corrente\nMultímetro na mão',
+          deliverable: 'Um circuito montado e medido',
+        },
+        { title: 'Sábado 2 · Arduino' },
+      ],
+    })
+
+    assert.equal(course.modules[0].sessionCount, 2)
+    assert.equal(course.modules[0].deliverable, 'Um circuito montado e medido')
+    assert.include(course.modules[0].topics, 'Multímetro')
+    // Módulo sem detalhe chega nulo, e não ausente: a página de curso decide
+    // esconder a linha, e `undefined` deixaria a decisão para o `??` de cada
+    // componente que a lê.
+    assert.isNull(course.modules[1].sessionCount)
+    assert.isNull(course.modules[1].deliverable)
+  })
+
+  test('recusa módulo que ocupa mais sábados que o curso inteiro', async ({ client }) => {
+    const session = await authenticateAsOwner(client)
+
+    // O curso tem dezesseis sábados. Um módulo de quarenta descreveria um curso
+    // que não existe.
+    const response = await client
+      .post('/administrator/courses')
+      .cookies(session)
+      .json(coursePayload({ modules: [{ title: 'Sábado 1', sessionCount: 40 }] }))
+
+    response.assertStatus(422)
+  })
+
   test('reenviar a grade substitui a anterior inteira', async ({ client, assert }) => {
     const session = await authenticateAsOwner(client)
     const course = await createCourse(client, session, {

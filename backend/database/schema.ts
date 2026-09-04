@@ -106,12 +106,14 @@ export class CourseFaqSchema extends BaseModel {
 }
 
 export class CourseModuleSchema extends BaseModel {
-  static $columns = ['courseId', 'createdAt', 'description', 'id', 'position', 'title', 'updatedAt'] as const
+  static $columns = ['courseId', 'createdAt', 'deliverable', 'description', 'id', 'position', 'sessionCount', 'title', 'topics', 'updatedAt'] as const
   $columns = CourseModuleSchema.$columns
   @column()
   declare courseId: string
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column()
+  declare deliverable: string | null
   @column()
   declare description: string | null
   @column({ isPrimary: true })
@@ -119,7 +121,11 @@ export class CourseModuleSchema extends BaseModel {
   @column()
   declare position: number
   @column()
+  declare sessionCount: number | null
+  @column()
   declare title: string
+  @column()
+  declare topics: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }
