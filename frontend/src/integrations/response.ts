@@ -125,6 +125,15 @@ export type CourseModuleResponse = {
   position: number
   title: string
   description: string | null
+  /**
+   * Quantos sábados o módulo ocupa. `null` é "a grade ainda não foi detalhada",
+   * e a página de curso esconde a linha em vez de escrever zero.
+   */
+  sessionCount: number | null
+  /** Os tópicos do encontro, um por linha. */
+  topics: string | null
+  /** O que o aluno leva pronto ao fim do módulo. */
+  deliverable: string | null
   createdAt: string
   updatedAt: string | null
 }

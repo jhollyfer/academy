@@ -14,6 +14,33 @@ import type { CourseResponse } from '#/integrations/response'
  * que estreia sem histórico de domínio, é a diferença entre aparecer com um
  * cartão e aparecer com uma linha.
  */
+/**
+ * O FAQ do curso em `schema.org/FAQPage`, ou nada quando não há pergunta.
+ *
+ * Devolve lista para o `...` do `scripts` acima: é o que permite o bloco sumir
+ * inteiro sem um `undefined` sobrando no array.
+ */
+function faqJsonLd(course: CourseResponse) {
+  const faqs = course.faqs ?? []
+
+  if (faqs.length === 0) return []
+
+  return [
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faqs.map((faq) => ({
+          '@type': 'Question',
+          name: faq.question,
+          acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+        })),
+      }),
+    },
+  ]
+}
+
 function courseJsonLd(course: CourseResponse) {
   const jsonLd: Record<string, unknown> = {
     '@context': 'https://schema.org',
@@ -176,6 +203,18 @@ export const Route = createFileRoute('/_public/courses/$slug')({
           type: 'application/ld+json',
           children: JSON.stringify(courseJsonLd(loaderData)),
         },
+        /*
+         * O FAQ como dado estruturado, além do acordeão na tela.
+         *
+         * É o mesmo conteúdo servido duas vezes para leitores diferentes - a
+         * pessoa lê o acordeão, o buscador lê isto -, e é o que permite a
+         * resposta aparecer direto no resultado de busca. Barato: a máquina de
+         * JSON-LD já existe nesta rota para `Course` e `CourseInstance`.
+         *
+         * Só quando há pergunta: um `FAQPage` de lista vazia é marcação
+         * inválida, e o buscador penaliza dado estruturado quebrado.
+         */
+        ...faqJsonLd(loaderData),
       ],
     }
   },

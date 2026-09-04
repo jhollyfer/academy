@@ -55,8 +55,12 @@ const ITEMS: ReadonlyArray<{ icon: Icon; title: string; description: string }> =
     {
       icon: PresentationChart,
       title: 'Projeto final apresentado',
+      // "É o que fica com você" saiu daqui: lido junto do kit de eletrônica do
+      // card acima, dava a entender que o aluno leva o que montou para casa - e
+      // o material é da escola. O que fica é saber fazer, e é o que a frase diz
+      // agora.
       description:
-        'No último sábado cada aluno apresenta o que construiu. É o que fica com você no fim.',
+        'No último sábado cada aluno apresenta o que construiu para a turma. Sai daqui sabendo fazer de novo.',
     },
     {
       icon: CirclesThreePlus,
@@ -111,7 +115,7 @@ export function WhatYouGet(): React.JSX.Element {
           <SectionTitle
             tone="ink"
             className="lg:text-display-md"
-            lead="O que você"
+            eyebrow="O curso" lead="O que você"
             accent="leva daqui"
           />
 

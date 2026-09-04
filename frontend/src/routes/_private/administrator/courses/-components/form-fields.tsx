@@ -47,6 +47,19 @@ import type { CourseResponse } from '#/integrations/response'
  * o `vineResolver` deixaria passar um campo obrigatório apagado - a API leria o
  * campo ausente como "não mexer" e o valor antigo ficaria.
  */
+/**
+ * O que um campo numérico opcional guarda.
+ *
+ * `null` para vazio, e não zero: `Number('')` é 0, e zero aqui afirmaria um
+ * módulo que não ocupa sábado nenhum - que é diferente de "ainda não foi
+ * detalhado", que é o que o campo em branco quer dizer.
+ */
+function optionalNumber(value: string): number | null {
+  if (!value) return null
+
+  return Number(value)
+}
+
 export type CourseFormType = AdministratorCourseCreatePayload
 
 /**
@@ -447,6 +460,93 @@ export function CourseFormFields({
                 </Field>
               )}
             />
+
+            {/*
+              Os tópicos, um por linha. `Textarea` e não uma lista de inputs: já
+              existe um `useFieldArray` para os módulos, e aninhar um segundo
+              faria o formulário gerenciar array dentro de array para guardar
+              string solta. A quebra de linha é o separador, e a página de curso
+              a lê de volta.
+            */}
+            <Controller
+              control={form.control}
+              name={`modules.${index}.topics`}
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel htmlFor={`modules.${index}.topics`}>
+                    Tópicos, um por linha
+                  </FieldLabel>
+                  <Textarea
+                    {...field}
+                    value={field.value ?? ''}
+                    // String vazia vira `null`: o campo é opcional, e gravar
+                    // `''` faria a página de curso desenhar uma lista vazia.
+                    onChange={(event) =>
+                      field.onChange(event.target.value || null)
+                    }
+                    id={`modules.${index}.topics`}
+                    rows={3}
+                  />
+                </Field>
+              )}
+            />
+
+            <div className="grid gap-3 sm:grid-cols-[10rem_1fr]">
+              <Controller
+                control={form.control}
+                name={`modules.${index}.sessionCount`}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={`modules.${index}.sessionCount`}>
+                      Sábados
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      value={field.value ?? ''}
+                      // Campo vazio vira `null`, e não zero: zero afirmaria um
+                      // módulo que não ocupa sábado nenhum, e `Number('')` é 0.
+                      onChange={(event) =>
+                        field.onChange(optionalNumber(event.target.value))
+                      }
+                      id={`modules.${index}.sessionCount`}
+                      type="number"
+                      min={1}
+                      max={16}
+                      {...invalidProps(
+                        fieldState.invalid,
+                        `modules.${index}.sessionCount`,
+                      )}
+                    />
+                    {fieldState.error && (
+                      <FieldError id={errorId(`modules.${index}.sessionCount`)}>
+                        {fieldState.error.message}
+                      </FieldError>
+                    )}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                control={form.control}
+                name={`modules.${index}.deliverable`}
+                render={({ field }) => (
+                  <Field>
+                    <FieldLabel htmlFor={`modules.${index}.deliverable`}>
+                      O que o aluno leva pronto
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      value={field.value ?? ''}
+                      onChange={(event) =>
+                        field.onChange(event.target.value || null)
+                      }
+                      id={`modules.${index}.deliverable`}
+                      placeholder="Um robô que segue a linha sozinho"
+                    />
+                  </Field>
+                )}
+              />
+            </div>
           </div>
         ))}
 
@@ -454,7 +554,15 @@ export function CourseFormFields({
           type="button"
           variant="outline"
           className="w-fit"
-          onClick={() => modules.append({ title: '', description: null })}
+          onClick={() =>
+            modules.append({
+              title: '',
+              description: null,
+              sessionCount: null,
+              topics: null,
+              deliverable: null,
+            })
+          }
         >
           <Plus />
           Adicionar encontro
@@ -751,6 +859,9 @@ export function courseToValues(course: CourseResponse): CourseFormType {
     modules: (course.modules ?? []).map((entry) => ({
       title: entry.title,
       description: entry.description,
+      sessionCount: entry.sessionCount,
+      topics: entry.topics,
+      deliverable: entry.deliverable,
     })),
     faqs: (course.faqs ?? []).map((entry) => ({
       question: entry.question,
