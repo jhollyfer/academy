@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import {
   storefrontCoursesQueryOptions,
   storefrontFaqsQueryOptions,
+  storefrontPartnersQueryOptions,
 } from '#/integrations/tanstack-query/queries'
 import {
   ADDRESS,
@@ -77,13 +78,20 @@ export const Route = createFileRoute('/_public/')({
    * mostra é a seção afetada, que já sabe sumir sozinha. Falha de uma seção não
    * derruba a página.
    *
-   * As duas em paralelo: encadeadas, o FAQ só começaria a carregar depois de os
-   * cursos voltarem, e a primeira navegação pagaria os dois tempos.
+   * As três em paralelo: encadeadas, o FAQ só começaria a carregar depois de os
+   * cursos voltarem, e a primeira navegação pagaria os três tempos.
+   *
+   * **Toda seção que lê a API precisa estar aqui.** Sem o prefetch o cache do
+   * servidor nasce vazio, o `useQuery` da seção devolve `undefined` no SSR e o
+   * bloco só aparece depois da hidratação - invisível para quem está sem
+   * JavaScript e para o rastreador do buscador. Foi o que aconteceu com os
+   * parceiros: a seção existia, a API respondia, e o HTML servido não a trazia.
    */
   loader: ({ context }) =>
     Promise.all([
       context.queryClient.prefetchQuery(storefrontCoursesQueryOptions()),
       context.queryClient.prefetchQuery(storefrontFaqsQueryOptions()),
+      context.queryClient.prefetchQuery(storefrontPartnersQueryOptions()),
     ]),
   head: () => ({
     meta: [
