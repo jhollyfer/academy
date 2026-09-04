@@ -54,7 +54,7 @@ export function Faq({
       */}
       <div className="relative px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-20">
-          <SectionTitle className={REVEAL} lead={title} accent={highlight} />
+          <SectionTitle className={REVEAL} eyebrow="Dúvidas" lead={title} accent={highlight} />
 
           {/*
             `keepMounted` porque o `aria-controls` abaixo é escrito à mão. Por
@@ -71,12 +71,24 @@ export function Faq({
               'delay-100 rounded-card border-border bg-card',
             )}
           >
-            {faqs.map((faq) => (
+            {faqs.map((faq, index) => (
               <AccordionItem key={faq.id} value={faq.id} className="px-2">
                 <AccordionTrigger
                   aria-controls={panelId(faq.id)}
                   className="py-5 text-left text-base font-medium text-foreground"
                 >
+                  {/*
+                    O número antes da pergunta, `aria-hidden`: dá à lista a
+                    cadência de documento, e um leitor de tela que anunciasse
+                    "zero um" antes de cada pergunta só atrasaria quem já sabe
+                    que está num acordeão.
+                  */}
+                  <span
+                    aria-hidden
+                    className="mr-3 text-sm text-muted-foreground tabular-nums"
+                  >
+                    {String(index + 1).padStart(2, '0')}.
+                  </span>
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent

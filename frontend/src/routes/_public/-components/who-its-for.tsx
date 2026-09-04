@@ -52,7 +52,7 @@ export function WhoItsFor(): React.JSX.Element {
         <div className="mx-auto max-w-7xl">
           <SectionTitle
             className={REVEAL}
-            lead="Para quem é"
+            eyebrow="Público" lead="Para quem é"
             accent="esta turma"
           />
 

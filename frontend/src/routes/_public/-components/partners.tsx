@@ -44,7 +44,7 @@ export function Partners({
         <div className="relative mx-auto max-w-7xl">
           <SectionTitle
             className={REVEAL}
-            lead="Quem sustenta"
+            eyebrow="Parceiros" lead="Quem sustenta"
             accent="esta escola"
           />
 

@@ -261,6 +261,23 @@
   --neon: var(--brand-green-500);
   --neon-ink: var(--brand-green-900);
 
+  /*
+   * As superfícies da vitrine escura, e o fio que as separa.
+   *
+   * Três níveis derivados do mesmo matiz 147.3 de `--brand-ink`, e não cinzas
+   * neutros: é o desvio de matiz que impede o resultado de parecer preto sobre
+   * preto de template. A referência faz o mesmo com um cinza azul-violeta; aqui
+   * o desvio é o verde da própria marca.
+   *
+   * `--ink-hairline` é a borda. Quase invisível de propósito: a estrutura da
+   * página é dada por fios, nunca por caixa - uma borda que se vê transforma
+   * seção em cartão, e cartões empilhados viram uma pilha listrada.
+   */
+  --ink-canvas: var(--brand-ink);
+  --ink-surface: oklch(0.21 0.02 147.3);
+  --ink-raised: oklch(0.25 0.022 147.3);
+  --ink-hairline: oklch(0.85 0.12 147.3 / 0.08);
+
   --badge-neutral: oklch(0.94 0.006 33);
   --badge-neutral-fg: oklch(0.42 0.012 34);
   --badge-info: oklch(0.94 0.04 235);
@@ -488,6 +505,10 @@
   --color-brand-ink-soft: var(--brand-ink-soft);
   --color-neon: var(--neon);
   --color-neon-ink: var(--neon-ink);
+  --color-ink-canvas: var(--ink-canvas);
+  --color-ink-surface: var(--ink-surface);
+  --color-ink-raised: var(--ink-raised);
+  --color-ink-hairline: var(--ink-hairline);
 
   --color-badge-neutral: var(--badge-neutral);
   --color-badge-neutral-foreground: var(--badge-neutral-fg);
@@ -871,6 +892,104 @@
   text-transform: uppercase;
   letter-spacing: 0.01em;
   line-height: 0.95;
+}
+
+/*
+ * A assinatura de seção: quadrado, rótulo em caixa alta e um traço baixo.
+ *
+ * Três elementos numa linha, e é o que mais separa uma página densa de uma
+ * página bonita - o rótulo diz de que seção se trata antes do título dizer o
+ * que ela afirma, e o olho aprende a pular de um para o outro.
+ *
+ * `letter-spacing` bem aberto porque o corpo é pequeno: é a inversão da escala
+ * display, onde o tracking é negativo. Máximo de espacejamento onde o tipo é
+ * menor, negativo onde é maior - é essa oposição que faz o conjunto parecer
+ * desenhado em vez de escolhido.
+ *
+ * O quadrado tem `border-radius: 1px` e não é um círculo: bolinha lê como
+ * marcador de lista, e quadrado lê como marca de sistema.
+ */
+@utility eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: --spacing(2);
+  font-family: var(--font-display);
+  font-size: 0.8125rem; /* 13px */
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1;
+
+  &::before {
+    content: '';
+    width: --spacing(1);
+    height: --spacing(1);
+    border-radius: 1px;
+    background-color: currentColor;
+  }
+}
+
+/*
+ * A moldura vertical: dois fios que percorrem a altura da página.
+ *
+ * Custa duas bordas e dá à página uma arquitetura que nenhum conteúdo precisa
+ * sustentar. É o truque mais barato da referência - o container já existia com
+ * `max-w`, e ganhar as laterais não muda uma linha de layout.
+ *
+ * Só de `lg` para cima: em telas estreitas o conteúdo já encosta nas bordas, e
+ * os fios ficariam colados no texto.
+ */
+@utility frame-x {
+  @variant lg {
+    border-inline: 1px solid var(--ink-hairline);
+  }
+}
+
+/*
+ * A grade cujos vãos são os divisores.
+ *
+ * O fundo da grade aparece por `gap: 1px` entre células opacas. Não há borda
+ * para gerenciar, não há linha dupla no cruzamento e não há o `:last-child` que
+ * toda grade com `border-right` acaba precisando.
+ *
+ * Quem usa define as colunas e o fundo das células.
+ */
+@utility hairline-grid {
+  display: grid;
+  gap: 1px;
+  background-color: var(--ink-hairline);
+}
+
+/*
+ * O brilho do topo da seção escura: um halo do acento sobre uma trama de pontos.
+ *
+ * `color-mix` do próprio token, e não uma cor escrita: trocar o acento recolore
+ * o halo junto, e é o que permite uma seção inteira mudar de cor por um
+ * atributo sem ninguém tocar aqui.
+ *
+ * `pointer-events: none` porque é decoração sobre conteúdo clicável.
+ */
+@utility accent-glow {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 40rem;
+  opacity: 0.45;
+  pointer-events: none;
+  background-image:
+    radial-gradient(
+      circle at 50% 15%,
+      color-mix(in srgb, var(--neon) 22%, transparent),
+      transparent 52%
+    ),
+    radial-gradient(
+      circle,
+      color-mix(in srgb, white 12%, transparent) 0.7px,
+      transparent 0.9px
+    );
+  background-size:
+    100% 100%,
+    4px 4px;
 }
 
 /*

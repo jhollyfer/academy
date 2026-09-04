@@ -53,7 +53,7 @@ export function School(): React.JSX.Element {
           />
 
           <div className={cn(REVEAL, 'delay-100')}>
-            <SectionTitle lead="Quem" accent="somos" />
+            <SectionTitle eyebrow="A escola" lead="Quem" accent="somos" />
 
             <div className="mt-7 space-y-5 text-body-md text-muted-foreground sm:text-body-lg">
               <p>
