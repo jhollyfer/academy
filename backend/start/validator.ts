@@ -105,6 +105,13 @@ export const FIELD_LABELS = {
   'direction': 'a direção da ordenação',
   'trashed': 'o filtro de arquivados',
 
+  // ── Parceiros ────────────────────────────────────────────────────────
+  // `role` não entra aqui: a chave já existe no bloco de identidade, e o mapa é
+  // por nome de campo. "O papel" serve tanto ao papel de quem entra no painel
+  // quanto ao que a instituição faz pela escola.
+  'url': 'o site',
+  'logoId': 'a logomarca',
+
   // ── Cursos ───────────────────────────────────────────────────────────
   'accent': 'o tema',
   'tagline': 'a chamada',

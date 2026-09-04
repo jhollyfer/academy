@@ -103,6 +103,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storefront/faqs/paginate.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'storefront.partners': {
+    methods: ["GET","HEAD"]
+    pattern: '/storefront/partners'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#core/validator').PaginationValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/storefront/partners/paginate.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storefront/partners/paginate.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'storefront.enrollments.create': {
     methods: ["POST"]
     pattern: '/storefront/enrollments'
@@ -343,6 +355,54 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/courses/update.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'administrator.partners.paginate': {
+    methods: ["GET","HEAD"]
+    pattern: '/administrator/partners'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#core/validator').AdministratorPartnerPaginationValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/partners/paginate.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/partners/paginate.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'administrator.partners.create': {
+    methods: ["POST"]
+    pattern: '/administrator/partners'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').AdministratorPartnerCreateValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').AdministratorPartnerCreateValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/partners/create.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/partners/create.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'administrator.partners.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/administrator/partners/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQueryForGet<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/partners/show.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/partners/show.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'administrator.partners.update': {
+    methods: ["PUT"]
+    pattern: '/administrator/partners/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').AdministratorPartnerUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').AdministratorPartnerUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/partners/update.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/partners/update.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'administrator.classes.paginate': {
     methods: ["GET","HEAD"]
     pattern: '/administrator/classes'
@@ -545,6 +605,42 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/courses/delete.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/courses/delete.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'administrator.lifecycle.partners.archive': {
+    methods: ["PATCH"]
+    pattern: '/administrator/partners/:id/archive'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/partners/archive.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/partners/archive.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'administrator.lifecycle.partners.unarchive': {
+    methods: ["PATCH"]
+    pattern: '/administrator/partners/:id/unarchive'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/partners/unarchive.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/partners/unarchive.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'administrator.lifecycle.partners.purge': {
+    methods: ["DELETE"]
+    pattern: '/administrator/partners/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/partners/delete.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/partners/delete.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'administrator.lifecycle.classes.archive': {

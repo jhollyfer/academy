@@ -1,6 +1,7 @@
 import Class from '#models/class'
 import PixService from '#services/pix.service'
 import type Course from '#models/course'
+import type Partner from '#models/partner'
 import type Enrollment from '#models/enrollment'
 import { withSeatsTaken } from '#features/_shared.seats'
 import { ActiveStatuses, ClassStatuses } from '#core/entity'
@@ -19,6 +20,22 @@ import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
  * vitrine, não como erro.
  */
 export function visibleCourses<TQuery extends ModelQueryBuilderContract<typeof Course, Course>>(
+  query: TQuery
+): TQuery {
+  query.whereNull('deletedAt').where('status', ActiveStatuses.ACTIVE)
+
+  return query
+}
+
+/**
+ * A condição de visibilidade dos parceiros, pela mesma regra dos cursos.
+ *
+ * Existe separada porque a razão de sair do ar é outra: um curso some entre duas
+ * turmas, um parceiro some quando o convênio fica suspenso. O que as duas
+ * compartilham é a consequência - a vitrine não pode anunciar nenhum dos dois
+ * enquanto isso durar.
+ */
+export function visiblePartners<TQuery extends ModelQueryBuilderContract<typeof Partner, Partner>>(
   query: TQuery
 ): TQuery {
   query.whereNull('deletedAt').where('status', ActiveStatuses.ACTIVE)

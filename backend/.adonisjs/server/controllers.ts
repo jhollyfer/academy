@@ -36,6 +36,15 @@ export const controllers = {
       Unarchive: () => import('#features/administrator/enrollments/unarchive.controller'),
       Update: () => import('#features/administrator/enrollments/update.controller'),
     },
+    partners: {
+      Archive: () => import('#features/administrator/partners/archive.controller'),
+      Create: () => import('#features/administrator/partners/create.controller'),
+      Delete: () => import('#features/administrator/partners/delete.controller'),
+      Paginate: () => import('#features/administrator/partners/paginate.controller'),
+      Show: () => import('#features/administrator/partners/show.controller'),
+      Unarchive: () => import('#features/administrator/partners/unarchive.controller'),
+      Update: () => import('#features/administrator/partners/update.controller'),
+    },
     users: {
       Archive: () => import('#features/administrator/users/archive.controller'),
       AttachDependent: () => import('#features/administrator/users/attach-dependent.controller'),
@@ -81,6 +90,9 @@ export const controllers = {
     },
     faqs: {
       Paginate: () => import('#features/storefront/faqs/paginate.controller'),
+    },
+    partners: {
+      Paginate: () => import('#features/storefront/partners/paginate.controller'),
     },
   },
 }

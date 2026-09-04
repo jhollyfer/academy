@@ -141,6 +141,34 @@ export async function createCourse(
 }
 
 /**
+ * O payload mínimo de um parceiro. Os campos obrigatórios e nada mais - cada
+ * teste sobrescreve o que precisa provar.
+ */
+export function partnerPayload(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    name: 'CETI Aristélio Sabino de Oliveira',
+    role: 'Cede as salas onde as aulas acontecem, aos sábados.',
+    ...overrides,
+  }
+}
+
+/** Cria um parceiro pelo painel e devolve o recurso criado. */
+export async function createPartner(
+  client: ApiClient,
+  session: Session,
+  overrides: Record<string, unknown> = {}
+): Promise<Record<string, any>> {
+  const response = await client
+    .post('/administrator/partners')
+    .cookies(session)
+    .json(partnerPayload(overrides))
+
+  response.assertStatus(201)
+
+  return body(response)
+}
+
+/**
  * O payload mínimo de uma turma. `courseId` é obrigatório e vem de quem chama.
  */
 export function classPayload(

@@ -124,6 +124,11 @@ router
     // as perguntas de `courseId` nulo, que não pertencem a curso nenhum.
     router.get('faqs', [controllers.storefront.faqs.Paginate]).as('faqs')
 
+    // Os parceiros da escola. Leitura só, e sem `:id`: a home mostra a faixa
+    // inteira e não há página de parceiro - quem quer saber mais vai para
+    // `/parceiros`, que é uma página do site e não um recurso da API.
+    router.get('partners', [controllers.storefront.partners.Paginate]).as('partners')
+
     router
       .group(() => {
         router.post('/', [controllers.storefront.enrollments.Create]).use(enrollmentThrottle)
@@ -269,6 +274,16 @@ router
 
     router
       .group(() => {
+        router.get('/', [controllers.administrator.partners.Paginate])
+        router.post('/', [controllers.administrator.partners.Create])
+        router.get(':id', [controllers.administrator.partners.Show])
+        router.put(':id', [controllers.administrator.partners.Update])
+      })
+      .prefix('partners')
+      .as('partners')
+
+    router
+      .group(() => {
         router.get('/', [controllers.administrator.classes.Paginate])
         router.post('/', [controllers.administrator.classes.Create])
         router.get(':id', [controllers.administrator.classes.Show])
@@ -337,6 +352,20 @@ router
           })
           .prefix('courses')
           .as('courses')
+
+        router
+          .group(() => {
+            router.patch(':id/archive', [controllers.administrator.partners.Archive]).as('archive')
+            router
+              .patch(':id/unarchive', [controllers.administrator.partners.Unarchive])
+              .as('unarchive')
+            router
+              .delete(':id', [controllers.administrator.partners.Delete])
+              .as('purge')
+              .use(middleware.role(['OWNER']))
+          })
+          .prefix('partners')
+          .as('partners')
 
         router
           .group(() => {

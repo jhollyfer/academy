@@ -87,6 +87,15 @@ const tags: TagRule[] = [
     plural: 'matrículas',
   },
   {
+    prefix: '/storefront/partners',
+    name: 'Site · Parceiros',
+    description:
+      'As instituições que sustentam a escola, como a home as mostra. Leitura pública, ' +
+      'só o que está no ar.',
+    singular: 'parceiro',
+    plural: 'parceiros',
+  },
+  {
     prefix: '/storages',
     name: 'Arquivos',
     description:
@@ -111,6 +120,15 @@ const tags: TagRule[] = [
       'da lixeira; apagar só aceita o que já está arquivado, e recusa curso com turma.',
     singular: 'curso',
     plural: 'cursos',
+  },
+  {
+    prefix: '/administrator/partners',
+    name: 'Painel · Parceiros',
+    description:
+      'O cadastro das instituições parceiras: quem são, o que fazem pela escola e em que ' +
+      'ordem aparecem na vitrine.',
+    singular: 'parceiro',
+    plural: 'parceiros',
   },
   {
     prefix: '/administrator/classes',

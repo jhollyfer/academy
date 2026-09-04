@@ -1,5 +1,6 @@
 import Class from '#models/class'
 import Course from '#models/course'
+import Partner from '#models/partner'
 import CourseFaq from '#models/course_faq'
 import CourseModule from '#models/course_module'
 import Enrollment from '#models/enrollment'
@@ -93,6 +94,19 @@ const COURSE: ModelResource = {
  * Sem a grade e sem o FAQ do curso: quem lista turmas quer o nome do curso na
  * coluna, não a ementa inteira em cada linha.
  */
+/**
+ * O parceiro com a logomarca aninhada.
+ *
+ * `logo` vem junto porque nenhuma tela pede um parceiro sem ela: a faixa da home
+ * é feita de imagens, e uma segunda chamada para buscá-las seria um waterfall em
+ * cima de uma seção decorativa.
+ */
+const PARTNER: ModelResource = {
+  model: Partner,
+  enums: { status: ACTIVE_STATUSES },
+  relations: { logo: STORAGE },
+}
+
 const CLASS: ModelResource = {
   model: Class,
   enums: { weekday: WEEKDAYS, shift: SHIFTS, status: CLASS_STATUSES },
@@ -271,6 +285,7 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'administrator/classes': CLASS,
   'administrator/enrollments': ENROLLMENT,
   'administrator/users': MANAGED_USER,
+  'administrator/partners': PARTNER,
 
   // O mesmo recurso do painel: quem restringe o que a pessoa alcança é o escopo
   // da consulta, não uma projeção. Diferente do `storefront`, que é anônimo e
@@ -278,6 +293,7 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'portal/enrollments': ENROLLMENT,
 
   'storefront/courses': COURSE,
+  'storefront/partners': PARTNER,
   // Projeção declarada pelo mesmo motivo da matrícula pública, mas por outro
   // caminho: aqui não é sigilo, é um `pick` que enxuga a linha.
   'storefront/faqs': StorefrontFaqResponse,

@@ -54,6 +54,12 @@ const routes = {
     tokens: [{"old":"/storefront/faqs","type":0,"val":"storefront","end":""},{"old":"/storefront/faqs","type":0,"val":"faqs","end":""}],
     types: placeholder as Registry['storefront.faqs']['types'],
   },
+  'storefront.partners': {
+    methods: ["GET","HEAD"],
+    pattern: '/storefront/partners',
+    tokens: [{"old":"/storefront/partners","type":0,"val":"storefront","end":""},{"old":"/storefront/partners","type":0,"val":"partners","end":""}],
+    types: placeholder as Registry['storefront.partners']['types'],
+  },
   'storefront.enrollments.create': {
     methods: ["POST"],
     pattern: '/storefront/enrollments',
@@ -174,6 +180,30 @@ const routes = {
     tokens: [{"old":"/administrator/courses/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/courses/:id","type":0,"val":"courses","end":""},{"old":"/administrator/courses/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['administrator.courses.update']['types'],
   },
+  'administrator.partners.paginate': {
+    methods: ["GET","HEAD"],
+    pattern: '/administrator/partners',
+    tokens: [{"old":"/administrator/partners","type":0,"val":"administrator","end":""},{"old":"/administrator/partners","type":0,"val":"partners","end":""}],
+    types: placeholder as Registry['administrator.partners.paginate']['types'],
+  },
+  'administrator.partners.create': {
+    methods: ["POST"],
+    pattern: '/administrator/partners',
+    tokens: [{"old":"/administrator/partners","type":0,"val":"administrator","end":""},{"old":"/administrator/partners","type":0,"val":"partners","end":""}],
+    types: placeholder as Registry['administrator.partners.create']['types'],
+  },
+  'administrator.partners.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/administrator/partners/:id',
+    tokens: [{"old":"/administrator/partners/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/partners/:id","type":0,"val":"partners","end":""},{"old":"/administrator/partners/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['administrator.partners.show']['types'],
+  },
+  'administrator.partners.update': {
+    methods: ["PUT"],
+    pattern: '/administrator/partners/:id',
+    tokens: [{"old":"/administrator/partners/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/partners/:id","type":0,"val":"partners","end":""},{"old":"/administrator/partners/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['administrator.partners.update']['types'],
+  },
   'administrator.classes.paginate': {
     methods: ["GET","HEAD"],
     pattern: '/administrator/classes',
@@ -275,6 +305,24 @@ const routes = {
     pattern: '/administrator/courses/:id',
     tokens: [{"old":"/administrator/courses/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/courses/:id","type":0,"val":"courses","end":""},{"old":"/administrator/courses/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['administrator.lifecycle.courses.purge']['types'],
+  },
+  'administrator.lifecycle.partners.archive': {
+    methods: ["PATCH"],
+    pattern: '/administrator/partners/:id/archive',
+    tokens: [{"old":"/administrator/partners/:id/archive","type":0,"val":"administrator","end":""},{"old":"/administrator/partners/:id/archive","type":0,"val":"partners","end":""},{"old":"/administrator/partners/:id/archive","type":1,"val":"id","end":""},{"old":"/administrator/partners/:id/archive","type":0,"val":"archive","end":""}],
+    types: placeholder as Registry['administrator.lifecycle.partners.archive']['types'],
+  },
+  'administrator.lifecycle.partners.unarchive': {
+    methods: ["PATCH"],
+    pattern: '/administrator/partners/:id/unarchive',
+    tokens: [{"old":"/administrator/partners/:id/unarchive","type":0,"val":"administrator","end":""},{"old":"/administrator/partners/:id/unarchive","type":0,"val":"partners","end":""},{"old":"/administrator/partners/:id/unarchive","type":1,"val":"id","end":""},{"old":"/administrator/partners/:id/unarchive","type":0,"val":"unarchive","end":""}],
+    types: placeholder as Registry['administrator.lifecycle.partners.unarchive']['types'],
+  },
+  'administrator.lifecycle.partners.purge': {
+    methods: ["DELETE"],
+    pattern: '/administrator/partners/:id',
+    tokens: [{"old":"/administrator/partners/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/partners/:id","type":0,"val":"partners","end":""},{"old":"/administrator/partners/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['administrator.lifecycle.partners.purge']['types'],
   },
   'administrator.lifecycle.classes.archive': {
     methods: ["PATCH"],

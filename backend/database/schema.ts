@@ -242,6 +242,31 @@ export class GuardianshipSchema extends BaseModel {
   declare studentId: string
 }
 
+export class PartnerSchema extends BaseModel {
+  static $columns = ['createdAt', 'deletedAt', 'id', 'logoId', 'name', 'position', 'role', 'status', 'updatedAt', 'url'] as const
+  $columns = PartnerSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime()
+  declare deletedAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare logoId: string | null
+  @column()
+  declare name: string
+  @column()
+  declare position: number
+  @column()
+  declare role: string
+  @column()
+  declare status: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare url: string | null
+}
+
 export class RateLimitSchema extends BaseModel {
   static $columns = ['expire', 'key', 'points'] as const
   $columns = RateLimitSchema.$columns

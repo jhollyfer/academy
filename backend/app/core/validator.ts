@@ -240,6 +240,7 @@ export function sortFields<const TColumns extends readonly [string, ...string[]]
 export const COURSE_SORT_COLUMNS = ['name', 'position', 'createdAt'] as const
 export const CLASS_SORT_COLUMNS = ['name', 'startsAt', 'capacity', 'status', 'createdAt'] as const
 export const ENROLLMENT_SORT_COLUMNS = ['studentName', 'status', 'createdAt'] as const
+export const PARTNER_SORT_COLUMNS = ['name', 'position', 'createdAt'] as const
 /**
  * `position` é a ordem na grade e no FAQ - o que a tela mostra. Não há por que
  * ordenar por título: a sequência dos sábados é o conteúdo.
@@ -414,6 +415,58 @@ export type AdministratorCourseCreatePayload = Infer<typeof AdministratorCourseC
 export type AdministratorCourseUpdatePayload = Infer<typeof AdministratorCourseUpdateValidator>
 export type AdministratorCoursePaginationPayload = Infer<
   typeof AdministratorCoursePaginationValidator
+>
+
+// ---------------------------------------------------------------------------
+// administrator/partners
+// ---------------------------------------------------------------------------
+
+/**
+ * Uma instituição parceira. Sem `slug`: parceiro não tem página própria, e a
+ * identidade é o `name` - é ele que a criação usa para decidir entre ressuscitar
+ * uma linha arquivada e recusar uma duplicata viva.
+ *
+ * `role` é obrigatório e é o campo que faz a seção valer alguma coisa: uma
+ * grade de logos sem papel declarado não prova nada. Com dois parceiros, a
+ * explicação de cada um é o que separa parceria de decoração.
+ */
+export const AdministratorPartnerCreateValidator = vine.create({
+  name: vine.string().trim().minLength(2).maxLength(160),
+  role: vine.string().trim().minLength(4).maxLength(200),
+  // Opcional porque escola pública de cidade pequena muitas vezes não tem site,
+  // e um card sem link é melhor que um link morto.
+  url: vine.string().trim().url().maxLength(300).nullable().optional(),
+  logoId: vine.string().uuid().nullable().optional(),
+  position: vine.number().min(0).max(999).optional(),
+  status: activeStatus().optional(),
+})
+
+/**
+ * O mesmo conjunto, todo opcional: o `PUT` é merge parcial - campo ausente não é
+ * tocado, `null` explícito limpa.
+ *
+ * Declarado por extenso e não derivado do de criação, como em toda a referência.
+ */
+export const AdministratorPartnerUpdateValidator = vine.create({
+  name: vine.string().trim().minLength(2).maxLength(160).optional(),
+  role: vine.string().trim().minLength(4).maxLength(200).optional(),
+  url: vine.string().trim().url().maxLength(300).nullable().optional(),
+  logoId: vine.string().uuid().nullable().optional(),
+  position: vine.number().min(0).max(999).optional(),
+  status: activeStatus().optional(),
+})
+
+export const AdministratorPartnerPaginationValidator = vine.create({
+  ...paginationFields(),
+  ...trashedField(),
+  ...sortFields(PARTNER_SORT_COLUMNS),
+  status: activeStatus().optional(),
+})
+
+export type AdministratorPartnerCreatePayload = Infer<typeof AdministratorPartnerCreateValidator>
+export type AdministratorPartnerUpdatePayload = Infer<typeof AdministratorPartnerUpdateValidator>
+export type AdministratorPartnerPaginationPayload = Infer<
+  typeof AdministratorPartnerPaginationValidator
 >
 
 // ---------------------------------------------------------------------------

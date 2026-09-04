@@ -29,6 +29,10 @@
       "description": "A matrícula virtual, sem autenticação - quem se inscreve não tem conta e não vai ter. A criação devolve um `protocol`, e é só por ele que o candidato acompanha o próprio pedido depois. Turma lotada não recusa a inscrição: ela entra como `WAITLIST`."
     },
     {
+      "name": "Site · Parceiros",
+      "description": "As instituições que sustentam a escola, como a home as mostra. Leitura pública, só o que está no ar."
+    },
+    {
       "name": "Arquivos",
       "description": "Upload presigned multipart: o binário vai do navegador direto ao bucket e nunca atravessa esta API. `POST /storages` abre a sessão de upload, `/parts` assina as partes, `/complete` fecha. Só arquivo `UPLOADED` pode ser anexado a uma matrícula."
     },
@@ -39,6 +43,10 @@
     {
       "name": "Painel · Cursos",
       "description": "O curso e o que pende dele - a grade dos sábados e o FAQ. Arquivar tira da vitrine e da lixeira; apagar só aceita o que já está arquivado, e recusa curso com turma."
+    },
+    {
+      "name": "Painel · Parceiros",
+      "description": "O cadastro das instituições parceiras: quem são, o que fazem pela escola e em que ordem aparecem na vitrine."
     },
     {
       "name": "Painel · Turmas",
@@ -2355,6 +2363,693 @@
           }
         },
         "description": "Tira da lixeira. Responde 204 sem corpo. Se a turma tiver lotado enquanto isso, a matrícula volta como `WAITLIST` em vez de estourar a capacidade.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/administrator/partners": {
+      "get": {
+        "operationId": "administratorPartnersPaginate",
+        "summary": "Listar parceiros",
+        "tags": [
+          "Painel · Parceiros"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMeta"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AdministratorPartnersPaginateItem"
+                      }
+                    }
+                  },
+                  "required": [
+                    "meta",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: OWNER, ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500PartnerListError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Os parceiros da escola, na ordem em que a vitrine os mostra. Aceita `?trashed` para alcançar a lixeira e `?status` para separar o que está no ar do que saiu.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "trashed",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "only",
+                "with"
+              ]
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "name",
+                "position",
+                "createdAt"
+              ]
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ACTIVE",
+                "INACTIVE"
+              ]
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "administratorPartnersCreate",
+        "summary": "Criar parceiro",
+        "tags": [
+          "Painel · Parceiros"
+        ],
+        "responses": {
+          "201": {
+            "description": "Recurso criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdministratorPartnersCreateResponse201"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: OWNER, ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Parceiro já existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error409PartnerAlreadyExists"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500PartnerCreateError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Devolve 201 com o parceiro criado, objeto nu e sem envelope. O `name` é único: cadastrar de novo um parceiro arquivado reativa a linha existente em vez de duplicá-la.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdministratorPartnersCreateBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/administrator/partners/{id}": {
+      "get": {
+        "operationId": "administratorPartnersShow",
+        "summary": "Detalhar parceiro",
+        "tags": [
+          "Painel · Parceiros"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdministratorPartnersShowResponse200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: OWNER, ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Parceiro não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404PartnerNotFound"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500PartnerShowError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Devolve o objeto nu, sem envelope, com a logomarca aninhada. Parceiro arquivado não é encontrado aqui - para alcançá-lo, liste com `?trashed`.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "put": {
+        "operationId": "administratorPartnersUpdate",
+        "summary": "Atualizar parceiro",
+        "tags": [
+          "Painel · Parceiros"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdministratorPartnersUpdateResponse200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: OWNER, ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Parceiro não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404PartnerNotFound"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Parceiro já existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error409PartnerAlreadyExists"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500PartnerUpdateError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Merge parcial: campo ausente não é tocado, `null` explícito limpa. Reenviar o `name` que já está gravado não conta como troca e não dispara conflito.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdministratorPartnersUpdateBody"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "administratorLifecyclePartnersPurge",
+        "summary": "Apagar parceiro",
+        "tags": [
+          "Painel · Parceiros"
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucesso, sem corpo"
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: OWNER.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Parceiro não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404PartnerNotFound"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Parceiro não está arquivado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error409PartnerNotArchived"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500PartnerDeleteError"
+                }
+              }
+            }
+          }
+        },
+        "description": "**Irreversível**: apaga a linha do banco. Só aceita parceiro já arquivado. A logomarca não vai junto - o arquivo é neutro e continua em `/storages`, livre para ser apagado de lá. Privilégio exclusivo do dono.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/administrator/partners/{id}/archive": {
+      "patch": {
+        "operationId": "administratorLifecyclePartnersArchive",
+        "summary": "Arquivar parceiro",
+        "tags": [
+          "Painel · Parceiros"
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucesso, sem corpo"
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: OWNER, ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Parceiro não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404PartnerNotFound"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500PartnerArchiveError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Envia para a lixeira. Reversível por `PATCH /:id/unarchive`. Responde 204 sem corpo. Parceiro já arquivado é 404 aqui, pelo mesmo filtro que toda leitura aplica.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/administrator/partners/{id}/unarchive": {
+      "patch": {
+        "operationId": "administratorLifecyclePartnersUnarchive",
+        "summary": "Restaurar parceiro",
+        "tags": [
+          "Painel · Parceiros"
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucesso, sem corpo"
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: OWNER, ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Parceiro não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404PartnerNotFound"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500PartnerUnarchiveError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Tira da lixeira. Responde 204 sem corpo. Parceiro vivo é 404 aqui, pelo espelho exato da razão que faz parceiro arquivado ser 404 em `archive`.",
         "security": [
           {
             "cookieAuth": []
@@ -4749,6 +5444,93 @@
           }
         },
         "description": "As perguntas frequentes da escola, as que valem para a home. Sem sessão.\n\nSó as de `courseId` nulo: pergunta de um curso sai junto do curso, em `GET /storefront/courses/:slug`.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        ]
+      }
+    },
+    "/storefront/partners": {
+      "get": {
+        "operationId": "storefrontPartners",
+        "summary": "Listar parceiros",
+        "tags": [
+          "Site · Parceiros"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMeta"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/StorefrontPartnersItem"
+                      }
+                    }
+                  },
+                  "required": [
+                    "meta",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500PartnerListError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Os parceiros como o visitante os vê, sem sessão. Só parceiro `ACTIVE` e não removido, na ordem que a escola definiu para a faixa da home.\n\nSem `?trashed` e sem `?status`, pela mesma razão da vitrine de cursos: o site não tem lixeira nem enxerga rascunho, e aceitar o parâmetro para ignorá-lo prometeria no OpenAPI um filtro que não existe.",
         "parameters": [
           {
             "name": "page",
@@ -9687,6 +10469,679 @@
           "updatedAt"
         ]
       },
+      "AdministratorPartnersCreateBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 160
+          },
+          "role": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 200
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri",
+            "maxLength": 300
+          },
+          "logoId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "position": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 999
+          },
+          "status": {
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "role"
+        ],
+        "additionalProperties": false
+      },
+      "AdministratorPartnersCreateResponse201": {
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "logoId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "position": {
+            "type": "number"
+          },
+          "role": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "logo": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "mimetype": {
+                "type": "string"
+              },
+              "originalName": {
+                "type": "string"
+              },
+              "partSize": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "path": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "UPLOADED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "uploadId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "createdAt",
+              "deletedAt",
+              "filename",
+              "id",
+              "mimetype",
+              "originalName",
+              "partSize",
+              "path",
+              "size",
+              "status",
+              "updatedAt",
+              "uploadId"
+            ]
+          }
+        },
+        "required": [
+          "createdAt",
+          "deletedAt",
+          "id",
+          "logoId",
+          "name",
+          "position",
+          "role",
+          "status",
+          "updatedAt",
+          "url"
+        ]
+      },
+      "AdministratorPartnersPaginateItem": {
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "logoId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "position": {
+            "type": "number"
+          },
+          "role": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "logo": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "mimetype": {
+                "type": "string"
+              },
+              "originalName": {
+                "type": "string"
+              },
+              "partSize": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "path": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "UPLOADED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "uploadId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "createdAt",
+              "deletedAt",
+              "filename",
+              "id",
+              "mimetype",
+              "originalName",
+              "partSize",
+              "path",
+              "size",
+              "status",
+              "updatedAt",
+              "uploadId"
+            ]
+          }
+        },
+        "required": [
+          "createdAt",
+          "deletedAt",
+          "id",
+          "logoId",
+          "name",
+          "position",
+          "role",
+          "status",
+          "updatedAt",
+          "url"
+        ]
+      },
+      "AdministratorPartnersShowResponse200": {
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "logoId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "position": {
+            "type": "number"
+          },
+          "role": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "logo": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "mimetype": {
+                "type": "string"
+              },
+              "originalName": {
+                "type": "string"
+              },
+              "partSize": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "path": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "UPLOADED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "uploadId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "createdAt",
+              "deletedAt",
+              "filename",
+              "id",
+              "mimetype",
+              "originalName",
+              "partSize",
+              "path",
+              "size",
+              "status",
+              "updatedAt",
+              "uploadId"
+            ]
+          }
+        },
+        "required": [
+          "createdAt",
+          "deletedAt",
+          "id",
+          "logoId",
+          "name",
+          "position",
+          "role",
+          "status",
+          "updatedAt",
+          "url"
+        ]
+      },
+      "AdministratorPartnersUpdateBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 160
+          },
+          "role": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 200
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri",
+            "maxLength": 300
+          },
+          "logoId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "position": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 999
+          },
+          "status": {
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "AdministratorPartnersUpdateResponse200": {
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "logoId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "position": {
+            "type": "number"
+          },
+          "role": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "logo": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "mimetype": {
+                "type": "string"
+              },
+              "originalName": {
+                "type": "string"
+              },
+              "partSize": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "path": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "UPLOADED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "uploadId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "createdAt",
+              "deletedAt",
+              "filename",
+              "id",
+              "mimetype",
+              "originalName",
+              "partSize",
+              "path",
+              "size",
+              "status",
+              "updatedAt",
+              "uploadId"
+            ]
+          }
+        },
+        "required": [
+          "createdAt",
+          "deletedAt",
+          "id",
+          "logoId",
+          "name",
+          "position",
+          "role",
+          "status",
+          "updatedAt",
+          "url"
+        ]
+      },
       "AdministratorUsersCreateBody": {
         "type": "object",
         "properties": {
@@ -13161,6 +14616,40 @@
           "code"
         ]
       },
+      "Error404PartnerNotFound": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              404
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "PARTNER_NOT_FOUND"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error404StorageNotFound": {
         "type": "object",
         "properties": {
@@ -13454,6 +14943,74 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "ENROLLMENT_NOT_ARCHIVED"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error409PartnerAlreadyExists": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              409
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "PARTNER_ALREADY_EXISTS"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error409PartnerNotArchived": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              409
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "PARTNER_NOT_ARCHIVED"
             ]
           },
           "errors": {
@@ -14866,6 +16423,244 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "INVITE_SHOW_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500PartnerArchiveError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "PARTNER_ARCHIVE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500PartnerCreateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "PARTNER_CREATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500PartnerDeleteError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "PARTNER_DELETE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500PartnerListError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "PARTNER_LIST_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500PartnerShowError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "PARTNER_SHOW_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500PartnerUnarchiveError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "PARTNER_UNARCHIVE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500PartnerUpdateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "PARTNER_UPDATE_ERROR"
             ]
           },
           "errors": {
@@ -18435,6 +20230,152 @@
           "answer"
         ],
         "additionalProperties": false
+      },
+      "StorefrontPartnersItem": {
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "logoId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "position": {
+            "type": "number"
+          },
+          "role": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "logo": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "mimetype": {
+                "type": "string"
+              },
+              "originalName": {
+                "type": "string"
+              },
+              "partSize": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "path": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "UPLOADED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "uploadId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "createdAt",
+              "deletedAt",
+              "filename",
+              "id",
+              "mimetype",
+              "originalName",
+              "partSize",
+              "path",
+              "size",
+              "status",
+              "updatedAt",
+              "uploadId"
+            ]
+          }
+        },
+        "required": [
+          "createdAt",
+          "deletedAt",
+          "id",
+          "logoId",
+          "name",
+          "position",
+          "role",
+          "status",
+          "updatedAt",
+          "url"
+        ]
       }
     }
   }
