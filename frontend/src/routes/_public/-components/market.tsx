@@ -28,6 +28,19 @@ import { cn } from '#/lib/utils'
  * A fonte e o ano ficam colados no bloco, com o tamanho da amostra e a ressalva
  * de amostragem por conveniência. Número sem fonte numa página de escola é o
  * mesmo que número inventado.
+ *
+ * **A seção já foi lida como promessa, e por isso a forma importa tanto quanto
+ * o texto.** Um teste de aceitação apontou que ela podia configurar publicidade
+ * enganosa, e o defeito não estava em nenhuma frase isolada - estava no arranjo:
+ * a cifra vinha em tamanho de manchete, antes do cargo a que pertencia; a
+ * ressalva de metodologia ficava dois parágrafos abaixo, depois de a impressão
+ * já estar formada; e um parágrafo punha o preço da inscrição ao lado da média
+ * do júnior, que se lê como conta mesmo sem prometer nada.
+ *
+ * Três correções, então: o cargo antes do valor e o valor em corpo de texto, a
+ * ressalva logo abaixo dos cartões, e o parágrafo do preço sem a comparação.
+ * O dado continua na página inteiro - o que saiu foi o destaque que o
+ * transformava em oferta.
  */
 type Card = {
   valor: number
@@ -110,16 +123,46 @@ export function Market(): React.JSX.Element {
                 )}
                 style={{ animationDelay: `${index * STAGGER}ms` }}
               >
-                <dd className="brand-title text-display-md text-neon">
-                  {formatMoney(card.valor)}
-                </dd>
-                <dt className="mt-3 text-heading-sm font-semibold text-white">
+                {/*
+                  O nome do cargo primeiro, e o valor depois - na ordem que
+                  `dl` já pedia (`dt` é o termo, `dd` a descrição) e que estava
+                  invertida aqui.
+
+                  A inversão não era só semântica: com o valor em
+                  `text-display-md` no topo, o que a página gritava era a cifra,
+                  e o cargo a que ela pertence chegava depois, menor. Um leitor
+                  que passasse os olhos levava o número sem levar o "de quem" -
+                  e foi assim que a seção acabou lida como promessa de salário.
+                */}
+                <dt className="text-heading-sm font-semibold text-white">
                   {card.titulo}
                 </dt>
+                <dd className="brand-title mt-2 text-heading-md text-neon">
+                  {formatMoney(card.valor)}
+                  <span className="ml-1 text-body-sm font-normal text-white/55">
+                    por mês
+                  </span>
+                </dd>
                 <p className="mt-2 text-body-sm text-white/65">{card.nota}</p>
               </div>
             ))}
           </dl>
+
+          {/*
+            A ressalva sobe para junto dos cartões.
+
+            Ela ficava no fim da seção, dois parágrafos abaixo - e o teste de
+            aceitação leu os números sem nunca chegar nela. Ressalva que só
+            aparece depois de a pessoa ter formado a impressão não é ressalva, é
+            rodapé.
+          */}
+          <p className="mt-6 max-w-[62ch] text-body-sm text-white/55">
+            Fonte: Pesquisa Salarial de Programadores 2026, Código Fonte TV.
+            17.046 respondentes, coleta de fevereiro a junho de 2026. A
+            amostragem é por conveniência, então os números são um panorama do
+            mercado e não um censo. As médias são nacionais e puxadas por
+            Sudeste e Sul.
+          </p>
 
           {inscricao !== null && (
             <p
@@ -128,12 +171,22 @@ export function Market(): React.JSX.Element {
                 'delay-300 mt-10 max-w-[62ch] text-body-md text-white sm:text-body-lg',
               )}
             >
+              {/*
+                O preço fica; a comparação sai.
+
+                A frase punha o valor da inscrição ao lado da média do júnior,
+                e duas cifras lado a lado se leem como uma conta - "pago isto,
+                ganho aquilo" -, ainda que nenhuma palavra prometesse nada. O
+                que a escola pode afirmar é o que ela cobra e o que ela faz;
+                quanto alguém vai ganhar não é dela para dizer.
+              */}
               A inscrição na Maiyu custa{' '}
               <strong className="font-semibold text-neon">
                 {formatMoney(inscricao)}
               </strong>
-              . A média de quem já está dentro dessa carreira, no primeiro
-              degrau, é {formatMoney(CARDS[0].valor)} por mês.
+              . Os números acima são do mercado, não uma promessa da escola:
+              quanto cada pessoa ganha depende da empresa, da região e do
+              momento em que ela procura o primeiro emprego.
             </p>
           )}
 
@@ -152,14 +205,6 @@ export function Market(): React.JSX.Element {
           >
             Entre os 12 estados com mais respostas na pesquisa, nenhum é do
             Norte. Não falta talento na região. Falta porta de entrada.
-          </p>
-
-          <p className="mt-10 max-w-[62ch] text-body-sm text-white/55">
-            Fonte: Pesquisa Salarial de Programadores 2026, Código Fonte TV.
-            17.046 respondentes, coleta de fevereiro a junho de 2026. A
-            amostragem é por conveniência, então os números são um panorama do
-            mercado e não um censo. As médias são nacionais e puxadas por
-            Sudeste e Sul.
           </p>
         </div>
       </div>
