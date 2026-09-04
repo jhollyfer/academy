@@ -10,6 +10,7 @@ import type {
   CourseResponse,
   EnrollmentResponse,
   ManagedUserResponse,
+  PartnerResponse,
   StorageResponse,
   StorefrontEnrollmentResponse,
 } from '../response'
@@ -20,6 +21,8 @@ import type {
   AdministratorCourseCreatePayload,
   AdministratorCourseUpdatePayload,
   AdministratorEnrollmentUpdatePayload,
+  AdministratorPartnerCreatePayload,
+  AdministratorPartnerUpdatePayload,
   AdministratorUserCreatePayload,
   AdministratorUserUpdatePayload,
   AuthenticationInviteAcceptPayload,
@@ -216,6 +219,82 @@ export function useCourseUpdate(
       return request<CourseResponse>('/administrator/courses/'.concat(id), {
         method: 'PUT',
         body: JSON.stringify(payload),
+      })
+    },
+  })
+}
+
+// ---------------------------------------------------------------------------
+// administrator/partners
+// ---------------------------------------------------------------------------
+
+export function usePartnerCreate(
+  options?: MutationProps<PartnerResponse, AdministratorPartnerCreatePayload>,
+) {
+  return useMutation<
+    PartnerResponse,
+    HTTPError,
+    AdministratorPartnerCreatePayload
+  >({
+    ...options,
+    mutationFn: function (payload) {
+      return request<PartnerResponse>('/administrator/partners', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      })
+    },
+  })
+}
+
+export function usePartnerUpdate(
+  id: string,
+  options?: MutationProps<PartnerResponse, AdministratorPartnerUpdatePayload>,
+) {
+  return useMutation<
+    PartnerResponse,
+    HTTPError,
+    AdministratorPartnerUpdatePayload
+  >({
+    ...options,
+    mutationFn: function (payload) {
+      return request<PartnerResponse>('/administrator/partners/'.concat(id), {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      })
+    },
+  })
+}
+
+export function usePartnerArchive(options?: MutationProps<void, string>) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return request<void>('/administrator/partners/'.concat(id, '/archive'), {
+        method: 'PATCH',
+      })
+    },
+  })
+}
+
+export function usePartnerUnarchive(options?: MutationProps<void, string>) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return request<void>(
+        '/administrator/partners/'.concat(id, '/unarchive'),
+        { method: 'PATCH' },
+      )
+    },
+  })
+}
+
+/** Irreversível, e só o dono alcança - a API responde 403 para o resto. */
+export function usePartnerDelete(options?: MutationProps<void, string>) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return request<void>('/administrator/partners/'.concat(id), {
+        method: 'DELETE',
       })
     },
   })

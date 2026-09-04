@@ -477,6 +477,41 @@ export type AdministratorCoursePaginationPayload = Infer<
 >
 
 // ---------------------------------------------------------------------------
+// administrator/partners
+// ---------------------------------------------------------------------------
+
+/**
+ * Uma instituição parceira. Espelha `backend/app/core/validator.ts` - os dois
+ * têm de sair iguais, senão o formulário aceita o que a API recusa.
+ *
+ * Sem `slug`: parceiro não tem página própria, e a identidade é o `name`.
+ */
+export const AdministratorPartnerCreateValidator = vine.create({
+  name: vine.string().trim().minLength(2).maxLength(160),
+  role: vine.string().trim().minLength(4).maxLength(200),
+  url: vine.string().trim().url().maxLength(300).nullable().optional(),
+  logoId: vine.string().uuid().nullable().optional(),
+  position: vine.number().min(0).max(999).optional(),
+  status: activeStatus().optional(),
+})
+
+export const AdministratorPartnerUpdateValidator = vine.create({
+  name: vine.string().trim().minLength(2).maxLength(160).optional(),
+  role: vine.string().trim().minLength(4).maxLength(200).optional(),
+  url: vine.string().trim().url().maxLength(300).nullable().optional(),
+  logoId: vine.string().uuid().nullable().optional(),
+  position: vine.number().min(0).max(999).optional(),
+  status: activeStatus().optional(),
+})
+
+export type AdministratorPartnerCreatePayload = Infer<
+  typeof AdministratorPartnerCreateValidator
+>
+export type AdministratorPartnerUpdatePayload = Infer<
+  typeof AdministratorPartnerUpdateValidator
+>
+
+// ---------------------------------------------------------------------------
 // authentication
 // ---------------------------------------------------------------------------
 

@@ -10,6 +10,7 @@ import {
   BookOpenIcon,
   CheckerboardIcon,
   GraduationCapIcon,
+  HandshakeIcon,
   SignOutIcon,
   UserGearIcon,
   UsersThreeIcon,
@@ -65,6 +66,7 @@ const STAFF_NAVIGATION = linkOptions([
     label: 'Matrículas',
     icon: UsersThreeIcon,
   },
+  { to: '/administrator/partners', label: 'Parceiros', icon: HandshakeIcon },
   { to: '/administrator/users', label: 'Usuários', icon: UserGearIcon },
 ])
 

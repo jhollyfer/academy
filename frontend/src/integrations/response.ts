@@ -173,6 +173,27 @@ export type ClassResponse = {
   deletedAt: string | null
 }
 
+/**
+ * Uma instituição parceira, como o painel e a vitrine a recebem.
+ *
+ * `role` é o que a instituição faz pela escola, e não o papel de quem entra no
+ * painel - a coincidência de nome com `UserResponse.role` é do campo, não do
+ * conceito.
+ */
+export type PartnerResponse = {
+  id: string
+  name: string
+  role: string
+  url: string | null
+  logoId: string | null
+  logo?: StorageResponse | null
+  position: number
+  status: ActiveStatus
+  createdAt: string
+  updatedAt: string | null
+  deletedAt: string | null
+}
+
 export type CourseResponse = {
   id: string
   slug: string

@@ -8,6 +8,7 @@ import type {
   CourseResponse,
   EnrollmentResponse,
   ManagedUserResponse,
+  PartnerResponse,
   StorefrontEnrollmentResponse,
   Paginated,
 } from '../response'
@@ -63,6 +64,8 @@ export type CourseListSearch = Merge<
   { status?: string; accent?: string }
 >
 
+export type PartnerListSearch = Merge<ListSearch, { status?: string }>
+
 export type ClassListSearch = Merge<
   ListSearch,
   { courseId?: string; status?: string }
@@ -112,6 +115,30 @@ export const courseQueryOptions = (id: string) =>
     queryKey: queryKeys.courses.detail(id),
     queryFn: ({ signal }) =>
       request<CourseResponse>('/administrator/courses/'.concat(id), { signal }),
+  })
+
+// ---------------------------------------------------------------------------
+// administrator/partners
+// ---------------------------------------------------------------------------
+
+export const partnersQueryOptions = (params: PartnerListSearch) =>
+  queryOptions({
+    queryKey: queryKeys.partners.list(params),
+    queryFn: ({ signal }) =>
+      request<Paginated<PartnerResponse>>(
+        '/administrator/partners'.concat(search(params)),
+        { signal },
+      ),
+    placeholderData: keepPreviousData,
+  })
+
+export const partnerQueryOptions = (id: string) =>
+  queryOptions({
+    queryKey: queryKeys.partners.detail(id),
+    queryFn: ({ signal }) =>
+      request<PartnerResponse>('/administrator/partners/'.concat(id), {
+        signal,
+      }),
   })
 
 // ---------------------------------------------------------------------------
@@ -228,6 +255,19 @@ export const storefrontFaqsQueryOptions = () =>
     queryKey: queryKeys.storefront.faqs(),
     queryFn: ({ signal }) =>
       request<Paginated<CourseFaqResponse>>('/storefront/faqs', { signal }),
+  })
+
+/**
+ * Os parceiros que a home mostra.
+ *
+ * Sem `retry: false`: ao contrário do protocolo de matrícula, aqui a lista
+ * vazia é resposta legítima e o erro é de rede - repetir é o certo.
+ */
+export const storefrontPartnersQueryOptions = () =>
+  queryOptions({
+    queryKey: queryKeys.storefront.partners(),
+    queryFn: ({ signal }) =>
+      request<Paginated<PartnerResponse>>('/storefront/partners', { signal }),
   })
 
 export const storefrontCourseQueryOptions = (slug: string) =>

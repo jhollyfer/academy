@@ -54,6 +54,12 @@ export const queryKeys = {
     detail: (id: string) => ['courses', 'detail', id] as const,
   },
 
+  partners: {
+    all: ['partners'] as const,
+    list: (params: ListSearch) => ['partners', 'list', params] as const,
+    detail: (id: string) => ['partners', 'detail', id] as const,
+  },
+
   classes: {
     all: ['classes'] as const,
     list: (params: ListSearch) => ['classes', 'list', params] as const,
@@ -84,6 +90,11 @@ export const queryKeys = {
      * tem por que invalidar as perguntas gerais.
      */
     faqs: () => ['storefront', 'faqs'] as const,
+    /**
+     * Os parceiros, pelo mesmo motivo dos cursos: o painel enxerga rascunho e
+     * lixeira, o site só o que está no ar.
+     */
+    partners: () => ['storefront', 'partners'] as const,
     /**
      * O acompanhamento por protocolo. Não é `enrollments.detail`: a chave lá é
      * o `id`, que o candidato não tem - e o corpo é outro, sem as anotações da

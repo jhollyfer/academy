@@ -125,6 +125,13 @@ export const FIELD_LABELS = {
   question: 'a pergunta',
   answer: 'a resposta',
 
+  // ── Parceiro ───────────────────────────────────────────────────────
+  // `name`, `role`, `position` e `status` já estão acima: o mapa é por nome de
+  // campo, e os rótulos genéricos servem aos dois recursos sem mentir em
+  // nenhum.
+  url: 'o site',
+  logoId: 'a logomarca',
+
   // ── Turma ──────────────────────────────────────────────────────────
   courseId: 'o curso',
   classId: 'a turma',
