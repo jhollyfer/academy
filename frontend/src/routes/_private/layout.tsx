@@ -25,6 +25,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '#/components/ui/sidebar'
+import { useCompactViewport } from '#/hooks/use-compact-viewport'
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
 import { buildBreadcrumbs } from '#/lib/breadcrumbs'
 
@@ -72,11 +73,40 @@ export const Route = createFileRoute('/_private')({
 const MAIN_ID = 'conteudo'
 
 function RouteComponent(): React.JSX.Element {
+  const compact = useCompactViewport()
+
+  const [open, setOpen] = React.useState(true)
+  const [wasCompact, setWasCompact] = React.useState(compact)
+
+  /*
+   * A sidebar acompanha a largura da janela, e só quando ela cruza o limite.
+   *
+   * Entre 768px e 1280px ela não respondia a nada: larga demais para virar
+   * gaveta, aberta demais para a tabela caber ao lado. É a faixa dos notebooks,
+   * e era o que o teste de aceitação via.
+   *
+   * Sincronizar no render e não num `useEffect`: com o React Compiler ligado o
+   * efeito seria uma renderização a mais, e é o mesmo padrão que o `DatePicker`
+   * usa para acompanhar valor que vem de fora.
+   *
+   * Reage à **transição**, e não ao estado: depois de cruzar o limite, quem
+   * abrir a sidebar pelo botão continua com ela aberta. Forçar a cada render
+   * transformaria o `SidebarTrigger` num botão que não faz nada.
+   */
+  if (compact !== wasCompact) {
+    setWasCompact(compact)
+    setOpen(!compact)
+  }
+
   return (
     // `h-svh` sobre o `min-h-svh` do componente: com altura mínima o container
     // cresce junto com o conteúdo, e uma altura que cresce não limita ninguém.
     // Altura fixa dá o teto, e quem rola passa a ser a área interna.
-    <SidebarProvider className="h-svh overflow-hidden">
+    <SidebarProvider
+      open={open}
+      onOpenChange={setOpen}
+      className="h-svh overflow-hidden"
+    >
       {/*
         `sr-only` com `focus:not-sr-only`, e não `display: none`: escondido de
         verdade o link não receberia foco e deixaria de existir para quem ele
