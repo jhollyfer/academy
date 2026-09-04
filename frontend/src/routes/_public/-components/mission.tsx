@@ -24,19 +24,25 @@ import { cn } from '#/lib/utils'
  * inteira já sustenta: a base e o projeto.
  *
  * "Sem distinção de raça, cor ou etnia" está escrito, e não subentendido: numa
- * região onde a maior parte dos jovens é indígena, o silêncio não é neutro.
+ * região onde a maior parte dos jovens é ribeirinha ou indígena, o silêncio não
+ * é neutro.
  *
- * Mas está escrito como compromisso da escola, e não como lista de grupos. A
- * primeira versão dizia "jovens indígenas e não indígenas", e ela nomeava uma
- * divisão para logo depois negá-la - quem lê fica com a divisão. Uma escola que
- * é de todo mundo daqui não precisa dividir todo mundo em dois para dizer isso.
+ * E os povos são nomeados junto do compromisso. O que continua fora é a forma
+ * que a primeira versão usava - "jovens indígenas e não indígenas" -, porque
+ * ela opõe dois blocos e deixa a divisão na cabeça de quem lê. Uma lista que
+ * soma - ribeirinha, indígena e cabocla - faz o contrário: nomeia sem separar.
+ *
+ * Nomear importa aqui. Numa região onde a maior parte da juventude é ribeirinha
+ * ou indígena, uma escola que só diz "para todos" deixa cada um decidir sozinho
+ * se o "todos" o inclui - e quem já foi deixado de fora muitas vezes decide que
+ * não.
  */
 const PILLARS = [
   {
     icon: UsersThree,
     title: 'Talento daqui, sem filtro',
     description:
-      'A escola é da juventude do Alto Solimões, sem distinção de raça, cor ou etnia. O talento já está na região; o que faltava era a porta.',
+      'A escola é da juventude ribeirinha, indígena e cabocla do Alto Solimões, sem distinção de raça, cor ou etnia. O talento já está na comunidade amazônica; o que faltava era a porta.',
   },
   {
     icon: Path,
@@ -81,9 +87,9 @@ export function Mission(): React.JSX.Element {
               'delay-100 mt-6 max-w-[64ch] text-body-md text-muted-foreground sm:text-body-lg',
             )}
           >
-            A Maiyu nasce para ser a primeira escola de tecnologia do Alto
-            Solimões, para que morar aqui deixe de ser o motivo pelo qual alguém
-            não entra nessa área.
+            A Maiyu é a primeira escola totalmente especializada em tecnologia
+            do Alto Solimões, e existe para que morar na Amazônia deixe de ser o
+            motivo pelo qual alguém não entra nessa área.
           </p>
 
           <div className="mt-12 grid gap-4 lg:grid-cols-3">

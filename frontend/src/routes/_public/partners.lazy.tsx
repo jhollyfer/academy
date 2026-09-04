@@ -69,7 +69,7 @@ function RouteComponent(): React.JSX.Element {
               <p>
                 Isso não se faz sozinho. Instituições da região cedem espaço,
                 recebem quem vem se inscrever e abrem porta para a juventude
-                daqui — e é assim que a escola funciona hoje.
+                daqui. É assim que a escola funciona hoje.
               </p>
             </div>
 
@@ -111,7 +111,7 @@ function RouteComponent(): React.JSX.Element {
               </p>
               <p>
                 <strong className="text-foreground">Alcance.</strong> Levar a
-                inscrição até onde a juventude já está — escola, secretaria,
+                inscrição até onde a juventude já está: escola, secretaria,
                 comunidade.
               </p>
               <p>
@@ -119,8 +119,8 @@ function RouteComponent(): React.JSX.Element {
                 material ou custeio de vaga para quem não teria como pagar.
               </p>
               <p>
-                Se a sua instituição pode entrar por um desses caminhos — ou por
-                outro que a gente ainda não pensou —, a conversa começa no
+                Se a sua instituição pode entrar por um desses caminhos, ou por
+                outro que a gente ainda não pensou, a conversa começa no
                 WhatsApp.
               </p>
             </div>

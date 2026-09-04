@@ -470,7 +470,7 @@ function RouteComponent(): React.JSX.Element {
                 )}
               >
                 O kit e os computadores são da escola e ficam nela, para a turma
-                seguinte — é por isso que ninguém precisa comprar equipamento
+                seguinte. É por isso que ninguém precisa comprar equipamento
                 para estudar aqui. O que sai com você é o certificado, o código
                 que você escreveu e saber fazer de novo.
               </p>

@@ -47,13 +47,18 @@ export function absoluteUrl(path: string): string {
 /**
  * A descrição da raiz, herdada por rota que não escreva a sua.
  *
- * Nomeia a cidade de propósito: a busca que traz aluno é local ("curso de
- * robótica Benjamin Constant"), e uma descrição genérica sobre "aprender
- * programação" concorre com o mundo inteiro e não ganha de ninguém.
+ * Nomeia a região e a cidade de propósito: a busca que traz aluno é local
+ * ("curso de robótica Benjamin Constant"), e uma descrição genérica sobre
+ * "aprender programação" concorre com o mundo inteiro e não ganha de ninguém.
+ *
+ * O posicionamento vem antes do que a escola vende, e com as duas qualificações
+ * que o tornam verificável - "do Alto Solimões" e "totalmente especializada".
+ * É o mesmo recorte da pílula do hero, e os dois têm de dizer a mesma coisa: o
+ * cartão de link no WhatsApp é onde a maioria vê a escola pela primeira vez.
  */
 export const SITE_DESCRIPTION =
-  'Escola de tecnologia no Alto Solimões, em Benjamin Constant. Cursos presenciais de robótica ' +
-  'e desenvolvimento web, aos sábados, para a juventude da região.'
+  'A primeira escola totalmente especializada em tecnologia do Alto Solimões, na Amazônia. ' +
+  'Cursos presenciais de robótica e desenvolvimento web, aos sábados, em Benjamin Constant.'
 
 /**
  * O título da raiz, que é o nome mais o posicionamento.
@@ -64,7 +69,7 @@ export const SITE_DESCRIPTION =
  * longo demais para o que o buscador mostra.
  */
 export const SITE_TAGLINE =
-  'Maiyu Academy · Escola de Tecnologia em Benjamin Constant'
+  'Maiyu Academy · A primeira escola de tecnologia do Alto Solimões'
 
 /**
  * O WhatsApp da secretaria, só dígitos com o código do país.

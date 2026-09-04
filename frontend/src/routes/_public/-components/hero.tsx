@@ -119,21 +119,34 @@ export function Hero(): React.JSX.Element {
               De quem é a escola, antes do horário. O hero dizia o que ela
               oferece e quando; não dizia para quem.
 
-              "Toda ela", e não "indígenas e não indígenas": listar os dois
-              grupos nomeia uma divisão para em seguida negá-la, e quem lê fica
-              com a divisão. A frase inclusiva é a que não separa ninguém para
-              depois somar. O compromisso explícito - sem distinção de raça, cor
-              ou etnia - está na seção de missão, onde é afirmação da escola
-              sobre si e não rótulo colado em quem lê.
+              A frase terminava em "para a juventude daqui. Toda ela." - que
+              tentava dizer inclusão sem nomear ninguém, e saía ambígua: "toda
+              ela" lia tanto como a escola quanto como a juventude.
 
-              Sem o superlativo aqui: "a primeira" entra como propósito
-              declarado na seção da escola e na de missão, onde há espaço para
-              a frase inteira. No hero ele viraria alegação seca, e a página
-              não afirma nada que precise defender.
+              Agora os povos são nomeados, e a diferença em relação ao que o
+              comentário antigo evitava está na **forma**. "Indígenas e não
+              indígenas" opõe dois blocos e deixa a divisão na cabeça de quem
+              lê; uma lista aberta que termina em "de toda a comunidade
+              amazônica" soma sem separar, e o travessão final é o que a mantém
+              aberta em vez de exaustiva.
+
+              Nomear importa aqui: numa região onde a maior parte da juventude é
+              ribeirinha ou indígena, uma escola que só diz "para todos" deixa
+              cada um decidir sozinho se o "todos" o inclui.
+
+              Sem o superlativo no hero, e sem selo carregando-o. Ele é
+              afirmado na seção da escola e na de missão, onde entra como frase
+              inteira e com as qualificações que o tornam verificável.
+
+              Um selo com a alegação dentro foi tentado aqui e saiu: rótulo
+              flutuante anunciando o próprio pioneirismo é o gesto que denuncia
+              página montada às pressas, e ele enfraquece justamente a
+              afirmação que queria destacar. Quem é o primeiro escreve isso
+              numa frase; quem precisa provar é que põe num selo.
             */}
             <p className="max-w-[46ch] text-body-md font-medium text-white sm:text-body-lg">
-              Uma escola de tecnologia no Alto Solimões, para a juventude daqui.
-              Toda ela.
+              Uma escola de tecnologia no Alto Solimões, para a juventude
+              ribeirinha, indígena e cabocla, de toda a comunidade amazônica.
             </p>
 
             <p className="mt-3 max-w-[46ch] text-body-md text-white/80 sm:text-body-lg">
